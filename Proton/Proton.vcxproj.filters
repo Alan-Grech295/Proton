@@ -27,9 +27,15 @@
     <ClInclude Include="src\Proton\EntryPoint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Proton\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Log.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,0 +1,3 @@
+[submodule "Proton/vendor/spdlog"]
+	path = Proton/vendor/spdlog
+	url = https://github.com/gabime/spdlog
