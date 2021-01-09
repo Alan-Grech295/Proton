@@ -4,6 +4,9 @@
     <Filter Include="Proton">
       <UniqueIdentifier>{C77AC9CA-B31C-F4A0-9CD7-07F588187BF1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Proton\Events">
+      <UniqueIdentifier>{CB60BE80-3721-3AB7-005C-83346CDB7E93}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Proton.h" />
@@ -15,6 +18,18 @@
     </ClInclude>
     <ClInclude Include="src\Proton\EntryPoint.h">
       <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Events\ApplicationEvent.h">
+      <Filter>Proton\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Events\Event.h">
+      <Filter>Proton\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Events\KeyEvent.h">
+      <Filter>Proton\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Events\MouseEvent.h">
+      <Filter>Proton\Events</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Log.h">
       <Filter>Proton</Filter>
