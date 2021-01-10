@@ -2,9 +2,6 @@
 
 #include "Proton/Core.h"
 
-#include <string>
-#include <functional>
-
 namespace Proton
 {
 	/*Events in Proton are currently blocking, meaning they are processed

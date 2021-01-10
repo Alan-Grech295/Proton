@@ -2,8 +2,6 @@
 
 #include "Event.h"
 
-#include <sstream>
-
 namespace Proton
 {
 	class PROTON_API KeyEvent : public Event

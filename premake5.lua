@@ -18,6 +18,9 @@ project "Proton"
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
 	objdir ("bin-int/" .. outputdir .. "/%{prj.name}")
 
+	pchheader "ptpch.h"
+	pchsource "Proton/src/ptpch.cpp"
+
 	files
 	{
 		"%{prj.name}/src/**.h",
