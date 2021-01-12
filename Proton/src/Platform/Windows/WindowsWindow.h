@@ -21,10 +21,12 @@ namespace Proton
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 
-		static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+		static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		static LRESULT WINAPI HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+		LRESULT WINAPI HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	private:
 		virtual void Init(const WindowProperties& props, HINSTANCE hInstance);
-		static void Shutdown();
+		virtual void Shutdown();
 	private:
 		struct WindowData
 		{
@@ -36,5 +38,24 @@ namespace Proton
 		};
 
 		WindowData m_Data;
+
+		HWND m_HWnd;
+		HINSTANCE m_HInstance;
+		bool receivingMouseInput;
 	};
 }
+
+#define GET_ERROR(hr) char* msgBuf = nullptr;\
+					     DWORD msgLen = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | \
+												   FORMAT_MESSAGE_FROM_SYSTEM | \
+												   FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, \
+												   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&msgBuf), 0, nullptr);\
+						 if(msgLen == 0)\
+						 {\
+							 PT_CORE_ERROR("Unidentified error code!");\
+						 }\
+						 std::string errorString = msgBuf;\
+						 LocalFree(msgBuf);\
+						 PT_CORE_ERROR("Error at line {0} in file {1} \n\t\t[Error Code] {2}\n\t\t[Description] {3}", __LINE__, __FILE__, hr, errorString);
+
+#define LAST_ERROR() GET_ERROR(GetLastError());
