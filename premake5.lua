@@ -51,19 +51,22 @@ project "Proton"
 
 	filter "configurations:Debug"
 		defines "PT_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "PT_RELEASE"
+		buildoptions "/MD"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "PT_DIST"
+		buildoptions "/MD"
 		optimize "On"
 	
 project "Sandbox"
 	location "Sandbox"
-	kind "ConsoleApp"
+	kind "WindowedApp"
 	language "C++"
 
 	targetdir ("bin/" .. outputdir .. "/%{prj.name}")
@@ -98,12 +101,15 @@ project "Sandbox"
 
 	filter "configurations:Debug"
 		defines "PT_DEBUG"
+		buildoptions "/MDd"
 		symbols "On"
 
 	filter "configurations:Release"
 		defines "PT_RELEASE"
+		buildoptions "/MD"
 		optimize "On"
 
 	filter "configurations:Dist"
 		defines "PT_DIST"
+		buildoptions "/MD"
 		optimize "On"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ptpch.h"
 #include "Proton/Core.h"
 
 namespace Proton
@@ -47,6 +48,8 @@ namespace Proton
 		{
 			return GetCategoryFlags() & category;
 		}
+
+		inline bool Handled() const { return m_Handled; }
 
 	protected:
 		bool m_Handled = false;

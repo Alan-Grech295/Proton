@@ -84,6 +84,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <AdditionalOptions>/MDd %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -108,6 +109,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/MD %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -133,6 +135,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <AdditionalOptions>/MD %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
@@ -146,6 +149,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Proton.h" />
     <ClInclude Include="src\Proton\Application.h" />
     <ClInclude Include="src\Proton\Core.h" />
@@ -154,11 +158,17 @@
     <ClInclude Include="src\Proton\Events\Event.h" />
     <ClInclude Include="src\Proton\Events\KeyEvent.h" />
     <ClInclude Include="src\Proton\Events\MouseEvent.h" />
+    <ClInclude Include="src\Proton\Layer.h" />
+    <ClInclude Include="src\Proton\LayerStack.h" />
     <ClInclude Include="src\Proton\Log.h" />
+    <ClInclude Include="src\Proton\Window.h" />
     <ClInclude Include="src\ptpch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Proton\Application.cpp" />
+    <ClCompile Include="src\Proton\Layer.cpp" />
+    <ClCompile Include="src\Proton\LayerStack.cpp" />
     <ClCompile Include="src\Proton\Log.cpp" />
     <ClCompile Include="src\ptpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>

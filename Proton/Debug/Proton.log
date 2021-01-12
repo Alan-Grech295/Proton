@@ -1,0 +1,42 @@
+﻿cl : command line warning D9025: overriding '/MTd' with '/MDd'
+  ptpch.cpp
+cl : command line warning D9025: overriding '/MTd' with '/MDd'
+  WindowsWindow.cpp
+C:\Dev\Proton\Proton\src\Proton\Log.h(17,54): warning C4251: 'Proton::Log::s_CoreLogger': class 'std::shared_ptr<spdlog::logger>' needs to have dll-interface to be used by clients of class 'Proton::Log'
+C:\Dev\Proton\Proton\vendor\spdlog\include\spdlog\details\registry.h(34): message : see declaration of 'std::shared_ptr<spdlog::logger>'
+C:\Dev\Proton\Proton\src\Proton\Log.h(18,56): warning C4251: 'Proton::Log::s_ClientLogger': class 'std::shared_ptr<spdlog::logger>' needs to have dll-interface to be used by clients of class 'Proton::Log'
+C:\Dev\Proton\Proton\vendor\spdlog\include\spdlog\details\registry.h(34): message : see declaration of 'std::shared_ptr<spdlog::logger>'
+C:\Dev\Proton\Proton\src\Platform\Windows\WindowsWindow.cpp(60,27): error C3867: 'Proton::WindowsWindow::WndProc': non-standard syntax; use '&' to create a pointer to member
+C:\Dev\Proton\Proton\src\Platform\Windows\WindowsWindow.cpp(60,27): error C2440: '=': cannot convert from 'LRESULT (__stdcall Proton::WindowsWindow::* )(HWND,UINT,WPARAM,LPARAM)' to 'WNDPROC'
+C:\Dev\Proton\Proton\src\Platform\Windows\WindowsWindow.cpp(60,20): message : There is no context in which this conversion is possible
+  Application.cpp
+C:\Dev\Proton\Proton\src\Proton\Application.h(18,35): warning C4251: 'Proton::Application::m_Window': class 'std::unique_ptr<Proton::Window,std::default_delete<Proton::Window>>' needs to have dll-interface to be used by clients of class 'Proton::Application'
+C:\Dev\Proton\Proton\src\Proton\Application.h(18): message : see declaration of 'std::unique_ptr<Proton::Window,std::default_delete<Proton::Window>>'
+C:\Dev\Proton\Proton\src\Proton\Log.h(17,54): warning C4251: 'Proton::Log::s_CoreLogger': class 'std::shared_ptr<spdlog::logger>' needs to have dll-interface to be used by clients of class 'Proton::Log'
+C:\Dev\Proton\Proton\vendor\spdlog\include\spdlog\details\registry.h(34): message : see declaration of 'std::shared_ptr<spdlog::logger>'
+C:\Dev\Proton\Proton\src\Proton\Log.h(18,56): warning C4251: 'Proton::Log::s_ClientLogger': class 'std::shared_ptr<spdlog::logger>' needs to have dll-interface to be used by clients of class 'Proton::Log'
+C:\Dev\Proton\Proton\vendor\spdlog\include\spdlog\details\registry.h(34): message : see declaration of 'std::shared_ptr<spdlog::logger>'
+  Layer.cpp
+C:\Dev\Proton\Proton\src\Proton\Layer.h(21,26): warning C4251: 'Proton::Layer::m_DebugName': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'Proton::Layer'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xstring(4471): message : see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+  LayerStack.cpp
+C:\Dev\Proton\Proton\src\Proton\Layer.h(21,26): warning C4251: 'Proton::Layer::m_DebugName': class 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>' needs to have dll-interface to be used by clients of class 'Proton::Layer'
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\xstring(4471): message : see declaration of 'std::basic_string<char,std::char_traits<char>,std::allocator<char>>'
+C:\Dev\Proton\Proton\src\Proton\LayerStack.h(25,31): warning C4251: 'Proton::LayerStack::m_Layers': class 'std::vector<Proton::Layer *,std::allocator<Proton::Layer *>>' needs to have dll-interface to be used by clients of class 'Proton::LayerStack'
+C:\Dev\Proton\Proton\src\Proton\LayerStack.h(21): message : see declaration of 'std::vector<Proton::Layer *,std::allocator<Proton::Layer *>>'
+C:\Dev\Proton\Proton\src\Proton\LayerStack.h(26,46): warning C4251: 'Proton::LayerStack::m_LayerInsert': class 'std::_Vector_iterator<std::_Vector_val<std::_Simple_types<_Ty>>>' needs to have dll-interface to be used by clients of class 'Proton::LayerStack'
+          with
+          [
+              _Ty=Proton::Layer *
+          ]
+C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.25.28610\include\vector(439): message : see declaration of 'std::_Vector_iterator<std::_Vector_val<std::_Simple_types<_Ty>>>'
+          with
+          [
+              _Ty=Proton::Layer *
+          ]
+  Log.cpp
+C:\Dev\Proton\Proton\src\Proton\Log.h(17,54): warning C4251: 'Proton::Log::s_CoreLogger': class 'std::shared_ptr<spdlog::logger>' needs to have dll-interface to be used by clients of class 'Proton::Log'
+C:\Dev\Proton\Proton\vendor\spdlog\include\spdlog\details\registry.h(34): message : see declaration of 'std::shared_ptr<spdlog::logger>'
+C:\Dev\Proton\Proton\src\Proton\Log.h(18,56): warning C4251: 'Proton::Log::s_ClientLogger': class 'std::shared_ptr<spdlog::logger>' needs to have dll-interface to be used by clients of class 'Proton::Log'
+C:\Dev\Proton\Proton\vendor\spdlog\include\spdlog\details\registry.h(34): message : see declaration of 'std::shared_ptr<spdlog::logger>'
+  Generating Code...

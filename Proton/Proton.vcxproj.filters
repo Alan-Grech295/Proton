@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{2AC788B4-1694-E3BF-3FAD-D1672BD9184E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform\Windows">
+      <UniqueIdentifier>{64FBD71A-50F4-F66C-7926-DCF1657ED678}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Proton">
       <UniqueIdentifier>{C77AC9CA-B31C-F4A0-9CD7-07F588187BF1}</UniqueIdentifier>
     </Filter>
@@ -9,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
+      <Filter>Platform\Windows</Filter>
+    </ClInclude>
     <ClInclude Include="src\Proton.h" />
     <ClInclude Include="src\Proton\Application.h">
       <Filter>Proton</Filter>
@@ -31,13 +40,31 @@
     <ClInclude Include="src\Proton\Events\MouseEvent.h">
       <Filter>Proton\Events</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Layer.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\LayerStack.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
     <ClInclude Include="src\Proton\Log.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Window.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
+      <Filter>Platform\Windows</Filter>
+    </ClCompile>
     <ClCompile Include="src\Proton\Application.cpp">
+      <Filter>Proton</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Layer.cpp">
+      <Filter>Proton</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\LayerStack.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Log.cpp">
