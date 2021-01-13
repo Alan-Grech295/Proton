@@ -26,11 +26,13 @@ namespace Proton
 		//Message handling
 		MSG msg;
 
-		GetMessage(&msg, nullptr, 0, 0);
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
 
-		TranslateMessage(&msg);
-
-		DispatchMessage(&msg);
+		pGfx->ShowFrame();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
@@ -43,6 +45,20 @@ namespace Proton
 	bool WindowsWindow::IsVSync() const
 	{
 		return m_Data.vSync;
+	}
+
+	void WindowsWindow::SetTitle(const std::string& title)
+	{
+		//Store the title as an LPCW string so it can be used
+		std::wstring tempStr = std::wstring(title.begin(), title.end());
+		const LPCWSTR titleName = tempStr.c_str();
+
+		SetWindowTextW(m_HWnd, titleName);
+	}
+
+	WindowsGraphics& WindowsWindow::Gfx()
+	{
+		return *pGfx;
 	}
 
 	void WindowsWindow::Init(const WindowProperties& props, HINSTANCE hInstance)
@@ -108,6 +124,9 @@ namespace Proton
 
 		//Shows the window
 		ShowWindow(m_HWnd, SW_SHOWDEFAULT);
+
+		//Create graphics object
+		pGfx = std::make_unique<WindowsGraphics>(m_HWnd);
 	}
 	
 	void WindowsWindow::Shutdown()
@@ -208,10 +227,18 @@ namespace Proton
 						data.eventCallback(event);
 						receivingMouseInput = true;
 					}
+
+					MouseMovedEvent event(pt.x, pt.y);
+					data.eventCallback(event);
+				}
+				else if ((wParam & (MK_LBUTTON | MK_RBUTTON)) == 0 && receivingMouseInput)
+				{
+					ReleaseCapture();
+					MouseLeftEvent event(pt.x, pt.y);
+					data.eventCallback(event);
+					receivingMouseInput = false;
 				}
 
-				MouseMovedEvent event(pt.x, pt.y);
-				data.eventCallback(event);
 				break;
 			}
 		case WM_MOUSEWHEEL:

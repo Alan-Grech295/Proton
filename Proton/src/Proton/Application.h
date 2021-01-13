@@ -4,6 +4,7 @@
 #include "Events/Event.h"
 #include "Events/ApplicationEvent.h"
 #include "Window.h"
+#include "Timer.h"
 
 namespace Proton
 {
@@ -21,6 +22,7 @@ namespace Proton
 
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
+		Timer timer;
 	};
 
 	//To be defined in CLIENT

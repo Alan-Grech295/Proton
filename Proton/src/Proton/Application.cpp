@@ -4,6 +4,7 @@
 
 #include "Proton/Log.h"
 #include "Proton/Events/ApplicationEvent.h"
+#include <iomanip>
 
 namespace Proton
 {

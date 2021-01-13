@@ -2,6 +2,11 @@
 
 #include "Proton/Window.h"
 #include "Proton/Log.h"
+#include "WindowsGraphics.h"
+#include <memory>
+
+//Temp includes
+#include "Proton/Timer.h"
 
 namespace Proton
 {
@@ -20,6 +25,9 @@ namespace Proton
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.eventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+		void SetTitle(const std::string& title) override;
+
+		WindowsGraphics& Gfx();
 
 		static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		static LRESULT WINAPI HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -42,6 +50,10 @@ namespace Proton
 		HWND m_HWnd;
 		HINSTANCE m_HInstance;
 		bool receivingMouseInput;
+		std::unique_ptr<WindowsGraphics> pGfx;
+
+		//Temp variables
+		Timer timer;
 	};
 }
 

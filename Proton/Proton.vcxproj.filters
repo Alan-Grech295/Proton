@@ -53,6 +53,8 @@
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
+    <ClInclude Include="src\Proton\Timer.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsGraphics.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
@@ -71,5 +73,7 @@
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
+    <ClCompile Include="src\Proton\Timer.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp" />
   </ItemGroup>
 </Project>
