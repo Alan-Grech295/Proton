@@ -76,4 +76,8 @@
     <ClCompile Include="src\Proton\Timer.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="src\Proton\Shader\VertexShader.hlsl" />
+    <FxCompile Include="src\Proton\Shader\PixelShader.hlsl" />
+  </ItemGroup>
 </Project>

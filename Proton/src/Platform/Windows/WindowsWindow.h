@@ -56,18 +56,3 @@ namespace Proton
 		Timer timer;
 	};
 }
-
-#define GET_ERROR(hr) char* msgBuf = nullptr;\
-					     DWORD msgLen = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | \
-												   FORMAT_MESSAGE_FROM_SYSTEM | \
-												   FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, hr, \
-												   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&msgBuf), 0, nullptr);\
-						 if(msgLen == 0)\
-						 {\
-							 PT_CORE_ERROR("Unidentified error code!");\
-						 }\
-						 std::string errorString = msgBuf;\
-						 LocalFree(msgBuf);\
-						 PT_CORE_ERROR("Error at line {0} in file {1} \n\t\t[Error Code] {2}\n\t\t[Description] {3}", __LINE__, __FILE__, hr, errorString);
-
-#define LAST_ERROR() GET_ERROR(GetLastError());

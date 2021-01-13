@@ -32,6 +32,10 @@ namespace Proton
 			DispatchMessage(&msg);
 		}
 
+		float c = sin(timer.Peek()) / 2.0f + 0.5f;
+
+		pGfx->ClearBuffer(c, c, 1.0f);
+		pGfx->DrawTestTriangle();
 		pGfx->ShowFrame();
 	}
 
