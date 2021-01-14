@@ -2,14 +2,16 @@
 
 #include "Proton/Window.h"
 #include "Proton/Log.h"
-#include "WindowsGraphics.h"
 #include <memory>
+#include "WindowsGraphics.h"
 
 //Temp includes
 #include "Proton/Timer.h"
 
 namespace Proton
 {
+	class WindowsGraphics;
+
 	class WindowsWindow : public Window
 	{
 	public:
@@ -41,7 +43,7 @@ namespace Proton
 			std::string title;
 			unsigned int width;
 			unsigned int height;
-			bool vSync;
+			bool vSync = true;
 			EventCallbackFn eventCallback;
 		};
 

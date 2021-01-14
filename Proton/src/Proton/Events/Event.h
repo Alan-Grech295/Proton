@@ -49,6 +49,11 @@ namespace Proton
 			return GetCategoryFlags() & category;
 		}
 
+		inline bool IsEventType(EventType type)
+		{
+			return GetEventType() == type;
+		}
+
 		inline bool Handled() const { return m_Handled; }
 
 	protected:

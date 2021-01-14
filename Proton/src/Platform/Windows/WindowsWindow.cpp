@@ -34,16 +34,26 @@ namespace Proton
 
 		float c = sin(timer.Peek()) / 2.0f + 0.5f;
 
+		//Clears the back buffer
 		pGfx->ClearBuffer(c, c, 1.0f);
+
+		//Draws a test triangle
 		pGfx->DrawTestTriangle();
+
+		//Dispatches an AppRenderEvent. This is done after the render 
+		//but before presenting the frame so that if any post processing
+		//effect want to be applied, they will show in the frame
+		AppRenderEvent event;
+		m_Data.eventCallback(event);
+
+		//Present the frame
 		pGfx->ShowFrame();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
 		m_Data.vSync = enabled;
-
-		//TODO: Add vsync
+		pGfx->SetVSync(enabled);
 	}
 
 	bool WindowsWindow::IsVSync() const
@@ -130,7 +140,7 @@ namespace Proton
 		ShowWindow(m_HWnd, SW_SHOWDEFAULT);
 
 		//Create graphics object
-		pGfx = std::make_unique<WindowsGraphics>(m_HWnd);
+		pGfx = std::make_unique<WindowsGraphics>(m_HWnd, (UINT)m_Data.width, (UINT)m_Data.height);
 	}
 	
 	void WindowsWindow::Shutdown()

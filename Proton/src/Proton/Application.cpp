@@ -12,8 +12,9 @@ namespace Proton
 
 	Application::Application()
 	{
-		m_Window = std::unique_ptr<Window>(Window::Create());
+		m_Window = std::unique_ptr<Window>(Window::Create({"Proton Game Engine", 800, 600}));
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+		m_Window->SetVSync(true);
 	}
 
 	Application::~Application()
@@ -26,7 +27,12 @@ namespace Proton
 
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
 
-		PT_CORE_TRACE("{0}", e);
+		//Only displays events which are not AppRender, as this
+		//event is called every frame and clutters up the console
+		if (!e.IsEventType(EventType::AppRender))
+		{
+			PT_CORE_TRACE("{0}", e);
+		}
 	}
 
 	void Application::Run()
