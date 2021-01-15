@@ -21,7 +21,7 @@ namespace Proton
 		void ShowFrame();
 		void ClearBuffer(float r, float g, float b);
 
-		void DrawTestTriangle();
+		void DrawTestCube(float angle, float x, float z);
 
 		void SetVSync(bool enabled);
 	private:
@@ -31,6 +31,8 @@ namespace Proton
 		Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+
 		std::string pixelShaderPath;
 		std::string vertexShaderPath;
 

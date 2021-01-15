@@ -37,9 +37,6 @@ namespace Proton
 		//Clears the back buffer
 		pGfx->ClearBuffer(c, c, 1.0f);
 
-		//Draws a test triangle
-		pGfx->DrawTestTriangle();
-
 		//Dispatches an AppRenderEvent. This is done after the render 
 		//but before presenting the frame so that if any post processing
 		//effect want to be applied, they will show in the frame
@@ -68,6 +65,12 @@ namespace Proton
 		const LPCWSTR titleName = tempStr.c_str();
 
 		SetWindowTextW(m_HWnd, titleName);
+	}
+
+	void WindowsWindow::DrawTestCube(float angle, float x, float z)
+	{
+		//Draws a test triangle
+		pGfx->DrawTestCube(angle, x, z);
 	}
 
 	WindowsGraphics& WindowsWindow::Gfx()

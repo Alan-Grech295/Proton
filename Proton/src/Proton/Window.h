@@ -37,6 +37,7 @@ namespace Proton
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 		virtual void SetTitle(const std::string& title) = 0;
+		virtual void DrawTestCube(float angle, float x, float z) = 0;
 
 		static Window* Create(const WindowProperties& props = WindowProperties());
 	};

@@ -3,6 +3,7 @@
 #include "Core.h"
 #include "Events/Event.h"
 #include "Events/ApplicationEvent.h"
+#include "Events/MouseEvent.h"
 #include "Window.h"
 #include "Timer.h"
 
@@ -20,9 +21,14 @@ namespace Proton
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
+		bool OnAppRender(AppRenderEvent& e);
+
+		bool OnMouseMove(MouseMovedEvent& e);
+
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
 		Timer timer;
+		float mouseX, mouseY;
 	};
 
 	//To be defined in CLIENT

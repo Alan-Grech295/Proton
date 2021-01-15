@@ -3,10 +3,13 @@
 #include <d3dcompiler.h>
 #include "Proton/Log.h"
 #include <filesystem>
+#include <DirectXMath.h>
 
 namespace fs = std::filesystem;
 
 namespace wrl = Microsoft::WRL;
+
+namespace dx = DirectX;
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "D3DCompiler.lib")
@@ -61,7 +64,42 @@ namespace Proton
 			&pTarget
 		);
 
-		pBackBuffer->Release();
+		//Create depth stencil state
+		D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+		dsDesc.DepthEnable = TRUE;
+		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+
+		wrl::ComPtr<ID3D11DepthStencilState> pDSState;
+		pDevice->CreateDepthStencilState(&dsDesc, &pDSState);
+
+		//Bind depth stencil state
+		pContext->OMSetDepthStencilState(pDSState.Get(), 1);
+
+		//Create depth stencil texture
+		wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
+		D3D11_TEXTURE2D_DESC descDepth = {};
+		descDepth.Width = width;
+		descDepth.Height = height;
+		descDepth.MipLevels = 1;
+		descDepth.ArraySize = 1;
+		descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+		descDepth.SampleDesc.Count = 1;
+		descDepth.SampleDesc.Quality = 0;
+		descDepth.Usage = D3D11_USAGE_DEFAULT;
+		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+		
+		pDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil);
+
+		//Create depth stencil view
+		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
+		descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		descDSV.Texture2D.MipSlice = 0;
+
+		pDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &pDSV);
+
+		pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
 
 		//Creating Pixel and Vertex shader path strings
 		std::string filePath = __FILE__;
@@ -106,9 +144,10 @@ namespace Proton
 	{
 		const float color[] = { r, g, b, 1 };
 		pContext->ClearRenderTargetView(pTarget.Get(), color);
+		pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
-	void WindowsGraphics::DrawTestTriangle()
+	void WindowsGraphics::DrawTestCube(float angle, float x, float z)
 	{
 		namespace wrl = Microsoft::WRL;
 
@@ -118,29 +157,22 @@ namespace Proton
 			{
 				float x;
 				float y;
+				float z;
 			} pos;
-			
-			struct
-			{
-				BYTE r;
-				BYTE g;
-				BYTE b;
-				BYTE a;
-			} colour;
 		};
 
 		//Setting an array with the triangle vertices (2D triangle at the centre of the screen)
 		Vertex vertices[] =
 		{
-			{0.0f, 0.5f, 255, 0, 0, 0},
-			{0.5f, -0.5f, 0, 255, 0, 0},
-			{-0.5f, -0.5f, 0, 0, 255, 0},
-			{-0.3f, 0.3f, 0, 255, 0, 0},
-			{0.3f, 0.3f, 0, 0, 255, 0},
-			{0.0f, -0.8f, 255, 0, 0, 0}
+			{-1.0f, -1.0f, -1.0f},
+			{1.0f, -1.0f, -1.0f},
+			{-1.0f, 1.0f, -1.0f},
+			{1.0f, 1.0f, -1.0f},
+			{-1.0f, -1.0f, 1.0f},
+			{1.0f, -1.0f, 1.0f},
+			{-1.0f, 1.0f, 1.0f},
+			{1.0f, 1.0f, 1.0f},
 		};
-
-		vertices[0].colour.g = 255;
 
 		wrl::ComPtr<ID3D11Buffer> pVertexBuffer;
 		//Setting the vertex buffer description
@@ -168,10 +200,12 @@ namespace Proton
 		//Create index buffer
 		unsigned short indices[] = 
 		{
-			0, 1, 2,
-			0, 2, 3,
-			0, 4, 1,
-			2, 1, 5
+			0, 2, 1,  2, 3, 1,
+			1, 3, 5,  3, 7, 5,
+			2, 6, 3,  3, 6, 7,
+			4, 5, 7,  4, 7, 6,
+			0, 4, 2,  2, 4, 6,
+			0, 1, 4,  1, 5, 4
 		};
 
 		wrl::ComPtr<ID3D11Buffer> pIndexBuffer;
@@ -193,6 +227,82 @@ namespace Proton
 
 		//Binding index buffer to pipeline
 		pContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0);
+
+		//Create constant buffer for transformation matrix
+		struct ConstantBuffer
+		{
+			dx::XMMATRIX transform;
+		};
+
+		const ConstantBuffer cb =
+		{
+				dx::XMMatrixTranspose(
+					dx::XMMatrixRotationX(angle) *
+					dx::XMMatrixRotationY(angle) *
+					dx::XMMatrixRotationZ(angle) *
+					dx::XMMatrixTranslation(x, 0, z + 4.0f) *
+					dx::XMMatrixPerspectiveLH(1.0f, (float)height / width, 0.5f, 10.0f)
+				)
+		};
+
+		//Create the constant buffer
+		wrl::ComPtr<ID3D11Buffer> pConstantBuffer;
+		D3D11_BUFFER_DESC cbd;
+		cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cbd.Usage = D3D11_USAGE_DYNAMIC;
+		cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		cbd.MiscFlags = 0;
+		cbd.ByteWidth = sizeof(cb);
+		cbd.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA csd = {};
+		csd.pSysMem = &cb;
+
+		pDevice->CreateBuffer(&cbd, &csd, &pConstantBuffer);
+
+		//Bind constant buffer to vertex shader
+		pContext->VSSetConstantBuffers(0, 1, pConstantBuffer.GetAddressOf());
+
+		struct ConstantBuffer2
+		{
+			struct
+			{
+				float r;
+				float g;
+				float b;
+				float a;
+			} face_colours[6];
+		};
+
+		const ConstantBuffer2 cb2 =
+		{
+			{
+				{1.0f, 0.0f, 1.0f},
+				{1.0f, 0.0f, 0.0f},
+				{0.0f, 1.0f, 0.0f},
+				{0.0f, 0.0f, 1.0f},
+				{1.0f, 1.0f, 0.0f},
+				{0.0f, 1.0f, 1.0f},
+			}
+		};
+
+		//Create the constant buffer
+		wrl::ComPtr<ID3D11Buffer> pConstantBuffer2;
+		D3D11_BUFFER_DESC cbd2;
+		cbd2.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+		cbd2.Usage = D3D11_USAGE_DYNAMIC;
+		cbd2.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+		cbd2.MiscFlags = 0;
+		cbd2.ByteWidth = sizeof(cb2);
+		cbd2.StructureByteStride = 0;
+
+		D3D11_SUBRESOURCE_DATA csd2 = {};
+		csd2.pSysMem = &cb2;
+
+		pDevice->CreateBuffer(&cbd2, &csd2, &pConstantBuffer2);
+
+		//Bind constant buffer to vertex shader
+		pContext->PSSetConstantBuffers(0, 1, pConstantBuffer2.GetAddressOf());
 
 		wrl::ComPtr<ID3DBlob> pBlob;
 
@@ -217,8 +327,7 @@ namespace Proton
 		wrl::ComPtr<ID3D11InputLayout> pInputLayout;
 		const D3D11_INPUT_ELEMENT_DESC ied[] =
 		{
-			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{"COLOUR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
+			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		};
 
 		pDevice->CreateInputLayout(
@@ -231,9 +340,6 @@ namespace Proton
 
 		//Bind input layout
 		pContext->IASetInputLayout(pInputLayout.Get());
-
-		//Bind render target
-		pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), nullptr);
 
 		//Set primitive topology to triangle list (group of 3 vertices)
 		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

@@ -28,6 +28,7 @@ namespace Proton
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 		void SetTitle(const std::string& title) override;
+		void DrawTestCube(float angle, float x, float z) override;
 
 		WindowsGraphics& Gfx();
 
