@@ -6,6 +6,7 @@
 #include "Events/MouseEvent.h"
 #include "Window.h"
 #include "Timer.h"
+//#include "Drawable/Header Files/Box.h"
 
 namespace Proton
 {
@@ -29,6 +30,8 @@ namespace Proton
 		std::unique_ptr<Window> m_Window;
 		Timer timer;
 		float mouseX, mouseY;
+
+		std::vector<std::unique_ptr<class Box>> boxes;
 	};
 
 	//To be defined in CLIENT

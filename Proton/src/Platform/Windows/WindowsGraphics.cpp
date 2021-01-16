@@ -4,6 +4,8 @@
 #include "Proton/Log.h"
 #include <filesystem>
 #include <DirectXMath.h>
+#include <random>
+#include "Proton/Drawable/Header Files/Box.h"
 
 namespace fs = std::filesystem;
 
@@ -101,6 +103,17 @@ namespace Proton
 
 		pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
 
+		//Configure viewport
+		D3D11_VIEWPORT vp;
+		vp.Width = width;
+		vp.Height = height;
+		vp.MinDepth = 0;
+		vp.MaxDepth = 1;
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
+
+		pContext->RSSetViewports(1, &vp);
+
 		//Creating Pixel and Vertex shader path strings
 		std::string filePath = __FILE__;
 
@@ -137,6 +150,8 @@ namespace Proton
 
 	void WindowsGraphics::ShowFrame()
 	{
+		//DrawTestCube(45, 1, 1);
+
 		pSwap->Present(isVSync ? 1 : 0, 0);
 	}
 
@@ -368,5 +383,30 @@ namespace Proton
 	{
 		std::wstring stemp = std::wstring(s.begin(), s.end());
 		return stemp;
+	}
+
+	void WindowsGraphics::DrawIndexed(UINT count) noexcept
+	{
+		pContext->DrawIndexed(count, 0u, 0u);
+	}
+
+	void WindowsGraphics::SetProjection(DirectX::FXMMATRIX proj) noexcept
+	{
+		projection = proj;
+	}
+
+	DirectX::XMMATRIX WindowsGraphics::GetProjection() const noexcept
+	{
+		return projection;
+	}
+
+	std::wstring WindowsGraphics::GetPixelShaderPath()
+	{
+		return s2ws(pixelShaderPath);
+	}
+
+	std::wstring WindowsGraphics::GetVertexShaderPath()
+	{
+		return s2ws(vertexShaderPath);
 	}
 }

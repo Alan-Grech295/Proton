@@ -55,6 +55,18 @@
     <ClInclude Include="src\ptpch.h" />
     <ClInclude Include="src\Proton\Timer.h" />
     <ClInclude Include="src\Platform\Windows\WindowsGraphics.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\Bindable.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\ConstantBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\IndexBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\InputLayout.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\PixelShader.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\Topology.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\TransformCBuf.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\VertexBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\VertexShader.h" />
+    <ClInclude Include="src\Proton\Drawable\Header Files\Drawable.h" />
+    <ClInclude Include="src\Proton\Drawable\Header Files\Box.h" />
+    <ClInclude Include="src\Proton\Bindable\Header Files\BindableBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
@@ -75,6 +87,16 @@
     <ClCompile Include="src\ptpch.cpp" />
     <ClCompile Include="src\Proton\Timer.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Source Files\Bindable.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Source Files\IndexBuffer.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Source Files\InputLayout.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Source Files\PixelShader.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Source Files\Topology.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Source Files\TransformCBuf.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Source Files\VertexBuffer.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Source Files\VertexShader.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Source Files\Drawable.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Source Files\Box.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\VertexShader.hlsl" />

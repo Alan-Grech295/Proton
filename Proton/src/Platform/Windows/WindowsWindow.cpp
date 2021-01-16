@@ -3,6 +3,8 @@
 #include "Proton/Events/ApplicationEvent.h"
 #include "Proton/Events/MouseEvent.h"
 #include "Proton/Events/KeyEvent.h"
+#include "Proton/Drawable/Header Files/Box.h"
+#include "Proton/Drawable/Header Files/Drawable.h"
 
 namespace Proton
 {
@@ -71,6 +73,24 @@ namespace Proton
 	{
 		//Draws a test triangle
 		pGfx->DrawTestCube(angle, x, z);
+	}
+
+	void WindowsWindow::SetProjection(DirectX::FXMMATRIX proj) noexcept
+	{
+		pGfx->SetProjection(proj);
+	}
+
+	std::unique_ptr<Box> WindowsWindow::CreateBox(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist)
+	{
+		return std::make_unique<Box>(
+			Gfx(), rng, adist,
+			ddist, odist, rdist
+			);
+	}
+
+	void WindowsWindow::Draw(Drawable* drawable)
+	{
+		drawable->Draw(Gfx());
 	}
 
 	WindowsGraphics& WindowsWindow::Gfx()
