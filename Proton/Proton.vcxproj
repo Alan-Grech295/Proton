@@ -166,6 +166,7 @@
     <ClInclude Include="src\Proton\Core.h" />
     <ClInclude Include="src\Proton\Drawable\Header Files\Box.h" />
     <ClInclude Include="src\Proton\Drawable\Header Files\Drawable.h" />
+    <ClInclude Include="src\Proton\Drawable\Header Files\DrawableBase.h" />
     <ClInclude Include="src\Proton\EntryPoint.h" />
     <ClInclude Include="src\Proton\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Proton\Events\Event.h" />

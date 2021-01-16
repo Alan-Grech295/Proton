@@ -1,9 +1,9 @@
 #pragma once
-#include "Drawable.h"
+#include "DrawableBase.h"
 
 namespace Proton
 {
-	class Box : public Drawable
+	class Box : public DrawableBase<Box>
 	{
 	public:
 		Box(WindowsGraphics& gfx, std::mt19937& rng,

@@ -34,10 +34,8 @@ namespace Proton
 			DispatchMessage(&msg);
 		}
 
-		float c = sin(timer.Peek()) / 2.0f + 0.5f;
-
 		//Clears the back buffer
-		pGfx->ClearBuffer(c, c, 1.0f);
+		pGfx->ClearBuffer(0, 0, 0);
 
 		//Dispatches an AppRenderEvent. This is done after the render 
 		//but before presenting the frame so that if any post processing

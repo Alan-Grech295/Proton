@@ -67,6 +67,7 @@
     <ClInclude Include="src\Proton\Drawable\Header Files\Drawable.h" />
     <ClInclude Include="src\Proton\Drawable\Header Files\Box.h" />
     <ClInclude Include="src\Proton\Bindable\Header Files\BindableBase.h" />
+    <ClInclude Include="src\Proton\Drawable\Header Files\DrawableBase.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">

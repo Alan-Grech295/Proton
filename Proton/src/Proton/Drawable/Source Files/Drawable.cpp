@@ -13,6 +13,12 @@ namespace Proton
 		{
 			b->Bind(gfx);
 		}
+
+		for (auto& b : GetStaticBinds())
+		{
+			b->Bind(gfx);
+		}
+
 		//PT_CORE_INFO(pIndexBuffer->GetCount());
 		gfx.DrawIndexed(pIndexBuffer->GetCount());
 	}
