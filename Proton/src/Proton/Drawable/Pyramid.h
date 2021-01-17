@@ -3,10 +3,10 @@
 
 namespace Proton
 {
-	class Box : public DrawableBase<Box>
+	class Pyramid : public DrawableBase<Pyramid>
 	{
 	public:
-		Box(WindowsGraphics& gfx, std::mt19937& rng,
+		Pyramid(WindowsGraphics& gfx, std::mt19937& rng,
 			std::uniform_real_distribution<float>& adist,
 			std::uniform_real_distribution<float>& ddist,
 			std::uniform_real_distribution<float>& odist,

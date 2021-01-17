@@ -3,8 +3,10 @@
 #include "Proton/Events/ApplicationEvent.h"
 #include "Proton/Events/MouseEvent.h"
 #include "Proton/Events/KeyEvent.h"
-#include "Proton/Drawable/Header Files/Box.h"
-#include "Proton/Drawable/Header Files/Drawable.h"
+#include "Proton/Drawable/Box.h"
+#include "Proton/Drawable/Melon.h"
+#include "Proton/Drawable/Pyramid.h"
+#include "Proton/Drawable/Drawable.h"
 
 namespace Proton
 {
@@ -67,22 +69,32 @@ namespace Proton
 		SetWindowTextW(m_HWnd, titleName);
 	}
 
-	void WindowsWindow::DrawTestCube(float angle, float x, float z)
-	{
-		//Draws a test triangle
-		pGfx->DrawTestCube(angle, x, z);
-	}
-
 	void WindowsWindow::SetProjection(DirectX::FXMMATRIX proj) noexcept
 	{
 		pGfx->SetProjection(proj);
 	}
 
-	std::unique_ptr<Box> WindowsWindow::CreateBox(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist)
+	std::unique_ptr<Box> WindowsWindow::CreateBox(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, std::uniform_real_distribution<float>& bdist)
 	{
 		return std::make_unique<Box>(
-			Gfx(), rng, adist,
-			ddist, odist, rdist
+			Gfx(), rng, adist, ddist,
+			odist, rdist, bdist
+			);
+	}
+
+	std::unique_ptr<Melon> WindowsWindow::CreateMelon(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, std::uniform_int_distribution<int>& longdist, std::uniform_int_distribution<int>& latdist)
+	{
+		return std::make_unique<Melon>(
+			Gfx(), rng, adist, ddist,
+			odist, rdist, longdist, latdist
+			);
+	}
+
+	std::unique_ptr<Pyramid> WindowsWindow::CreatePyramid(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist)
+	{
+		return std::make_unique<Pyramid>(
+			Gfx(), rng, adist, ddist,
+			odist, rdist
 			);
 	}
 

@@ -1,5 +1,5 @@
 #include "ptpch.h"
-#include "Proton/Bindable/Header Files/TransformCBuf.h"
+#include "Proton/Bindable/TransformCBuf.h"
 
 namespace Proton
 {

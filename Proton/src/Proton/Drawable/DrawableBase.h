@@ -1,6 +1,6 @@
 #pragma once
 #include "Drawable.h"
-#include "Proton/Bindable/Header Files/IndexBuffer.h"
+#include "Proton/Bindable/IndexBuffer.h"
 
 namespace Proton
 {

@@ -1,6 +1,6 @@
 #pragma once
 #include "ConstantBuffer.h"
-#include "Proton/Drawable/Header Files/Drawable.h"
+#include "Proton/Drawable/Drawable.h"
 #include <DirectXMath.h>
 
 namespace Proton

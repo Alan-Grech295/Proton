@@ -26,16 +26,13 @@ namespace Proton
 		void ShowFrame();
 		void ClearBuffer(float r, float g, float b);
 
-		void DrawTestCube(float angle, float x, float z);
-
 		void SetVSync(bool enabled);
 
 		void DrawIndexed(UINT count) noexcept;
 		void SetProjection(DirectX::FXMMATRIX proj) noexcept;
 		DirectX::XMMATRIX GetProjection() const noexcept;
 
-		std::wstring GetPixelShaderPath();
-		std::wstring GetVertexShaderPath();
+		std::wstring GetShaderPath(std::string shaderName);
 	private:
 		std::wstring s2ws(const std::string& s);
 
@@ -47,8 +44,7 @@ namespace Proton
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
 
-		std::string pixelShaderPath;
-		std::string vertexShaderPath;
+		std::string absPath;
 
 		UINT width, height;
 

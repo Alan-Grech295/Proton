@@ -153,28 +153,37 @@
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Proton.h" />
     <ClInclude Include="src\Proton\Application.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\Bindable.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\BindableBase.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\ConstantBuffer.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\IndexBuffer.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\InputLayout.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\PixelShader.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\Topology.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\TransformCBuf.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\VertexBuffer.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\VertexShader.h" />
+    <ClInclude Include="src\Proton\Bindable\Bindable.h" />
+    <ClInclude Include="src\Proton\Bindable\BindableBase.h" />
+    <ClInclude Include="src\Proton\Bindable\ConstantBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\IndexBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\InputLayout.h" />
+    <ClInclude Include="src\Proton\Bindable\PixelShader.h" />
+    <ClInclude Include="src\Proton\Bindable\Topology.h" />
+    <ClInclude Include="src\Proton\Bindable\TransformCBuf.h" />
+    <ClInclude Include="src\Proton\Bindable\VertexBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\VertexShader.h" />
     <ClInclude Include="src\Proton\Core.h" />
-    <ClInclude Include="src\Proton\Drawable\Header Files\Box.h" />
-    <ClInclude Include="src\Proton\Drawable\Header Files\Drawable.h" />
-    <ClInclude Include="src\Proton\Drawable\Header Files\DrawableBase.h" />
+    <ClInclude Include="src\Proton\Drawable\Box.h" />
+    <ClInclude Include="src\Proton\Drawable\Drawable.h" />
+    <ClInclude Include="src\Proton\Drawable\DrawableBase.h" />
+    <ClInclude Include="src\Proton\Drawable\Melon.h" />
+    <ClInclude Include="src\Proton\Drawable\Pyramid.h" />
     <ClInclude Include="src\Proton\EntryPoint.h" />
     <ClInclude Include="src\Proton\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Proton\Events\Event.h" />
     <ClInclude Include="src\Proton\Events\KeyEvent.h" />
     <ClInclude Include="src\Proton\Events\MouseEvent.h" />
+    <ClInclude Include="src\Proton\Geometry\Cone.h" />
+    <ClInclude Include="src\Proton\Geometry\Cube.h" />
+    <ClInclude Include="src\Proton\Geometry\IndexedTriangleList.h" />
+    <ClInclude Include="src\Proton\Geometry\Plane.h" />
+    <ClInclude Include="src\Proton\Geometry\Prism.h" />
+    <ClInclude Include="src\Proton\Geometry\Sphere.h" />
     <ClInclude Include="src\Proton\Layer.h" />
     <ClInclude Include="src\Proton\LayerStack.h" />
     <ClInclude Include="src\Proton\Log.h" />
+    <ClInclude Include="src\Proton\Math.h" />
     <ClInclude Include="src\Proton\Timer.h" />
     <ClInclude Include="src\Proton\Window.h" />
     <ClInclude Include="src\ptpch.h" />
@@ -183,16 +192,18 @@
     <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Proton\Application.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\InputLayout.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\Bindable.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\IndexBuffer.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\PixelShader.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\Topology.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\TransformCBuf.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\VertexBuffer.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\VertexShader.cpp" />
-    <ClCompile Include="src\Proton\Drawable\Source Files\Box.cpp" />
-    <ClCompile Include="src\Proton\Drawable\Source Files\Drawable.cpp" />
+    <ClCompile Include="src\Proton\Bindable\InputLayout.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Bindable.cpp" />
+    <ClCompile Include="src\Proton\Bindable\IndexBuffer.cpp" />
+    <ClCompile Include="src\Proton\Bindable\PixelShader.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Topology.cpp" />
+    <ClCompile Include="src\Proton\Bindable\TransformCBuf.cpp" />
+    <ClCompile Include="src\Proton\Bindable\VertexBuffer.cpp" />
+    <ClCompile Include="src\Proton\Bindable\VertexShader.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Box.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Drawable.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Melon.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Pyramid.cpp" />
     <ClCompile Include="src\Proton\Layer.cpp" />
     <ClCompile Include="src\Proton\LayerStack.cpp" />
     <ClCompile Include="src\Proton\Log.cpp" />
@@ -202,6 +213,50 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\ColorBlendVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\ColorIndexPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">Pixel</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\ColorIndexVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">Vertex</ShaderType>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="src\Proton\Shader\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>

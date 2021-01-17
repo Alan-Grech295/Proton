@@ -1,5 +1,5 @@
 #include "ptpch.h"
-#include "Proton/Bindable/Header Files/Topology.h"
+#include "Proton/Bindable/Topology.h"
 
 namespace Proton
 {

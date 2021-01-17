@@ -55,19 +55,28 @@
     <ClInclude Include="src\ptpch.h" />
     <ClInclude Include="src\Proton\Timer.h" />
     <ClInclude Include="src\Platform\Windows\WindowsGraphics.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\Bindable.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\ConstantBuffer.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\IndexBuffer.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\InputLayout.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\PixelShader.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\Topology.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\TransformCBuf.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\VertexBuffer.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\VertexShader.h" />
-    <ClInclude Include="src\Proton\Drawable\Header Files\Drawable.h" />
-    <ClInclude Include="src\Proton\Drawable\Header Files\Box.h" />
-    <ClInclude Include="src\Proton\Bindable\Header Files\BindableBase.h" />
-    <ClInclude Include="src\Proton\Drawable\Header Files\DrawableBase.h" />
+    <ClInclude Include="src\Proton\Geometry\IndexedTriangleList.h" />
+    <ClInclude Include="src\Proton\Geometry\Cube.h" />
+    <ClInclude Include="src\Proton\Geometry\Cone.h" />
+    <ClInclude Include="src\Proton\Math.h" />
+    <ClInclude Include="src\Proton\Geometry\Plane.h" />
+    <ClInclude Include="src\Proton\Geometry\Prism.h" />
+    <ClInclude Include="src\Proton\Geometry\Sphere.h" />
+    <ClInclude Include="src\Proton\Drawable\Box.h" />
+    <ClInclude Include="src\Proton\Drawable\Drawable.h" />
+    <ClInclude Include="src\Proton\Drawable\DrawableBase.h" />
+    <ClInclude Include="src\Proton\Drawable\Melon.h" />
+    <ClInclude Include="src\Proton\Drawable\Pyramid.h" />
+    <ClInclude Include="src\Proton\Bindable\Bindable.h" />
+    <ClInclude Include="src\Proton\Bindable\BindableBase.h" />
+    <ClInclude Include="src\Proton\Bindable\ConstantBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\IndexBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\InputLayout.h" />
+    <ClInclude Include="src\Proton\Bindable\PixelShader.h" />
+    <ClInclude Include="src\Proton\Bindable\Topology.h" />
+    <ClInclude Include="src\Proton\Bindable\TransformCBuf.h" />
+    <ClInclude Include="src\Proton\Bindable\VertexBuffer.h" />
+    <ClInclude Include="src\Proton\Bindable\VertexShader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
@@ -88,19 +97,25 @@
     <ClCompile Include="src\ptpch.cpp" />
     <ClCompile Include="src\Proton\Timer.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\Bindable.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\IndexBuffer.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\InputLayout.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\PixelShader.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\Topology.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\TransformCBuf.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\VertexBuffer.cpp" />
-    <ClCompile Include="src\Proton\Bindable\Source Files\VertexShader.cpp" />
-    <ClCompile Include="src\Proton\Drawable\Source Files\Drawable.cpp" />
-    <ClCompile Include="src\Proton\Drawable\Source Files\Box.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Box.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Drawable.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Melon.cpp" />
+    <ClCompile Include="src\Proton\Drawable\Pyramid.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Bindable.cpp" />
+    <ClCompile Include="src\Proton\Bindable\IndexBuffer.cpp" />
+    <ClCompile Include="src\Proton\Bindable\InputLayout.cpp" />
+    <ClCompile Include="src\Proton\Bindable\PixelShader.cpp" />
+    <ClCompile Include="src\Proton\Bindable\Topology.cpp" />
+    <ClCompile Include="src\Proton\Bindable\TransformCBuf.cpp" />
+    <ClCompile Include="src\Proton\Bindable\VertexBuffer.cpp" />
+    <ClCompile Include="src\Proton\Bindable\VertexShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\VertexShader.hlsl" />
     <FxCompile Include="src\Proton\Shader\PixelShader.hlsl" />
+    <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\ColorBlendVS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\ColorIndexVS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\ColorIndexPS.hlsl" />
   </ItemGroup>
 </Project>

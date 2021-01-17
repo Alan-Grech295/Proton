@@ -8,7 +8,6 @@
 
 namespace Proton
 {
-	class Box;
 	class Drawable;
 
 	struct WindowProperties
@@ -42,10 +41,24 @@ namespace Proton
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
 		virtual void SetTitle(const std::string& title) = 0;
-		virtual void DrawTestCube(float angle, float x, float z) = 0;
 		virtual void SetProjection(DirectX::FXMMATRIX proj) noexcept = 0;
 
-		virtual std::unique_ptr<Box> CreateBox(std::mt19937& rng,
+		virtual std::unique_ptr<class Box> CreateBox(std::mt19937& rng,
+			std::uniform_real_distribution<float>& adist,
+			std::uniform_real_distribution<float>& ddist,
+			std::uniform_real_distribution<float>& odist,
+			std::uniform_real_distribution<float>& rdist,
+			std::uniform_real_distribution<float>& bdist) = 0;
+
+		virtual std::unique_ptr<class Melon> CreateMelon(std::mt19937& rng,
+			std::uniform_real_distribution<float>& adist,
+			std::uniform_real_distribution<float>& ddist,
+			std::uniform_real_distribution<float>& odist,
+			std::uniform_real_distribution<float>& rdist,
+			std::uniform_int_distribution<int>& longdist,
+			std::uniform_int_distribution<int>& latdist) = 0;
+
+		virtual std::unique_ptr<class Pyramid> CreatePyramid(std::mt19937& rng,
 			std::uniform_real_distribution<float>& adist,
 			std::uniform_real_distribution<float>& ddist,
 			std::uniform_real_distribution<float>& odist,

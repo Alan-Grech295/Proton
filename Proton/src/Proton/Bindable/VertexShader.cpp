@@ -1,5 +1,5 @@
 #include "ptpch.h"
-#include "Proton/Bindable/Header Files/VertexShader.h"
+#include "Proton/Bindable/VertexShader.h"
 
 namespace Proton
 {

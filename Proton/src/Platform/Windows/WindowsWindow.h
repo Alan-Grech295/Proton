@@ -5,7 +5,7 @@
 #include <memory>
 #include "WindowsGraphics.h"
 #include <random>
-//#include "Proton/Drawable/Header Files/Drawable.h"
+//#include "Proton/Drawable/Drawable.h"
 
 //Temp includes
 #include "Proton/Timer.h"
@@ -13,7 +13,6 @@
 namespace Proton
 {
 	class WindowsGraphics;
-	class Box;
 	class Drawable;
 
 	class WindowsWindow : public Window
@@ -32,10 +31,24 @@ namespace Proton
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
 		void SetTitle(const std::string& title) override;
-		void DrawTestCube(float angle, float x, float z) override;
 		void SetProjection(DirectX::FXMMATRIX proj) noexcept override;
 
-		std::unique_ptr<Box> CreateBox(std::mt19937& rng,
+		std::unique_ptr<class Box> CreateBox(std::mt19937& rng,
+			std::uniform_real_distribution<float>& adist,
+			std::uniform_real_distribution<float>& ddist,
+			std::uniform_real_distribution<float>& odist,
+			std::uniform_real_distribution<float>& rdist,
+			std::uniform_real_distribution<float>& bdist) override;
+
+		std::unique_ptr<class Melon> CreateMelon(std::mt19937& rng,
+			std::uniform_real_distribution<float>& adist,
+			std::uniform_real_distribution<float>& ddist,
+			std::uniform_real_distribution<float>& odist,
+			std::uniform_real_distribution<float>& rdist,
+			std::uniform_int_distribution<int>& longdist,
+			std::uniform_int_distribution<int>& latdist) override;
+
+		std::unique_ptr<class Pyramid> CreatePyramid(std::mt19937& rng,
 			std::uniform_real_distribution<float>& adist,
 			std::uniform_real_distribution<float>& ddist,
 			std::uniform_real_distribution<float>& odist,

@@ -1,5 +1,5 @@
 #include "ptpch.h"
-#include "Proton/Bindable/Header Files/Bindable.h"
+#include "Proton/Bindable/Bindable.h"
 
 namespace Proton
 {

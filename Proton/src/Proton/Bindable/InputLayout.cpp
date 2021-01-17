@@ -1,5 +1,5 @@
 #include "ptpch.h"
-#include "Proton/Bindable/Header Files/InputLayout.h"
+#include "Proton/Bindable/InputLayout.h"
 
 namespace Proton
 {

@@ -1,6 +1,6 @@
 #include "ptpch.h"
-#include "Proton/Drawable/Header Files/Drawable.h"
-#include "Proton/Bindable/Header Files/IndexBuffer.h"
+#include "Proton/Drawable/Drawable.h"
+#include "Proton/Bindable/IndexBuffer.h"
 #include <cassert>
 #include <typeinfo>
 #include "Proton/Log.h"

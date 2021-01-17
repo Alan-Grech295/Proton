@@ -5,8 +5,12 @@
 #include "Proton/Log.h"
 #include "Proton/Events/ApplicationEvent.h"
 #include <iomanip>
-
-#include "Drawable/Header Files/Box.h"
+#include "Proton/Drawable/Melon.h"
+#include "Proton/Drawable/Pyramid.h"
+#include "Proton/Drawable/Box.h"
+#include <memory>
+#include <algorithm>
+#include "Proton/Math.h"
 
 namespace Proton
 {
@@ -18,16 +22,51 @@ namespace Proton
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 		m_Window->SetVSync(true);
 
-		std::mt19937 rng(std::random_device{}());
-		std::uniform_real_distribution<float> adist(0.0f, 3.1415f * 2.0f);
-		std::uniform_real_distribution<float> ddist(0.0f, 3.1415f * 2.0f);
-		std::uniform_real_distribution<float> odist(0.0f, 3.1415f * 0.3f);
-		std::uniform_real_distribution<float> rdist(6.0f, 20.0f);
-
-		for (auto i = 0; i < 80; i++)
+		class Factory
 		{
-			boxes.push_back(m_Window->CreateBox(rng, adist, ddist, odist, rdist));
-		}
+		public:
+			Factory(Window* window)
+				:
+				wnd(window)
+			{}
+			std::unique_ptr<Drawable> operator()()
+			{
+				switch (typedist(rng))
+				{
+				case 0:
+					return wnd->CreatePyramid(rng, adist, ddist,
+						odist, rdist);
+				case 1:
+					return wnd->CreateBox(
+						rng, adist, ddist,
+						odist, rdist, bdist
+						);
+				case 2:
+					return wnd->CreateMelon(
+						rng, adist, ddist,
+						odist, rdist, longdist, latdist
+						);
+				default:
+					assert(false && "bad drawable type in factory");
+					return {};
+				}
+			}
+		private:
+			Window* wnd;
+			std::mt19937 rng{ std::random_device{}() };
+			std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
+			std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
+			std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
+			std::uniform_real_distribution<float> rdist{ 6.0f,20.0f };
+			std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
+			std::uniform_int_distribution<int> latdist{ 5,20 };
+			std::uniform_int_distribution<int> longdist{ 10,40 };
+			std::uniform_int_distribution<int> typedist{ 0,2 };
+		};
+
+		Factory f(m_Window.get());
+		drawables.reserve(nDrawables);
+		std::generate_n(std::back_inserter(drawables), nDrawables, f);
 
 		m_Window->SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, ((float)m_Window->GetHeight() / m_Window->GetWidth()), 0.5f, 40.0f));
 	}
@@ -77,10 +116,10 @@ namespace Proton
 			(float)-mouseY / m_Window->GetHeight() * 2.0f + 1.0f);*/
 
 		auto dt = timer.Mark();
-		for (auto& b : boxes)
+		for (auto& d : drawables)
 		{
-			b->Update(dt);
-			m_Window->Draw(b.get());
+			d->Update(dt);
+			m_Window->Draw(d.get());
 		}
 
 		return true;
