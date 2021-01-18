@@ -30,14 +30,15 @@ project "Proton"
 	files
 	{
 		"%{prj.name}/src/**.h",
-		"%{prj.name}/src/**.cpp"
+		"%{prj.name}/src/**.cpp",
+		"%{prj.name}/src/**.hlsl"
 	}
 
 	includedirs
 	{
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
-		"%{prj.name}/vendor/DirectXTK/Inc",
+		"%{prj.name}/vendor/DirectXTK/include",
 		"%{IncludeDir.ImGui}"
 	}
 
@@ -60,6 +61,11 @@ project "Proton"
 		postbuildcommands
 		{
 			("{COPY} %{cfg.buildtarget.relpath} ../bin/" .. outputdir .. "/Sandbox")
+		}
+
+		links
+		{
+			("%{wks.location}/%{prj.name}/vendor/DirectXTK/" .. outputdir .. "/DirectXTK.lib")
 		}
 
 	filter "configurations:Debug"
@@ -95,7 +101,7 @@ project "Sandbox"
 	{
 		"%{wks.location}/Proton/vendor/spdlog/include",
 		"%{wks.location}/Proton/src",
-		"%{wks.location}/Hazel/vendor"
+		"%{wks.location}/Proton/vendor"
 	}
 
 	links
