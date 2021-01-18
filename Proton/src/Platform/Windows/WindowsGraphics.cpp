@@ -5,7 +5,8 @@
 #include <filesystem>
 #include <DirectXMath.h>
 #include <random>
-#include "Proton/Drawable/Box.h"
+#include "Proton/Box.h"
+#include "Platform/DirectX 11/imgui_impl_dx11.h"
 
 namespace fs = std::filesystem;
 
@@ -182,8 +183,28 @@ namespace Proton
 		return projection;
 	}
 
+	void WindowsGraphics::SetCamera(DirectX::FXMMATRIX cam)
+	{
+		this->camera = cam;
+	}
+
+	DirectX::XMMATRIX WindowsGraphics::GetCamera() const
+	{
+		return camera;
+	}
+
 	std::wstring WindowsGraphics::GetShaderPath(std::string shaderName)
 	{
 		return s2ws(absPath + shaderName);
+	}
+	ID3D11Device* WindowsGraphics::GetDevice()
+	{
+		return pDevice.Get();
+	}
+
+	void WindowsGraphics::InitImGui()
+	{
+		//Init ImGui d3d Impl
+		ImGui_ImplDX11_Init(pDevice.Get(), pContext.Get());
 	}
 }

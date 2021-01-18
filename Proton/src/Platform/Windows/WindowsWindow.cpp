@@ -3,10 +3,12 @@
 #include "Proton/Events/ApplicationEvent.h"
 #include "Proton/Events/MouseEvent.h"
 #include "Proton/Events/KeyEvent.h"
-#include "Proton/Drawable/Box.h"
-#include "Proton/Drawable/Melon.h"
-#include "Proton/Drawable/Pyramid.h"
-#include "Proton/Drawable/Drawable.h"
+#include "Proton/Box.h"
+#include "Proton/Melon.h"
+#include "Proton/Pyramid.h"
+#include "Proton/Sheet.h"
+#include "Proton/Drawable.h"
+#include "Platform/DirectX 11/imgui_impl_win32.h"
 
 namespace Proton
 {
@@ -98,6 +100,27 @@ namespace Proton
 			);
 	}
 
+	std::unique_ptr<class Sheet> WindowsWindow::CreateSheet(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist)
+	{
+		return std::make_unique<Sheet>(
+			Gfx(), rng, adist, ddist,
+			odist, rdist
+			);
+	}
+
+	void WindowsWindow::InitImGui()
+	{
+		//Init ImGui Win32 Impl
+		ImGui_ImplWin32_Init(m_HWnd);
+		pGfx->InitImGui();
+		initializedImGui = true;
+	}
+
+	void WindowsWindow::SetCamera(DirectX::FXMMATRIX cam)
+	{
+		pGfx->SetCamera(cam);
+	}
+
 	void WindowsWindow::Draw(Drawable* drawable)
 	{
 		drawable->Draw(Gfx());
@@ -178,12 +201,21 @@ namespace Proton
 	
 	void WindowsWindow::Shutdown()
 	{
+		if(initializedImGui)
+			ImGui_ImplWin32_Shutdown();
+
+		initializedImGui = false;
 		DestroyWindow(m_HWnd);
 		PostQuitMessage(1);
 	}
 
 	LRESULT CALLBACK WindowsWindow::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 	{
+		if (initializedImGui && ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam))
+		{
+			return true;
+		}
+
 		WindowData& data = *(WindowData*)GetClassLongPtr(hWnd, 0);
 
 		switch (msg)

@@ -5,7 +5,7 @@
 #include <memory>
 #include "WindowsGraphics.h"
 #include <random>
-//#include "Proton/Drawable/Drawable.h"
+//#include "Proton/Drawable.h"
 
 //Temp includes
 #include "Proton/Timer.h"
@@ -54,6 +54,16 @@ namespace Proton
 			std::uniform_real_distribution<float>& odist,
 			std::uniform_real_distribution<float>& rdist) override;
 
+		std::unique_ptr<class Sheet> CreateSheet(std::mt19937& rng,
+			std::uniform_real_distribution<float>& adist,
+			std::uniform_real_distribution<float>& ddist,
+			std::uniform_real_distribution<float>& odist,
+			std::uniform_real_distribution<float>& rdist) override;
+
+		void InitImGui() override;
+
+		void SetCamera(DirectX::FXMMATRIX cam) override;
+
 		void Draw(Drawable* drawable) override;
 
 		WindowsGraphics& Gfx();
@@ -79,6 +89,7 @@ namespace Proton
 		HWND m_HWnd;
 		HINSTANCE m_HInstance;
 		bool receivingMouseInput;
+		bool initializedImGui = false;
 		std::unique_ptr<WindowsGraphics> pGfx;
 
 		//Temp variables

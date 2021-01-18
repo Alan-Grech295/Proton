@@ -10,6 +10,12 @@ workspace "Proton"
 
 outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 
+--Include Directories relative to root folder
+IncludeDir = {}
+IncludeDir["ImGui"] = "%{wks.location}/Proton/vendor/imgui"
+
+include "Proton/vendor/imgui"
+
 project "Proton"
 	location "Proton"
 	kind "SharedLib"
@@ -30,7 +36,14 @@ project "Proton"
 	includedirs
 	{
 		"%{prj.name}/src",
-		"%{prj.name}/vendor/spdlog/include"
+		"%{prj.name}/vendor/spdlog/include",
+		"%{prj.name}/vendor/DirectXTK/Inc",
+		"%{IncludeDir.ImGui}"
+	}
+
+	links
+	{
+		"ImGui"
 	}
 
 	filter "system:windows"
@@ -80,8 +93,9 @@ project "Sandbox"
 
 	includedirs
 	{
-		"Proton/vendor/spdlog/include",
-		"Proton/src"
+		"%{wks.location}/Proton/vendor/spdlog/include",
+		"%{wks.location}/Proton/src",
+		"%{wks.location}/Hazel/vendor"
 	}
 
 	links

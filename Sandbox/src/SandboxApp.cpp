@@ -5,7 +5,7 @@ class Sandbox : public Proton::Application
 public:
 	Sandbox()
 	{
-
+		PushOverlay(new Proton::ImGuiLayer());
 	}
 
 	~Sandbox()

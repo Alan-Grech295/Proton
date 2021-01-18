@@ -6,7 +6,8 @@
 #include "Events/MouseEvent.h"
 #include "Window.h"
 #include "Timer.h"
-//#include "Drawable/Box.h"
+#include "LayerStack.h"
+#include "Platform/Windows/Camera.h"
 
 namespace Proton
 {
@@ -19,6 +20,14 @@ namespace Proton
 		void Run();
 
 		void OnEvent(Event& e);
+
+		void PushLayer(Layer* layer);
+
+		void PushOverlay(Layer* overlay);
+
+		static inline Application& Get() { return *s_Instance; }
+
+		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
@@ -26,13 +35,19 @@ namespace Proton
 
 		bool OnMouseMove(MouseMovedEvent& e);
 
+	private:
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
 		Timer timer;
 		float mouseX, mouseY;
+		LayerStack m_LayerStack;
 
 		std::vector<std::unique_ptr<class Drawable>> drawables;
 		static constexpr size_t nDrawables = 180;
+
+		Camera camera;
+	private:
+		static Application* s_Instance;
 	};
 
 	//To be defined in CLIENT

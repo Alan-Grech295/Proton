@@ -31,11 +31,18 @@ namespace Proton
 		void DrawIndexed(UINT count) noexcept;
 		void SetProjection(DirectX::FXMMATRIX proj) noexcept;
 		DirectX::XMMATRIX GetProjection() const noexcept;
+		void SetCamera(DirectX::FXMMATRIX cam);
+		DirectX::XMMATRIX GetCamera() const;
 
 		std::wstring GetShaderPath(std::string shaderName);
+
+		ID3D11Device* GetDevice();
+
+		void InitImGui();
 	private:
 		std::wstring s2ws(const std::string& s);
-
+	private:
+		DirectX::XMMATRIX camera;
 		DirectX::XMMATRIX projection;
 
 		Microsoft::WRL::ComPtr<ID3D11Device> pDevice;

@@ -64,6 +64,17 @@ namespace Proton
 			std::uniform_real_distribution<float>& odist,
 			std::uniform_real_distribution<float>& rdist) = 0;
 
+		virtual std::unique_ptr<class Sheet> CreateSheet(std::mt19937& rng,
+			std::uniform_real_distribution<float>& adist,
+			std::uniform_real_distribution<float>& ddist,
+			std::uniform_real_distribution<float>& odist,
+			std::uniform_real_distribution<float>& rdist) = 0;
+
+		//Windows Camera, make abstract later
+		virtual void SetCamera(DirectX::FXMMATRIX cam) = 0;
+
+		virtual void InitImGui() = 0;
+
 		virtual void Draw(Drawable* drawable) = 0;
 
 		static Window* Create(const WindowProperties& props = WindowProperties());
