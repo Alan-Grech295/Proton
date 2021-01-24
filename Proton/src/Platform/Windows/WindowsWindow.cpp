@@ -9,6 +9,7 @@
 #include "Proton/Sheet.h"
 #include "Proton/Drawable.h"
 #include "Platform/DirectX 11/imgui_impl_win32.h"
+#include "Proton/PointLight.h"
 
 namespace Proton
 {
@@ -84,28 +85,19 @@ namespace Proton
 			);
 	}
 
-	std::unique_ptr<Melon> WindowsWindow::CreateMelon(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, std::uniform_int_distribution<int>& longdist, std::uniform_int_distribution<int>& latdist)
+	PointLight* WindowsWindow::CreateLight(float radius)
 	{
-		return std::make_unique<Melon>(
-			Gfx(), rng, adist, ddist,
-			odist, rdist, longdist, latdist
-			);
+		return new PointLight(Gfx(), radius);
 	}
 
-	std::unique_ptr<Pyramid> WindowsWindow::CreatePyramid(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist)
+	void WindowsWindow::BindLight(PointLight* light)
 	{
-		return std::make_unique<Pyramid>(
-			Gfx(), rng, adist, ddist,
-			odist, rdist
-			);
+		light->Bind(Gfx());
 	}
 
-	std::unique_ptr<class Sheet> WindowsWindow::CreateSheet(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist)
+	void WindowsWindow::DrawLight(PointLight* light)
 	{
-		return std::make_unique<Sheet>(
-			Gfx(), rng, adist, ddist,
-			odist, rdist
-			);
+		light->Draw(Gfx());
 	}
 
 	void WindowsWindow::InitImGui()
@@ -133,6 +125,8 @@ namespace Proton
 
 	void WindowsWindow::Init(const WindowProperties& props, HINSTANCE hInstance)
 	{
+		input = WindowsInput::s_Instance;
+
 		//Saves any needed data
 		m_HInstance = hInstance;
 		m_Data.title = props.title;
@@ -232,6 +226,7 @@ namespace Proton
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			{
+				input->keyStates[wParam] = true;
 				KeyPressedEvent event(wParam, lParam & 0xffff);
 				data.eventCallback(event);
 				break;
@@ -239,6 +234,7 @@ namespace Proton
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			{
+				input->keyStates[wParam] = false;
 				KeyReleasedEvent event(wParam);
 				data.eventCallback(event);
 				break;
@@ -251,6 +247,7 @@ namespace Proton
 			//Mouse messages
 		case WM_LBUTTONDOWN:
 			{
+				input->mbStates[0] = true;
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonPressedEvent event(0, pt.x, pt.y);
 				data.eventCallback(event);
@@ -258,6 +255,7 @@ namespace Proton
 			break;
 		case WM_LBUTTONUP:
 			{
+				input->mbStates[0] = false;
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonReleasedEvent event(0, pt.x, pt.y);
 				data.eventCallback(event);
@@ -273,6 +271,7 @@ namespace Proton
 			break;
 		case WM_RBUTTONDOWN:
 			{
+				input->mbStates[1] = true;
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonPressedEvent event(1, pt.x, pt.y);
 				data.eventCallback(event);
@@ -280,6 +279,7 @@ namespace Proton
 			break;
 		case WM_RBUTTONUP:
 			{
+				input->mbStates[1] = false;
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonReleasedEvent event(1, pt.x, pt.y);
 				data.eventCallback(event);
@@ -296,6 +296,9 @@ namespace Proton
 		case WM_MOUSEMOVE:
 			{
 				const POINTS pt = MAKEPOINTS(lParam);
+
+				input->mousePosX = pt.x;
+				input->mousePosY = pt.y;
 
 				if (pt.x >= 0 && pt.x < m_Data.width && pt.y >= 0 && pt.y < m_Data.height)
 				{

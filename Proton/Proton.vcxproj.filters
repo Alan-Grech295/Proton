@@ -36,6 +36,9 @@
     <ClInclude Include="src\Platform\Windows\WindowsGraphics.h">
       <Filter>Platform\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="src\Platform\Windows\WindowsInput.h">
+      <Filter>Platform\Windows</Filter>
+    </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h">
       <Filter>Platform\Windows</Filter>
     </ClInclude>
@@ -94,7 +97,13 @@
     <ClInclude Include="src\Proton\IndexedTriangleList.h">
       <Filter>Proton</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Input.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
     <ClInclude Include="src\Proton\InputLayout.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\KeyCodes.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Layer.h">
@@ -112,10 +121,16 @@
     <ClInclude Include="src\Proton\Melon.h">
       <Filter>Proton</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\MouseButtonCodes.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
     <ClInclude Include="src\Proton\PixelShader.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Plane.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\PointLight.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Prism.h">
@@ -128,6 +143,9 @@
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Sheet.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\SolidSphere.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Sphere.h">
@@ -175,6 +193,9 @@
     <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp">
       <Filter>Platform\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
+      <Filter>Platform\Windows</Filter>
+    </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>Platform\Windows</Filter>
     </ClCompile>
@@ -214,6 +235,9 @@
     <ClCompile Include="src\Proton\PixelShader.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
+    <ClCompile Include="src\Proton\PointLight.cpp">
+      <Filter>Proton</Filter>
+    </ClCompile>
     <ClCompile Include="src\Proton\Pyramid.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
@@ -221,6 +245,9 @@
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Sheet.cpp">
+      <Filter>Proton</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\SolidSphere.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Surface.cpp">
@@ -262,7 +289,19 @@
     <FxCompile Include="src\Proton\Shader\ColorIndexVS.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongPS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongVS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
     <FxCompile Include="src\Proton\Shader\PixelShader.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\SolidPS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\SolidVS.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\TexturePS.hlsl">

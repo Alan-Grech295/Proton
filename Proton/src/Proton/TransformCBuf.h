@@ -11,7 +11,13 @@ namespace Proton
 		TransformCBuf(WindowsGraphics& gfx, const Drawable& parent);
 		void Bind(WindowsGraphics& gfx) noexcept override;
 	private:
-		static std::unique_ptr<VertexConstantBuffer<DirectX::XMMATRIX>> pVcbuf;
+		struct Transforms
+		{
+			DirectX::XMMATRIX modelViewProj;
+			DirectX::XMMATRIX model;
+		};
+	private:
+		static std::unique_ptr<VertexConstantBuffer<TransformCBuf::Transforms>> pVcbuf;
 		const Drawable& parent;
 	};
 }

@@ -302,6 +302,8 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
     if (ImGui::GetCurrentContext() == NULL)
         return 0;
 
+    //OutputDebugString(L"Received Event\n");
+
     ImGuiIO& io = ImGui::GetIO();
     switch (msg)
     {

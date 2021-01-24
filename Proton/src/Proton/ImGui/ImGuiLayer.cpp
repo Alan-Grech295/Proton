@@ -58,6 +58,10 @@ namespace Proton
 
 			ImGui::End();
 
+			Application::Get().camera.CreateControlWindow();
+
+			Application::Get().light->CreateControlWindow();
+
 			ImGui::Render();
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 		}

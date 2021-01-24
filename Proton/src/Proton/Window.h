@@ -40,6 +40,8 @@ namespace Proton
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;
 		virtual bool IsVSync() const = 0;
+		virtual void* GetNativeWindow() const = 0;
+
 		virtual void SetTitle(const std::string& title) = 0;
 		virtual void SetProjection(DirectX::FXMMATRIX proj) noexcept = 0;
 
@@ -50,25 +52,11 @@ namespace Proton
 			std::uniform_real_distribution<float>& rdist,
 			std::uniform_real_distribution<float>& bdist) = 0;
 
-		virtual std::unique_ptr<class Melon> CreateMelon(std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist,
-			std::uniform_int_distribution<int>& longdist,
-			std::uniform_int_distribution<int>& latdist) = 0;
+		virtual class PointLight* CreateLight(float radius = 0.5f) = 0;
 
-		virtual std::unique_ptr<class Pyramid> CreatePyramid(std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist) = 0;
+		virtual void BindLight(class PointLight* light) = 0;
 
-		virtual std::unique_ptr<class Sheet> CreateSheet(std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist) = 0;
+		virtual void DrawLight(class PointLight* light) = 0;
 
 		//Windows Camera, make abstract later
 		virtual void SetCamera(DirectX::FXMMATRIX cam) = 0;

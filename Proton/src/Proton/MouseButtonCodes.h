@@ -1,0 +1,6 @@
+#pragma once
+#define PT_LMOUSEBUTTON			1
+#define PT_RMOUSEBUTTON			2
+#define PT_MMOUSEBUTTON			4
+#define PT_X1MOUSEBUTTON		5
+#define PT_X2MOUSEBUTTON		6

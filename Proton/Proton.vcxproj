@@ -156,6 +156,7 @@
     <ClInclude Include="src\Platform\DirectX 11\imgui_impl_win32.h" />
     <ClInclude Include="src\Platform\Windows\Camera.h" />
     <ClInclude Include="src\Platform\Windows\WindowsGraphics.h" />
+    <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Proton.h" />
     <ClInclude Include="src\Proton\Application.h" />
@@ -176,18 +177,23 @@
     <ClInclude Include="src\Proton\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Proton\IndexBuffer.h" />
     <ClInclude Include="src\Proton\IndexedTriangleList.h" />
+    <ClInclude Include="src\Proton\Input.h" />
     <ClInclude Include="src\Proton\InputLayout.h" />
+    <ClInclude Include="src\Proton\KeyCodes.h" />
     <ClInclude Include="src\Proton\Layer.h" />
     <ClInclude Include="src\Proton\LayerStack.h" />
     <ClInclude Include="src\Proton\Log.h" />
     <ClInclude Include="src\Proton\Math.h" />
     <ClInclude Include="src\Proton\Melon.h" />
+    <ClInclude Include="src\Proton\MouseButtonCodes.h" />
     <ClInclude Include="src\Proton\PixelShader.h" />
     <ClInclude Include="src\Proton\Plane.h" />
+    <ClInclude Include="src\Proton\PointLight.h" />
     <ClInclude Include="src\Proton\Prism.h" />
     <ClInclude Include="src\Proton\Pyramid.h" />
     <ClInclude Include="src\Proton\Sampler.h" />
     <ClInclude Include="src\Proton\Sheet.h" />
+    <ClInclude Include="src\Proton\SolidSphere.h" />
     <ClInclude Include="src\Proton\Sphere.h" />
     <ClInclude Include="src\Proton\Surface.h" />
     <ClInclude Include="src\Proton\Texture.h" />
@@ -205,6 +211,7 @@
     <ClCompile Include="src\Platform\DirectX 11\imgui_impl_win32.cpp" />
     <ClCompile Include="src\Platform\Windows\Camera.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Proton\Application.cpp" />
     <ClCompile Include="src\Proton\Bindable.cpp" />
@@ -218,9 +225,11 @@
     <ClCompile Include="src\Proton\Log.cpp" />
     <ClCompile Include="src\Proton\Melon.cpp" />
     <ClCompile Include="src\Proton\PixelShader.cpp" />
+    <ClCompile Include="src\Proton\PointLight.cpp" />
     <ClCompile Include="src\Proton\Pyramid.cpp" />
     <ClCompile Include="src\Proton\Sampler.cpp" />
     <ClCompile Include="src\Proton\Sheet.cpp" />
+    <ClCompile Include="src\Proton\SolidSphere.cpp" />
     <ClCompile Include="src\Proton\Surface.cpp" />
     <ClCompile Include="src\Proton\Texture.cpp" />
     <ClCompile Include="src\Proton\TextureLoader.cpp" />
@@ -250,8 +259,24 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="src\Proton\Shader\PixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\SolidPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\SolidVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\TexturePS.hlsl">

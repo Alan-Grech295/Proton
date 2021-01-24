@@ -4,10 +4,12 @@
 #include "Events/Event.h"
 #include "Events/ApplicationEvent.h"
 #include "Events/MouseEvent.h"
+#include "Events/KeyEvent.h"
 #include "Window.h"
 #include "Timer.h"
 #include "LayerStack.h"
 #include "Platform/Windows/Camera.h"
+#include "PointLight.h"
 
 namespace Proton
 {
@@ -32,20 +34,17 @@ namespace Proton
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		bool OnAppRender(AppRenderEvent& e);
-
-		bool OnMouseMove(MouseMovedEvent& e);
-
 	private:
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
 		Timer timer;
-		float mouseX, mouseY;
 		LayerStack m_LayerStack;
 
 		std::vector<std::unique_ptr<class Drawable>> drawables;
-		static constexpr size_t nDrawables = 180;
-
+		static constexpr size_t nDrawables = 500;
+	public:
 		Camera camera;
+		PointLight* light;
 	private:
 		static Application* s_Instance;
 	};

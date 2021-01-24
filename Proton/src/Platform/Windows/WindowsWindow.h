@@ -5,7 +5,7 @@
 #include <memory>
 #include "WindowsGraphics.h"
 #include <random>
-//#include "Proton/Drawable.h"
+#include "WindowsInput.h"
 
 //Temp includes
 #include "Proton/Timer.h"
@@ -30,6 +30,8 @@ namespace Proton
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.eventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
+		inline virtual void* GetNativeWindow() const { return m_HWnd; }
+
 		void SetTitle(const std::string& title) override;
 		void SetProjection(DirectX::FXMMATRIX proj) noexcept override;
 
@@ -40,25 +42,11 @@ namespace Proton
 			std::uniform_real_distribution<float>& rdist,
 			std::uniform_real_distribution<float>& bdist) override;
 
-		std::unique_ptr<class Melon> CreateMelon(std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist,
-			std::uniform_int_distribution<int>& longdist,
-			std::uniform_int_distribution<int>& latdist) override;
+		virtual class PointLight* CreateLight(float radius = 0.5f) override;
 
-		std::unique_ptr<class Pyramid> CreatePyramid(std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist) override;
+		virtual void BindLight(class PointLight* light) override;
 
-		std::unique_ptr<class Sheet> CreateSheet(std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist) override;
+		virtual void DrawLight(class PointLight* light) override;
 
 		void InitImGui() override;
 
@@ -91,6 +79,7 @@ namespace Proton
 		bool receivingMouseInput;
 		bool initializedImGui = false;
 		std::unique_ptr<WindowsGraphics> pGfx;
+		WindowsInput* input;
 
 		//Temp variables
 		Timer timer;

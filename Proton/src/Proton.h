@@ -6,6 +6,10 @@
 #include "Proton/Log.h"
 #include "Proton/Layer.h"
 
+#include "Proton/Input.h"
+#include "Proton/MouseButtonCodes.h"
+#include "Proton/KeyCodes.h"
+
 #include "Proton/ImGui/ImGuiLayer.h"
 
 //---Entry Point------------------
