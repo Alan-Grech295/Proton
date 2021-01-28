@@ -13,7 +13,7 @@
 namespace Proton
 {
 	class WindowsGraphics;
-	class Drawable;
+	//class Drawable;
 
 	class WindowsWindow : public Window
 	{
@@ -40,19 +40,21 @@ namespace Proton
 			std::uniform_real_distribution<float>& ddist,
 			std::uniform_real_distribution<float>& odist,
 			std::uniform_real_distribution<float>& rdist,
-			std::uniform_real_distribution<float>& bdist) override;
+			std::uniform_real_distribution<float>& bdist,
+			DirectX::XMFLOAT3 material) override;
 
-		virtual class PointLight* CreateLight(float radius = 0.5f) override;
-
-		virtual void BindLight(class PointLight* light) override;
-
-		virtual void DrawLight(class PointLight* light) override;
+		virtual std::unique_ptr<class AssimpTest> CreateTestMesh(
+			std::mt19937& rng,
+			std::uniform_real_distribution<float>& adist,
+			std::uniform_real_distribution<float>& ddist,
+			std::uniform_real_distribution<float>& odist,
+			std::uniform_real_distribution<float>& rdist,
+			DirectX::XMFLOAT3 material
+		) override;
 
 		void InitImGui() override;
 
 		void SetCamera(DirectX::FXMMATRIX cam) override;
-
-		void Draw(Drawable* drawable) override;
 
 		WindowsGraphics& Gfx();
 

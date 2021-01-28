@@ -13,10 +13,10 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 --Include Directories relative to root folder
 IncludeDir = {}
 IncludeDir["ImGui"] = "%{wks.location}/Proton/vendor/imgui"
---IncludeDir["Assimp"] = "%{wks.location}/Proton/vendor/Assimp/include"
+IncludeDir["Assimp"] = "%{wks.location}/Proton/vendor/Assimp/include"
 
 include "Proton/vendor/imgui"
---include "Proton/vendor/Assimp"
+include "Proton/vendor/Assimp"
 
 project "Proton"
 	location "Proton"
@@ -41,14 +41,14 @@ project "Proton"
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/DirectXTK/include",
-		"%{IncludeDir.ImGui}"
-		--"%{IncludeDir.Assimp}"
+		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.Assimp}"
 	}
 
 	links
 	{
-		"ImGui"
-		--"Assimp"
+		"ImGui",
+		"assimp"
 	}
 
 	filter "system:windows"

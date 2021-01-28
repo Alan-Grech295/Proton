@@ -4,3 +4,6 @@
 [submodule "Proton/vendor/imgui"]
 	path = Proton/vendor/imgui
 	url = https://github.com/TheCherno/imgui
+[submodule "Proton/vendor/Assimp"]
+	path = Proton/vendor/Assimp
+	url = https://github.com/AminAliari/assimp

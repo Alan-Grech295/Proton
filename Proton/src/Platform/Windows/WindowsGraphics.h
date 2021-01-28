@@ -16,7 +16,8 @@ namespace Proton
 
 	class WindowsGraphics
 	{
-		friend class Bindable;
+		friend class DirectXVertexBuffer;
+		friend class DirectXIndexBuffer;
 	public:
 		WindowsGraphics(HWND hWnd, UINT width, UINT height);
 		WindowsGraphics(const WindowsGraphics&) = delete;
@@ -34,13 +35,14 @@ namespace Proton
 		void SetCamera(DirectX::FXMMATRIX cam);
 		DirectX::XMMATRIX GetCamera() const;
 
-		std::wstring GetShaderPath(std::string shaderName);
-
-		ID3D11Device* GetDevice();
+		static std::string GetShaderPath(std::string shaderName);
 
 		void InitImGui();
+
+		static ID3D11DeviceContext* GetContext();
+		static ID3D11Device* GetDevice();
 	private:
-		std::wstring s2ws(const std::string& s);
+		static std::wstring s2ws(const std::string& s);
 	private:
 		DirectX::XMMATRIX camera;
 		DirectX::XMMATRIX projection;
@@ -51,9 +53,11 @@ namespace Proton
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
 
-		std::string absPath;
+		static std::string absPath;
 
 		UINT width, height;
+
+		static WindowsGraphics* s_Instance;
 
 		bool isVSync;
 	};

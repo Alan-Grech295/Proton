@@ -40,7 +40,7 @@ namespace Proton
 		Timer timer;
 		LayerStack m_LayerStack;
 
-		std::vector<std::unique_ptr<class Drawable>> drawables;
+		std::vector<std::unique_ptr<class Box>> boxes;
 		static constexpr size_t nDrawables = 500;
 	public:
 		Camera camera;

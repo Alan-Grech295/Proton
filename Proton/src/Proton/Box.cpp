@@ -1,18 +1,20 @@
 #include "ptpch.h"
 #include "Proton/Box.h"
-#include "Proton/BindableBase.h"
 #include "Proton/Log.h"
 #include "Proton/Cube.h"
 
+//Temp
+#include "Platform\Windows\WindowsGraphics.h"
+
 namespace Proton
 {
-	Box::Box(WindowsGraphics& gfx,
-		std::mt19937& rng,
+	Box::Box(std::mt19937& rng,
 		std::uniform_real_distribution<float>& adist,
 		std::uniform_real_distribution<float>& ddist,
 		std::uniform_real_distribution<float>& odist,
 		std::uniform_real_distribution<float>& rdist,
-		std::uniform_real_distribution<float>& bdist)
+		std::uniform_real_distribution<float>& bdist,
+		DirectX::XMFLOAT3 material)
 		:
 		r(rdist(rng)),
 		droll(ddist(rng)),
@@ -26,42 +28,35 @@ namespace Proton
 		phi(adist(rng))
 	{
 		namespace dx = DirectX;
-		if (!IsStaticInitialised())
+		
+		struct Vertex
 		{
-			struct Vertex
-			{
-				dx::XMFLOAT3 pos;
-				dx::XMFLOAT3 n;
-			};
-			
-			auto model = Cube::MakeIndependent<Vertex>();
-			model.SetNormalsIndependentFlat();
+			dx::XMFLOAT3 pos;
+			dx::XMFLOAT3 n;
+		};
 
-			AddStaticBind(std::make_unique<VertexBuffer>(gfx, model.vertices));
+		auto model = Cube::MakeIndependent<Vertex>();
+		model.SetNormalsIndependentFlat();
 
-			auto pvs = std::make_unique<VertexShader>(gfx, gfx.GetShaderPath("PhongVS.cso"));
-			auto pvsbc = pvs->GetBytecode();
-			AddStaticBind(std::move(pvs));
+		m_VertBuffer.reset(VertexBuffer::Create(sizeof(Vertex), &model.vertices[0], model.vertices.size()));
 
-			AddStaticBind(std::make_unique<PixelShader>(gfx, gfx.GetShaderPath("PhongPS.cso")));
+		m_VertShader.reset(VertexShader::Create(WindowsGraphics::GetShaderPath("PhongVS.cso")));
 
-			AddStaticIndexBuffer(std::make_unique<IndexBuffer>(gfx, model.indices));
+		m_PixelShader.reset(PixelShader::Create(WindowsGraphics::GetShaderPath("PhongPS.cso")));
 
-			const std::vector<D3D11_INPUT_ELEMENT_DESC> ied =
-			{
-				{ "POSITION",0,DXGI_FORMAT_R32G32B32_FLOAT,0,0,D3D11_INPUT_PER_VERTEX_DATA,0 },
-				{"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0}
-			};
-			AddStaticBind(std::make_unique<InputLayout>(gfx, ied, pvsbc));
+		m_IndexBuffer.reset(IndexBuffer::Create(&model.indices[0], model.indices.size()));
 
-			AddStaticBind(std::make_unique<Topology>(gfx, D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST));
-		}
-		else
-		{
-			SetIndexFromStatic();
-		}
+		BufferLayout layout = {
+			{"POSITION", ShaderDataType::Float3},
+			{"NORMAL", ShaderDataType::Float3}
+		};
 
-		AddBind(std::make_unique<TransformCBuf>(gfx, *this));
+		m_VertBuffer->SetLayout(layout, m_VertShader.get());
+
+		m_TransformCBuf.reset(VertexConstantBuffer::Create());
+
+		materialConstants.color = material;
+		m_MaterialCBuf.reset(PixelConstantBuffer::Create(0, sizeof(materialConstants), &materialConstants));
 
 		// model deformation transform (per instance, not stored as bind)
 		dx::XMStoreFloat3x3(

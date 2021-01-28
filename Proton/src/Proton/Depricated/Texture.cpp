@@ -1,5 +1,6 @@
 #include "ptpch.h"
 #include "Texture.h"
+#include "Renderer\Texture.h"
 
 namespace wrl = Microsoft::WRL;
 
@@ -49,5 +50,4 @@ namespace Proton
 	{
 		GetContext(gfx)->PSSetShaderResources(0u, 1u, pTextureView.GetAddressOf());
 	}
-
 }

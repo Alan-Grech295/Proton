@@ -1,16 +1,36 @@
 #pragma once
-#include "DrawableBase.h"
+#include <DirectXMath.h>
+#include "Renderer\Buffer.h"
+#include "Renderer\Shader.h"
 
 namespace Proton
 {
-	class SolidSphere : public DrawableBase<SolidSphere>
+	class SolidSphere
 	{
 	public:
-		SolidSphere(WindowsGraphics& gfx, float radius);
-		void Update(float dt) noexcept override;
+		SolidSphere(float radius);
+		void Update(float dt) noexcept;
 		void SetPos(DirectX::XMFLOAT3 pos);
-		DirectX::XMMATRIX GetTransformXM() const noexcept override;
+		DirectX::XMMATRIX GetTransformXM() const noexcept;
 	private:
 		DirectX::XMFLOAT3 pos = { 1.0f, 1.0f, 1.0f };
+		struct PSColorConstant
+		{
+			DirectX::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
+			float padding;
+		} colorConst;
+
+		struct Transforms
+		{
+			DirectX::XMMATRIX modelViewProj;
+			DirectX::XMMATRIX model;
+		};
+
+		std::unique_ptr<VertexBuffer> m_VertBuffer;
+		std::unique_ptr<IndexBuffer> m_IndexBuffer;
+		std::unique_ptr<VertexShader> m_VertShader;
+		std::unique_ptr<PixelShader> m_PixelShader;
+		std::unique_ptr<VertexConstantBuffer> m_TransformCBuf;
+		std::unique_ptr<PixelConstantBuffer> m_MaterialCBuf;
 	};
 }

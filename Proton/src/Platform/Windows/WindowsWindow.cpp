@@ -4,10 +4,8 @@
 #include "Proton/Events/MouseEvent.h"
 #include "Proton/Events/KeyEvent.h"
 #include "Proton/Box.h"
-#include "Proton/Melon.h"
-#include "Proton/Pyramid.h"
-#include "Proton/Sheet.h"
-#include "Proton/Drawable.h"
+#include "Proton/AssimpTest.h"
+//#include "Proton/Drawable.h"
 #include "Platform/DirectX 11/imgui_impl_win32.h"
 #include "Proton/PointLight.h"
 
@@ -77,28 +75,36 @@ namespace Proton
 		pGfx->SetProjection(proj);
 	}
 
-	std::unique_ptr<Box> WindowsWindow::CreateBox(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, std::uniform_real_distribution<float>& bdist)
+	std::unique_ptr<Box> WindowsWindow::CreateBox(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, std::uniform_real_distribution<float>& bdist, DirectX::XMFLOAT3 material)
 	{
 		return std::make_unique<Box>(
-			Gfx(), rng, adist, ddist,
-			odist, rdist, bdist
+			rng, adist, ddist,
+			odist, rdist, bdist, material
 			);
 	}
 
-	PointLight* WindowsWindow::CreateLight(float radius)
+	std::unique_ptr<AssimpTest> WindowsWindow::CreateTestMesh(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, DirectX::XMFLOAT3 material)
 	{
-		return new PointLight(Gfx(), radius);
+		return std::make_unique<AssimpTest>(
+			rng, adist, odist, 
+			ddist, rdist, material
+			);
 	}
 
-	void WindowsWindow::BindLight(PointLight* light)
+	/*PointLight* WindowsWindow::CreateLight(float radius)
 	{
-		light->Bind(Gfx());
+		return new PointLight(radius);
+	}
+
+	void WindowsWindow::BindLight(PointLight* light, DirectX::FXMMATRIX view)
+	{
+		light->Bind(Gfx(), view);
 	}
 
 	void WindowsWindow::DrawLight(PointLight* light)
 	{
 		light->Draw(Gfx());
-	}
+	}*/
 
 	void WindowsWindow::InitImGui()
 	{
@@ -113,10 +119,10 @@ namespace Proton
 		pGfx->SetCamera(cam);
 	}
 
-	void WindowsWindow::Draw(Drawable* drawable)
+	/*void WindowsWindow::Draw(Drawable* drawable)
 	{
 		drawable->Draw(Gfx());
-	}
+	}*/
 
 	WindowsGraphics& WindowsWindow::Gfx()
 	{

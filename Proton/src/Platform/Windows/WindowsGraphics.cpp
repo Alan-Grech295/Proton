@@ -19,6 +19,9 @@ namespace dx = DirectX;
 
 namespace Proton
 {
+	WindowsGraphics* WindowsGraphics::s_Instance = nullptr;
+	std::string WindowsGraphics::absPath = "";
+
 	WindowsGraphics::WindowsGraphics(HWND hWnd, UINT width, UINT height)
 		:
 		width(width),
@@ -142,6 +145,8 @@ namespace Proton
 		{
 			absPath += splitPath[i] + "\\";
 		}
+
+		WindowsGraphics::s_Instance = this;
 	}
 
 	void WindowsGraphics::ShowFrame()
@@ -166,6 +171,11 @@ namespace Proton
 	{
 		std::wstring stemp = std::wstring(s.begin(), s.end());
 		return stemp;
+	}
+
+	ID3D11DeviceContext* WindowsGraphics::GetContext()
+	{
+		return s_Instance->pContext.Get();
 	}
 
 	void WindowsGraphics::DrawIndexed(UINT count) noexcept
@@ -193,13 +203,14 @@ namespace Proton
 		return camera;
 	}
 
-	std::wstring WindowsGraphics::GetShaderPath(std::string shaderName)
+	std::string WindowsGraphics::GetShaderPath(std::string shaderName)
 	{
-		return s2ws(absPath + shaderName);
+		return absPath + shaderName;
 	}
+
 	ID3D11Device* WindowsGraphics::GetDevice()
 	{
-		return pDevice.Get();
+		return s_Instance->pDevice.Get();
 	}
 
 	void WindowsGraphics::InitImGui()

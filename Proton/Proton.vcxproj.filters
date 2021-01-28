@@ -46,10 +46,7 @@
     <ClInclude Include="src\Proton\Application.h">
       <Filter>Proton</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\Bindable.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\BindableBase.h">
+    <ClInclude Include="src\Proton\AssimpTest.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Box.h">
@@ -58,19 +55,10 @@
     <ClInclude Include="src\Proton\Cone.h">
       <Filter>Proton</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\ConstantBuffer.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\Core.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Cube.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Drawable.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\DrawableBase.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\EntryPoint.h">
@@ -91,16 +79,10 @@
     <ClInclude Include="src\Proton\ImGui\ImGuiLayer.h">
       <Filter>Proton\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\IndexBuffer.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\IndexedTriangleList.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Input.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\InputLayout.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\KeyCodes.h">
@@ -118,31 +100,10 @@
     <ClInclude Include="src\Proton\Math.h">
       <Filter>Proton</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\Melon.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\MouseButtonCodes.h">
       <Filter>Proton</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\PixelShader.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Plane.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\PointLight.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Prism.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Pyramid.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Sampler.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Sheet.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\SolidSphere.h">
@@ -151,34 +112,23 @@
     <ClInclude Include="src\Proton\Sphere.h">
       <Filter>Proton</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\Surface.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Texture.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\TextureLoader.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\Timer.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Topology.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\TransformCBuf.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\VertexBuffer.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\VertexShader.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Window.h">
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
+    <ClInclude Include="src\Proton\Renderer\Buffer.h" />
+    <ClInclude Include="src\Platform\DirectX 11\DirectXBuffer.h" />
+    <ClInclude Include="src\Proton\Renderer\Renderer.h" />
+    <ClInclude Include="src\Proton\Renderer\Shader.h" />
+    <ClInclude Include="src\Platform\DirectX 11\DirectXShader.h" />
+    <ClInclude Include="src\Proton\Renderer\Texture.h" />
+    <ClInclude Include="src\Platform\DirectX 11\DirectXTexture.h" />
+    <ClInclude Include="src\Proton\Renderer\RendererAPI.h" />
+    <ClInclude Include="src\Proton\Renderer\RenderCommand.h" />
+    <ClInclude Include="src\Platform\DirectX 11\DirectXRendererAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\imgui_impl_dx11.cpp">
@@ -202,23 +152,14 @@
     <ClCompile Include="src\Proton\Application.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\Bindable.cpp">
+    <ClCompile Include="src\Proton\AssimpTest.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Box.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\Drawable.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
     <ClCompile Include="src\Proton\ImGui\ImGuiLayer.cpp">
       <Filter>Proton\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\IndexBuffer.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\InputLayout.cpp">
-      <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Layer.cpp">
       <Filter>Proton</Filter>
@@ -229,52 +170,26 @@
     <ClCompile Include="src\Proton\Log.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\Melon.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\PixelShader.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
     <ClCompile Include="src\Proton\PointLight.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Pyramid.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Sampler.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Sheet.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\SolidSphere.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\Surface.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Texture.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\TextureLoader.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
     <ClCompile Include="src\Proton\Timer.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\Topology.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\TransformCBuf.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\VertexBuffer.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\VertexShader.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
+    <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Renderer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Shader.cpp" />
+    <ClCompile Include="src\Platform\DirectX 11\DirectXShader.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Texture.cpp" />
+    <ClCompile Include="src\Platform\DirectX 11\DirectXTexture.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp" />
+    <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp" />
+    <ClCompile Include="src\Platform\DirectX 11\DirectXRendererAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">
@@ -313,5 +228,8 @@
     <FxCompile Include="src\Proton\Shader\VertexShader.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

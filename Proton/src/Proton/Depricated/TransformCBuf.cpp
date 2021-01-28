@@ -3,26 +3,26 @@
 
 namespace Proton
 {
-	TransformCBuf::TransformCBuf(WindowsGraphics& gfx, const Drawable& parent)
+	TransformCBuf::TransformCBuf(WindowsGraphics& gfx, const Drawable& parent, UINT slot)
 		:
 		parent(parent)
 	{
 		if (!pVcbuf)
 		{
-			pVcbuf = std::make_unique<VertexConstantBuffer<Transforms>>(gfx);
+			pVcbuf = std::make_unique<VertexConstantBuffer<Transforms>>(gfx, slot);
 		}
 	}
 
 	void TransformCBuf::Bind(WindowsGraphics& gfx) noexcept
 	{
-		const auto model = parent.GetTransformXM();
+		const auto modelView = parent.GetTransformXM() * gfx.GetCamera();
 		const Transforms tf =
 		{
-			DirectX::XMMatrixTranspose(model),
+			DirectX::XMMatrixTranspose(modelView),
 			DirectX::XMMatrixTranspose(
-				model *
-				gfx.GetCamera() *
-				gfx.GetProjection())
+				modelView *
+				gfx.GetProjection()
+			)
 		};
 		pVcbuf->Update(gfx, tf);
 		pVcbuf->Bind(gfx);

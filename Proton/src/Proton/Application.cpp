@@ -5,10 +5,8 @@
 #include "Proton/Log.h"
 #include "Proton/Events/ApplicationEvent.h"
 #include <iomanip>
-#include "Proton/Melon.h"
-#include "Proton/Pyramid.h"
+#include "Proton/AssimpTest.h"
 #include "Proton/Box.h"
-#include "Proton/Sheet.h"
 #include <memory>
 #include <algorithm>
 #include "Proton/Math.h"
@@ -16,6 +14,7 @@
 #include "Platform/DirectX 11/imgui_impl_dx11.h"
 #include "Platform/DirectX 11/imgui_impl_win32.h"
 #include "Input.h"
+#include "Renderer\Buffer.h"
 
 namespace Proton
 {
@@ -31,7 +30,7 @@ namespace Proton
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 		m_Window->SetVSync(false);
 
-		class Factory
+		/*class Factory
 		{
 		public:
 			Factory(Window* window)
@@ -40,27 +39,40 @@ namespace Proton
 			{}
 			std::unique_ptr<Drawable> operator()()
 			{
-				return wnd->CreateBox(
-					rng, adist, ddist,
-					odist, rdist, bdist
-				);
+				const DirectX::XMFLOAT3 mat = { cdist(rng),cdist(rng),cdist(rng) };
+
+				switch (sdist(rng))
+				{
+				case 0:
+					return wnd->CreateBox(
+						rng, adist, ddist,
+						odist, rdist, bdist, mat
+					);
+				case 1:
+					return wnd->CreateTestMesh(
+						rng, adist, ddist,
+						odist, rdist, mat
+					);
+				}
 			}
 		private:
 			Window* wnd;
 			std::mt19937 rng{ std::random_device{}() };
+			std::uniform_int_distribution<int> sdist{ 0,1 };
 			std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
 			std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
 			std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
 			std::uniform_real_distribution<float> rdist{ 2.0f,50.0f };
 			std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
+			std::uniform_real_distribution<float> cdist{ 0.0f,1.0f };
 		};
 
 		drawables.reserve(nDrawables);
-		std::generate_n(std::back_inserter(drawables), nDrawables, Factory{ m_Window.get() });
+		std::generate_n(std::back_inserter(drawables), nDrawables, Factory{ m_Window.get() });*/
 
 		m_Window->SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, ((float)m_Window->GetHeight() / m_Window->GetWidth()), 0.5f, 1000.0f));
 	
-		light = m_Window->CreateLight();
+		//light = m_Window->CreateLight();
 	}
 
 	Application::~Application()
@@ -126,15 +138,15 @@ namespace Proton
 	{
 		m_Window->SetCamera(camera.GetMatrix());
 		auto dt = timer.Mark();
-		m_Window->BindLight(light);
+		//m_Window->BindLight(light, camera.GetMatrix());
 
-		for (auto& d : drawables)
+		/*for (auto& d : drawables)
 		{
 			d->Update(dt);
 			m_Window->Draw(d.get());
-		}
+		}*/
 
-		m_Window->DrawLight(light);
+		//m_Window->DrawLight(light);
 
 		return true;
 	}

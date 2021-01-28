@@ -8,7 +8,7 @@
 
 namespace Proton
 {
-	class Drawable;
+	//class Drawable;
 
 	struct WindowProperties
 	{
@@ -50,20 +50,22 @@ namespace Proton
 			std::uniform_real_distribution<float>& ddist,
 			std::uniform_real_distribution<float>& odist,
 			std::uniform_real_distribution<float>& rdist,
-			std::uniform_real_distribution<float>& bdist) = 0;
+			std::uniform_real_distribution<float>& bdist,
+			DirectX::XMFLOAT3 material) = 0;
 
-		virtual class PointLight* CreateLight(float radius = 0.5f) = 0;
-
-		virtual void BindLight(class PointLight* light) = 0;
-
-		virtual void DrawLight(class PointLight* light) = 0;
+		virtual std::unique_ptr<class AssimpTest> CreateTestMesh(
+			std::mt19937& rng,
+			std::uniform_real_distribution<float>& adist,
+			std::uniform_real_distribution<float>& ddist,
+			std::uniform_real_distribution<float>& odist,
+			std::uniform_real_distribution<float>& rdist,
+			DirectX::XMFLOAT3 material
+		) = 0;
 
 		//Windows Camera, make abstract later
 		virtual void SetCamera(DirectX::FXMMATRIX cam) = 0;
 
 		virtual void InitImGui() = 0;
-
-		virtual void Draw(Drawable* drawable) = 0;
 
 		static Window* Create(const WindowProperties& props = WindowProperties());
 	};

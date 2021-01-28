@@ -8,7 +8,7 @@ namespace Proton
 	class TransformCBuf : public Bindable
 	{
 	public:
-		TransformCBuf(WindowsGraphics& gfx, const Drawable& parent);
+		TransformCBuf(WindowsGraphics& gfx, const Drawable& parent, UINT slot = 0);
 		void Bind(WindowsGraphics& gfx) noexcept override;
 	private:
 		struct Transforms

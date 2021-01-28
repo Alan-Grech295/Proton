@@ -4,11 +4,11 @@
 
 namespace Proton
 {
-	PointLight::PointLight(WindowsGraphics& gfx, float radius)
+	PointLight::PointLight(float radius)
 		:
-		mesh(gfx, radius),
-		cbuf(gfx)
+		mesh(radius)
 	{
+		cbuf.reset(PixelConstantBuffer::Create(0, sizeof(cbData), &cbData));
 		Reset();
 	}
 
@@ -44,7 +44,6 @@ namespace Proton
 	{
 		cbData = {
 			{ 0.0f, 0.0f, 0.0f },
-			{0.7f, 0.7f, 0.9f},
 			{0.05f, 0.05f, 0.05f},
 			{1.0f, 1.0f, 1.0f},
 			2.0f,
@@ -54,15 +53,18 @@ namespace Proton
 		};
 	}
 
-	void PointLight::Draw(WindowsGraphics& gfx) const
+	/*void PointLight::Draw(WindowsGraphics& gfx) const
 	{
 		mesh.SetPos(cbData.pos);
 		mesh.Draw(gfx);
 	}
 
-	void PointLight::Bind(WindowsGraphics& gfx) const
+	void PointLight::Bind(WindowsGraphics& gfx, DirectX::FXMMATRIX view) const
 	{
-		cbuf.Update(gfx, cbData);
+		auto dataCopy = cbData;
+		const auto pos = DirectX::XMLoadFloat3(&cbData.pos);
+		DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, view));
+		cbuf.Update(gfx, dataCopy);
 		cbuf.Bind(gfx);
-	}
+	}*/
 }
