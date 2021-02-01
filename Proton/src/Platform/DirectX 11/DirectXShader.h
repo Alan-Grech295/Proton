@@ -1,6 +1,7 @@
 #pragma once
 #include "Proton\Renderer\Shader.h"
-#include "Platform\Windows\WindowsGraphics.h"
+#include "Platform\DirectX 11\DirectXRendererAPI.h"
+#include "Proton\Renderer\RenderCommand.h"
 #include <wrl.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>

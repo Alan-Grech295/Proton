@@ -2,9 +2,8 @@
 #include "Proton/Box.h"
 #include "Proton/Log.h"
 #include "Proton/Cube.h"
-
-//Temp
-#include "Platform\Windows\WindowsGraphics.h"
+#include "Renderer\Renderer.h"
+#include "Log.h"
 
 namespace Proton
 {
@@ -28,36 +27,36 @@ namespace Proton
 		phi(adist(rng))
 	{
 		namespace dx = DirectX;
-		
 		struct Vertex
 		{
 			dx::XMFLOAT3 pos;
 			dx::XMFLOAT3 n;
 		};
-
+		
 		auto model = Cube::MakeIndependent<Vertex>();
 		model.SetNormalsIndependentFlat();
-
+		
 		m_VertBuffer.reset(VertexBuffer::Create(sizeof(Vertex), &model.vertices[0], model.vertices.size()));
-
-		m_VertShader.reset(VertexShader::Create(WindowsGraphics::GetShaderPath("PhongVS.cso")));
-
-		m_PixelShader.reset(PixelShader::Create(WindowsGraphics::GetShaderPath("PhongPS.cso")));
-
+		
+		m_VertShader.reset(VertexShader::Create("C:\\Dev\\Proton\\Proton\\SolidVS.cso"));
+		
+		m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\SolidPS.cso"));
+		
 		m_IndexBuffer.reset(IndexBuffer::Create(&model.indices[0], model.indices.size()));
-
+		
 		BufferLayout layout = {
 			{"POSITION", ShaderDataType::Float3},
 			{"NORMAL", ShaderDataType::Float3}
 		};
-
+		
 		m_VertBuffer->SetLayout(layout, m_VertShader.get());
-
-		m_TransformCBuf.reset(VertexConstantBuffer::Create());
-
+		
+		m_TransformCBuf.reset(VertexConstantBuffer::Create(0, sizeof(Transforms), new Transforms{}));
+		
 		materialConstants.color = material;
-		m_MaterialCBuf.reset(PixelConstantBuffer::Create(0, sizeof(materialConstants), &materialConstants));
-
+		DirectX::XMFLOAT4 col = { material.x, material.y, material.z, 1.0f };
+		m_MaterialCBuf.reset(PixelConstantBuffer::Create(0, sizeof(col), &col));
+		
 		// model deformation transform (per instance, not stored as bind)
 		dx::XMStoreFloat3x3(
 			&mt,
@@ -73,6 +72,18 @@ namespace Proton
 		theta += dtheta * dt;
 		phi += dphi * dt;
 		chi += dchi * dt;
+
+		const auto modelView = GetTransformXM() * Renderer::GetCamera().GetViewMatrix();
+		const Transforms tf =
+		{
+			DirectX::XMMatrixTranspose(modelView),
+			DirectX::XMMatrixTranspose(
+				modelView *
+				Renderer::GetCamera().GetProjectionMatrix()
+			)
+		};
+
+		m_TransformCBuf->SetData(sizeof(Transforms), &tf);
 	}
 
 	DirectX::XMMATRIX Box::GetTransformXM() const noexcept

@@ -12,6 +12,7 @@ namespace Proton
 		void Update(float dt) noexcept;
 		void SetPos(DirectX::XMFLOAT3 pos);
 		DirectX::XMMATRIX GetTransformXM() const noexcept;
+		void Bind();
 	private:
 		DirectX::XMFLOAT3 pos = { 1.0f, 1.0f, 1.0f };
 		struct PSColorConstant
@@ -25,7 +26,7 @@ namespace Proton
 			DirectX::XMMATRIX modelViewProj;
 			DirectX::XMMATRIX model;
 		};
-
+	public:
 		std::unique_ptr<VertexBuffer> m_VertBuffer;
 		std::unique_ptr<IndexBuffer> m_IndexBuffer;
 		std::unique_ptr<VertexShader> m_VertShader;

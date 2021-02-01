@@ -3,7 +3,6 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include "Platform\Windows\WindowsGraphics.h"
 
 namespace Proton
 {
@@ -60,9 +59,9 @@ namespace Proton
 
 		m_IndexBuffer.reset(IndexBuffer::Create(&indices[0], indices.size()));
 
-		m_VertShader.reset(VertexShader::Create(WindowsGraphics::GetShaderPath("PhongVS.cso")));
+		m_VertShader.reset(VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso"));
 
-		m_PixelShader.reset(PixelShader::Create(WindowsGraphics::GetShaderPath("PhongPS.cso")));
+		m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso"));
 
 		BufferLayout layout = {
 			{"POSITION", ShaderDataType::Float3},
@@ -74,6 +73,6 @@ namespace Proton
 		pmc.color = material;
 		m_MaterialCBuf.reset(PixelConstantBuffer::Create(0, sizeof(pmc), &pmc));
 
-		m_TransformCBuf.reset(VertexConstantBuffer::Create());
+		m_TransformCBuf.reset(VertexConstantBuffer::Create(0, sizeof(Transforms), new Transforms()));
 	}
 }

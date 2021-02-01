@@ -5,6 +5,9 @@ namespace Proton
 {
 	class RenderCommand
 	{
+		friend class WindowsWindow;
+		friend class DirectXPixelShader;
+		friend class DirectXVertexShader;
 	public:
 		inline static void SetClearColor(float r, float g, float b)
 		{
@@ -20,6 +23,8 @@ namespace Proton
 		{
 			s_RendererAPI->DrawIndexed(vertBuffer, indexBuffer);
 		}
+
+		inline static RendererAPI* GetRendererAPI() { return s_RendererAPI; }
 	private:
 		static RendererAPI* s_RendererAPI;
 	};

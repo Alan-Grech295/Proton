@@ -1,5 +1,6 @@
 #pragma once
 #include "Proton\Renderer\Buffer.h"
+#include "Proton\PointLight.h"
 #include <wrl.h>
 #include <d3d11.h>
 
@@ -24,6 +25,7 @@ namespace Proton
 		UINT stride;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pVertexBuffer;
 		Microsoft::WRL::ComPtr<ID3D11InputLayout> pInputLayout;
+		D3D11_INPUT_ELEMENT_DESC* pInputLayoutDesc;
 		BufferLayout m_Layout;
 	};
 
@@ -35,6 +37,8 @@ namespace Proton
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
+
+		virtual unsigned int GetCount() const override;
 	private:
 		UINT count;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pIndexBuffer;

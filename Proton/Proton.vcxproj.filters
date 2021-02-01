@@ -30,12 +30,6 @@
     <ClInclude Include="src\Platform\DirectX 11\imgui_impl_win32.h">
       <Filter>Platform\DirectX 11</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\Windows\Camera.h">
-      <Filter>Platform\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Platform\Windows\WindowsGraphics.h">
-      <Filter>Platform\Windows</Filter>
-    </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsInput.h">
       <Filter>Platform\Windows</Filter>
     </ClInclude>
@@ -129,6 +123,7 @@
     <ClInclude Include="src\Proton\Renderer\RendererAPI.h" />
     <ClInclude Include="src\Proton\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Platform\DirectX 11\DirectXRendererAPI.h" />
+    <ClInclude Include="src\Proton\Renderer\Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\imgui_impl_dx11.cpp">
@@ -136,12 +131,6 @@
     </ClCompile>
     <ClCompile Include="src\Platform\DirectX 11\imgui_impl_win32.cpp">
       <Filter>Platform\DirectX 11</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Platform\Windows\Camera.cpp">
-      <Filter>Platform\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp">
-      <Filter>Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
       <Filter>Platform\Windows</Filter>
@@ -190,6 +179,7 @@
     <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Platform\DirectX 11\DirectXRendererAPI.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">

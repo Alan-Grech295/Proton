@@ -3,9 +3,11 @@
 
 namespace Proton
 {
-	void Renderer::BeginScene()
-	{
+	Camera* Renderer::m_Camera = nullptr;
 
+	void Renderer::BeginScene(Camera& camera)
+	{
+		m_Camera = &camera;
 	}
 
 	void Renderer::EndScene()

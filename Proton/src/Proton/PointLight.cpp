@@ -21,6 +21,8 @@ namespace Proton
 			ImGui::SliderFloat("Y", &cbData.pos.y, -60.0f, 60.0f, "%.1f");
 			ImGui::SliderFloat("Z", &cbData.pos.z, -60.0f, 60.0f, "%.1f");
 
+			mesh.SetPos(cbData.pos);
+
 			ImGui::Text("Intensity/Color");
 			ImGui::SliderFloat("Intensity", &cbData.diffuseIntensity, 0.01f, 2.0f, "%.2f");
 			ImGui::ColorEdit3("Diffuse Color", &cbData.diffuseColor.x);
@@ -57,14 +59,15 @@ namespace Proton
 	{
 		mesh.SetPos(cbData.pos);
 		mesh.Draw(gfx);
-	}
+	}*/
 
-	void PointLight::Bind(WindowsGraphics& gfx, DirectX::FXMMATRIX view) const
+	/*void PointLight::Bind() const
 	{
 		auto dataCopy = cbData;
 		const auto pos = DirectX::XMLoadFloat3(&cbData.pos);
 		DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, view));
-		cbuf.Update(gfx, dataCopy);
-		cbuf.Bind(gfx);
+		cbuf->SetData(sizeof(dataCopy), &dataCopy);
+		mesh.Bind();
+
 	}*/
 }

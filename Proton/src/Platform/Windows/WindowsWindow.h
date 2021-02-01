@@ -3,7 +3,6 @@
 #include "Proton/Window.h"
 #include "Proton/Log.h"
 #include <memory>
-#include "WindowsGraphics.h"
 #include <random>
 #include "WindowsInput.h"
 
@@ -11,10 +10,7 @@
 #include "Proton/Timer.h"
 
 namespace Proton
-{
-	class WindowsGraphics;
-	//class Drawable;
-
+{	
 	class WindowsWindow : public Window
 	{
 	public:
@@ -30,33 +26,11 @@ namespace Proton
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.eventCallback = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override;
-		inline virtual void* GetNativeWindow() const { return m_HWnd; }
+		inline virtual void* GetNativeWindow() const override { return m_HWnd; }
 
 		void SetTitle(const std::string& title) override;
-		void SetProjection(DirectX::FXMMATRIX proj) noexcept override;
-
-		std::unique_ptr<class Box> CreateBox(std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist,
-			std::uniform_real_distribution<float>& bdist,
-			DirectX::XMFLOAT3 material) override;
-
-		virtual std::unique_ptr<class AssimpTest> CreateTestMesh(
-			std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist,
-			DirectX::XMFLOAT3 material
-		) override;
 
 		void InitImGui() override;
-
-		void SetCamera(DirectX::FXMMATRIX cam) override;
-
-		WindowsGraphics& Gfx();
 
 		static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		static LRESULT WINAPI HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
@@ -80,8 +54,9 @@ namespace Proton
 		HINSTANCE m_HInstance;
 		bool receivingMouseInput;
 		bool initializedImGui = false;
-		std::unique_ptr<WindowsGraphics> pGfx;
 		WindowsInput* input;
+
+		class DirectXRendererAPI* api;
 
 		//Temp variables
 		Timer timer;

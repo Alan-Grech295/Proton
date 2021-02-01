@@ -51,6 +51,7 @@ namespace Proton
 			DirectX::XMMATRIX model;
 		};
 
+	public:
 		std::unique_ptr<VertexBuffer> m_VertBuffer;
 		std::unique_ptr<IndexBuffer> m_IndexBuffer;
 		std::unique_ptr<VertexShader> m_VertShader;

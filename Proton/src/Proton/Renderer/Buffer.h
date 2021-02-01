@@ -4,8 +4,6 @@
 #include "Shader.h"
 #include <cassert>
 
-#include "Renderer.h"
-
 namespace Proton
 {
 	enum class ShaderDataType
@@ -113,6 +111,8 @@ namespace Proton
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
+		virtual unsigned int GetCount() const = 0;
+
 		static IndexBuffer* Create(unsigned short* indices, uint32_t size);
 	};
 
@@ -126,7 +126,6 @@ namespace Proton
 		virtual void Unbind() const = 0;
 
 		static VertexConstantBuffer* Create(int slot, int size, const void* data);
-		static VertexConstantBuffer* Create(int slot = 0);
 	};
 
 	class PixelConstantBuffer

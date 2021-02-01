@@ -14,10 +14,10 @@ namespace Proton
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:
+		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::DirectX:
+		case RendererAPI::API::DirectX:
 			return new DirectXVertexBuffer(stride, vertices, size);
 		}
 
@@ -29,10 +29,10 @@ namespace Proton
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:
+		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::DirectX:
+		case RendererAPI::API::DirectX:
 			return new DirectXIndexBuffer(indices, size);
 		}
 
@@ -44,10 +44,10 @@ namespace Proton
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:
+		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::DirectX:
+		case RendererAPI::API::DirectX:
 			return new DirectXVertexConstantBuffer(slot, size, data);
 		}
 
@@ -55,19 +55,14 @@ namespace Proton
 		return nullptr;
 	}
 
-	VertexConstantBuffer* VertexConstantBuffer::Create(int slot)
-	{
-		return VertexConstantBuffer::Create(slot, 0, nullptr);
-	}
-
 	PixelConstantBuffer* PixelConstantBuffer::Create(int slot, int size, const void* data)
 	{
 		switch (Renderer::GetAPI())
 		{
-		case RendererAPI::None:
+		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
-		case RendererAPI::DirectX:
+		case RendererAPI::API::DirectX:
 			return new DirectXPixelConstantBuffer(slot, size, data);
 		}
 

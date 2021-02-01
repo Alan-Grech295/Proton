@@ -8,7 +8,7 @@
 #include "Window.h"
 #include "Timer.h"
 #include "LayerStack.h"
-#include "Platform/Windows/Camera.h"
+#include "Renderer\Camera.h"
 #include "PointLight.h"
 
 namespace Proton
@@ -37,14 +37,15 @@ namespace Proton
 	private:
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
+		std::unique_ptr<class Box> box;
 		Timer timer;
 		LayerStack m_LayerStack;
 
 		std::vector<std::unique_ptr<class Box>> boxes;
 		static constexpr size_t nDrawables = 500;
 	public:
-		Camera camera;
-		PointLight* light;
+		Camera m_Camera;
+		std::unique_ptr<PointLight> light;
 	private:
 		static Application* s_Instance;
 	};

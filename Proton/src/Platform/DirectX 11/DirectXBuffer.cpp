@@ -1,7 +1,9 @@
 #include "ptpch.h"
 #include "DirectXBuffer.h"
-#include "Platform\Windows\WindowsGraphics.h"
 #include "DirectXShader.h"
+#include "Proton\Log.h"
+
+#pragma comment(lib, "d3d11.lib")
 
 namespace Proton
 {
@@ -39,13 +41,16 @@ namespace Proton
 		bd.StructureByteStride = stride;
 		D3D11_SUBRESOURCE_DATA sd = {};
 		sd.pSysMem = vertices;
-		WindowsGraphics::GetDevice()->CreateBuffer(&bd, &sd, &pVertexBuffer);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&bd, &sd, &pVertexBuffer);
 	}
 
 	void DirectXVertexBuffer::Bind() const
 	{
-		WindowsGraphics::GetContext()->IASetVertexBuffers(0, 1u, pVertexBuffer.GetAddressOf(), &stride, 0);
-		WindowsGraphics::GetContext()->IASetInputLayout(pInputLayout.Get());
+		DirectXRendererAPI* api = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI());
+
+		const UINT offset = 0u;
+		api->GetContext()->IASetVertexBuffers(0, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
+		api->GetContext()->IASetInputLayout(pInputLayout.Get());
 	}
 
 	void DirectXVertexBuffer::Unbind() const
@@ -57,24 +62,21 @@ namespace Proton
 	{
 		m_Layout = layout;
 		std::vector<BufferElement> elements = layout.GetElements();
-		D3D11_INPUT_ELEMENT_DESC* inputLayoutDescTemp = new D3D11_INPUT_ELEMENT_DESC[elements.size()];
+		pInputLayoutDesc = new D3D11_INPUT_ELEMENT_DESC[elements.size()];
 
 		for (int i = 0; i < elements.size(); i++)
 		{
-			inputLayoutDescTemp[i] = { elements[i].Name.c_str(), 0, ShaderDataTypeToDXGIFormat(elements[i].Type), 0, elements[i].Offset, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+			pInputLayoutDesc[i] = { elements[i].Name.c_str(), 0, ShaderDataTypeToDXGIFormat(elements[i].Type), 0, elements[i].Offset, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 		}
 
-		DirectXVertexShader& dxVertexShader = *dynamic_cast<DirectXVertexShader*>(vertexShader);
+		DirectXVertexShader& dxVertexShader = *(DirectXVertexShader*)(vertexShader);
 
-		WindowsGraphics::GetDevice()->CreateInputLayout(
-			inputLayoutDescTemp, elements.size(),
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateInputLayout(
+			pInputLayoutDesc, elements.size(),
 			dxVertexShader.pBytecodeBlob->GetBufferPointer(),
 			dxVertexShader.pBytecodeBlob->GetBufferSize(),
 			&pInputLayout
 		);
-
-		delete[](&elements);
-		delete[](inputLayoutDescTemp);
 	}
 
 	//Index Buffer
@@ -91,17 +93,22 @@ namespace Proton
 		ibd.StructureByteStride = sizeof(unsigned short);
 		D3D11_SUBRESOURCE_DATA isd = {};
 		isd.pSysMem = indices;
-		WindowsGraphics::GetDevice()->CreateBuffer(&ibd, &isd, &pIndexBuffer);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&ibd, &isd, &pIndexBuffer);
 	}
 
 	void DirectXIndexBuffer::Bind() const
 	{
-		WindowsGraphics::GetContext()->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
 	}
 
 	void DirectXIndexBuffer::Unbind() const
 	{
 
+	}
+
+	unsigned int DirectXIndexBuffer::GetCount() const
+	{
+		return count;
 	}
 
 	//Vertex Constant Buffer
@@ -119,13 +126,13 @@ namespace Proton
 
 		D3D11_SUBRESOURCE_DATA csd = {};
 		csd.pSysMem = data;
-		WindowsGraphics::GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer);
 	}
 
 	void DirectXVertexConstantBuffer::SetData(int size, const void* data)
 	{
 		D3D11_MAPPED_SUBRESOURCE msr;
-		WindowsGraphics::GetContext()->Map(
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
 			pConstantBuffer.Get(), 0,
 			D3D11_MAP_WRITE_DISCARD, 0,
 			&msr
@@ -133,12 +140,12 @@ namespace Proton
 
 		memcpy(msr.pData, data, size);
 
-		WindowsGraphics::GetContext()->Unmap(pConstantBuffer.Get(), 0);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(pConstantBuffer.Get(), 0);
 	}
 
 	void DirectXVertexConstantBuffer::Bind() const
 	{
-		WindowsGraphics::GetContext()->VSSetConstantBuffers(mSlot, 1, pConstantBuffer.GetAddressOf());
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->VSSetConstantBuffers(mSlot, 1, pConstantBuffer.GetAddressOf());
 	}
 
 	void DirectXVertexConstantBuffer::Unbind() const
@@ -161,13 +168,13 @@ namespace Proton
 
 		D3D11_SUBRESOURCE_DATA csd = {};
 		csd.pSysMem = data;
-		WindowsGraphics::GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer);
 	}
 
 	void DirectXPixelConstantBuffer::SetData(int size, const void* data)
 	{
 		D3D11_MAPPED_SUBRESOURCE msr;
-		WindowsGraphics::GetContext()->Map(
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
 			pConstantBuffer.Get(), 0,
 			D3D11_MAP_WRITE_DISCARD, 0,
 			&msr
@@ -175,12 +182,12 @@ namespace Proton
 
 		memcpy(msr.pData, data, size);
 
-		WindowsGraphics::GetContext()->Unmap(pConstantBuffer.Get(), 0);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(pConstantBuffer.Get(), 0);
 	}
 
 	void DirectXPixelConstantBuffer::Bind() const
 	{
-		WindowsGraphics::GetContext()->PSSetConstantBuffers(mSlot, 1, pConstantBuffer.GetAddressOf());
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->PSSetConstantBuffers(mSlot, 1, pConstantBuffer.GetAddressOf());
 	}
 
 	void DirectXPixelConstantBuffer::Unbind() const

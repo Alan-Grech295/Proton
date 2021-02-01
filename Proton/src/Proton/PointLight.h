@@ -11,7 +11,9 @@ namespace Proton
 		void CreateControlWindow();
 		void Reset();
 		//void Draw(WindowsGraphics& gfx) const;
-		//void Bind(WindowsGraphics& gfx, DirectX::FXMMATRIX view) const;
+		//void Bind() const;
+	public:
+		mutable SolidSphere mesh;
 	private:
 		struct PointLightCBuf
 		{
@@ -25,7 +27,6 @@ namespace Proton
 		};
 	private:
 		PointLightCBuf cbData;
-		mutable SolidSphere mesh;
 		mutable std::unique_ptr<PixelConstantBuffer> cbuf;
 	};
 }

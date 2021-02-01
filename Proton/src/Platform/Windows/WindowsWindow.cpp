@@ -8,6 +8,9 @@
 //#include "Proton/Drawable.h"
 #include "Platform/DirectX 11/imgui_impl_win32.h"
 #include "Proton/PointLight.h"
+#include "Proton\Renderer\RenderCommand.h"
+#include "Platform\DirectX 11\DirectXRendererAPI.h"
+#include "Platform/DirectX 11/imgui_impl_dx11.h"
 
 namespace Proton
 {
@@ -37,9 +40,6 @@ namespace Proton
 			DispatchMessage(&msg);
 		}
 
-		//Clears the back buffer
-		pGfx->ClearBuffer(0, 0, 0);
-
 		//Dispatches an AppRenderEvent. This is done after the render 
 		//but before presenting the frame so that if any post processing
 		//effect want to be applied, they will show in the frame
@@ -47,13 +47,13 @@ namespace Proton
 		m_Data.eventCallback(event);
 
 		//Present the frame
-		pGfx->ShowFrame();
+		api->ShowFrame();
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
 	{
 		m_Data.vSync = enabled;
-		pGfx->SetVSync(enabled);
+		api->isVSync = enabled;
 	}
 
 	bool WindowsWindow::IsVSync() const
@@ -70,63 +70,12 @@ namespace Proton
 		SetWindowTextW(m_HWnd, titleName);
 	}
 
-	void WindowsWindow::SetProjection(DirectX::FXMMATRIX proj) noexcept
-	{
-		pGfx->SetProjection(proj);
-	}
-
-	std::unique_ptr<Box> WindowsWindow::CreateBox(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, std::uniform_real_distribution<float>& bdist, DirectX::XMFLOAT3 material)
-	{
-		return std::make_unique<Box>(
-			rng, adist, ddist,
-			odist, rdist, bdist, material
-			);
-	}
-
-	std::unique_ptr<AssimpTest> WindowsWindow::CreateTestMesh(std::mt19937& rng, std::uniform_real_distribution<float>& adist, std::uniform_real_distribution<float>& ddist, std::uniform_real_distribution<float>& odist, std::uniform_real_distribution<float>& rdist, DirectX::XMFLOAT3 material)
-	{
-		return std::make_unique<AssimpTest>(
-			rng, adist, odist, 
-			ddist, rdist, material
-			);
-	}
-
-	/*PointLight* WindowsWindow::CreateLight(float radius)
-	{
-		return new PointLight(radius);
-	}
-
-	void WindowsWindow::BindLight(PointLight* light, DirectX::FXMMATRIX view)
-	{
-		light->Bind(Gfx(), view);
-	}
-
-	void WindowsWindow::DrawLight(PointLight* light)
-	{
-		light->Draw(Gfx());
-	}*/
-
 	void WindowsWindow::InitImGui()
 	{
 		//Init ImGui Win32 Impl
 		ImGui_ImplWin32_Init(m_HWnd);
-		pGfx->InitImGui();
+		ImGui_ImplDX11_Init(api->pDevice.Get(), api->pContext.Get());
 		initializedImGui = true;
-	}
-
-	void WindowsWindow::SetCamera(DirectX::FXMMATRIX cam)
-	{
-		pGfx->SetCamera(cam);
-	}
-
-	/*void WindowsWindow::Draw(Drawable* drawable)
-	{
-		drawable->Draw(Gfx());
-	}*/
-
-	WindowsGraphics& WindowsWindow::Gfx()
-	{
-		return *pGfx;
 	}
 
 	void WindowsWindow::Init(const WindowProperties& props, HINSTANCE hInstance)
@@ -196,7 +145,9 @@ namespace Proton
 		ShowWindow(m_HWnd, SW_SHOWDEFAULT);
 
 		//Create graphics object
-		pGfx = std::make_unique<WindowsGraphics>(m_HWnd, (UINT)m_Data.width, (UINT)m_Data.height);
+		//pGfx = std::make_unique<WindowsGraphics>(m_HWnd, (UINT)m_Data.width, (UINT)m_Data.height);
+		api = ((DirectXRendererAPI*)RenderCommand::s_RendererAPI);
+		api->Initialize(*this, m_HWnd);
 	}
 	
 	void WindowsWindow::Shutdown()

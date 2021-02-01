@@ -159,8 +159,6 @@
     <ClInclude Include="src\Platform\DirectX 11\DirectXTexture.h" />
     <ClInclude Include="src\Platform\DirectX 11\imgui_impl_dx11.h" />
     <ClInclude Include="src\Platform\DirectX 11\imgui_impl_win32.h" />
-    <ClInclude Include="src\Platform\Windows\Camera.h" />
-    <ClInclude Include="src\Platform\Windows\WindowsGraphics.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Proton.h" />
@@ -186,6 +184,7 @@
     <ClInclude Include="src\Proton\MouseButtonCodes.h" />
     <ClInclude Include="src\Proton\PointLight.h" />
     <ClInclude Include="src\Proton\Renderer\Buffer.h" />
+    <ClInclude Include="src\Proton\Renderer\Camera.h" />
     <ClInclude Include="src\Proton\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Proton\Renderer\Renderer.h" />
     <ClInclude Include="src\Proton\Renderer\RendererAPI.h" />
@@ -204,8 +203,6 @@
     <ClCompile Include="src\Platform\DirectX 11\DirectXTexture.cpp" />
     <ClCompile Include="src\Platform\DirectX 11\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\Platform\DirectX 11\imgui_impl_win32.cpp" />
-    <ClCompile Include="src\Platform\Windows\Camera.cpp" />
-    <ClCompile Include="src\Platform\Windows\WindowsGraphics.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Proton\Application.cpp" />
@@ -217,6 +214,7 @@
     <ClCompile Include="src\Proton\Log.cpp" />
     <ClCompile Include="src\Proton\PointLight.cpp" />
     <ClCompile Include="src\Proton\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Camera.cpp" />
     <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Proton\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp" />

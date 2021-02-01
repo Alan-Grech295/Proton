@@ -11,8 +11,8 @@
 // https://github.com/ocornut/imgui
 
 #pragma once
-#include "Platform/Windows/WindowsGraphics.h"
 #include <windows.h>
+#include <d3d11.h>
 #include "imgui.h"      // IMGUI_IMPL_API
 
 IMGUI_IMPL_API bool     ImGui_ImplDX11_Init(ID3D11Device* device, ID3D11DeviceContext* device_context);

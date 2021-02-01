@@ -43,27 +43,6 @@ namespace Proton
 		virtual void* GetNativeWindow() const = 0;
 
 		virtual void SetTitle(const std::string& title) = 0;
-		virtual void SetProjection(DirectX::FXMMATRIX proj) noexcept = 0;
-
-		virtual std::unique_ptr<class Box> CreateBox(std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist,
-			std::uniform_real_distribution<float>& bdist,
-			DirectX::XMFLOAT3 material) = 0;
-
-		virtual std::unique_ptr<class AssimpTest> CreateTestMesh(
-			std::mt19937& rng,
-			std::uniform_real_distribution<float>& adist,
-			std::uniform_real_distribution<float>& ddist,
-			std::uniform_real_distribution<float>& odist,
-			std::uniform_real_distribution<float>& rdist,
-			DirectX::XMFLOAT3 material
-		) = 0;
-
-		//Windows Camera, make abstract later
-		virtual void SetCamera(DirectX::FXMMATRIX cam) = 0;
 
 		virtual void InitImGui() = 0;
 

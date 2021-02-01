@@ -4,6 +4,7 @@
 #include "Platform/DirectX 11/imgui_impl_dx11.h"
 #include "Platform/DirectX 11/imgui_impl_win32.h"
 #include "Proton/Application.h"
+#include "Proton\Log.h"
 
 namespace Proton
 {
@@ -57,8 +58,6 @@ namespace Proton
 			}
 
 			ImGui::End();
-
-			Application::Get().camera.CreateControlWindow();
 
 			Application::Get().light->CreateControlWindow();
 
