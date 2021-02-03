@@ -1,6 +1,7 @@
 #include "ptpch.h"
 #include "PointLight.h"
 #include <imgui.h>
+#include "Renderer\Renderer.h"
 
 namespace Proton
 {
@@ -8,8 +9,8 @@ namespace Proton
 		:
 		mesh(radius)
 	{
-		cbuf.reset(PixelConstantBuffer::Create(0, sizeof(cbData), &cbData));
 		Reset();
+		cbuf.reset(PixelConstantBuffer::Create(0, sizeof(cbData), &cbData));
 	}
 
 	void PointLight::CreateControlWindow()
@@ -61,13 +62,12 @@ namespace Proton
 		mesh.Draw(gfx);
 	}*/
 
-	/*void PointLight::Bind() const
+	void PointLight::SetLightData() const
 	{
 		auto dataCopy = cbData;
 		const auto pos = DirectX::XMLoadFloat3(&cbData.pos);
-		DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, view));
+		DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, Renderer::GetCamera().GetViewMatrix()));
 		cbuf->SetData(sizeof(dataCopy), &dataCopy);
-		mesh.Bind();
-
-	}*/
+		cbuf->Bind();
+	}
 }

@@ -24,8 +24,7 @@ namespace Proton
 
 	void DirectXRendererAPI::DrawIndexed(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer)
 	{
-		//vertBuffer->Bind();
-		//indexBuffer->Bind();
+		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		pContext->DrawIndexed(indexBuffer->GetCount(), 0u, 0u);
 	}
 

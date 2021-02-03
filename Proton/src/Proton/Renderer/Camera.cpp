@@ -17,16 +17,16 @@ namespace Proton
 			m_ProjectionMatrix = DirectX::XMMatrixOrthographicLH(1.0f, (float)screenHeight / screenWidth, nearZ, farZ);
 		}
 
-		m_ViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
+		m_ViewMatrix = DirectX::XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z) *
+					   DirectX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
-		m_ViewMatrix = DirectX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z) *
-			DirectX::XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+		m_ViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
 	}
 
 	void Camera::RecalculateViewMatrix()
 	{
-		m_ViewMatrix = DirectX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z) *
-					   DirectX::XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z);
+		m_ViewMatrix = DirectX::XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z) *
+					   DirectX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
 
 		m_ViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
 	}

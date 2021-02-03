@@ -11,7 +11,7 @@ namespace Proton
 		void CreateControlWindow();
 		void Reset();
 		//void Draw(WindowsGraphics& gfx) const;
-		//void Bind() const;
+		void SetLightData() const;
 	public:
 		mutable SolidSphere mesh;
 	private:

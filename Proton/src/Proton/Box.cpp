@@ -38,9 +38,9 @@ namespace Proton
 		
 		m_VertBuffer.reset(VertexBuffer::Create(sizeof(Vertex), &model.vertices[0], model.vertices.size()));
 		
-		m_VertShader.reset(VertexShader::Create("C:\\Dev\\Proton\\Proton\\SolidVS.cso"));
+		m_VertShader.reset(VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso"));
 		
-		m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\SolidPS.cso"));
+		m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso"));
 		
 		m_IndexBuffer.reset(IndexBuffer::Create(&model.indices[0], model.indices.size()));
 		
@@ -54,8 +54,7 @@ namespace Proton
 		m_TransformCBuf.reset(VertexConstantBuffer::Create(0, sizeof(Transforms), new Transforms{}));
 		
 		materialConstants.color = material;
-		DirectX::XMFLOAT4 col = { material.x, material.y, material.z, 1.0f };
-		m_MaterialCBuf.reset(PixelConstantBuffer::Create(0, sizeof(col), &col));
+		m_MaterialCBuf.reset(PixelConstantBuffer::Create(1, sizeof(materialConstants), &materialConstants));
 		
 		// model deformation transform (per instance, not stored as bind)
 		dx::XMStoreFloat3x3(
@@ -90,8 +89,8 @@ namespace Proton
 	{
 		namespace dx = DirectX;
 		return dx::XMLoadFloat3x3(&mt) *
-			dx::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
-			dx::XMMatrixTranslation(r, 0.0f, 0.0f) *
-			dx::XMMatrixRotationRollPitchYaw(theta, phi, chi);
+			   dx::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
+			   dx::XMMatrixTranslation(r, 0.0f, 0.0f) *
+			   dx::XMMatrixRotationRollPitchYaw(theta, phi, chi);
 	}
 }

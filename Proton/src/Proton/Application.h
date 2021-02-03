@@ -37,12 +37,12 @@ namespace Proton
 	private:
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
-		std::unique_ptr<class Box> box;
+		//std::unique_ptr<class Box> box;
 		Timer timer;
 		LayerStack m_LayerStack;
 
 		std::vector<std::unique_ptr<class Box>> boxes;
-		static constexpr size_t nDrawables = 500;
+		static constexpr size_t nDrawables = 150;
 	public:
 		Camera m_Camera;
 		std::unique_ptr<PointLight> light;

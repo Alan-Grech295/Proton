@@ -33,7 +33,7 @@ namespace Proton
 		m_Window = std::unique_ptr<Window>(Window::Create({"Proton Game Engine", 1920, 1080}));
 
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
-		m_Window->SetVSync(false);
+		m_Window->SetVSync(true);
 
 		std::mt19937 rng{ std::random_device{}() };
 		std::uniform_int_distribution<int> sdist{ 0,1 };
@@ -42,9 +42,14 @@ namespace Proton
 		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
 		std::uniform_real_distribution<float> rdist{ 6.0f,20.0f };
 		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
-		DirectX::XMFLOAT3 material = { 0, 0.2f, 1.0f };
+		std::uniform_real_distribution<float> cdist{ 0.0f, 1.0f };
 		
-		box = std::make_unique<Box>(rng, adist, ddist, odist, rdist, bdist, material);
+		boxes.resize(nDrawables);
+
+		for (int i = 0; i < nDrawables; i++)
+		{
+			boxes[i] = std::make_unique<Box>(rng, adist, ddist, odist, rdist, bdist, DirectX::XMFLOAT3(cdist(rng), cdist(rng), cdist(rng)));
+		}
 		
 		light = std::make_unique<PointLight>(0.5f);
 	}
@@ -92,6 +97,7 @@ namespace Proton
 	void Application::Run()
 	{
 		RenderCommand::SetClearColor(0.02f, 0.07f, 0.2f);
+
 		while (m_Running)
 		{
 			for (Layer* layer : m_LayerStack)
@@ -115,17 +121,22 @@ namespace Proton
 	{
 		Renderer::BeginScene(m_Camera);
 		auto dt = timer.Mark();
+
+		light->SetLightData();
 		
-		box->Update(dt);
+		for (int i = 0; i < nDrawables; i++)
+		{
+			boxes[i]->Update(dt);
 
-		box->m_VertShader->Bind();
-		box->m_PixelShader->Bind();
-		box->m_TransformCBuf->Bind();
-		box->m_MaterialCBuf->Bind();
+			boxes[i]->m_VertShader->Bind();
+			boxes[i]->m_PixelShader->Bind();
+			boxes[i]->m_TransformCBuf->Bind();
+			boxes[i]->m_MaterialCBuf->Bind();
+
+			Renderer::Submit(boxes[i]->m_VertBuffer.get(), boxes[i]->m_IndexBuffer.get());
+		}
+		
 		//Renderer::EndScene();
-
-		Renderer::Submit(box->m_VertBuffer.get(), box->m_IndexBuffer.get());
-
 		light->mesh.Bind();
 
 		Renderer::Submit(light->mesh.m_VertBuffer.get(), light->mesh.m_IndexBuffer.get());
