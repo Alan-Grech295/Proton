@@ -1,9 +1,9 @@
 # Binaries
 **/bin/
-!vendor/premake/bin/
+!vendor/bin/premake/
 bin-int/
 
-# Hazel files
+# Proton files
 *.log
 
 # Visual Studio files and folder
