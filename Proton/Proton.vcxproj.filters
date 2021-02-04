@@ -13,21 +13,33 @@
     <Filter Include="Proton">
       <UniqueIdentifier>{C77AC9CA-B31C-F4A0-9CD7-07F588187BF1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Proton\Depricated">
+      <UniqueIdentifier>{6BB92307-D7CF-219D-2047-ADBE8C9CF224}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Proton\Events">
       <UniqueIdentifier>{CB60BE80-3721-3AB7-005C-83346CDB7E93}</UniqueIdentifier>
     </Filter>
     <Filter Include="Proton\ImGui">
       <UniqueIdentifier>{31A90A88-1D0C-9A2C-C691-D2E2B2D365AF}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Proton\Renderer">
+      <UniqueIdentifier>{4DCED4A0-B959-4265-C26A-C5592E759E65}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Proton\Shader">
       <UniqueIdentifier>{8DE466A0-F9A4-E2D6-C2DF-2B542E5F27B3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Platform\DirectX 11\imgui_impl_dx11.h">
+    <ClInclude Include="src\Platform\DirectX 11\DirectXBuffer.h">
       <Filter>Platform\DirectX 11</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\DirectX 11\imgui_impl_win32.h">
+    <ClInclude Include="src\Platform\DirectX 11\DirectXRendererAPI.h">
+      <Filter>Platform\DirectX 11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\DirectX 11\DirectXShader.h">
+      <Filter>Platform\DirectX 11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\DirectX 11\DirectXTexture.h">
       <Filter>Platform\DirectX 11</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\Windows\WindowsInput.h">
@@ -100,6 +112,27 @@
     <ClInclude Include="src\Proton\PointLight.h">
       <Filter>Proton</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Buffer.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Camera.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\RenderCommand.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Renderer.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\RendererAPI.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Shader.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Texture.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Proton\SolidSphere.h">
       <Filter>Proton</Filter>
     </ClInclude>
@@ -113,23 +146,18 @@
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
-    <ClInclude Include="src\Proton\Renderer\Buffer.h" />
-    <ClInclude Include="src\Platform\DirectX 11\DirectXBuffer.h" />
-    <ClInclude Include="src\Proton\Renderer\Renderer.h" />
-    <ClInclude Include="src\Proton\Renderer\Shader.h" />
-    <ClInclude Include="src\Platform\DirectX 11\DirectXShader.h" />
-    <ClInclude Include="src\Proton\Renderer\Texture.h" />
-    <ClInclude Include="src\Platform\DirectX 11\DirectXTexture.h" />
-    <ClInclude Include="src\Proton\Renderer\RendererAPI.h" />
-    <ClInclude Include="src\Proton\Renderer\RenderCommand.h" />
-    <ClInclude Include="src\Platform\DirectX 11\DirectXRendererAPI.h" />
-    <ClInclude Include="src\Proton\Renderer\Camera.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Platform\DirectX 11\imgui_impl_dx11.cpp">
+    <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
       <Filter>Platform\DirectX 11</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\DirectX 11\imgui_impl_win32.cpp">
+    <ClCompile Include="src\Platform\DirectX 11\DirectXRendererAPI.cpp">
+      <Filter>Platform\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\DirectX 11\DirectXShader.cpp">
+      <Filter>Platform\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\DirectX 11\DirectXTexture.cpp">
       <Filter>Platform\DirectX 11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp">
@@ -162,6 +190,27 @@
     <ClCompile Include="src\Proton\PointLight.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Buffer.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Camera.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Renderer.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Shader.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Texture.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Proton\SolidSphere.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
@@ -169,17 +218,7 @@
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
-    <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Renderer.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Platform\DirectX 11\DirectXShader.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Texture.cpp" />
-    <ClCompile Include="src\Platform\DirectX 11\DirectXTexture.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Buffer.cpp" />
-    <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp" />
-    <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp" />
-    <ClCompile Include="src\Platform\DirectX 11\DirectXRendererAPI.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Camera.cpp" />
+    <ClCompile Include="src\Proton\ImGui\ImGuiBuild.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">
@@ -218,8 +257,5 @@
     <FxCompile Include="src\Proton\Shader\VertexShader.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

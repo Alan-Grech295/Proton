@@ -5,7 +5,7 @@ namespace Proton
 {
 	Camera::Camera(uint32_t screenWidth, uint32_t screenHeight, float nearZ, float farZ, ProjectionMode mode)
 		:
-		m_Position({0, 0, 20}),
+		m_Position({0, 0, 0}),
 		m_Rotation({0, 0, 0})
 	{
 		if (mode == ProjectionMode::Perspective)
@@ -14,20 +14,19 @@ namespace Proton
 		}
 		else
 		{
-			m_ProjectionMatrix = DirectX::XMMatrixOrthographicLH(1.0f, (float)screenHeight / screenWidth, nearZ, farZ);
+			m_ProjectionMatrix = DirectX::XMMatrixOrthographicLH(10, (float)screenHeight / screenWidth * 10, nearZ, farZ);
 		}
 
-		m_ViewMatrix = DirectX::XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z) *
-					   DirectX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-
-		m_ViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
+		RecalculateViewMatrix();
 	}
 
 	void Camera::RecalculateViewMatrix()
 	{
-		m_ViewMatrix = DirectX::XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z) *
-					   DirectX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z);
-
+		m_ViewMatrix = DirectX::XMMatrixInverse(nullptr,
+					   DirectX::XMMatrixRotationRollPitchYaw(m_Rotation.x, m_Rotation.y, m_Rotation.z) *
+					   DirectX::XMMatrixTranslation(m_Position.x, m_Position.y, m_Position.z)
+					   );
+					   
 		m_ViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
 	}
 }

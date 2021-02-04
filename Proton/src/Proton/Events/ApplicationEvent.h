@@ -5,7 +5,7 @@
 namespace Proton
 {
 	//Window Events
-	class PROTON_API WindowResizeEvent : public Event
+	class WindowResizeEvent : public Event
 	{
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)
@@ -28,7 +28,7 @@ namespace Proton
 		unsigned int m_Width, m_Height;
 	};
 
-	class PROTON_API WindowCloseEvent : public Event
+	class WindowCloseEvent : public Event
 	{
 	public:
 		WindowCloseEvent() {}
@@ -38,7 +38,7 @@ namespace Proton
 	};
 
 	//App Events
-	class PROTON_API AppTickEvent : public Event
+	class AppTickEvent : public Event
 	{
 	public:
 		AppTickEvent() {}
@@ -47,7 +47,7 @@ namespace Proton
 		EVENT_CLASS_TYPE(AppTick)
 	};
 
-	class PROTON_API AppUpdateEvent : public Event
+	class AppUpdateEvent : public Event
 	{
 	public:
 		AppUpdateEvent() {}
@@ -56,7 +56,7 @@ namespace Proton
 		EVENT_CLASS_TYPE(AppUpdate)
 	};
 
-	class PROTON_API AppRenderEvent : public Event
+	class AppRenderEvent : public Event
 	{
 	public:
 		AppRenderEvent() {}

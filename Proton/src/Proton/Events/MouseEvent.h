@@ -4,7 +4,7 @@
 
 namespace Proton
 {
-	class PROTON_API MouseMovedEvent : public Event
+	class MouseMovedEvent : public Event
 	{
 	public:
 		MouseMovedEvent(int x, int y)
@@ -28,7 +28,7 @@ namespace Proton
 		int m_MouseX, m_MouseY;
 	};
 
-	class PROTON_API MouseLeftEvent : public Event
+	class MouseLeftEvent : public Event
 	{
 	public:
 		MouseLeftEvent(int x, int y)
@@ -52,7 +52,7 @@ namespace Proton
 		int m_MouseX, m_MouseY;
 	};
 
-	class PROTON_API MouseEnteredEvent : public Event
+	class MouseEnteredEvent : public Event
 	{
 	public:
 		MouseEnteredEvent(int x, int y)
@@ -76,7 +76,7 @@ namespace Proton
 		int m_MouseX, m_MouseY;
 	};
 
-	class PROTON_API MouseScrolledEvent : public Event
+	class MouseScrolledEvent : public Event
 	{
 	public:
 		MouseScrolledEvent(int x, int y, int wheelDelta)
@@ -101,7 +101,7 @@ namespace Proton
 		int m_MouseX, m_MouseY, m_WheelDelta;
 	};
 
-	class PROTON_API MouseButtonEvent : public Event
+	class MouseButtonEvent : public Event
 	{
 	public:
 		inline int GetMouseButton() const { return m_Button; }
@@ -119,7 +119,7 @@ namespace Proton
 		int m_x, m_y;
 	};
 
-	class PROTON_API MouseButtonPressedEvent : public MouseButtonEvent
+	class MouseButtonPressedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonPressedEvent(int button, int x, int y)
@@ -135,7 +135,7 @@ namespace Proton
 		EVENT_CLASS_TYPE(MouseButtonPressed)
 	};
 
-	class PROTON_API MouseButtonReleasedEvent : public MouseButtonEvent
+	class MouseButtonReleasedEvent : public MouseButtonEvent
 	{
 	public:
 		MouseButtonReleasedEvent(int button, int x, int y)

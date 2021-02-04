@@ -1,10 +1,12 @@
 #include "ptpch.h"
 #include "ImGuiLayer.h"
 #include "imgui.h"
-#include "Platform/DirectX 11/imgui_impl_dx11.h"
-#include "Platform/DirectX 11/imgui_impl_win32.h"
+#include "examples\imgui_impl_win32.h"
+#include "examples\imgui_impl_dx11.h"
 #include "Proton/Application.h"
 #include "Proton\Log.h"
+#include "Platform\DirectX 11\DirectXRendererAPI.h"
+#include "Proton\Renderer\RenderCommand.h"
 
 namespace Proton
 {
@@ -26,8 +28,16 @@ namespace Proton
 		ImGui::StyleColorsDark();
 
 		ImGuiIO& io = ImGui::GetIO();
-		io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-		io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
+
+		ImGuiStyle& style = ImGui::GetStyle();
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			style.WindowRounding = 0.0f;
+			style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+		}
 
 		Application::Get().GetWindow().InitImGui();
 
@@ -36,33 +46,43 @@ namespace Proton
 
 	void ImGuiLayer::OnDetach()
 	{
-
+		ImGui_ImplWin32_Shutdown();
+		ImGui_ImplDX11_Shutdown();
+		ImGui::DestroyContext();
 	}
 
-	void ImGuiLayer::OnUpdate()
+	void ImGuiLayer::OnImGuiRender()
 	{
-		
+		//static bool show = true;
+		//ImGui::ShowDemoWindow(&show);
 	}
 
-	void ImGuiLayer::OnEvent(Event& event)
+	void ImGuiLayer::Begin()
 	{
-		if (event.IsEventType(EventType::AppRender))
+		ImGui_ImplDX11_NewFrame();
+		ImGui_ImplWin32_NewFrame();
+		ImGui::NewFrame();
+	}
+
+	void ImGuiLayer::End()
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		Application& app = Application::Get();
+
+		io.DisplaySize = ImVec2(app.GetWindow().GetWidth(), app.GetWindow().GetHeight());
+
+		ImGui::Render();
+		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
+		if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 		{
-			ImGui_ImplDX11_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			ImGui::NewFrame();
+			DirectXRendererAPI* api = (DirectXRendererAPI*)RenderCommand::GetRendererAPI();
+			ID3D11RenderTargetView* backupTarget = api->GetRenderTarget();
 
-			if (ImGui::Begin("Debug Data"))
-			{
-				ImGui::Text("Application Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			}
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
 
-			ImGui::End();
-
-			Application::Get().light->CreateControlWindow();
-
-			ImGui::Render();
-			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+			api->SetRenderTarget(backupTarget);
 		}
 	}
 }

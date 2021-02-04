@@ -6,11 +6,11 @@
 #include "Proton/Box.h"
 #include "Proton/AssimpTest.h"
 //#include "Proton/Drawable.h"
-#include "Platform/DirectX 11/imgui_impl_win32.h"
+#include "examples\imgui_impl_win32.h"
+#include "examples\imgui_impl_dx11.h"
 #include "Proton/PointLight.h"
 #include "Proton\Renderer\RenderCommand.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
-#include "Platform/DirectX 11/imgui_impl_dx11.h"
 
 namespace Proton
 {

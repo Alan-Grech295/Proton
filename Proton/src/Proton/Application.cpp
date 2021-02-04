@@ -11,13 +11,9 @@
 #include <algorithm>
 #include "Proton/Math.h"
 #include "imgui.h"
-#include "Platform/DirectX 11/imgui_impl_dx11.h"
-#include "Platform/DirectX 11/imgui_impl_win32.h"
 #include "Input.h"
-#include "Renderer\Buffer.h"
-#include "Renderer\RenderCommand.h"
+
 #include "Renderer\Renderer.h"
-#include "Box.h"
 
 namespace Proton
 {
@@ -26,32 +22,15 @@ namespace Proton
 	Application* Application::s_Instance = nullptr;
 
 	Application::Application()
-		:
-		m_Camera(1920, 1080, 0.5f, 1000.0f, Camera::ProjectionMode::Perspective)
 	{
 		s_Instance = this;
-		m_Window = std::unique_ptr<Window>(Window::Create({"Proton Game Engine", 1920, 1080}));
+		m_Window = std::unique_ptr<Window>(Window::Create({"Proton Game Engine", 1280, 720}));
 
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
 		m_Window->SetVSync(true);
 
-		std::mt19937 rng{ std::random_device{}() };
-		std::uniform_int_distribution<int> sdist{ 0,1 };
-		std::uniform_real_distribution<float> adist{ 0.0f,PI * 2.0f };
-		std::uniform_real_distribution<float> ddist{ 0.0f,PI * 0.5f };
-		std::uniform_real_distribution<float> odist{ 0.0f,PI * 0.08f };
-		std::uniform_real_distribution<float> rdist{ 6.0f,20.0f };
-		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
-		std::uniform_real_distribution<float> cdist{ 0.0f, 1.0f };
-		
-		boxes.resize(nDrawables);
-
-		for (int i = 0; i < nDrawables; i++)
-		{
-			boxes[i] = std::make_unique<Box>(rng, adist, ddist, odist, rdist, bdist, DirectX::XMFLOAT3(cdist(rng), cdist(rng), cdist(rng)));
-		}
-		
-		light = std::make_unique<PointLight>(0.5f);
+		m_ImGuiLayer = new ImGuiLayer();
+		PushOverlay(m_ImGuiLayer);
 	}
 
 	Application::~Application()
@@ -100,12 +79,15 @@ namespace Proton
 
 		while (m_Running)
 		{
-			for (Layer* layer : m_LayerStack)
-			{
-				layer->OnUpdate();
-			}
-
 			RenderCommand::Clear();
+
+			for (Layer* layer : m_LayerStack)
+				layer->OnUpdate();
+
+			m_ImGuiLayer->Begin();
+			for (Layer* layer : m_LayerStack)
+				layer->OnImGuiRender();
+			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
 		}
@@ -119,27 +101,7 @@ namespace Proton
 
 	bool Application::OnAppRender(AppRenderEvent& e)
 	{
-		Renderer::BeginScene(m_Camera);
-		auto dt = timer.Mark();
-
-		light->SetLightData();
 		
-		for (int i = 0; i < nDrawables; i++)
-		{
-			boxes[i]->Update(dt);
-
-			boxes[i]->m_VertShader->Bind();
-			boxes[i]->m_PixelShader->Bind();
-			boxes[i]->m_TransformCBuf->Bind();
-			boxes[i]->m_MaterialCBuf->Bind();
-
-			Renderer::Submit(boxes[i]->m_VertBuffer.get(), boxes[i]->m_IndexBuffer.get());
-		}
-		
-		//Renderer::EndScene();
-		light->mesh.Bind();
-
-		Renderer::Submit(light->mesh.m_VertBuffer.get(), light->mesh.m_IndexBuffer.get());
 		
 		return true;
 	}

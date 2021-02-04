@@ -17,6 +17,8 @@ namespace Proton
 
 		ID3D11Device* GetDevice() { return pDevice.Get(); }
 		ID3D11DeviceContext* GetContext() { return pContext.Get(); }
+		ID3D11RenderTargetView* GetRenderTarget() { return pTarget.Get(); }
+		void SetRenderTarget(ID3D11RenderTargetView* target) { pTarget = target; pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());}
 	private:
 		void Initialize(WindowsWindow& window, HWND hWnd);
 		void ShowFrame();

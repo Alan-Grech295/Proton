@@ -4,7 +4,7 @@
 
 namespace Proton
 {
-	class PROTON_API KeyEvent : public Event
+	class KeyEvent : public Event
 	{
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
@@ -18,7 +18,7 @@ namespace Proton
 		int m_KeyCode;
 	};
 
-	class PROTON_API KeyPressedEvent : public KeyEvent
+	class KeyPressedEvent : public KeyEvent
 	{
 	public:
 		KeyPressedEvent(int keyCode, int repeatCount)
@@ -38,7 +38,7 @@ namespace Proton
 		int m_RepeatCount;
 	};
 
-	class PROTON_API KeyReleasedEvent : public KeyEvent
+	class KeyReleasedEvent : public KeyEvent
 	{
 	public:
 		KeyReleasedEvent(int keyCode)

@@ -1,19 +1,23 @@
 #pragma once
 
 #include "Core.h"
+
+#include "Window.h"
+#include "LayerStack.h"
+#include "ImGui\ImGuiLayer.h"
+
 #include "Events/Event.h"
 #include "Events/ApplicationEvent.h"
 #include "Events/MouseEvent.h"
 #include "Events/KeyEvent.h"
-#include "Window.h"
+
 #include "Timer.h"
-#include "LayerStack.h"
 #include "Renderer\Camera.h"
 #include "PointLight.h"
 
 namespace Proton
 {
-	class PROTON_API Application
+	class Application
 	{
 	public:
 		Application();
@@ -37,15 +41,9 @@ namespace Proton
 	private:
 		bool m_Running = true;
 		std::unique_ptr<Window> m_Window;
-		//std::unique_ptr<class Box> box;
+		ImGuiLayer* m_ImGuiLayer;
 		Timer timer;
 		LayerStack m_LayerStack;
-
-		std::vector<std::unique_ptr<class Box>> boxes;
-		static constexpr size_t nDrawables = 150;
-	public:
-		Camera m_Camera;
-		std::unique_ptr<PointLight> light;
 	private:
 		static Application* s_Instance;
 	};

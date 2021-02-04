@@ -17,22 +17,14 @@ namespace Proton
 			std::uniform_real_distribution<float>& rdist,
 			DirectX::XMFLOAT3 material);
 
-		void Update(float dt) noexcept
-		{
-			roll = wrap_angle(roll + droll * dt);
-			pitch = wrap_angle(pitch + dpitch * dt);
-			yaw = wrap_angle(yaw + dyaw * dt);
-			theta = wrap_angle(theta + dtheta * dt);
-			phi = wrap_angle(phi + dphi * dt);
-			chi = wrap_angle(chi + dchi * dt);
-		}
+		void Update(float dt) noexcept;
 
 		DirectX::XMMATRIX GetTransformXM() const noexcept
 		{
 			namespace dx = DirectX;
 			return dx::XMMatrixRotationRollPitchYaw(pitch, yaw, roll) *
-				dx::XMMatrixTranslation(r, 0.0f, 0.0f) *
-				dx::XMMatrixRotationRollPitchYaw(theta, phi, chi);
+				   dx::XMMatrixTranslation(r, 0.0f, 0.0f) *
+				   dx::XMMatrixRotationRollPitchYaw(theta, phi, chi);
 		}
 	private:
 		// positional
@@ -64,7 +56,7 @@ namespace Proton
 			float specularPower = 30.0f;
 			float padding[3];
 		} pmc;
-
+	public:
 		std::unique_ptr<VertexBuffer> m_VertBuffer;
 		std::unique_ptr<IndexBuffer> m_IndexBuffer;
 		std::unique_ptr<VertexShader> m_VertShader;

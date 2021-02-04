@@ -3,6 +3,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include "Renderer\Renderer.h"
 
 namespace Proton
 {
@@ -71,8 +72,30 @@ namespace Proton
 		m_VertBuffer->SetLayout(layout, m_VertShader.get());
 
 		pmc.color = material;
-		m_MaterialCBuf.reset(PixelConstantBuffer::Create(0, sizeof(pmc), &pmc));
+		m_MaterialCBuf.reset(PixelConstantBuffer::Create(1, sizeof(pmc), &pmc));
 
 		m_TransformCBuf.reset(VertexConstantBuffer::Create(0, sizeof(Transforms), new Transforms()));
+	}
+
+	void AssimpTest::Update(float dt) noexcept
+	{
+		roll = wrap_angle(roll + droll * dt);
+		pitch = wrap_angle(pitch + dpitch * dt);
+		yaw = wrap_angle(yaw + dyaw * dt);
+		theta = wrap_angle(theta + dtheta * dt);
+		phi = wrap_angle(phi + dphi * dt);
+		chi = wrap_angle(chi + dchi * dt);
+
+		const auto modelView = GetTransformXM() * Renderer::GetCamera().GetViewMatrix();
+		const Transforms tf =
+		{
+			DirectX::XMMatrixTranspose(modelView),
+			DirectX::XMMatrixTranspose(
+				modelView *
+				Renderer::GetCamera().GetProjectionMatrix()
+			)
+		};
+
+		m_TransformCBuf->SetData(sizeof(Transforms), &tf);
 	}
 }

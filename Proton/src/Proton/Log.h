@@ -6,7 +6,7 @@
 
 namespace Proton
 {
-	class PROTON_API Log
+	class Log
 	{
 	public:
 		static void Init();
