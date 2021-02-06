@@ -146,6 +146,7 @@
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
+    <ClInclude Include="src\Proton\Core\TimeStep.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">

@@ -27,7 +27,7 @@ namespace Proton
 		m_Window = std::unique_ptr<Window>(Window::Create({"Proton Game Engine", 1280, 720}));
 
 		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
-		m_Window->SetVSync(true);
+		m_Window->SetVSync(false);
 
 		m_ImGuiLayer = new ImGuiLayer();
 		PushOverlay(m_ImGuiLayer);
@@ -76,13 +76,26 @@ namespace Proton
 	void Application::Run()
 	{
 		RenderCommand::SetClearColor(0.02f, 0.07f, 0.2f);
+		LARGE_INTEGER li;
+		QueryPerformanceCounter(&li);
+		m_AppStartTime = li.QuadPart;
 
 		while (m_Running)
 		{
 			RenderCommand::Clear();
 
+			QueryPerformanceFrequency(&li);
+			double pcFreq = li.QuadPart;
+			QueryPerformanceCounter(&li);
+
+			float time = (li.QuadPart - m_AppStartTime) / pcFreq;		//Platform::GetTime()
+
+			TimeStep timeStep = time - m_LastFrameTime;
+
+			m_LastFrameTime = time;
+
 			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate();
+				layer->OnUpdate(timeStep);
 
 			m_ImGuiLayer->Begin();
 			for (Layer* layer : m_LayerStack)

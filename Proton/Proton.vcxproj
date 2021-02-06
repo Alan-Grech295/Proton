@@ -161,6 +161,7 @@
     <ClInclude Include="src\Proton\Box.h" />
     <ClInclude Include="src\Proton\Cone.h" />
     <ClInclude Include="src\Proton\Core.h" />
+    <ClInclude Include="src\Proton\Core\TimeStep.h" />
     <ClInclude Include="src\Proton\Cube.h" />
     <ClInclude Include="src\Proton\EntryPoint.h" />
     <ClInclude Include="src\Proton\Events\ApplicationEvent.h" />

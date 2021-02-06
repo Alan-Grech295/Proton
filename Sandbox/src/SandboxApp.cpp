@@ -18,10 +18,10 @@ public:
 		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
 		std::uniform_real_distribution<float> cdist{ 0.0f, 1.0f };
 
-		std::uniform_int_distribution<int> mdist{ 0, nDrawables };
+		std::uniform_int_distribution<int> mdist{ 0, nDrawables - 100 };
 
-		int nBoxes = mdist(rng);
-		int nModels = 0;// nDrawables - nBoxes;
+		int nBoxes = mdist(rng) + 100;
+		int nModels = nDrawables - nBoxes;
 
 		boxes.resize(nBoxes);
 
@@ -40,35 +40,37 @@ public:
 		light = std::make_unique<Proton::PointLight>(0.5f);
 	}
 
-	void OnUpdate() override
+	void OnUpdate(Proton::TimeStep ts) override
 	{
+		PT_TRACE("Delta Time: {0}s, {1}ms", ts.GetSeconds(), ts.GetMilliseconds());
+		float speed = ts * 15.0f;
+
 		if (Proton::Input::IsKeyPressed(PT_KEY_D))
-			m_CameraPos.x += 0.1f;
+			m_CameraPos.x += speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_A))
-			m_CameraPos.x -= 0.1f;
+			m_CameraPos.x -= speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_E))
-			m_CameraPos.y += 0.1f;
+			m_CameraPos.y += speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_Q))
-			m_CameraPos.y -= 0.1f;
+			m_CameraPos.y -= speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_W))
-			m_CameraPos.z += 0.1f;
+			m_CameraPos.z += speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_S))
-			m_CameraPos.z -= 0.1f;
+			m_CameraPos.z -= speed;
 
 		m_Camera.SetPosition(m_CameraPos);
 		Proton::Renderer::BeginScene(m_Camera);
-		auto dt = 1.0f / 60.0f;// timer.Mark();
 
 		light->SetLightData();
 
 		for (int i = 0; i < boxes.size(); i++)
 		{
-			boxes[i]->Update(dt);
+			boxes[i]->Update(ts.GetSeconds());
 
 			boxes[i]->m_VertShader->Bind();
 			boxes[i]->m_PixelShader->Bind();
@@ -80,7 +82,7 @@ public:
 
 		for (int i = 0; i < models.size(); i++)
 		{
-			models[i]->Update(dt);
+			models[i]->Update(ts.GetSeconds());
 
 			models[i]->m_VertShader->Bind();
 			models[i]->m_PixelShader->Bind();

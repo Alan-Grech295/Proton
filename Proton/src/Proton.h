@@ -7,6 +7,8 @@
 #include "Proton/Layer.h"
 #include "Proton\Math.h"
 
+#include "Proton\Core\TimeStep.h"
+
 #include "Proton/Input.h"
 #include "Proton/MouseButtonCodes.h"
 #include "Proton/KeyCodes.h"

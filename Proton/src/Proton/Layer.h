@@ -2,7 +2,7 @@
 
 #include "Proton/Core.h"
 #include "Proton/Events/Event.h"
-
+#include "Proton\Core\TimeStep.h"
 namespace Proton
 {
 	class Layer
@@ -13,7 +13,7 @@ namespace Proton
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(TimeStep ts) {}
 		virtual void OnImGuiRender() {}
 		virtual void OnEvent(Event& event) {}
 

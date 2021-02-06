@@ -15,6 +15,8 @@
 #include "Renderer\Camera.h"
 #include "PointLight.h"
 
+#include "Proton\Core\TimeStep.h"
+
 namespace Proton
 {
 	class Application
@@ -44,6 +46,8 @@ namespace Proton
 		ImGuiLayer* m_ImGuiLayer;
 		Timer timer;
 		LayerStack m_LayerStack;
+		float m_LastFrameTime = 0.0f;
+		__int64 m_AppStartTime = 0.0f;
 	private:
 		static Application* s_Instance;
 	};
