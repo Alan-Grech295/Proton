@@ -4,6 +4,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
+#include "Proton\Log.h"
 
 namespace Proton
 {
@@ -76,6 +77,8 @@ namespace Proton
 				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i])
 				});
 		}
+
+		PT_CORE_INFO("{0}", mesh.mNumVertices);
 
 		std::vector<unsigned short> indices;
 		indices.reserve((UINT)mesh.mNumFaces * 3);

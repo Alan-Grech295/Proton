@@ -73,14 +73,17 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgManifestInstall>false</VcpkgManifestInstall>
     <VcpkgAutoLink>false</VcpkgAutoLink>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgManifestInstall>false</VcpkgManifestInstall>
     <VcpkgAutoLink>false</VcpkgAutoLink>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgManifestInstall>false</VcpkgManifestInstall>
     <VcpkgAutoLink>false</VcpkgAutoLink>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -156,6 +159,8 @@
     <ClInclude Include="src\Platform\DirectX 11\DirectXRendererAPI.h" />
     <ClInclude Include="src\Platform\DirectX 11\DirectXShader.h" />
     <ClInclude Include="src\Platform\DirectX 11\DirectXTexture.h" />
+    <ClInclude Include="src\Platform\DirectX 11\imgui_impl_dx11.h" />
+    <ClInclude Include="src\Platform\DirectX 11\imgui_impl_win32.h" />
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Proton.h" />
@@ -201,6 +206,8 @@
     <ClCompile Include="src\Platform\DirectX 11\DirectXRendererAPI.cpp" />
     <ClCompile Include="src\Platform\DirectX 11\DirectXShader.cpp" />
     <ClCompile Include="src\Platform\DirectX 11\DirectXTexture.cpp" />
+    <ClCompile Include="src\Platform\DirectX 11\imgui_impl_dx11.cpp" />
+    <ClCompile Include="src\Platform\DirectX 11\imgui_impl_win32.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Proton\Application.cpp" />
@@ -214,16 +221,12 @@
     <ClCompile Include="src\Proton\Model\Model.cpp" />
     <ClCompile Include="src\Proton\PointLight.cpp" />
     <ClCompile Include="src\Proton\Renderer\Buffer.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Camera.cpp">
-      <ObjectFileName>$(IntDir)\Camera1.obj</ObjectFileName>
-    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Camera.cpp" />
     <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Proton\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp" />
     <ClCompile Include="src\Proton\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Texture.cpp">
-      <ObjectFileName>$(IntDir)\Texture1.obj</ObjectFileName>
-    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Texture.cpp" />
     <ClCompile Include="src\Proton\SolidSphere.cpp" />
     <ClCompile Include="src\Proton\Timer.cpp" />
     <ClCompile Include="src\ptpch.cpp">

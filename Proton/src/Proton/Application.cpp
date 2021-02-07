@@ -78,6 +78,7 @@ namespace Proton
 	void Application::Run()
 	{
 		RenderCommand::SetClearColor(0.02f, 0.07f, 0.2f);
+
 		LARGE_INTEGER li;
 		QueryPerformanceCounter(&li);
 		m_AppStartTime = li.QuadPart;
@@ -87,7 +88,7 @@ namespace Proton
 			RenderCommand::Clear();
 
 			QueryPerformanceFrequency(&li);
-			LONGLONG pcFreq = li.QuadPart;
+			double pcFreq = li.QuadPart;
 			QueryPerformanceCounter(&li);
 
 			float time = (li.QuadPart - m_AppStartTime) / pcFreq;		//Platform::GetTime()
@@ -100,8 +101,10 @@ namespace Proton
 				layer->OnUpdate(timeStep);
 
 			m_ImGuiLayer->Begin();
+
 			for (Layer* layer : m_LayerStack)
 				layer->OnImGuiRender();
+
 			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();

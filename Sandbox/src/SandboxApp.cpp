@@ -44,7 +44,7 @@ public:
 
 	void OnUpdate(Proton::TimeStep ts) override
 	{
-		PT_TRACE("Delta Time: {0}s, {1}ms", ts.GetSeconds(), ts.GetMilliseconds());
+		//PT_TRACE("Delta Time: {0}s, {1}ms", ts.GetSeconds(), ts.GetMilliseconds());
 		float speed = ts * 15.0f;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_D))
