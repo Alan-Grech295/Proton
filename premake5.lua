@@ -81,6 +81,19 @@ project "Proton"
 		defines "PT_DIST"
 		runtime "Release"
 		optimize "on"
+
+	--Shader Output
+	filter { "files:**.hlsl" }
+   		shadermodel "5.0" 
+
+	filter { "files:**PS.hlsl" }
+   		shadertype "Pixel"
+
+	filter { "files:**VS.hlsl" }
+   		shadertype "Vertex"
+
+	filter { "files:**CS.hlsl" }
+   		shadertype "Compute"
 	
 project "Sandbox"
 	location "Sandbox"
