@@ -1,6 +1,7 @@
 #include "ptpch.h"
 #include "Renderer.h"
 
+
 namespace Proton
 {
 	Camera* Renderer::m_Camera = nullptr;
@@ -15,10 +16,20 @@ namespace Proton
 
 	}
 
+	void Renderer::Submit(Model& model, DirectX::FXMMATRIX transform)
+	{
+		model.Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transform);
+	}
+
 	void Renderer::Submit(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer)
 	{
 		vertBuffer->Bind();
 		indexBuffer->Bind();
-		RenderCommand::DrawIndexed(vertBuffer, indexBuffer);
+		RenderCommand::DrawIndexed(indexBuffer->GetCount());
+	}
+
+	void Renderer::DrawCall(const UINT count)
+	{
+		RenderCommand::DrawIndexed(count);
 	}
 }

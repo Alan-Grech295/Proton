@@ -41,9 +41,9 @@ namespace Proton
 	private:
 		struct WindowData
 		{
-			std::string title;
-			unsigned int width;
-			unsigned int height;
+			std::string title = "";
+			unsigned int width = 0;
+			unsigned int height = 0;
 			bool vSync = true;
 			EventCallbackFn eventCallback;
 		};

@@ -39,7 +39,13 @@ namespace Proton
 		uint32_t Offset;
 		uint32_t Size;
 
-		BufferElement() {}
+		BufferElement() 
+			:
+			Name("UNKNOWN"),
+			Type(ShaderDataType::None),
+			Size(0),
+			Offset(0)
+		{}
 
 		BufferElement(const std::string name, ShaderDataType type)
 			:

@@ -51,10 +51,10 @@ namespace Proton
 
 		struct PSMaterialConstant
 		{
-			DirectX::XMFLOAT3 color;
+			DirectX::XMFLOAT3 color = { 0, 0, 0 };
 			float specularIntensity = 2.0f;
 			float specularPower = 30.0f;
-			float padding[3];
+			float padding[3] = { 0, 0, 0 };
 		} pmc;
 	public:
 		std::unique_ptr<VertexBuffer> m_VertBuffer;

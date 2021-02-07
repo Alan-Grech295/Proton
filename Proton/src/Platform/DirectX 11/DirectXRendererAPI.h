@@ -13,7 +13,7 @@ namespace Proton
 		virtual void SetClearColor(float r, float g, float b) override;
 		virtual void Clear() override;
 
-		virtual void DrawIndexed(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer) override;
+		virtual void DrawIndexed(const UINT count) override;
 
 		ID3D11Device* GetDevice() { return pDevice.Get(); }
 		ID3D11DeviceContext* GetContext() { return pContext.Get(); }

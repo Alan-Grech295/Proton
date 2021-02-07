@@ -21,10 +21,10 @@ namespace Proton
 	private:
 		struct PSMaterialConstant
 		{
-			DirectX::XMFLOAT3 color;
+			DirectX::XMFLOAT3 color = { 1, 1, 1 };
 			float specularIntensity = 0.6f;
 			float specularPower = 30.0f;
-			float padding[3];
+			float padding[3] = { 0, 0, 0 };
 		} materialConstants;
 	private:
 		// positional

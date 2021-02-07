@@ -29,6 +29,8 @@ namespace Proton
 			ImGui::ColorEdit3("Diffuse Color", &cbData.diffuseColor.x);
 			ImGui::ColorEdit3("Ambient", &cbData.ambient.x);
 
+			mesh.colorConst.color = cbData.diffuseColor;
+
 			ImGui::Text("Falloff");
 			ImGui::SliderFloat("Constant", &cbData.attConst, 0.05f, 10.0f, "%.2f");
 			ImGui::SliderFloat("Linear", &cbData.attLin, 0.0001f, 4.0f, "%.4f");
@@ -55,12 +57,6 @@ namespace Proton
 			0.0075f
 		};
 	}
-
-	/*void PointLight::Draw(WindowsGraphics& gfx) const
-	{
-		mesh.SetPos(cbData.pos);
-		mesh.Draw(gfx);
-	}*/
 
 	void PointLight::SetLightData() const
 	{

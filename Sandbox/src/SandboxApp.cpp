@@ -9,7 +9,7 @@ public:
 		: Layer("Example"),
 		m_Camera(Proton::Application::Get().GetWindow().GetWidth(), Proton::Application::Get().GetWindow().GetHeight(), 0.5f, 1000.0f, Proton::Camera::ProjectionMode::Perspective)
 	{
-		std::mt19937 rng{ std::random_device{}() };
+		/*std::mt19937 rng{ std::random_device{}() };
 		std::uniform_int_distribution<int> sdist{ 0,1 };
 		std::uniform_real_distribution<float> adist{ 0.0f,Proton::PI * 2.0f };
 		std::uniform_real_distribution<float> ddist{ 0.0f,Proton::PI * 0.5f };
@@ -35,7 +35,9 @@ public:
 		for (int i = 0; i < nModels; i++)
 		{
 			models[i] = std::make_unique<Proton::AssimpTest>(rng, adist, ddist, odist, rdist, DirectX::XMFLOAT3(cdist(rng), cdist(rng), cdist(rng)));
-		}
+		}*/
+
+
 
 		light = std::make_unique<Proton::PointLight>(0.5f);
 	}
@@ -68,31 +70,11 @@ public:
 
 		light->SetLightData();
 
-		for (int i = 0; i < boxes.size(); i++)
-		{
-			boxes[i]->Update(ts.GetSeconds());
+		const auto transformMatrix = DirectX::XMMatrixRotationRollPitchYaw(m_Transform.roll, m_Transform.pitch, m_Transform.yaw) *
+			DirectX::XMMatrixTranslation(m_Transform.x, m_Transform.y, m_Transform.z);
 
-			boxes[i]->m_VertShader->Bind();
-			boxes[i]->m_PixelShader->Bind();
-			boxes[i]->m_TransformCBuf->Bind();
-			boxes[i]->m_MaterialCBuf->Bind();
+		Proton::Renderer::Submit(nano, transformMatrix);
 
-			Proton::Renderer::Submit(boxes[i]->m_VertBuffer.get(), boxes[i]->m_IndexBuffer.get());
-		}
-
-		for (int i = 0; i < models.size(); i++)
-		{
-			models[i]->Update(ts.GetSeconds());
-
-			models[i]->m_VertShader->Bind();
-			models[i]->m_PixelShader->Bind();
-			models[i]->m_TransformCBuf->Bind();
-			models[i]->m_MaterialCBuf->Bind();
-
-			Proton::Renderer::Submit(models[i]->m_VertBuffer.get(), models[i]->m_IndexBuffer.get());
-		}
-
-		//Renderer::EndScene();
 		light->mesh.Bind();
 
 		Proton::Renderer::Submit(light->mesh.m_VertBuffer.get(), light->mesh.m_IndexBuffer.get());
@@ -103,6 +85,25 @@ public:
 		if (ImGui::Begin("Debug Data"))
 		{
 			ImGui::Text("Application Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		}
+
+		ImGui::End();
+
+		light->CreateControlWindow();
+
+		if (ImGui::Begin("Model"))
+		{
+			using namespace std::string_literals;
+
+			ImGui::Text("Orientation");
+			ImGui::SliderAngle("Roll", &m_Transform.roll, -180.0f, 180.0f);
+			ImGui::SliderAngle("Pitch", &m_Transform.pitch, -180.0f, 180.0f);
+			ImGui::SliderAngle("Yaw", &m_Transform.yaw, -180.0f, 180.0f);
+
+			ImGui::Text("Position");
+			ImGui::SliderFloat("X", &m_Transform.x, -20.0f, 20.0f);
+			ImGui::SliderFloat("Y", &m_Transform.y, -20.0f, 20.0f);
+			ImGui::SliderFloat("Z", &m_Transform.z, -20.0f, 20.0f);
 		}
 
 		ImGui::End();
@@ -127,8 +128,19 @@ private:
 	static constexpr size_t nDrawables = 150;
 	Proton::Camera m_Camera;
 	std::unique_ptr<Proton::PointLight> light;
+	Proton::Model nano{ "C:\\Dev\\Proton\\Proton\\Models\\nanosuit.obj" };
 
 	DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };
+
+	struct
+	{
+		float roll = 0.0f;
+		float pitch = 0.0f;
+		float yaw = 0.0f;
+		float x = 0.0f;
+		float y = 0.0f;
+		float z = 0.0f;
+	} m_Transform;
 };
 
 class Sandbox : public Proton::Application

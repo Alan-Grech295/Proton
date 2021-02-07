@@ -22,10 +22,10 @@ namespace Proton
 		pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
-	void DirectXRendererAPI::DrawIndexed(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer)
+	void DirectXRendererAPI::DrawIndexed(const UINT count)
 	{
 		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		pContext->DrawIndexed(indexBuffer->GetCount(), 0u, 0u);
+		pContext->DrawIndexed(count, 0u, 0u);
 	}
 
 	void DirectXRendererAPI::Initialize(WindowsWindow& window, HWND hWnd)
@@ -116,8 +116,8 @@ namespace Proton
 
 		//Configure viewport
 		D3D11_VIEWPORT vp;
-		vp.Width = width;
-		vp.Height = height;
+		vp.Width = (FLOAT)width;
+		vp.Height = (FLOAT)height;
 		vp.MinDepth = 0;
 		vp.MaxDepth = 1;
 		vp.TopLeftX = 0;

@@ -19,9 +19,9 @@ namespace Proton
 			s_RendererAPI->Clear();
 		}
 
-		inline static void DrawIndexed(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer)
+		inline static void DrawIndexed(const UINT count)
 		{
-			s_RendererAPI->DrawIndexed(vertBuffer, indexBuffer);
+			s_RendererAPI->DrawIndexed(count);
 		}
 
 		inline static RendererAPI* GetRendererAPI() { return s_RendererAPI; }

@@ -13,13 +13,14 @@ namespace Proton
 		void SetPos(DirectX::XMFLOAT3 pos);
 		DirectX::XMMATRIX GetTransformXM() const noexcept;
 		void Bind();
-	private:
-		DirectX::XMFLOAT3 pos = { 1.0f, 1.0f, 1.0f };
+	public:
 		struct PSColorConstant
 		{
 			DirectX::XMFLOAT3 color = { 1.0f,1.0f,1.0f };
-			float padding;
+			float padding = 0.0f;
 		} colorConst;
+	private:
+		DirectX::XMFLOAT3 pos = { 1.0f, 1.0f, 1.0f };
 
 		struct Transforms
 		{

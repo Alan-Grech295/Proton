@@ -64,6 +64,8 @@ namespace Proton
 
 		m_TransformCBuf->SetData(sizeof(Transforms), &tf);
 
+		m_MaterialCBuf->SetData(sizeof(colorConst), &colorConst);
+
 		m_VertShader->Bind();
 		m_PixelShader->Bind();
 		m_TransformCBuf->Bind();

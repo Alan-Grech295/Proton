@@ -14,7 +14,7 @@ namespace Proton
 		virtual void SetClearColor(float r, float g, float b) = 0;
 		virtual void Clear() = 0;
 
-		virtual void DrawIndexed(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer) = 0;
+		virtual void DrawIndexed(const UINT count) = 0;
 
 		inline static API GetAPI() { return s_API; }
 	private:

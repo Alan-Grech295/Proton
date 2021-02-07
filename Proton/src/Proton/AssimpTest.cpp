@@ -46,7 +46,7 @@ namespace Proton
 		}
 
 		std::vector<unsigned short> indices;
-		indices.reserve(pMesh->mNumFaces * 3);
+		indices.reserve((UINT)pMesh->mNumFaces * 3);
 		for (unsigned int i = 0; i < pMesh->mNumFaces; i++)
 		{
 			const auto& face = pMesh->mFaces[i];
@@ -56,9 +56,9 @@ namespace Proton
 			indices.push_back(face.mIndices[2]);
 		}
 
-		m_VertBuffer.reset(VertexBuffer::Create(sizeof(Vertex), &vertices[0], vertices.size()));
+		m_VertBuffer.reset(VertexBuffer::Create(sizeof(Vertex), vertices.data(), (uint32_t)vertices.size()));
 
-		m_IndexBuffer.reset(IndexBuffer::Create(&indices[0], indices.size()));
+		m_IndexBuffer.reset(IndexBuffer::Create(indices.data(), (uint32_t)indices.size()));
 
 		m_VertShader.reset(VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso"));
 

@@ -147,6 +147,8 @@
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
     <ClInclude Include="src\Proton\Core\TimeStep.h" />
+    <ClInclude Include="src\Proton\Model\Model.h" />
+    <ClInclude Include="src\Proton\Core\Base.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -220,6 +222,7 @@
     </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
     <ClCompile Include="src\Proton\ImGui\ImGuiBuild.cpp" />
+    <ClCompile Include="src\Proton\Model\Model.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">

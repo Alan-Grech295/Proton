@@ -217,7 +217,7 @@ namespace Proton
 				MouseButtonReleasedEvent event(0, pt.x, pt.y);
 				data.eventCallback(event);
 
-				if (pt.x < 0 || pt.x >= m_Data.width || pt.y < 0 || pt.y >= m_Data.height)
+				if (pt.x < 0 || pt.x >= (SHORT)m_Data.width || pt.y < 0 || pt.y >= (SHORT)m_Data.height)
 				{
 					ReleaseCapture();
 					MouseLeftEvent event(pt.x, pt.y);
@@ -241,7 +241,7 @@ namespace Proton
 				MouseButtonReleasedEvent event(1, pt.x, pt.y);
 				data.eventCallback(event);
 
-				if (pt.x < 0 || pt.x >= m_Data.width || pt.y < 0 || pt.y >= m_Data.height)
+				if (pt.x < 0 || pt.x >= (SHORT)m_Data.width || pt.y < 0 || pt.y >= (SHORT)m_Data.height)
 				{
 					ReleaseCapture();
 					MouseLeftEvent event(pt.x, pt.y);
@@ -257,7 +257,7 @@ namespace Proton
 				input->mousePosX = pt.x;
 				input->mousePosY = pt.y;
 
-				if (pt.x >= 0 && pt.x < m_Data.width && pt.y >= 0 && pt.y < m_Data.height)
+				if (pt.x >= 0 && pt.x < (SHORT)m_Data.width && pt.y >= 0 && pt.y < (SHORT)m_Data.height)
 				{
 					if (!receivingMouseInput)
 					{

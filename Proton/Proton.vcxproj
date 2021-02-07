@@ -73,12 +73,15 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgAutoLink>false</VcpkgAutoLink>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgAutoLink>false</VcpkgAutoLink>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <VcpkgEnabled>false</VcpkgEnabled>
+    <VcpkgAutoLink>false</VcpkgAutoLink>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -161,6 +164,7 @@
     <ClInclude Include="src\Proton\Box.h" />
     <ClInclude Include="src\Proton\Cone.h" />
     <ClInclude Include="src\Proton\Core.h" />
+    <ClInclude Include="src\Proton\Core\Base.h" />
     <ClInclude Include="src\Proton\Core\TimeStep.h" />
     <ClInclude Include="src\Proton\Cube.h" />
     <ClInclude Include="src\Proton\EntryPoint.h" />
@@ -176,6 +180,7 @@
     <ClInclude Include="src\Proton\LayerStack.h" />
     <ClInclude Include="src\Proton\Log.h" />
     <ClInclude Include="src\Proton\Math.h" />
+    <ClInclude Include="src\Proton\Model\Model.h" />
     <ClInclude Include="src\Proton\MouseButtonCodes.h" />
     <ClInclude Include="src\Proton\PointLight.h" />
     <ClInclude Include="src\Proton\Renderer\Buffer.h" />
@@ -206,6 +211,7 @@
     <ClCompile Include="src\Proton\Layer.cpp" />
     <ClCompile Include="src\Proton\LayerStack.cpp" />
     <ClCompile Include="src\Proton\Log.cpp" />
+    <ClCompile Include="src\Proton\Model\Model.cpp" />
     <ClCompile Include="src\Proton\PointLight.cpp" />
     <ClCompile Include="src\Proton\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Proton\Renderer\Camera.cpp">

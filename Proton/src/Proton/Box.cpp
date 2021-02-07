@@ -24,7 +24,8 @@ namespace Proton
 		dchi(odist(rng)),
 		chi(adist(rng)),
 		theta(adist(rng)),
-		phi(adist(rng))
+		phi(adist(rng)),
+		mt({0, 0, 0, 0, 0, 0, 0, 0, 0})
 	{
 		namespace dx = DirectX;
 		struct Vertex

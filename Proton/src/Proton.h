@@ -25,6 +25,8 @@
 #include "Proton\AssimpTest.h"
 #include "Proton\PointLight.h"
 
+#include "Proton\Model\Model.h"
+
 //---Entry Point------------------
 #include "Proton/EntryPoint.h"
 //--------------------------------

@@ -13,6 +13,8 @@
 #include "imgui.h"
 #include "Input.h"
 
+#include "Core\Base.h"
+
 #include "Renderer\Renderer.h"
 
 namespace Proton
@@ -85,7 +87,7 @@ namespace Proton
 			RenderCommand::Clear();
 
 			QueryPerformanceFrequency(&li);
-			double pcFreq = li.QuadPart;
+			LONGLONG pcFreq = li.QuadPart;
 			QueryPerformanceCounter(&li);
 
 			float time = (li.QuadPart - m_AppStartTime) / pcFreq;		//Platform::GetTime()

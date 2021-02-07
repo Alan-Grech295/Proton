@@ -14,13 +14,13 @@ namespace Proton
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
-			assert(false, "RendererAPI::None is currently not supported!");
+			assert(false && "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
 			return new DirectXPixelShader(path);
 		}
 
-		assert(false, "Unknown RendererAPI!");
+		assert(false && "Unknown RendererAPI!");
 		return nullptr;
 	}
 
@@ -29,13 +29,13 @@ namespace Proton
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
-			assert(false, "RendererAPI::None is currently not supported!");
+			assert(false && "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
 			return new DirectXVertexShader(path);
 		}
 
-		assert(false, "Unknown RendererAPI!");
+		assert(false && "Unknown RendererAPI!");
 		return nullptr;
 	}
 }

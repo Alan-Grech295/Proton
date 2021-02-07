@@ -10,7 +10,6 @@ namespace Proton
 		PointLight(float radius = 0.5f);
 		void CreateControlWindow();
 		void Reset();
-		//void Draw(WindowsGraphics& gfx) const;
 		void SetLightData() const;
 	public:
 		mutable SolidSphere mesh;
