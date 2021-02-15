@@ -9,69 +9,69 @@ public:
 		: Layer("Example"),
 		m_Camera(Proton::Application::Get().GetWindow().GetWidth(), Proton::Application::Get().GetWindow().GetHeight(), 0.5f, 1000.0f, Proton::Camera::ProjectionMode::Perspective)
 	{
-		/*std::mt19937 rng{ std::random_device{}() };
-		std::uniform_int_distribution<int> sdist{ 0,1 };
-		std::uniform_real_distribution<float> adist{ 0.0f,Proton::PI * 2.0f };
-		std::uniform_real_distribution<float> ddist{ 0.0f,Proton::PI * 0.5f };
-		std::uniform_real_distribution<float> odist{ 0.0f,Proton::PI * 0.08f };
-		std::uniform_real_distribution<float> rdist{ 6.0f,20.0f };
-		std::uniform_real_distribution<float> bdist{ 0.4f,3.0f };
-		std::uniform_real_distribution<float> cdist{ 0.0f, 1.0f };
-
-		std::uniform_int_distribution<int> mdist{ 0, nDrawables - 100 };
-
-		int nBoxes = mdist(rng) + 100;
-		int nModels = nDrawables - nBoxes;
-
-		boxes.resize(nBoxes);
-
-		for (int i = 0; i < nBoxes; i++)
-		{
-			boxes[i] = std::make_unique<Proton::Box>(rng, adist, ddist, odist, rdist, bdist, DirectX::XMFLOAT3(cdist(rng), cdist(rng), cdist(rng)));
-		}
-
-		models.resize(nModels);
-
-		for (int i = 0; i < nModels; i++)
-		{
-			models[i] = std::make_unique<Proton::AssimpTest>(rng, adist, ddist, odist, rdist, DirectX::XMFLOAT3(cdist(rng), cdist(rng), cdist(rng)));
-		}*/
-
-
-
+		Proton::Application::Get().GetWindow().ShowCursor();
 		light = std::make_unique<Proton::PointLight>(0.5f);
 	}
 
 	void OnUpdate(Proton::TimeStep ts) override
 	{
-		//PT_TRACE("Delta Time: {0}s, {1}ms", ts.GetSeconds(), ts.GetMilliseconds());
-		float speed = ts * 15.0f;
+		float speed = ts * cameraSpeed;
+
+		DirectX::XMFLOAT3 localMove = { 0, 0, 0 };
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_D))
-			m_CameraPos.x += speed;
+			localMove.x += speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_A))
-			m_CameraPos.x -= speed;
+			localMove.x -= speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_E))
-			m_CameraPos.y += speed;
+			localMove.y += speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_Q))
-			m_CameraPos.y -= speed;
+			localMove.y -= speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_W))
-			m_CameraPos.z += speed;
+			localMove.z += speed;
 
 		if (Proton::Input::IsKeyPressed(PT_KEY_S))
-			m_CameraPos.z -= speed;
+			localMove.z -= speed;
 
+		if (Proton::Input::IsKeyPressed(PT_KEY_ESCAPE))
+		{
+			if (cursor)
+			{
+				Proton::Application::Get().GetWindow().HideCursor();
+			}
+			else
+			{
+				Proton::Application::Get().GetWindow().ShowCursor();
+			}
+		}
+
+		if (Proton::Input::IsKeyReleased(PT_KEY_ESCAPE))
+		{
+			cursor = !cursor;
+		}
+
+		DirectX::XMStoreFloat3(&localMove, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&localMove), m_Camera.GetRotationMatrix()));
+
+		m_CameraPos.x += localMove.x;
+		m_CameraPos.y += localMove.y;
+		m_CameraPos.z += localMove.z;
+
+		DirectX::XMFLOAT3 newRot = m_Camera.GetRotation();
+
+		newRot.x += rotationSpeed * Proton::Input::GetMouseDeltaY() * ts;
+		newRot.y += rotationSpeed * Proton::Input::GetMouseDeltaX() * ts;
+
+		m_Camera.SetRotation(newRot);
 		m_Camera.SetPosition(m_CameraPos);
 		Proton::Renderer::BeginScene(m_Camera);
 
 		light->SetLightData();
 
-		const auto transformMatrix = DirectX::XMMatrixRotationRollPitchYaw(m_Transform.roll, m_Transform.pitch, m_Transform.yaw) *
-			DirectX::XMMatrixTranslation(m_Transform.x, m_Transform.y, m_Transform.z);
+		const auto transformMatrix = DirectX::XMMatrixIdentity();
 
 		Proton::Renderer::Submit(nano, transformMatrix);
 
@@ -91,22 +91,7 @@ public:
 
 		light->CreateControlWindow();
 
-		if (ImGui::Begin("Model"))
-		{
-			using namespace std::string_literals;
-
-			ImGui::Text("Orientation");
-			ImGui::SliderAngle("Roll", &m_Transform.roll, -180.0f, 180.0f);
-			ImGui::SliderAngle("Pitch", &m_Transform.pitch, -180.0f, 180.0f);
-			ImGui::SliderAngle("Yaw", &m_Transform.yaw, -180.0f, 180.0f);
-
-			ImGui::Text("Position");
-			ImGui::SliderFloat("X", &m_Transform.x, -20.0f, 20.0f);
-			ImGui::SliderFloat("Y", &m_Transform.y, -20.0f, 20.0f);
-			ImGui::SliderFloat("Z", &m_Transform.z, -20.0f, 20.0f);
-		}
-
-		ImGui::End();
+		nano.ShowWindow();
 	}
 
 	void OnAttach() override
@@ -128,9 +113,13 @@ private:
 	static constexpr size_t nDrawables = 150;
 	Proton::Camera m_Camera;
 	std::unique_ptr<Proton::PointLight> light;
-	Proton::Model nano{ "C:\\Dev\\Proton\\Proton\\Models\\nanosuit.obj" };
+	Proton::Model nano{ "C:\\Dev\\Proton\\Proton\\Models\\nanosuit.gltf" };
 
 	DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };
+	float cameraSpeed = 15.0f;
+	float rotationSpeed = 1.5f;
+
+	bool cursor = true;
 
 	struct
 	{

@@ -19,6 +19,7 @@ namespace Proton
 
 		const DirectX::XMMATRIX GetProjectionMatrix() const { return m_ProjectionMatrix; }
 		const DirectX::XMMATRIX GetViewMatrix() const { return m_ViewMatrix; }
+		const DirectX::XMMATRIX GetRotationMatrix() const;
 		const DirectX::XMMATRIX GetViewProjectionMatrix() const { return m_ViewProjectionMatrix; }
 	private:
 		void RecalculateViewMatrix();

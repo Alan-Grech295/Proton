@@ -22,6 +22,9 @@ namespace Proton
 		inline unsigned int GetWidth() const override { return m_Data.width; }
 		inline unsigned int GetHeight() const override { return m_Data.height; }
 
+		virtual void ShowCursor() const override;
+		virtual void HideCursor() const override;
+
 		//Window Attributes
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.eventCallback = callback; }
 		void SetVSync(bool enabled) override;
@@ -55,6 +58,8 @@ namespace Proton
 		bool receivingMouseInput;
 		bool initializedImGui = false;
 		WindowsInput* input;
+
+		std::vector<BYTE> rawBuffer;
 
 		class DirectXRendererAPI* api;
 

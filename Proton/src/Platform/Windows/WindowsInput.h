@@ -12,16 +12,22 @@ namespace Proton
 		friend Input;
 	protected:
 		virtual bool IsKeyPressedImpl(int keycode) override;
+		virtual bool IsKeyReleasedImpl(int keycode) override;
 		virtual bool IsMouseButtonPressedImpl(int button) override;
 		virtual float GetMouseXImpl() override;
 		virtual float GetMouseYImpl() override;
+		virtual float GetMouseXDeltaImpl() override;
+		virtual float GetMouseYDeltaImpl() override;
 	private:
 		static constexpr unsigned int nKeys = 256;
 		static constexpr unsigned int nMouseButtons = 3;
-		std::bitset<nKeys> keyStates;
+		std::bitset<nKeys> pressedKeyStates;
+		std::bitset<nKeys> releasedKeyStates;
 		std::bitset<nMouseButtons> mbStates;
 		float mousePosX;
 		float mousePosY;
+		float mouseDeltaX;
+		float mouseDeltaY;
 	private:
 		static WindowsInput* s_Instance;
 	};

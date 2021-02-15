@@ -29,4 +29,12 @@ namespace Proton
 					   
 		m_ViewProjectionMatrix = m_ViewMatrix * m_ProjectionMatrix;
 	}
+
+	const DirectX::XMMATRIX Camera::GetRotationMatrix() const
+	{
+		DirectX::XMFLOAT3X3 rotMat;
+		DirectX::XMStoreFloat3x3(&rotMat, m_ViewMatrix);
+
+		return DirectX::XMMatrixInverse(nullptr, DirectX::XMLoadFloat3x3(&rotMat));
+	}
 }

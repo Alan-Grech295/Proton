@@ -5,20 +5,25 @@
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 #include "Proton\Log.h"
+#include <unordered_map>
+#include <imgui.h>
 
 namespace Proton
 {
 	//Node
-	Node::Node(std::vector<Mesh*> meshPtrs, const DirectX::XMMATRIX transform)
+	Node::Node(std::string name, std::vector<Mesh*> meshPtrs, const DirectX::XMMATRIX transform)
 		:
 		m_MeshPtrs(std::move(meshPtrs)),
-		m_Transform(transform)
+		m_Transform(transform),
+		m_Name(name)
 	{
 	}
 
 	void Node::Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform) const
 	{
-		const auto built = m_Transform * accumulatedTransform;
+		const auto built = m_AppliedTransform *
+						   m_Transform * 
+						   accumulatedTransform;
 
 		for (const auto pm : m_MeshPtrs)
 		{
@@ -31,19 +36,116 @@ namespace Proton
 		}
 	}
 
+	void Node::SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept
+	{
+		m_AppliedTransform = transform;
+	}
+
 	void Node::AddChild(std::unique_ptr<Node> pChild)
 	{
 		assert(pChild);
 		m_ChildPtrs.push_back(std::move(pChild));
 	}
 
-	//Model
-	Model::Model(const std::string& modelPath)
+	void Node::ShowTree(int& nodeIndex, std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept
 	{
+		// nodeIndex serves as the uid for gui tree nodes, incremented throughout recursion
+		const int currentNodeIndex = nodeIndex;
+		nodeIndex++;
+		// build up flags for current node
+		const auto node_flags = ImGuiTreeNodeFlags_OpenOnArrow
+			| ((currentNodeIndex == selectedIndex.value_or(-1)) ? ImGuiTreeNodeFlags_Selected : 0)
+			| ((m_ChildPtrs.size() == 0) ? ImGuiTreeNodeFlags_Leaf : 0);
+		// render this node
+		const auto expanded = ImGui::TreeNodeEx(
+			(void*)(intptr_t)currentNodeIndex, node_flags, m_Name.c_str()
+		);
+		// processing for selecting node
+		if (ImGui::IsItemClicked())
+		{
+			selectedIndex = currentNodeIndex;
+			pSelectedNode = const_cast<Node*>(this);
+		}
+		// recursive rendering of open node's children
+		if (expanded)
+		{
+			for (const auto& pChild : m_ChildPtrs)
+			{
+				pChild->ShowTree(nodeIndex, selectedIndex, pSelectedNode);
+			}
+			ImGui::TreePop();
+		}
+	}
+
+	//Model
+	class ModelWindow // pImpl idiom, only defined in this .cpp
+	{
+	public:
+		void Show(const char* windowName, const Node& root) noexcept
+		{
+			// window name defaults to "Model"
+			windowName = windowName ? windowName : "Model";
+			// need an ints to track node indices and selected node
+			int nodeIndexTracker = 0;
+			if (ImGui::Begin(windowName))
+			{
+				ImGui::Columns(2, nullptr, true);
+				root.ShowTree(nodeIndexTracker, selectedIndex, pSelectedNode);
+
+				ImGui::NextColumn();
+				if (pSelectedNode != nullptr)
+				{
+					auto& transform = transforms[*selectedIndex];
+					ImGui::Text("Orientation");
+					ImGui::SliderAngle("Roll", &transform.roll, -180.0f, 180.0f);
+					ImGui::SliderAngle("Pitch", &transform.pitch, -180.0f, 180.0f);
+					ImGui::SliderAngle("Yaw", &transform.yaw, -180.0f, 180.0f);
+					ImGui::Text("Position");
+					ImGui::SliderFloat("X", &transform.x, -20.0f, 20.0f);
+					ImGui::SliderFloat("Y", &transform.y, -20.0f, 20.0f);
+					ImGui::SliderFloat("Z", &transform.z, -20.0f, 20.0f);
+				}
+			}
+			ImGui::End();
+		}
+
+		DirectX::XMMATRIX GetTransform() const noexcept
+		{
+			const auto& transform = transforms.at(*selectedIndex);
+			return
+				DirectX::XMMatrixRotationRollPitchYaw(transform.roll, transform.pitch, transform.yaw) *
+				DirectX::XMMatrixTranslation(transform.x, transform.y, transform.z);
+		}
+
+		Node* GetSelectedNode() const noexcept
+		{
+			return pSelectedNode;
+		}
+	private:
+		std::optional<int> selectedIndex;
+		Node* pSelectedNode;
+		struct TransformParameters
+		{
+			float roll = 0.0f;
+			float pitch = 0.0f;
+			float yaw = 0.0f;
+			float x = 0.0f;
+			float y = 0.0f;
+			float z = 0.0f;
+		};
+		std::unordered_map<int, TransformParameters> transforms;
+	};
+
+	Model::Model(const std::string& modelPath)
+		:
+		pWindow(std::make_unique<ModelWindow>())
+	{	
 		Assimp::Importer imp;
 		const auto pScene = imp.ReadFile(modelPath.c_str(),
 			aiProcess_Triangulate |
-			aiProcess_JoinIdenticalVertices);
+			aiProcess_JoinIdenticalVertices |
+			aiProcess_ConvertToLeftHanded |
+			aiProcess_GenNormals);
 
 		for (size_t i = 0; i < pScene->mNumMeshes; i++)
 		{
@@ -55,8 +157,21 @@ namespace Proton
 
 	void Model::Bind(RenderCallback callback, DirectX::FXMMATRIX transform) const
 	{
+		if (auto node = pWindow->GetSelectedNode())
+		{
+			node->SetAppliedTransform(pWindow->GetTransform());
+		}
+
 		m_Root->Bind(callback, transform);
 	}
+
+	void Model::ShowWindow(const char* windowName) noexcept
+	{
+		pWindow->Show(windowName, *m_Root);
+	}
+
+	Model::~Model() noexcept
+	{}
 
 	std::unique_ptr<Mesh> Model::ParseMesh(const aiMesh& mesh)
 	{
@@ -140,7 +255,7 @@ namespace Proton
 			curMeshPtrs.push_back(m_MeshPtrs.at(meshIdx).get());
 		}
 
-		auto pNode = std::make_unique<Node>(std::move(curMeshPtrs), transform);
+		auto pNode = std::make_unique<Node>(node.mName.C_Str(), std::move(curMeshPtrs), transform);
 
 		for (size_t i = 0; i < node.mNumChildren; i++)
 		{

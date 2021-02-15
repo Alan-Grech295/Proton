@@ -31,6 +31,11 @@ namespace Proton
 
 	void WindowsWindow::OnUpdate()
 	{
+		input->mouseDeltaX = 0;
+		input->mouseDeltaY = 0;
+
+		input->releasedKeyStates.reset();
+
 		//Message handling
 		MSG msg;
 
@@ -48,6 +53,16 @@ namespace Proton
 
 		//Present the frame
 		api->ShowFrame();
+	}
+
+	void WindowsWindow::ShowCursor() const
+	{
+		while (::ShowCursor(TRUE) < 0);
+	}
+
+	void WindowsWindow::HideCursor() const
+	{
+		while (::ShowCursor(FALSE) >= 0);
 	}
 
 	void WindowsWindow::SetVSync(bool enabled)
@@ -148,6 +163,17 @@ namespace Proton
 		//pGfx = std::make_unique<WindowsGraphics>(m_HWnd, (UINT)m_Data.width, (UINT)m_Data.height);
 		api = ((DirectXRendererAPI*)RenderCommand::s_RendererAPI);
 		api->Initialize(*this, m_HWnd);
+
+		RAWINPUTDEVICE rid;
+		rid.usUsagePage = 0x01;
+		rid.usUsage = 0x02;
+		rid.dwFlags = 0;
+		rid.hwndTarget = nullptr;
+
+		if (RegisterRawInputDevices(&rid, 1, sizeof(rid)) == FALSE)
+		{
+			PT_CORE_ERROR("Could not initialized Raw Input Device!");
+		}
 	}
 	
 	void WindowsWindow::Shutdown()
@@ -183,7 +209,7 @@ namespace Proton
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			{
-				input->keyStates[wParam] = true;
+				input->pressedKeyStates[wParam] = true;
 				KeyPressedEvent event(wParam, lParam & 0xffff);
 				data.eventCallback(event);
 				break;
@@ -191,7 +217,8 @@ namespace Proton
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			{
-				input->keyStates[wParam] = false;
+				input->pressedKeyStates[wParam] = false;
+				input->releasedKeyStates[wParam] = true;
 				KeyReleasedEvent event(wParam);
 				data.eventCallback(event);
 				break;
@@ -286,6 +313,41 @@ namespace Proton
 				MouseScrolledEvent event(pt.x, pt.y, GET_WHEEL_DELTA_WPARAM(wParam));
 				data.eventCallback(event);
 				break;
+			}
+
+			/****** Raw Mouse Messages *******/
+		case WM_INPUT:
+			{
+				UINT size;
+				if (GetRawInputData(
+					reinterpret_cast<HRAWINPUT>(lParam),
+					RID_INPUT,
+					nullptr,
+					&size,
+					sizeof(RAWINPUTHEADER)) == -1)
+				{
+					break;
+				}
+
+				rawBuffer.resize(size);
+
+				if (GetRawInputData(
+					reinterpret_cast<HRAWINPUT>(lParam),
+					RID_INPUT,
+					rawBuffer.data(),
+					&size,
+					sizeof(RAWINPUTHEADER)) != size)
+				{
+					break;
+				}
+
+				auto& ri = reinterpret_cast<const RAWINPUT&>(*rawBuffer.data());
+				if (ri.header.dwType == RIM_TYPEMOUSE &&
+					(ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0))
+				{
+					input->mouseDeltaX = ri.data.mouse.lLastX;
+					input->mouseDeltaY = ri.data.mouse.lLastY;
+				}
 			}
 		}
 

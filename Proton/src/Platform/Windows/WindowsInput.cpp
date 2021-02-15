@@ -10,7 +10,12 @@ namespace Proton
 
 	bool WindowsInput::IsKeyPressedImpl(int keycode)
 	{
-		return keyStates[keycode];
+		return pressedKeyStates[keycode];
+	}
+
+	bool WindowsInput::IsKeyReleasedImpl(int keycode)
+	{
+		return releasedKeyStates[keycode];
 	}
 
 	bool WindowsInput::IsMouseButtonPressedImpl(int button)
@@ -26,5 +31,15 @@ namespace Proton
 	float WindowsInput::GetMouseYImpl()
 	{
 		return mousePosY;
+	}
+
+	float WindowsInput::GetMouseXDeltaImpl()
+	{
+		return mouseDeltaX;
+	}
+
+	float WindowsInput::GetMouseYDeltaImpl()
+	{
+		return mouseDeltaY;
 	}
 }
