@@ -149,7 +149,7 @@ namespace Proton
 
 		for (size_t i = 0; i < pScene->mNumMeshes; i++)
 		{
-			m_MeshPtrs.push_back(ParseMesh(*pScene->mMeshes[i]));
+			m_MeshPtrs.push_back(ParseMesh(*pScene->mMeshes[i], pScene->mMaterials));
 		}
 
 		m_Root = ParseNode(*pScene->mRootNode);
@@ -173,13 +173,14 @@ namespace Proton
 	Model::~Model() noexcept
 	{}
 
-	std::unique_ptr<Mesh> Model::ParseMesh(const aiMesh& mesh)
+	std::unique_ptr<Mesh> Model::ParseMesh(const aiMesh& mesh, const aiMaterial* const* pMaterials)
 	{
 		namespace dx = DirectX;
 		struct Vertex
 		{
 			dx::XMFLOAT3 pos;
 			dx::XMFLOAT3 n;
+			dx::XMFLOAT2 uv;
 		};
 
 		std::vector<Vertex> vertices;
@@ -189,7 +190,8 @@ namespace Proton
 		{
 			vertices.push_back({
 				{ mesh.mVertices[i].x, mesh.mVertices[i].y, mesh.mVertices[i].z },
-				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i])
+				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]),
+				*reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i])
 				});
 		}
 
@@ -208,29 +210,66 @@ namespace Proton
 
 		std::unique_ptr<Mesh> pMesh = std::make_unique<Mesh>();
 
+		float shininess = 40.0f;
+
+		if (mesh.mMaterialIndex >= 0)
+		{
+			using namespace std::string_literals;
+			auto& material = *pMaterials[mesh.mMaterialIndex];
+
+			const auto base = "C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\"s;
+			aiString texFileName;
+
+			material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
+			pMesh->m_Texture.reset(Texture2D::Create(base + texFileName.C_Str()));
+			pMesh->hasSpecular = false;
+
+			if (material.GetTexture(aiTextureType_SPECULAR, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasSpecular = true;
+				pMesh->m_Specular.reset(Texture2D::Create(base + texFileName.C_Str(), 1));
+			}
+			else
+			{
+				material.Get(AI_MATKEY_SHININESS, shininess);
+			}
+
+			pMesh->m_Sampler.reset(Sampler::Create());
+		}
+
 		pMesh->m_VertBuffer.reset(VertexBuffer::Create(sizeof(Vertex), vertices.data(), (uint32_t)vertices.size()));
 
 		pMesh->m_IndexBuffer.reset(IndexBuffer::Create(indices.data(), (uint32_t)indices.size()));
 
+		if (pMesh->hasSpecular)
+		{
+			pMesh->m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso"));
+
+		}
+		else
+		{
+			pMesh->m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso"));
+		}
+
 		pMesh->m_VertShader.reset(VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso"));
 
-		pMesh->m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso"));
 
 		BufferLayout layout = {
 			{"POSITION", ShaderDataType::Float3},
-			{"NORMAL", ShaderDataType::Float3}
+			{"NORMAL", ShaderDataType::Float3},
+			{"TEXCOORD", ShaderDataType::Float2}
 		};
 
 		pMesh->m_VertBuffer->SetLayout(layout, pMesh->m_VertShader.get());
 
 		struct PSMaterialConstant
 		{
-			DirectX::XMFLOAT3 color = { 0.6f,0.6f,0.8f };
-			float specularIntensity = 0.6f;
-			float specularPower = 30.0f;
-			float padding[3] = { 0, 0, 0 };
+			float specularIntensity = 1.0f;
+			float specularPower;
+			float padding[2] = { 0, 0 };
 		} pmc;
 
+		pmc.specularPower = shininess;
 		pMesh->m_MaterialCBuf.reset(PixelConstantBuffer::Create(1, sizeof(pmc), &pmc));
 
 		pMesh->m_TransformCBuf.reset(VertexConstantBuffer::Create(0, sizeof(Mesh::Transforms), new Mesh::Transforms()));
@@ -271,7 +310,18 @@ namespace Proton
 		m_IndexBuffer->Bind();
 		m_VertShader->Bind();
 		m_PixelShader->Bind();
-		m_MaterialCBuf->Bind();
+
+		if (hasSpecular)
+		{
+			m_Specular->Bind();
+		}
+		else
+		{
+			m_MaterialCBuf->Bind();
+		}
+
+		m_Texture->Bind();
+		m_Sampler->Bind();
 
 		const auto modelView = accumulatedTransform * Renderer::GetCamera().GetViewMatrix();
 		const Transforms tf =

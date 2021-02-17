@@ -6,6 +6,9 @@ bin-int/
 # Proton files
 *.log
 
+#Models
+!Proton/Models/**/*.obj
+
 # Visual Studio files and folder
 .vs/
 **.sln

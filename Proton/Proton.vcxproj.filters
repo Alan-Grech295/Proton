@@ -164,6 +164,8 @@
       <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
+    <ClInclude Include="src\Proton\Renderer\Sampler.h" />
+    <ClInclude Include="src\Platform\DirectX 11\DirectXSampler.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -248,6 +250,8 @@
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Sampler.cpp" />
+    <ClCompile Include="src\Platform\DirectX 11\DirectXSampler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">
@@ -280,5 +284,6 @@
     <FxCompile Include="src\Proton\Shader\TextureVS.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongSpecularPS.hlsl" />
   </ItemGroup>
 </Project>

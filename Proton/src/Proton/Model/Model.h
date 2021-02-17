@@ -1,5 +1,7 @@
 #pragma once
 #include "Proton\Renderer\Buffer.h"
+#include "Proton\Renderer\Texture.h"
+#include "Proton\Renderer\Sampler.h"
 #include <DirectXMath.h>
 #include <memory>
 #include <vector>
@@ -7,6 +9,7 @@
 
 struct aiNode;
 struct aiMesh;
+struct aiMaterial;
 
 namespace Proton
 {
@@ -34,6 +37,11 @@ namespace Proton
 		std::unique_ptr<PixelShader> m_PixelShader;
 		std::unique_ptr<VertexConstantBuffer> m_TransformCBuf;
 		std::unique_ptr<PixelConstantBuffer> m_MaterialCBuf;
+		std::unique_ptr<class Texture2D> m_Texture;
+		std::unique_ptr<class Texture2D> m_Specular;
+		std::unique_ptr<class Sampler> m_Sampler;
+
+		bool hasSpecular = false;
 
 		struct Transforms
 		{
@@ -69,7 +77,7 @@ namespace Proton
 		void ShowWindow(const char* windowName = nullptr) noexcept;
 		~Model() noexcept;
 	private:
-		static std::unique_ptr<Mesh> ParseMesh(const aiMesh& mesh);
+		static std::unique_ptr<Mesh> ParseMesh(const aiMesh& mesh, const aiMaterial* const* pMaterials);
 		std::unique_ptr<Node> ParseNode(const aiNode& node);
 	private:
 		std::unique_ptr<Node> m_Root;

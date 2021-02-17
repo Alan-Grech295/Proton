@@ -11,7 +11,7 @@ namespace Proton
 		static void BeginScene(Camera& camera);
 		static void EndScene();
 
-		static void Submit(Model& model, DirectX::FXMMATRIX transform);
+		static void Submit(class Model& model, DirectX::FXMMATRIX transform);
 
 		static void Submit(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer);
 

@@ -2,7 +2,6 @@
 #include <string>
 #include <cassert>
 #include "Shader.h"
-#include <cassert>
 
 namespace Proton
 {

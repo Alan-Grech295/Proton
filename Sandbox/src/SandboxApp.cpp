@@ -54,17 +54,25 @@ public:
 			cursor = !cursor;
 		}
 
+		if (Proton::Input::IsKeyReleased(PT_KEY_SPACE))
+		{
+			enableCursor = !enableCursor;
+		}
+
 		DirectX::XMStoreFloat3(&localMove, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&localMove), m_Camera.GetRotationMatrix()));
 
 		m_CameraPos.x += localMove.x;
 		m_CameraPos.y += localMove.y;
 		m_CameraPos.z += localMove.z;
-
+		
 		DirectX::XMFLOAT3 newRot = m_Camera.GetRotation();
 
-		newRot.x += rotationSpeed * Proton::Input::GetMouseDeltaY() * ts;
-		newRot.y += rotationSpeed * Proton::Input::GetMouseDeltaX() * ts;
-
+		if (enableCursor)
+		{
+			newRot.x += rotationSpeed * Proton::Input::GetMouseDeltaY() * ts;
+			newRot.y += rotationSpeed * Proton::Input::GetMouseDeltaX() * ts;
+		}
+		
 		m_Camera.SetRotation(newRot);
 		m_Camera.SetPosition(m_CameraPos);
 		Proton::Renderer::BeginScene(m_Camera);
@@ -113,12 +121,13 @@ private:
 	static constexpr size_t nDrawables = 150;
 	Proton::Camera m_Camera;
 	std::unique_ptr<Proton::PointLight> light;
-	Proton::Model nano{ "C:\\Dev\\Proton\\Proton\\Models\\nanosuit.gltf" };
+	Proton::Model nano{ "C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\nanosuit.obj" };
 
 	DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };
 	float cameraSpeed = 15.0f;
 	float rotationSpeed = 1.5f;
 
+	bool enableCursor = true;
 	bool cursor = true;
 
 	struct
