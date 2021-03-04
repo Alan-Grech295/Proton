@@ -42,10 +42,14 @@ public:
 			if (cursor)
 			{
 				Proton::Application::Get().GetWindow().HideCursor();
+				Proton::Application::Get().GetWindow().DisableImGuiCursor();
+				Proton::Application::Get().GetWindow().ConfineCursor();
 			}
 			else
 			{
 				Proton::Application::Get().GetWindow().ShowCursor();
+				Proton::Application::Get().GetWindow().EnableImGuiCursor();
+				Proton::Application::Get().GetWindow().FreeCursor();
 			}
 		}
 
@@ -78,12 +82,6 @@ public:
 		Proton::Renderer::BeginScene(m_Camera);
 
 		light->SetLightData();
-
-		//Proton::Renderer::Submit(nano, transformMatrix);
-
-		//Proton::Renderer::Submit(nano2, transformMatrix);
-
-		//Proton::Renderer::Submit(brickWall, transformMatrix);
 
 		Proton::Renderer::Submit(goblin);
 
@@ -129,6 +127,7 @@ private:
 	Proton::Camera m_Camera;
 	Proton::Ref<Proton::PointLight> light;
 	Proton::Model goblin{ "C:\\Dev\\Proton\\Proton\\Models\\Goblin\\GoblinX.obj" };
+	//Proton::Model nano{ "C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\nanosuit.obj" };
 
 	DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };
 	float cameraSpeed = 15.0f;

@@ -260,7 +260,6 @@ namespace Proton
 			{
 				pMesh->hasNormalMap = true;
 				pMesh->m_Normal = Texture2D::Create(basePath + texFileName.C_Str(), 2);
-				PT_CORE_TRACE(basePath + texFileName.C_Str());
 			}
 
 			if(pMesh->hasSpecular || pMesh->hasNormalMap || pMesh->hasDiffuseMap)
@@ -294,7 +293,6 @@ namespace Proton
 		else
 		{
 			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
-			PT_CORE_TRACE(mesh.mName.C_Str());
 			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 		}
 		
@@ -327,14 +325,13 @@ namespace Proton
 			pmc.specularPower = shininess;
 			pmc.specularColor = specularColor;
 			pmc.materialColor = diffuseColor;
-			PT_CORE_INFO(mesh.mName.C_Str());
-			pMesh->m_MaterialCBuf = PixelConstantBuffer::Create(meshTag, 1, sizeof(pmc), &pmc);
+			pMesh->m_MaterialCBuf = PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc);
 		}
 		else
 		{
 			struct PSMaterialConstant
 			{
-				float specularIntensity = 1.0f;
+				float specularIntensity;
 				float specularPower;
 				BOOL hasAlphaGloss;
 				float padding;
@@ -343,7 +340,7 @@ namespace Proton
 			pmc.specularPower = shininess;
 			pmc.specularIntensity = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
 			pmc.hasAlphaGloss = hasAlphaGloss ? TRUE : FALSE;
-			pMesh->m_MaterialCBuf = PixelConstantBuffer::Create(meshTag, 1, sizeof(pmc), &pmc);
+			pMesh->m_MaterialCBuf = PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc);
 		}
 
 		return pMesh;

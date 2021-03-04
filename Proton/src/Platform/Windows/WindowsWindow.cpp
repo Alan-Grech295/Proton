@@ -63,6 +63,29 @@ namespace Proton
 		while (::ShowCursor(FALSE) >= 0);
 	}
 
+	void WindowsWindow::EnableImGuiCursor() const
+	{
+		ImGui::GetIO().ConfigFlags &= ~ImGuiConfigFlags_NoMouse;
+	}
+
+	void WindowsWindow::DisableImGuiCursor() const
+	{
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_NoMouse;
+	}
+
+	void WindowsWindow::ConfineCursor() const
+	{
+		RECT rect;
+		GetClientRect(m_HWnd, &rect);
+		MapWindowPoints(m_HWnd, nullptr, reinterpret_cast<POINT*>(&rect), 2);
+		ClipCursor(&rect);
+	}
+
+	void WindowsWindow::FreeCursor() const
+	{
+		ClipCursor(nullptr);
+	}
+
 	void WindowsWindow::SetVSync(bool enabled)
 	{
 		m_Data.vSync = enabled;

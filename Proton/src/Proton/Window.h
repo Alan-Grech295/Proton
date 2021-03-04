@@ -39,6 +39,12 @@ namespace Proton
 		virtual void ShowCursor() const = 0;
 		virtual void HideCursor() const = 0;
 
+		virtual void EnableImGuiCursor() const = 0;
+		virtual void DisableImGuiCursor() const = 0;
+
+		virtual void ConfineCursor() const = 0;
+		virtual void FreeCursor() const = 0;
+
 		//Window Attributes
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;

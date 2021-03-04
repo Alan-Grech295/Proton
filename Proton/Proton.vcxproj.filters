@@ -279,6 +279,8 @@
     <FxCompile Include="src\Proton\Shader\PhongNormalMapSpecPS.hlsl" />
     <FxCompile Include="src\Proton\Shader\PhongNoTexVS.hlsl" />
     <FxCompile Include="src\Proton\Shader\PhongNoTexPS.hlsl" />
-    <FxCompile Include="src\Proton\Shader\TextureCPUAccessCS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\Includes\LightVectorData.hlsl" />
+    <FxCompile Include="src\Proton\Shader\Includes\ShaderUtils.hlsl" />
+    <FxCompile Include="src\Proton\Shader\Includes\PointLight.hlsl" />
   </ItemGroup>
 </Project>

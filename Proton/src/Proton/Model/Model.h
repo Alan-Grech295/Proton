@@ -40,12 +40,12 @@ namespace Proton
 		Ref<IndexBuffer> m_IndexBuffer;
 		Ref<VertexShader> m_VertShader;
 		Ref<PixelShader> m_PixelShader;
-		Ref<PixelConstantBuffer> m_MaterialCBuf;
 		Ref<class Texture2D> m_Diffuse;
 		Ref<class Texture2D> m_Specular;
 		Ref<class Texture2D> m_Normal;
 		Ref<class Sampler> m_Sampler;
 
+		Scope<PixelConstantBuffer> m_MaterialCBuf;
 		Scope<VertexConstantBuffer> m_TransformCBuf;
 		Scope<PixelConstantBuffer> m_TransformCBufPix;
 

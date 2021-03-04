@@ -1,13 +1,6 @@
-cbuffer LightCBuf
-{
-    float3 lightPos;
-    float3 ambient;
-    float3 diffuseColor;
-    float diffuseIntensity;
-    float attConst;
-    float attLin;
-    float attQuad;
-};
+#include "Includes/PointLight.hlsl"
+#include "Includes/ShaderUtils.hlsl"
+#include "Includes/LightVectorData.hlsl"
 
 cbuffer ObjectCBuf
 {
@@ -27,36 +20,24 @@ Texture2D normalMap : register(t2);
 
 SamplerState smplr;
 
-float4 main(float3 viewPos : POSITION, float3 n : NORMAL, float3 tan : TANGENT, float3 bitan : BITANGENT, float2 tc : TEXCOORD) : SV_TARGET
+float4 main(float3 viewFragPos : POSITION, float3 viewNormal : NORMAL, float3 viewTan : TANGENT, float3 viewBitan : BITANGENT, float2 tc : TEXCOORD) : SV_TARGET
 {
-    const float3x3 tanToView = float3x3(
-        normalize(tan),
-        normalize(bitan),
-        normalize(n)
-    );
+    //renormalize interpolated normal
+    viewNormal = normalize(viewNormal);
     
-    float4 normalSample = normalMap.Sample(smplr, tc);
+    viewNormal = MapNormal(normalize(viewTan), normalize(viewBitan), viewNormal, tc, normalMap, smplr);
     
-    n = normalSample * 2.0f - 1.0f;
-    n.y = -n.y;
-    n = mul(n, tanToView);
-    
-	//fragment to light vector data
-    const float3 vToL = lightPos - viewPos;
-    const float distToL = length(vToL);
-    const float3 dirToL = vToL / distToL;
+	// fragment to light vector data
+    const LightVectorData lv = CalculateLightVectorData(viewLightPos, viewFragPos);
 	
 	//diffuse attenuation
-    float att = 1.0f / (attConst + attLin * distToL + attQuad * (distToL * distToL));
+    float att = Attenuation(attConst, attLin, attQuad, lv.distToL);
 	
 	//diffuse intensity
-    float3 diffuse = diffuseColor * diffuseIntensity * att * max(0.0f, dot(dirToL, n));
-	
-	// reflected light vector
-    const float3 w = n * dot(vToL, n);
-    const float3 r = w * 2.0f - vToL;
-	// calculate specular intensity based on angle between viewing vector and reflection vector, narrow with power function
-    const float3 specular = att * (diffuseColor * diffuseIntensity) * specularIntensity * pow(max(0.0f, dot(normalize(-r), normalize(viewPos))), specularPower);
+    float3 diffuse = Diffuse(diffuseColor, diffuseIntensity, att, lv.dirToL, viewNormal);
+    
+    // calculate specular intensity based on angle between viewing vector and reflection vector, narrow with power function
+    const float3 specular = Specular(diffuseColor, diffuseIntensity, viewNormal, lv.vToL, viewFragPos, att, specularPower);
 	
     return float4(saturate((diffuse + ambient) * tex.Sample(smplr, tc).rgb + specular), 1.0f);
 

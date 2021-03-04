@@ -25,6 +25,12 @@ namespace Proton
 		virtual void ShowCursor() const override;
 		virtual void HideCursor() const override;
 
+		virtual void EnableImGuiCursor() const override;
+		virtual void DisableImGuiCursor() const override;
+
+		virtual void ConfineCursor() const override;
+		virtual void FreeCursor() const override;
+
 		//Window Attributes
 		inline void SetEventCallback(const EventCallbackFn& callback) override { m_Data.eventCallback = callback; }
 		void SetVSync(bool enabled) override;
