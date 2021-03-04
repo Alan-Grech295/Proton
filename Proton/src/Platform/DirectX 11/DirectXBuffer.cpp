@@ -28,9 +28,10 @@ namespace Proton
 		return DXGI_FORMAT_UNKNOWN;
 	}
 	//Vertex Buffer
-	DirectXVertexBuffer::DirectXVertexBuffer(int stride, const void* vertices, uint32_t size)
+	DirectXVertexBuffer::DirectXVertexBuffer(const std::string& tag, int stride, const void* vertices, uint32_t size)
 		:
-		stride(stride)
+		stride(stride),
+		uid(tag)
 	{
 		D3D11_BUFFER_DESC bd = {};
 		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
@@ -58,6 +59,11 @@ namespace Proton
 
 	}
 
+	std::string DirectXVertexBuffer::GetUID() const noexcept
+	{
+		return uid;
+	}
+
 	void DirectXVertexBuffer::SetLayout(const BufferLayout& layout, VertexShader* vertexShader)
 	{
 		m_Layout = layout;
@@ -80,9 +86,10 @@ namespace Proton
 	}
 
 	//Index Buffer
-	DirectXIndexBuffer::DirectXIndexBuffer(unsigned short* indices, uint32_t size)
+	DirectXIndexBuffer::DirectXIndexBuffer(const std::string& tag, unsigned short* indices, uint32_t size)
 		:
-		count(size)
+		count(size),
+		uid(tag)
 	{
 		D3D11_BUFFER_DESC ibd = {};
 		ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
@@ -106,15 +113,21 @@ namespace Proton
 
 	}
 
+	std::string DirectXIndexBuffer::GetUID() const noexcept
+	{
+		return uid;
+	}
+
 	unsigned int DirectXIndexBuffer::GetCount() const
 	{
 		return count;
 	}
 
 	//Vertex Constant Buffer
-	DirectXVertexConstantBuffer::DirectXVertexConstantBuffer(int slot, int size, const void* data)
+	DirectXVertexConstantBuffer::DirectXVertexConstantBuffer(const std::string& tag, int slot, int size, const void* data)
 		:
-		mSlot(slot)
+		mSlot(slot),
+		uid(tag)
 	{
 		D3D11_BUFFER_DESC cbd;
 		cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -153,10 +166,16 @@ namespace Proton
 
 	}
 
+	std::string DirectXVertexConstantBuffer::GetUID() const noexcept
+	{
+		return uid;
+	}
+
 	//Pixel Constant Buffer
-	DirectXPixelConstantBuffer::DirectXPixelConstantBuffer(int slot, int size, const void* data)
+	DirectXPixelConstantBuffer::DirectXPixelConstantBuffer(const std::string& tag, int slot, int size, const void* data)
 		:
-		mSlot(slot)
+		mSlot(slot),
+		uid(tag)
 	{
 		D3D11_BUFFER_DESC cbd;
 		cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -193,5 +212,9 @@ namespace Proton
 	void DirectXPixelConstantBuffer::Unbind() const
 	{
 
+	}
+	std::string DirectXPixelConstantBuffer::GetUID() const noexcept
+	{
+		return uid;
 	}
 }

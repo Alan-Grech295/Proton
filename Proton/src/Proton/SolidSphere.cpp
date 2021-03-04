@@ -2,6 +2,7 @@
 #include "SolidSphere.h"
 #include "Sphere.h"
 #include "Renderer\Renderer.h"
+#include "Proton\Renderer\BindsCollection.h"
 
 namespace Proton
 {
@@ -19,15 +20,15 @@ namespace Proton
 		auto model = Sphere::Make<Vertex>();
 		model.Transform(dx::XMMatrixScaling(radius, radius, radius));
 
-		m_VertBuffer.reset(VertexBuffer::Create(sizeof(Vertex), model.vertices.data(), model.vertices.size()));
+		m_VertBuffer = VertexBuffer::Create("LightVertexBuffer", sizeof(Vertex), model.vertices.data(), model.vertices.size());
 
-		m_IndexBuffer.reset(IndexBuffer::Create(model.indices.data(), model.indices.size()));
+		m_IndexBuffer = IndexBuffer::Create("LightIndexBuffer", model.indices.data(), model.indices.size());
 
-		m_VertShader.reset(VertexShader::Create("C:\\Dev\\Proton\\Proton\\SolidVS.cso"));
+		m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\SolidVS.cso");
 
-		m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\SolidPS.cso"));
+		m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\SolidPS.cso");
 
-		m_MaterialCBuf.reset(PixelConstantBuffer::Create(0, sizeof(colorConst), &colorConst));
+		m_MaterialCBuf = PixelConstantBuffer::Create("LightMaterialBuffer", 0, sizeof(colorConst), &colorConst);
 
 		BufferLayout layout = {
 			{"POSITION", ShaderDataType::Float3}
@@ -35,7 +36,7 @@ namespace Proton
 
 		m_VertBuffer->SetLayout(layout, m_VertShader.get());
 
-		m_TransformCBuf.reset(VertexConstantBuffer::Create(0, sizeof(Transforms), new Transforms()));
+		m_TransformCBuf = VertexConstantBuffer::Create("LightTransformBuffer", 0, sizeof(Transforms), new Transforms());
 	}
 
 	void SolidSphere::Update(float dt) noexcept {}

@@ -2,6 +2,7 @@
 #include <string>
 #include <cassert>
 #include "Shader.h"
+#include "Proton\Log.h"
 
 namespace Proton
 {
@@ -104,8 +105,15 @@ namespace Proton
 
 		virtual const BufferLayout GetLayout() const = 0;
 		virtual void SetLayout(const BufferLayout& layout, VertexShader* vertexShader) = 0;
+
+		virtual std::string GetUID() const noexcept = 0;
+
+		template<typename...Ignore>
+		static std::string GenerateUID(const std::string& tag, Ignore&&...ignore) { return tag; }
+
+		static Ref<VertexBuffer> Create(const std::string& tag, int stride, const void* vertices, uint32_t size);
 		
-		static VertexBuffer* Create(int stride, const void* vertices, uint32_t size);
+		static Scope<VertexBuffer> CreateUnique(int stride, const void* vertices, uint32_t size);
 	};
 
 	class IndexBuffer
@@ -118,7 +126,14 @@ namespace Proton
 
 		virtual unsigned int GetCount() const = 0;
 
-		static IndexBuffer* Create(unsigned short* indices, uint32_t size);
+		virtual std::string GetUID() const noexcept = 0;
+
+		template<typename...Ignore>
+		static std::string GenerateUID(const std::string& tag, Ignore&&...ignore) { return tag; }
+
+		static Ref<IndexBuffer> Create(const std::string& tag, unsigned short* indices, uint32_t size);
+		
+		static Scope<IndexBuffer> CreateUnique(unsigned short* indices, uint32_t size);
 	};
 
 	class VertexConstantBuffer
@@ -130,7 +145,14 @@ namespace Proton
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		static VertexConstantBuffer* Create(int slot, int size, const void* data);
+		virtual std::string GetUID() const noexcept = 0;
+
+		template<typename...Ignore>
+		static std::string GenerateUID(const std::string& tag, Ignore&&...ignore) { return tag; }
+
+		static Ref<VertexConstantBuffer> Create(const std::string& tag, int slot, int size, const void* data);
+		
+		static Scope<VertexConstantBuffer> CreateUnique(int slot, int size, const void* data);
 	};
 
 	class PixelConstantBuffer
@@ -143,7 +165,13 @@ namespace Proton
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		static PixelConstantBuffer* Create(int slot, int size, const void* data);
-		static PixelConstantBuffer* Create(int slot = 0);
+		virtual std::string GetUID() const noexcept = 0;
+
+		template<typename...Ignore>
+		static std::string GenerateUID(const std::string& tag, Ignore&&...ignore) { return tag; }
+
+		static Ref<PixelConstantBuffer> Create(const std::string& tag, int slot, int size, const void* data);
+
+		static Scope<PixelConstantBuffer> CreateUnique(int slot, int size, const void* data);
 	};
 }

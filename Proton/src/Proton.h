@@ -21,8 +21,6 @@
 #include "Proton\Renderer\Camera.h"
 #include "Proton\Renderer\Shader.h"
 
-#include "Proton\Box.h"
-#include "Proton\AssimpTest.h"
 #include "Proton\PointLight.h"
 
 #include "Proton\Model\Model.h"

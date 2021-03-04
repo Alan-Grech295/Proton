@@ -61,12 +61,6 @@
     <ClInclude Include="src\Proton\Application.h">
       <Filter>Proton</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\AssimpTest.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Box.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\Cone.h">
       <Filter>Proton</Filter>
     </ClInclude>
@@ -166,6 +160,7 @@
     <ClInclude Include="src\ptpch.h" />
     <ClInclude Include="src\Proton\Renderer\Sampler.h" />
     <ClInclude Include="src\Platform\DirectX 11\DirectXSampler.h" />
+    <ClInclude Include="src\Proton\Renderer\BindsCollection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -193,12 +188,6 @@
       <Filter>Platform\Windows</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Application.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\AssimpTest.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Box.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\ImGui\ImGuiBuild.cpp">
@@ -285,5 +274,11 @@
       <Filter>Proton\Shader</Filter>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongSpecularPS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\PhongNormalMapPS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\PhongNormalMapVS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\PhongNormalMapSpecPS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\PhongNoTexVS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\PhongNoTexPS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\TextureCPUAccessCS.hlsl" />
   </ItemGroup>
 </Project>

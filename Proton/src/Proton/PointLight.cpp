@@ -10,7 +10,7 @@ namespace Proton
 		mesh(radius)
 	{
 		Reset();
-		cbuf.reset(PixelConstantBuffer::Create(0, sizeof(cbData), &cbData));
+		cbuf = PixelConstantBuffer::Create("LightDataBuffer", 0, sizeof(cbData), &cbData);
 	}
 
 	void PointLight::CreateControlWindow()

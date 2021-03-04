@@ -5,9 +5,10 @@
 
 namespace Proton
 {
-	DirectXSampler::DirectXSampler(int slot)
+	DirectXSampler::DirectXSampler(const std::string& tag, int slot)
 		:
-		m_Slot(slot)
+		m_Slot(slot),
+		uid(tag)
 	{
 		D3D11_SAMPLER_DESC samplerDesc = {};
 		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -26,6 +27,11 @@ namespace Proton
 	void DirectXSampler::Unbind() const
 	{
 
+	}
+
+	std::string DirectXSampler::GetUID() const noexcept
+	{
+		return uid;
 	}
 }
 

@@ -11,7 +11,13 @@ namespace Proton
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		static PixelShader* Create(std::string path);
+		virtual std::string GetUID() const noexcept = 0;
+
+		static std::string GenerateUID(const std::string& path) { return path; }
+
+		static Ref<PixelShader> Create(std::string path);
+
+		static Scope<PixelShader> CreateUnique(std::string path);
 	};
 
 	class VertexShader
@@ -22,6 +28,12 @@ namespace Proton
 		virtual void Bind() const = 0;
 		virtual void Unbind() const = 0;
 
-		static VertexShader* Create(std::string path);
+		virtual std::string GetUID() const noexcept = 0;
+
+		static std::string GenerateUID(const std::string& path) { return path; }
+
+		static Ref<VertexShader> Create(std::string path);
+
+		static Scope<VertexShader> CreateUnique(std::string path);
 	};
 }

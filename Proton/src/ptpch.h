@@ -12,6 +12,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+#include "Proton\Core.h"
+
 #ifdef PT_PLATFORM_WINDOWS
 	#include <Windows.h>
 #endif // PT_PLATFORM_WINDOWS

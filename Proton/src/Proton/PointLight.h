@@ -26,6 +26,6 @@ namespace Proton
 		};
 	private:
 		PointLightCBuf cbData;
-		mutable std::unique_ptr<PixelConstantBuffer> cbuf;
+		mutable Ref<PixelConstantBuffer> cbuf;
 	};
 }

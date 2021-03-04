@@ -1,5 +1,6 @@
 #include "ptpch.h"
 #include "Texture.h"
+#include "BindsCollection.h"
 
 #ifdef PT_PLATFORM_WINDOWS
 #include "Platform\DirectX 11\DirectXTexture.h"
@@ -7,7 +8,7 @@
 
 namespace Proton
 {
-	Texture2D* Texture2D::Create(std::string path, int slot)
+	Ref<Texture2D> Texture2D::Create(std::string path, int slot)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -15,7 +16,22 @@ namespace Proton
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return new DirectXTexture2D(path, slot);
+			return BindsCollection::Resolve<DirectXTexture2D>(path, slot);
+		}
+
+		assert(false && "Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Scope<Texture2D> Texture2D::CreateUnique(std::string path, int slot)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			assert("RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::DirectX:
+			return std::make_unique<DirectXTexture2D>(path, slot);
 		}
 
 		assert(false && "Unknown RendererAPI!");

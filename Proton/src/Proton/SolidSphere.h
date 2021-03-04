@@ -28,11 +28,11 @@ namespace Proton
 			DirectX::XMMATRIX model;
 		};
 	public:
-		std::unique_ptr<VertexBuffer> m_VertBuffer;
-		std::unique_ptr<IndexBuffer> m_IndexBuffer;
-		std::unique_ptr<VertexShader> m_VertShader;
-		std::unique_ptr<PixelShader> m_PixelShader;
-		std::unique_ptr<VertexConstantBuffer> m_TransformCBuf;
-		std::unique_ptr<PixelConstantBuffer> m_MaterialCBuf;
+		Ref<VertexBuffer> m_VertBuffer;
+		Ref<IndexBuffer> m_IndexBuffer;
+		Ref<VertexShader> m_VertShader;
+		Ref<PixelShader> m_PixelShader;
+		Ref<VertexConstantBuffer> m_TransformCBuf;
+		Ref<PixelConstantBuffer> m_MaterialCBuf;
 	};
 }

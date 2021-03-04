@@ -19,9 +19,12 @@ namespace Proton
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
+
+		virtual std::string GetUID() const noexcept override;
 	private:
 		Microsoft::WRL::ComPtr<ID3DBlob> pBytecodeBlob;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
+		std::string m_Path;
 	};
 
 	class DirectXVertexShader : public VertexShader
@@ -33,8 +36,11 @@ namespace Proton
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
+
+		virtual std::string GetUID() const noexcept override;
 	private:
 		Microsoft::WRL::ComPtr<ID3DBlob> pBytecodeBlob;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
+		std::string m_Path;
 	};
 }

@@ -10,13 +10,16 @@ namespace Proton
 	class DirectXSampler : public Sampler
 	{
 	public:
-		DirectXSampler(int slot = 0);
+		DirectXSampler(const std::string& tag, int slot = 0);
 		virtual ~DirectXSampler() {}
 
 		virtual void Bind() const override;
 		virtual void Unbind() const override;
+
+		virtual std::string GetUID() const noexcept override;
 	private:
 		int m_Slot = 0;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> pSampler;
+		std::string uid;
 	};
 }

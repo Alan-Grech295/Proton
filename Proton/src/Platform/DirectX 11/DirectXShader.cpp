@@ -5,6 +5,8 @@
 namespace Proton
 {
 	DirectXPixelShader::DirectXPixelShader(std::string path)
+		:
+		m_Path(path)
 	{
 		std::wstring wpath = std::wstring(path.begin(), path.end());
 		D3DReadFileToBlob(wpath.c_str(), &pBytecodeBlob);
@@ -21,7 +23,14 @@ namespace Proton
 
 	}
 
+	std::string DirectXPixelShader::GetUID() const noexcept
+	{
+		return m_Path;
+	}
+
 	DirectXVertexShader::DirectXVertexShader(std::string path)
+		:
+		m_Path(path)
 	{
 		std::wstring wpath = std::wstring(path.begin(), path.end());
 		D3DReadFileToBlob(wpath.c_str(), &pBytecodeBlob);
@@ -36,6 +45,11 @@ namespace Proton
 	void DirectXVertexShader::Unbind() const
 	{
 
+	}
+
+	std::string DirectXVertexShader::GetUID() const noexcept
+	{
+		return m_Path;
 	}
 }
 

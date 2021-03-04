@@ -16,9 +16,9 @@ namespace Proton
 
 	}
 
-	void Renderer::Submit(Model& model, DirectX::FXMMATRIX transform)
+	void Renderer::Submit(Model& model)
 	{
-		model.Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transform);
+		model.Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), DirectX::XMMatrixIdentity());
 	}
 
 	void Renderer::Submit(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer)

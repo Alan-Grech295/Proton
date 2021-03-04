@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "Renderer.h"
+#include "BindsCollection.h"
 
 #ifdef PT_PLATFORM_WINDOWS
 #include "Platform\DirectX 11\DirectXBuffer.h"
@@ -10,7 +11,7 @@
 
 namespace Proton
 {
-	VertexBuffer* VertexBuffer::Create(int stride, const void* vertices, uint32_t size)
+	Ref<VertexBuffer> VertexBuffer::Create(const std::string& tag, int stride, const void* vertices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -18,14 +19,14 @@ namespace Proton
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return new DirectXVertexBuffer(stride, vertices, size);
+			return BindsCollection::Resolve<DirectXVertexBuffer>(tag, stride, vertices, size);
 		}
 
 		assert("Unknown RendererAPI!");
 		return nullptr;
 	}
 
-	IndexBuffer* IndexBuffer::Create(unsigned short* indices, uint32_t size)
+	Scope<VertexBuffer> VertexBuffer::CreateUnique(int stride, const void* vertices, uint32_t size)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -33,14 +34,44 @@ namespace Proton
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return new DirectXIndexBuffer(indices, size);
+			return std::make_unique<DirectXVertexBuffer>("", stride, vertices, size);
+		}
+
+		assert("Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Ref<IndexBuffer> IndexBuffer::Create(const std::string& tag, unsigned short* indices, uint32_t size)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			assert("RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::DirectX:
+			return BindsCollection::Resolve<DirectXIndexBuffer>(tag, indices, size);
+		}
+
+		assert("Unknown RendererAPI!");
+		return nullptr;
+	}
+
+	Scope<IndexBuffer> IndexBuffer::CreateUnique(unsigned short* indices, uint32_t size)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			assert("RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::DirectX:
+			return std::make_unique<DirectXIndexBuffer>("", indices, size);
 		}
 
 		assert("Unknown RendererAPI!");
 		return nullptr;
 	}
 	
-	VertexConstantBuffer* VertexConstantBuffer::Create(int slot, int size, const void* data)
+	Ref<VertexConstantBuffer> VertexConstantBuffer::Create(const std::string& tag, int slot, int size, const void* data)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -48,14 +79,14 @@ namespace Proton
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return new DirectXVertexConstantBuffer(slot, size, data);
+			return BindsCollection::Resolve<DirectXVertexConstantBuffer>(tag, slot, size, data);
 		}
 
 		assert("Unknown RendererAPI!");
 		return nullptr;
 	}
 
-	PixelConstantBuffer* PixelConstantBuffer::Create(int slot, int size, const void* data)
+	Scope<VertexConstantBuffer> VertexConstantBuffer::CreateUnique(int slot, int size, const void* data)
 	{
 		switch (Renderer::GetAPI())
 		{
@@ -63,16 +94,40 @@ namespace Proton
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return new DirectXPixelConstantBuffer(slot, size, data);
+			return std::make_unique<DirectXVertexConstantBuffer>("", slot, size, data);
 		}
 
 		assert("Unknown RendererAPI!");
 		return nullptr;
 	}
 
-	PixelConstantBuffer* PixelConstantBuffer::Create(int slot)
+	Ref<PixelConstantBuffer> PixelConstantBuffer::Create(const std::string& tag, int slot, int size, const void* data)
 	{
-		return PixelConstantBuffer::Create(slot, 0, nullptr);
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			assert("RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::DirectX:
+			return BindsCollection::Resolve<DirectXPixelConstantBuffer>(tag, slot, size, data);
+		}
+
+		assert("Unknown RendererAPI!");
+		return nullptr;
 	}
 
+	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(int slot, int size, const void* data)
+	{
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			assert("RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::DirectX:
+			return std::make_unique<DirectXPixelConstantBuffer>("", slot, size, data);
+		}
+
+		assert("Unknown RendererAPI!");
+		return nullptr;
+	}
 }

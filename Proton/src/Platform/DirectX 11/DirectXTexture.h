@@ -18,9 +18,17 @@ namespace Proton
 		virtual void Unbind() const override;
 		virtual void Load(std::string path) override;
 		virtual Color GetPixel(int x, int y) const override;
+
+		virtual bool HasAlpha() const override;
+
+		virtual std::string GetUID() const noexcept override;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Resource> pTexture;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView;
 		int m_Slot = 0;
+		std::string m_Path;
+		bool hasAlpha;
+		int width, height;
+		BYTE* data;
 	};
 }

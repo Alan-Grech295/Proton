@@ -7,6 +7,7 @@
 #include "Proton\Log.h"
 #include <unordered_map>
 #include <imgui.h>
+#include <filesystem>
 
 namespace Proton
 {
@@ -41,7 +42,7 @@ namespace Proton
 		m_AppliedTransform = transform;
 	}
 
-	void Node::AddChild(std::unique_ptr<Node> pChild)
+	void Node::AddChild(Scope<Node> pChild)
 	{
 		assert(pChild);
 		m_ChildPtrs.push_back(std::move(pChild));
@@ -145,11 +146,14 @@ namespace Proton
 			aiProcess_Triangulate |
 			aiProcess_JoinIdenticalVertices |
 			aiProcess_ConvertToLeftHanded |
-			aiProcess_GenNormals);
+			aiProcess_GenNormals |
+			aiProcess_CalcTangentSpace);
+
+		std::string basePath = std::filesystem::path(modelPath).remove_filename().string();
 
 		for (size_t i = 0; i < pScene->mNumMeshes; i++)
 		{
-			m_MeshPtrs.push_back(ParseMesh(*pScene->mMeshes[i], pScene->mMaterials));
+			m_MeshPtrs.push_back(ParseMesh(basePath, *pScene->mMeshes[i], pScene->mMaterials));
 		}
 
 		m_Root = ParseNode(*pScene->mRootNode);
@@ -173,13 +177,15 @@ namespace Proton
 	Model::~Model() noexcept
 	{}
 
-	std::unique_ptr<Mesh> Model::ParseMesh(const aiMesh& mesh, const aiMaterial* const* pMaterials)
+	Scope<Mesh> Model::ParseMesh(const std::string& basePath, const aiMesh& mesh, const aiMaterial* const* pMaterials)
 	{
 		namespace dx = DirectX;
 		struct Vertex
 		{
 			dx::XMFLOAT3 pos;
 			dx::XMFLOAT3 n;
+			dx::XMFLOAT3 tangent;
+			dx::XMFLOAT3 bitangent;
 			dx::XMFLOAT2 uv;
 		};
 
@@ -189,13 +195,13 @@ namespace Proton
 		for (unsigned int i = 0; i < mesh.mNumVertices; i++)
 		{
 			vertices.push_back({
-				{ mesh.mVertices[i].x, mesh.mVertices[i].y, mesh.mVertices[i].z },
+				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]),
 				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]),
+				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mTangents[i]),
+				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mBitangents[i]),
 				*reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i])
 				});
 		}
-
-		PT_CORE_INFO("{0}", mesh.mNumVertices);
 
 		std::vector<unsigned short> indices;
 		indices.reserve((UINT)mesh.mNumFaces * 3);
@@ -207,77 +213,143 @@ namespace Proton
 			indices.push_back(face.mIndices[1]);
 			indices.push_back(face.mIndices[2]);
 		}
+		using namespace std::string_literals;
 
-		std::unique_ptr<Mesh> pMesh = std::make_unique<Mesh>();
+		auto meshTag = basePath + "%" + mesh.mName.C_Str();
+
+		Scope<Mesh> pMesh = std::make_unique<Mesh>(meshTag);
 
 		float shininess = 40.0f;
+		bool hasAlphaGloss = false;
+		dx::XMFLOAT4 diffuseColor = { 1.0f,0.0f,1.0f,1.0f };
+		dx::XMFLOAT4 specularColor = { 0.18f,0.18f,0.18f,1.0f };
 
 		if (mesh.mMaterialIndex >= 0)
 		{
-			using namespace std::string_literals;
 			auto& material = *pMaterials[mesh.mMaterialIndex];
 
-			const auto base = "C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\"s;
 			aiString texFileName;
 
-			material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName);
-			pMesh->m_Texture.reset(Texture2D::Create(base + texFileName.C_Str()));
-			pMesh->hasSpecular = false;
+			if (material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasDiffuseMap = true;
+				pMesh->m_Diffuse = Texture2D::Create(basePath + texFileName.C_Str());
+			}
+			else
+			{
+				material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(diffuseColor));
+			}
 
 			if (material.GetTexture(aiTextureType_SPECULAR, 0, &texFileName) == aiReturn_SUCCESS)
 			{
 				pMesh->hasSpecular = true;
-				pMesh->m_Specular.reset(Texture2D::Create(base + texFileName.C_Str(), 1));
+				pMesh->m_Specular = Texture2D::Create(basePath + texFileName.C_Str(), 1);
+				hasAlphaGloss = pMesh->m_Specular->HasAlpha();
 			}
 			else
+			{
+				material.Get(AI_MATKEY_COLOR_SPECULAR, reinterpret_cast<aiColor3D&>(specularColor));
+			}
+
+			if (!hasAlphaGloss)
 			{
 				material.Get(AI_MATKEY_SHININESS, shininess);
 			}
 
-			pMesh->m_Sampler.reset(Sampler::Create());
+			if (material.GetTexture(aiTextureType_NORMALS, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasNormalMap = true;
+				pMesh->m_Normal = Texture2D::Create(basePath + texFileName.C_Str(), 2);
+				PT_CORE_TRACE(basePath + texFileName.C_Str());
+			}
+
+			if(pMesh->hasSpecular || pMesh->hasNormalMap || pMesh->hasDiffuseMap)
+				pMesh->m_Sampler = Sampler::Create(meshTag);
 		}
 
-		pMesh->m_VertBuffer.reset(VertexBuffer::Create(sizeof(Vertex), vertices.data(), (uint32_t)vertices.size()));
+		pMesh->m_IndexBuffer = IndexBuffer::Create(meshTag, indices.data(), (uint32_t)indices.size());
 
-		pMesh->m_IndexBuffer.reset(IndexBuffer::Create(indices.data(), (uint32_t)indices.size()));
+		Ref<VertexShader> vs;
 
-		if (pMesh->hasSpecular)
+		if (pMesh->hasSpecular && !pMesh->hasNormalMap)
 		{
-			pMesh->m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso"));
-
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
+			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+		}
+		else if (pMesh->hasNormalMap && !pMesh->hasSpecular)
+		{
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
+			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+		}
+		else if (pMesh->hasNormalMap && pMesh->hasSpecular)
+		{
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
+			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+		}
+		else if (!pMesh->hasNormalMap && !pMesh->hasSpecular && pMesh->hasDiffuseMap)
+		{
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
+			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 		}
 		else
 		{
-			pMesh->m_PixelShader.reset(PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso"));
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
+			PT_CORE_TRACE(mesh.mName.C_Str());
+			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 		}
-
-		pMesh->m_VertShader.reset(VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso"));
-
+		
+		pMesh->m_VertShader = vs;
 
 		BufferLayout layout = {
 			{"POSITION", ShaderDataType::Float3},
 			{"NORMAL", ShaderDataType::Float3},
+			{"TANGENT", ShaderDataType::Float3},
+			{"BITANGENT", ShaderDataType::Float3},
 			{"TEXCOORD", ShaderDataType::Float2}
 		};
 
-		pMesh->m_VertBuffer->SetLayout(layout, pMesh->m_VertShader.get());
+		Ref<VertexBuffer> vertBuffer = VertexBuffer::Create(meshTag, sizeof(Vertex), vertices.data(), (uint32_t)vertices.size());
 
-		struct PSMaterialConstant
+		vertBuffer->SetLayout(layout, &*vs);
+
+		pMesh->m_VertBuffer = vertBuffer;
+
+		if (!pMesh->hasDiffuseMap && !pMesh->hasSpecular && !pMesh->hasNormalMap)
 		{
-			float specularIntensity = 1.0f;
-			float specularPower;
-			float padding[2] = { 0, 0 };
-		} pmc;
+			struct PSMaterialConstantNoTex
+			{
+				dx::XMFLOAT4 materialColor;
+				dx::XMFLOAT4 specularColor;
+				float specularPower;
+				float padding[3];
+			} pmc;
 
-		pmc.specularPower = shininess;
-		pMesh->m_MaterialCBuf.reset(PixelConstantBuffer::Create(1, sizeof(pmc), &pmc));
+			pmc.specularPower = shininess;
+			pmc.specularColor = specularColor;
+			pmc.materialColor = diffuseColor;
+			PT_CORE_INFO(mesh.mName.C_Str());
+			pMesh->m_MaterialCBuf = PixelConstantBuffer::Create(meshTag, 1, sizeof(pmc), &pmc);
+		}
+		else
+		{
+			struct PSMaterialConstant
+			{
+				float specularIntensity = 1.0f;
+				float specularPower;
+				BOOL hasAlphaGloss;
+				float padding;
+			} pmc;
 
-		pMesh->m_TransformCBuf.reset(VertexConstantBuffer::Create(0, sizeof(Mesh::Transforms), new Mesh::Transforms()));
+			pmc.specularPower = shininess;
+			pmc.specularIntensity = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
+			pmc.hasAlphaGloss = hasAlphaGloss ? TRUE : FALSE;
+			pMesh->m_MaterialCBuf = PixelConstantBuffer::Create(meshTag, 1, sizeof(pmc), &pmc);
+		}
 
 		return pMesh;
 	}
 
-	std::unique_ptr<Node> Model::ParseNode(const aiNode& node)
+	Scope<Node> Model::ParseNode(const aiNode& node)
 	{
 		namespace dx = DirectX;
 		const auto transform = dx::XMMatrixTranspose(
@@ -306,23 +378,6 @@ namespace Proton
 
 	void Mesh::Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform) const
 	{
-		m_VertBuffer->Bind();
-		m_IndexBuffer->Bind();
-		m_VertShader->Bind();
-		m_PixelShader->Bind();
-
-		if (hasSpecular)
-		{
-			m_Specular->Bind();
-		}
-		else
-		{
-			m_MaterialCBuf->Bind();
-		}
-
-		m_Texture->Bind();
-		m_Sampler->Bind();
-
 		const auto modelView = accumulatedTransform * Renderer::GetCamera().GetViewMatrix();
 		const Transforms tf =
 		{
@@ -335,8 +390,42 @@ namespace Proton
 
 		m_TransformCBuf->SetData(sizeof(Transforms), &tf);
 
+		m_VertBuffer->Bind();
+		m_IndexBuffer->Bind();
+		m_VertShader->Bind();
+		m_PixelShader->Bind();
 		m_TransformCBuf->Bind();
+		m_MaterialCBuf->Bind();
+
+		if(hasDiffuseMap)
+			m_Diffuse->Bind();
+
+		if(hasSpecular)
+			m_Specular->Bind();
+
+		if (hasNormalMap)
+		{
+			m_Normal->Bind();
+			m_TransformCBufPix->SetData(sizeof(Transforms), &tf);
+			m_TransformCBufPix->Bind();
+		}
+
+		if (hasNormalMap || hasSpecular || hasDiffuseMap)
+		{
+			m_Sampler->Bind();
+		}
 
 		callback(m_IndexBuffer->GetCount());
 	}
+
+	/*void Mesh::AddBind(std::unique_ptr<Bindable> bind)
+	{
+		if (typeid(*bind) == typeid(IndexBuffer))
+		{
+			assert("Binding multiple index buffers not allowed" && m_IndexBuffer == nullptr);
+			m_IndexBuffer = &static_cast<IndexBuffer&>(*bind);
+		}
+
+		m_Binds.push_back(bind);
+	}*/
 }

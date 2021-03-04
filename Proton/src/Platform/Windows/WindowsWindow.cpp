@@ -3,8 +3,6 @@
 #include "Proton/Events/ApplicationEvent.h"
 #include "Proton/Events/MouseEvent.h"
 #include "Proton/Events/KeyEvent.h"
-#include "Proton/Box.h"
-#include "Proton/AssimpTest.h"
 //#include "Proton/Drawable.h"
 #include "examples\imgui_impl_win32.h"
 #include "examples\imgui_impl_dx11.h"

@@ -10,7 +10,7 @@ public:
 		m_Camera(Proton::Application::Get().GetWindow().GetWidth(), Proton::Application::Get().GetWindow().GetHeight(), 0.5f, 1000.0f, Proton::Camera::ProjectionMode::Perspective)
 	{
 		Proton::Application::Get().GetWindow().ShowCursor();
-		light = std::make_unique<Proton::PointLight>(0.5f);
+		light = std::make_shared<Proton::PointLight>(0.5f);
 	}
 
 	void OnUpdate(Proton::TimeStep ts) override
@@ -79,9 +79,13 @@ public:
 
 		light->SetLightData();
 
-		const auto transformMatrix = DirectX::XMMatrixIdentity();
+		//Proton::Renderer::Submit(nano, transformMatrix);
 
-		Proton::Renderer::Submit(nano, transformMatrix);
+		//Proton::Renderer::Submit(nano2, transformMatrix);
+
+		//Proton::Renderer::Submit(brickWall, transformMatrix);
+
+		Proton::Renderer::Submit(goblin);
 
 		light->mesh.Bind();
 
@@ -99,7 +103,13 @@ public:
 
 		light->CreateControlWindow();
 
-		nano.ShowWindow();
+		goblin.ShowWindow();
+
+		//nano.ShowWindow("Model 1");
+
+		//nano2.ShowWindow("Model 2");
+
+		//brickWall.ShowWindow("Brick Wall");
 	}
 
 	void OnAttach() override
@@ -112,16 +122,13 @@ public:
 		if (event.IsEventType(Proton::EventType::KeyPressed))
 		{
 			Proton::KeyPressedEvent& e = (Proton::KeyPressedEvent&) event;
-			//PT_TRACE("{0}", (char)e.GetKeyCode());
 		}
 	}
 private:
-	std::vector<std::unique_ptr<Proton::Box>> boxes;
-	std::vector<std::unique_ptr<Proton::AssimpTest>> models;
 	static constexpr size_t nDrawables = 150;
 	Proton::Camera m_Camera;
-	std::unique_ptr<Proton::PointLight> light;
-	Proton::Model nano{ "C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\nanosuit.obj" };
+	Proton::Ref<Proton::PointLight> light;
+	Proton::Model goblin{ "C:\\Dev\\Proton\\Proton\\Models\\Goblin\\GoblinX.obj" };
 
 	DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };
 	float cameraSpeed = 15.0f;

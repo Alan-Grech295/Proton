@@ -6,6 +6,7 @@
 #include <memory>
 #include <vector>
 #include <optional>
+#include <cassert>
 
 struct aiNode;
 struct aiMesh;
@@ -21,27 +22,36 @@ namespace Proton
 		friend class Model;
 		friend class Renderer;
 	public:
-		Mesh() 
+		//Mesh(std::vector<std::unique_ptr<Bindable>> binds);
+		Mesh(const std::string& meshTag)
 			:
 			m_Transform(DirectX::XMMatrixIdentity())
-		{}
+		{
+			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
+			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Transforms), new Transforms());
+		}
 	private:
 		DirectX::XMMATRIX GetTransformXM() const { return m_Transform; }
 		void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform) const;
 	private:
 		DirectX::XMMATRIX m_Transform;
-		//Temp (TODO: Add them as "bindables")
-		std::unique_ptr<VertexBuffer> m_VertBuffer;
-		std::unique_ptr<IndexBuffer> m_IndexBuffer;
-		std::unique_ptr<VertexShader> m_VertShader;
-		std::unique_ptr<PixelShader> m_PixelShader;
-		std::unique_ptr<VertexConstantBuffer> m_TransformCBuf;
-		std::unique_ptr<PixelConstantBuffer> m_MaterialCBuf;
-		std::unique_ptr<class Texture2D> m_Texture;
-		std::unique_ptr<class Texture2D> m_Specular;
-		std::unique_ptr<class Sampler> m_Sampler;
+
+		Ref<VertexBuffer> m_VertBuffer;
+		Ref<IndexBuffer> m_IndexBuffer;
+		Ref<VertexShader> m_VertShader;
+		Ref<PixelShader> m_PixelShader;
+		Ref<PixelConstantBuffer> m_MaterialCBuf;
+		Ref<class Texture2D> m_Diffuse;
+		Ref<class Texture2D> m_Specular;
+		Ref<class Texture2D> m_Normal;
+		Ref<class Sampler> m_Sampler;
+
+		Scope<VertexConstantBuffer> m_TransformCBuf;
+		Scope<PixelConstantBuffer> m_TransformCBufPix;
 
 		bool hasSpecular = false;
+		bool hasNormalMap = false;
+		bool hasDiffuseMap = false;
 
 		struct Transforms
 		{
@@ -59,11 +69,11 @@ namespace Proton
 		void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform) const;
 		void SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept;
 	private:
-		void AddChild(std::unique_ptr<Node> pChild);
+		void AddChild(Scope<Node> pChild);
 		void ShowTree(int& nodeIndex, std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept;
 	private:
 		std::string m_Name;
-		std::vector<std::unique_ptr<Node>> m_ChildPtrs;
+		std::vector<Scope<Node>> m_ChildPtrs;
 		std::vector<Mesh*> m_MeshPtrs;
 		DirectX::XMMATRIX m_Transform;
 		DirectX::XMMATRIX m_AppliedTransform = DirectX::XMMatrixIdentity();
@@ -77,11 +87,11 @@ namespace Proton
 		void ShowWindow(const char* windowName = nullptr) noexcept;
 		~Model() noexcept;
 	private:
-		static std::unique_ptr<Mesh> ParseMesh(const aiMesh& mesh, const aiMaterial* const* pMaterials);
-		std::unique_ptr<Node> ParseNode(const aiNode& node);
+		static Scope<Mesh> ParseMesh(const std::string& basePath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
+		Scope<Node> ParseNode(const aiNode& node);
 	private:
-		std::unique_ptr<Node> m_Root;
-		std::vector<std::unique_ptr<Mesh>> m_MeshPtrs;
-		std::unique_ptr<class ModelWindow> pWindow;
+		Scope<Node> m_Root;
+		std::vector<Scope<Mesh>> m_MeshPtrs;
+		Scope<class ModelWindow> pWindow;
 	};
 }
