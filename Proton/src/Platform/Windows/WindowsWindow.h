@@ -1,13 +1,10 @@
 #pragma once
 
-#include "Proton/Window.h"
-#include "Proton/Log.h"
+#include "Proton\Core\Window.h"
+#include "Proton\Core\Log.h"
 #include <memory>
 #include <random>
 #include "WindowsInput.h"
-
-//Temp includes
-#include "Proton/Timer.h"
 
 namespace Proton
 {	
@@ -68,8 +65,5 @@ namespace Proton
 		std::vector<BYTE> rawBuffer;
 
 		class DirectXRendererAPI* api;
-
-		//Temp variables
-		Timer timer;
 	};
 }

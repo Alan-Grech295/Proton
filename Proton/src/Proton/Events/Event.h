@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ptpch.h"
-#include "Proton/Core.h"
+#include "Proton\Core\Core.h"
 
 namespace Proton
 {

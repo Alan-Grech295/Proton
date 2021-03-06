@@ -1,7 +1,7 @@
 #include "ptpch.h"
 #include "DirectXBuffer.h"
 #include "DirectXShader.h"
-#include "Proton\Log.h"
+#include "Proton\Core\Log.h"
 
 #pragma comment(lib, "d3d11.lib")
 

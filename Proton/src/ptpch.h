@@ -12,7 +12,9 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#include "Proton\Core.h"
+#include "Proton\Core\Core.h"
+
+#include "Proton\Debug\Instrumentation.h"
 
 #ifdef PT_PLATFORM_WINDOWS
 	#include <Windows.h>

@@ -15,6 +15,8 @@ public:
 
 	void OnUpdate(Proton::TimeStep ts) override
 	{
+		PT_PROFILE_FUNCTION();
+
 		float speed = ts * cameraSpeed;
 
 		DirectX::XMFLOAT3 localMove = { 0, 0, 0 };
@@ -76,18 +78,33 @@ public:
 			newRot.x += rotationSpeed * Proton::Input::GetMouseDeltaY() * ts;
 			newRot.y += rotationSpeed * Proton::Input::GetMouseDeltaX() * ts;
 		}
+		static bool vSync = true;
+
+		if (Proton::Input::IsKeyReleased(PT_KEY_0))
+		{
+			vSync = !vSync;
+			Proton::Application::Get().GetWindow().SetVSync(vSync);
+		}
 		
 		m_Camera.SetRotation(newRot);
 		m_Camera.SetPosition(m_CameraPos);
-		Proton::Renderer::BeginScene(m_Camera);
 
-		light->SetLightData();
+		{
+			PT_PROFILE_SCOPE("Renderer Draw");
+			Proton::Renderer::BeginScene(m_Camera);
 
-		Proton::Renderer::Submit(goblin);
+			light->SetLightData();
 
-		light->mesh.Bind();
+			Proton::Renderer::Submit(goblin);
 
-		Proton::Renderer::Submit(light->mesh.m_VertBuffer.get(), light->mesh.m_IndexBuffer.get());
+			//Proton::Renderer::Submit(nano);
+
+			//Proton::Renderer::Submit(cube);
+
+			light->mesh.Bind();
+
+			Proton::Renderer::Submit(light->mesh.m_VertBuffer.get(), light->mesh.m_IndexBuffer.get());
+		}
 	}
 
 	void OnImGuiRender() override
@@ -100,6 +117,8 @@ public:
 		ImGui::End();
 
 		light->CreateControlWindow();
+
+		//cube.ShowWindow();
 
 		goblin.ShowWindow();
 
@@ -127,6 +146,7 @@ private:
 	Proton::Camera m_Camera;
 	Proton::Ref<Proton::PointLight> light;
 	Proton::Model goblin{ "C:\\Dev\\Proton\\Proton\\Models\\Goblin\\GoblinX.obj" };
+	//Proton::Model cube{ "C:\\Dev\\Proton\\Proton\\Models\\Cube.obj" };
 	//Proton::Model nano{ "C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\nanosuit.obj" };
 
 	DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };

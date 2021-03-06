@@ -2,7 +2,7 @@
 #include "Proton\Renderer\RendererAPI.h"
 #include <wrl.h>
 #include <d3d11.h>
-#include "Proton\Log.h"
+#include "Proton\Core\Log.h"
 
 namespace Proton
 {

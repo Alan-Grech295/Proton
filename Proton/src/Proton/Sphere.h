@@ -1,7 +1,7 @@
 #pragma once
 #include "IndexedTriangleList.h"
 #include <DirectXMath.h>
-#include "Proton/Math.h"
+#include "Proton\Core\Math.h"
 
 namespace Proton
 {

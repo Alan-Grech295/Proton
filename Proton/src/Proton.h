@@ -2,16 +2,16 @@
 
 //For use by Proton Applications
 
-#include "Proton/Application.h"
-#include "Proton/Log.h"
-#include "Proton/Layer.h"
-#include "Proton\Math.h"
+#include "Proton\Core\Application.h"
+#include "Proton\Core\Log.h"
+#include "Proton\Core\Layer.h"
+#include "Proton\Core\Math.h"
 
 #include "Proton\Core\TimeStep.h"
 
-#include "Proton/Input.h"
-#include "Proton/MouseButtonCodes.h"
-#include "Proton/KeyCodes.h"
+#include "Proton\Core\Input.h"
+#include "Proton\Core\MouseButtonCodes.h"
+#include "Proton\Core\KeyCodes.h"
 
 //---Renderer---------------------
 #include "Proton\Renderer\RenderCommand.h"
@@ -26,5 +26,5 @@
 #include "Proton\Model\Model.h"
 
 //---Entry Point------------------
-#include "Proton/EntryPoint.h"
+#include "Proton\Core\EntryPoint.h"
 //--------------------------------

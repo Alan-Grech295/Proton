@@ -2,6 +2,7 @@
 #include "DirectXTexture.h"
 #include "Proton\Renderer\RenderCommand.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
+#include <cassert>
 
 namespace Proton
 {
@@ -20,71 +21,74 @@ namespace Proton
 
 	void DirectXTexture2D::Unbind() const
 	{
-
+		
 	}
 
 	void DirectXTexture2D::Load(std::string path)
 	{
-		HRESULT hr = DirectX::CreateWICTextureFromFileEx(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice(),
-			std::wstring(path.begin(), path.end()).c_str(), 0, D3D11_USAGE_DEFAULT,
-			D3D11_BIND_SHADER_RESOURCE, 0, 0, DirectX::WIC_LOADER_DEFAULT,
-			&pTexture,
-			&pTextureView);
-
-
-		ID3D11Texture2D* tex = static_cast<ID3D11Texture2D*>(pTexture.Get());
-
-		D3D11_TEXTURE2D_DESC desc;
-
-		tex->GetDesc(&desc);
-		width = desc.Width;
-		height = desc.Height;
-
-		ID3D11Texture2D* transferTex;
-
-		D3D11_TEXTURE2D_DESC desc2;
-		desc2 = desc;
-		desc2.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
-		desc2.Usage = D3D11_USAGE_STAGING;
-		desc2.BindFlags = 0;
-
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&desc2, nullptr, &transferTex);
-
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->CopyResource(transferTex, tex);
-
-		D3D11_MAPPED_SUBRESOURCE msr;
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
-			transferTex, 0,
-			D3D11_MAP_READ, 0,
-			&msr
-		);
-
-		data = static_cast<BYTE*>(msr.pData);
-
-		hasAlpha = false;
-
-		for (int i = 0; i < desc.Height * desc.Width * 4; i += 4)
-		{
-			if (data[i + 3] != 255)
-			{
-				hasAlpha = true;
-				break;
-			}
-		}
+		HRESULT hr = DirectX::LoadFromWICFile(std::wstring(path.begin(), path.end()).c_str(), DirectX::WIC_FLAGS_NONE,
+											  nullptr, scratch);
 
 		if (FAILED(hr))
 		{
 			PT_CORE_ERROR("[TEXTURE PATH] {0}", path);
 			GET_ERROR(hr);
 		}
+
+		if (scratch.GetImage(0, 0, 0)->format != format)
+		{
+			DirectX::ScratchImage converted;
+			hr = DirectX::Convert(
+				*scratch.GetImage(0, 0, 0),
+				format,
+				DirectX::TEX_FILTER_DEFAULT,
+				DirectX::TEX_THRESHOLD_DEFAULT,
+				converted
+			);
+
+			scratch = std::move(converted);
+		}
+
+		width = scratch.GetMetadata().width;
+		height = scratch.GetMetadata().height;
+
+		D3D11_TEXTURE2D_DESC desc = {};
+		desc.Format = format;
+		desc.Width = width;
+		desc.Height = height;
+		desc.MipLevels = 1;
+		desc.ArraySize = 1;
+		desc.SampleDesc.Count = 1;
+		desc.SampleDesc.Quality = 0;
+		desc.Usage = D3D11_USAGE_DEFAULT;
+		desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+
+		D3D11_SUBRESOURCE_DATA srd;
+		srd.pSysMem = scratch.GetPixels();
+		srd.SysMemPitch = scratch.GetImage(0, 0, 0)->rowPitch;
+
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&desc, &srd, &pTexture);
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+		srvDesc.Format = format;
+		srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		srvDesc.Texture2D.MostDetailedMip = 0;
+		srvDesc.Texture2D.MipLevels = desc.MipLevels;
+
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateShaderResourceView(pTexture.Get(), &srvDesc, &pTextureView);
+
+		hasAlpha = !scratch.IsAlphaAllOpaque();
 	}
 
 	Color DirectXTexture2D::GetPixel(int x, int y) const
 	{
-		int arrStart = (x + y * width) * 4;
-		Color c{ data[arrStart] / 255.0f, data[arrStart + 1] / 255.0f, 
-				 data[arrStart + 2] / 255.0f, data[arrStart + 3] / 255.0f };
-		return c;
+		assert(x >= 0);
+		assert(y >= 0);
+		//assert(x < GetWidth());
+		//assert(y < GetHeight());
+		//auto& imgData = *scratch.GetImage(0, 0, 0);
+
+		return Color();// reinterpret_cast<Color*>(&imgData.pixels[y * imgData.rowPitch])[x];
 	}
 
 	bool DirectXTexture2D::HasAlpha() const

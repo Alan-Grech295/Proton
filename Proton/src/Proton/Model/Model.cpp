@@ -4,7 +4,7 @@
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include "Proton\Log.h"
+#include "Proton\Core\Log.h"
 #include <unordered_map>
 #include <imgui.h>
 #include <filesystem>
@@ -165,7 +165,7 @@ namespace Proton
 		{
 			node->SetAppliedTransform(pWindow->GetTransform());
 		}
-
+		
 		m_Root->Bind(callback, transform);
 	}
 
@@ -215,6 +215,8 @@ namespace Proton
 		}
 		using namespace std::string_literals;
 
+		PT_CORE_TRACE(mesh.mName.C_Str());
+
 		auto meshTag = basePath + "%" + mesh.mName.C_Str();
 
 		Scope<Mesh> pMesh = std::make_unique<Mesh>(meshTag);
@@ -233,7 +235,9 @@ namespace Proton
 			if (material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName) == aiReturn_SUCCESS)
 			{
 				pMesh->hasDiffuseMap = true;
-				pMesh->m_Diffuse = Texture2D::Create(basePath + texFileName.C_Str());
+				PT_CORE_TRACE(texFileName.C_Str());
+
+				pMesh->m_Diffuse = Texture2D::Create(basePath + texFileName.C_Str());		
 			}
 			else
 			{

@@ -1,5 +1,5 @@
 #include "ptpch.h"
-#include "Proton\Log.h"
+#include "Proton\Core\Log.h"
 #include "DirectXShader.h"
 
 namespace Proton

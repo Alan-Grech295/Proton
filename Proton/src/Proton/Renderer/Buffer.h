@@ -2,7 +2,7 @@
 #include <string>
 #include <cassert>
 #include "Shader.h"
-#include "Proton\Log.h"
+#include "Proton\Core\Log.h"
 
 namespace Proton
 {

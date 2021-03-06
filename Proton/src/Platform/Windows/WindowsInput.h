@@ -1,6 +1,6 @@
 #pragma once
-#include "Proton/Input.h"
-#include "Proton/Core.h"
+#include "Proton\Core\Input.h"
+#include "Proton\Core\Core.h"
 #include <bitset>
 
 

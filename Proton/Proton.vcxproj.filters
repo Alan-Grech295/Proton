@@ -31,12 +31,18 @@
     <Filter Include="Proton\Shader">
       <UniqueIdentifier>{8DE466A0-F9A4-E2D6-C2DF-2B542E5F27B3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Proton\Shader\Includes">
+      <UniqueIdentifier>{53CD30DA-3FC7-592C-2834-F03C14CDBF98}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Platform\DirectX 11\DirectXBuffer.h">
       <Filter>Platform\DirectX 11</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\DirectX 11\DirectXRendererAPI.h">
+      <Filter>Platform\DirectX 11</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Platform\DirectX 11\DirectXSampler.h">
       <Filter>Platform\DirectX 11</Filter>
     </ClInclude>
     <ClInclude Include="src\Platform\DirectX 11\DirectXShader.h">
@@ -58,26 +64,11 @@
       <Filter>Platform\Windows</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton.h" />
-    <ClInclude Include="src\Proton\Application.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Cone.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Core.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\Core\Base.h">
       <Filter>Proton\Core</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Core\TimeStep.h">
       <Filter>Proton\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Cube.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\EntryPoint.h">
-      <Filter>Proton</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Events\ApplicationEvent.h">
       <Filter>Proton\Events</Filter>
@@ -97,32 +88,14 @@
     <ClInclude Include="src\Proton\IndexedTriangleList.h">
       <Filter>Proton</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\Input.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\KeyCodes.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Layer.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\LayerStack.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Log.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Math.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\Model\Model.h">
       <Filter>Proton\Model</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\MouseButtonCodes.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\PointLight.h">
       <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\BindsCollection.h">
+      <Filter>Proton\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Renderer\Buffer.h">
       <Filter>Proton\Renderer</Filter>
@@ -139,6 +112,9 @@
     <ClInclude Include="src\Proton\Renderer\RendererAPI.h">
       <Filter>Proton\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Sampler.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
     <ClInclude Include="src\Proton\Renderer\Shader.h">
       <Filter>Proton\Renderer</Filter>
     </ClInclude>
@@ -151,22 +127,50 @@
     <ClInclude Include="src\Proton\Sphere.h">
       <Filter>Proton</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\Timer.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Window.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\ptpch.h" />
-    <ClInclude Include="src\Proton\Renderer\Sampler.h" />
-    <ClInclude Include="src\Platform\DirectX 11\DirectXSampler.h" />
-    <ClInclude Include="src\Proton\Renderer\BindsCollection.h" />
+    <ClInclude Include="src\Proton\Debug\Instrumentation.h" />
+    <ClInclude Include="src\Proton\Core\Application.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\Core.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\Input.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\EntryPoint.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\KeyCodes.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\Layer.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\LayerStack.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\Log.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\Math.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\MouseButtonCodes.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Core\Window.h">
+      <Filter>Proton</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
       <Filter>Platform\DirectX 11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\DirectX 11\DirectXRendererAPI.cpp">
+      <Filter>Platform\DirectX 11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\DirectX 11\DirectXSampler.cpp">
       <Filter>Platform\DirectX 11</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\DirectX 11\DirectXShader.cpp">
@@ -187,23 +191,11 @@
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp">
       <Filter>Platform\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\Application.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
     <ClCompile Include="src\Proton\ImGui\ImGuiBuild.cpp">
       <Filter>Proton\ImGui</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\ImGui\ImGuiLayer.cpp">
       <Filter>Proton\ImGui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Layer.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\LayerStack.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Log.cpp">
-      <Filter>Proton</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Model\Model.cpp">
       <Filter>Proton\Model</Filter>
@@ -226,6 +218,9 @@
     <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp">
       <Filter>Proton\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Sampler.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
     <ClCompile Include="src\Proton\Renderer\Shader.cpp">
       <Filter>Proton\Renderer</Filter>
     </ClCompile>
@@ -235,12 +230,19 @@
     <ClCompile Include="src\Proton\SolidSphere.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\Timer.cpp">
+    <ClCompile Include="src\ptpch.cpp" />
+    <ClCompile Include="src\Proton\Core\Application.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
-    <ClCompile Include="src\ptpch.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Sampler.cpp" />
-    <ClCompile Include="src\Platform\DirectX 11\DirectXSampler.cpp" />
+    <ClCompile Include="src\Proton\Core\Layer.cpp">
+      <Filter>Proton</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Core\LayerStack.cpp">
+      <Filter>Proton</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Core\Log.cpp">
+      <Filter>Proton</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">
@@ -255,7 +257,34 @@
     <FxCompile Include="src\Proton\Shader\ColorIndexVS.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
+    <FxCompile Include="src\Proton\Shader\Includes\LightVectorData.hlsl">
+      <Filter>Proton\Shader\Includes</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\Includes\PointLight.hlsl">
+      <Filter>Proton\Shader\Includes</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\Includes\ShaderUtils.hlsl">
+      <Filter>Proton\Shader\Includes</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongNoTexPS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongNoTexVS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongNormalMapPS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongNormalMapSpecPS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongNormalMapVS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongPS.hlsl">
+      <Filter>Proton\Shader</Filter>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\PhongSpecularPS.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongVS.hlsl">
@@ -273,14 +302,5 @@
     <FxCompile Include="src\Proton\Shader\TextureVS.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\PhongSpecularPS.hlsl" />
-    <FxCompile Include="src\Proton\Shader\PhongNormalMapPS.hlsl" />
-    <FxCompile Include="src\Proton\Shader\PhongNormalMapVS.hlsl" />
-    <FxCompile Include="src\Proton\Shader\PhongNormalMapSpecPS.hlsl" />
-    <FxCompile Include="src\Proton\Shader\PhongNoTexVS.hlsl" />
-    <FxCompile Include="src\Proton\Shader\PhongNoTexPS.hlsl" />
-    <FxCompile Include="src\Proton\Shader\Includes\LightVectorData.hlsl" />
-    <FxCompile Include="src\Proton\Shader\Includes\ShaderUtils.hlsl" />
-    <FxCompile Include="src\Proton\Shader\Includes\PointLight.hlsl" />
   </ItemGroup>
 </Project>

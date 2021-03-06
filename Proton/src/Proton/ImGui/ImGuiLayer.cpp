@@ -3,8 +3,8 @@
 #include "imgui.h"
 #include "examples\imgui_impl_win32.h"
 #include "examples\imgui_impl_dx11.h"
-#include "Proton/Application.h"
-#include "Proton\Log.h"
+#include "Proton\Core\Application.h"
+#include "Proton\Core\Log.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
 #include "Proton\Renderer\RenderCommand.h"
 

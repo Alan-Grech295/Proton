@@ -1,6 +1,6 @@
 #pragma once
 #include <DirectXMath.h>
-#include "Proton\Core.h"
+#include "Proton\Core\Core.h"
 
 namespace Proton
 {

@@ -1,7 +1,7 @@
 #include "ptpch.h"
 #include "DirectXRendererAPI.h"
-#include "Proton\Application.h"
-#include "Proton\Log.h"
+#include "Proton\Core\Application.h"
+#include "Proton\Core\Log.h"
 #include "Platform\Windows\WindowsWindow.h"
 #include <Windows.h>
 

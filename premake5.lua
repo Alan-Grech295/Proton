@@ -16,7 +16,7 @@ IncludeDir["ImGui"] = "%{wks.location}/Proton/vendor/imgui"
 IncludeDir["Assimp"] = "%{wks.location}/Proton/vendor/Assimp/include"
 
 include "Proton/vendor/imgui"
-include "Proton/vendor/Assimp"
+--include "Proton/vendor/Assimp"
 
 project "Proton"
 	location "Proton"
@@ -43,14 +43,15 @@ project "Proton"
 		"%{prj.name}/src",
 		"%{prj.name}/vendor/spdlog/include",
 		"%{prj.name}/vendor/DirectXTK/include",
+		"%{prj.name}/vendor/DirectXTex/include",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.Assimp}"
 	}
 
 	links
 	{
-		"ImGui",
-		"assimp"
+		"ImGui"
+		--"assimp"
 	}
 
 	filter "system:windows"
@@ -64,7 +65,9 @@ project "Proton"
 
 		links
 		{
-			("%{wks.location}/%{prj.name}/vendor/DirectXTK/" .. outputdir .. "/DirectXTK.lib")
+			("%{wks.location}/%{prj.name}/vendor/DirectXTK/" .. outputdir .. "/DirectXTK.lib"),
+			("%{wks.location}/%{prj.name}/vendor/DirectXTex/" .. outputdir .. "/DirectXTex.lib"),
+			("%{wks.location}/%{prj.name}/vendor/Assimp/" .. outputdir .. "/assimp-vc142-mtd.lib")
 		}
 
 	filter "configurations:Debug"
