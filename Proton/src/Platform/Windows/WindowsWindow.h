@@ -14,7 +14,7 @@ namespace Proton
 		WindowsWindow(const WindowProperties& props, HINSTANCE hInstance);
 		virtual ~WindowsWindow();
 
-		void OnUpdate() override;
+		void OnUpdate(TimeStep ts) override;
 
 		inline unsigned int GetWidth() const override { return m_Data.width; }
 		inline unsigned int GetHeight() const override { return m_Data.height; }

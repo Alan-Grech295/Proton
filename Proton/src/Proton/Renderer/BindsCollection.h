@@ -17,13 +17,15 @@ namespace Proton
 		template<class T, typename...Params>
 		Ref<T> Resolve_(Params&&... p)
 		{
+			PT_PROFILE_FUNCTION();
+
 			using namespace std::string_literals;
 			const std::string key = std::string(typeid(T).name()) + "#"s + T::GenerateUID(std::forward<Params>(p)...);
 			const auto i = binds.find(key);
 
 			if (i == binds.end())
 			{
-				auto bind = std::make_shared<T>(std::forward<Params>(p)...);
+				auto bind = CreateRef<T>(std::forward<Params>(p)...);
 				binds[key] = bind;
 				return bind;
 			}

@@ -28,6 +28,9 @@ namespace Proton
 		float mousePosY;
 		float mouseDeltaX;
 		float mouseDeltaY;
+
+		float accMouseDeltaX;
+		float accMouseDeltaY;
 	private:
 		static WindowsInput* s_Instance;
 	};

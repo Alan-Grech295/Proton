@@ -18,6 +18,8 @@ namespace Proton
 
 	void Renderer::Submit(Model& model)
 	{
+		PT_PROFILE_FUNCTION();
+
 		model.Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), DirectX::XMMatrixIdentity());
 	}
 
@@ -30,6 +32,8 @@ namespace Proton
 
 	void Renderer::DrawCall(const UINT count)
 	{
+		PT_PROFILE_FUNCTION();
+
 		RenderCommand::DrawIndexed(count);
 	}
 }

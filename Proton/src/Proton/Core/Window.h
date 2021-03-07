@@ -5,6 +5,7 @@
 #include "Proton/Events/Event.h"
 #include <random>
 #include <DirectXMath.h>
+#include "Proton\Core\TimeStep.h"
 
 namespace Proton
 {
@@ -31,7 +32,7 @@ namespace Proton
 
 		virtual ~Window() {}
 
-		virtual void OnUpdate() = 0;
+		virtual void OnUpdate(TimeStep ts) = 0;
 
 		virtual unsigned int GetWidth() const = 0;
 		virtual unsigned int GetHeight() const = 0;

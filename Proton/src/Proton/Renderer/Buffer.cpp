@@ -13,6 +13,8 @@ namespace Proton
 {
 	Ref<VertexBuffer> VertexBuffer::Create(const std::string& tag, int stride, const void* vertices, uint32_t size)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -28,13 +30,15 @@ namespace Proton
 
 	Scope<VertexBuffer> VertexBuffer::CreateUnique(int stride, const void* vertices, uint32_t size)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return std::make_unique<DirectXVertexBuffer>("", stride, vertices, size);
+			return CreateScope<DirectXVertexBuffer>("", stride, vertices, size);
 		}
 
 		assert("Unknown RendererAPI!");
@@ -43,6 +47,8 @@ namespace Proton
 
 	Ref<IndexBuffer> IndexBuffer::Create(const std::string& tag, unsigned short* indices, uint32_t size)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -58,13 +64,15 @@ namespace Proton
 
 	Scope<IndexBuffer> IndexBuffer::CreateUnique(unsigned short* indices, uint32_t size)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return std::make_unique<DirectXIndexBuffer>("", indices, size);
+			return CreateScope<DirectXIndexBuffer>("", indices, size);
 		}
 
 		assert("Unknown RendererAPI!");
@@ -73,6 +81,8 @@ namespace Proton
 	
 	Ref<VertexConstantBuffer> VertexConstantBuffer::Create(const std::string& tag, int slot, int size, const void* data)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -88,13 +98,15 @@ namespace Proton
 
 	Scope<VertexConstantBuffer> VertexConstantBuffer::CreateUnique(int slot, int size, const void* data)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return std::make_unique<DirectXVertexConstantBuffer>("", slot, size, data);
+			return CreateScope<DirectXVertexConstantBuffer>("", slot, size, data);
 		}
 
 		assert("Unknown RendererAPI!");
@@ -103,6 +115,8 @@ namespace Proton
 
 	Ref<PixelConstantBuffer> PixelConstantBuffer::Create(const std::string& tag, int slot, int size, const void* data)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -118,13 +132,15 @@ namespace Proton
 
 	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(int slot, int size, const void* data)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return std::make_unique<DirectXPixelConstantBuffer>("", slot, size, data);
+			return CreateScope<DirectXPixelConstantBuffer>("", slot, size, data);
 		}
 
 		assert("Unknown RendererAPI!");

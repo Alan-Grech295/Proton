@@ -156,6 +156,7 @@
     <ClInclude Include="src\Proton\Debug\Instrumentation.h" />
     <ClInclude Include="src\Proton\Core\TimeStep.h" />
     <ClInclude Include="src\Proton\Core\EntryPoint.h" />
+    <ClInclude Include="src\Proton\Debug\ProfileLayer.h" />
     <ClInclude Include="src\Proton\Events\ApplicationEvent.h" />
     <ClInclude Include="src\Proton\Events\Event.h" />
     <ClInclude Include="src\Proton\Events\KeyEvent.h" />
@@ -196,6 +197,7 @@
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Proton\Core\Application.cpp" />
+    <ClCompile Include="src\Proton\Debug\ProfileLayer.cpp" />
     <ClCompile Include="src\Proton\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Proton\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Proton\Core\Layer.cpp" />

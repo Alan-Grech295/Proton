@@ -1,3 +1,5 @@
+#define NOMINMAX
+
 #include "ptpch.h"
 #include "WindowsWindow.h"
 #include "Proton/Events/ApplicationEvent.h"
@@ -9,6 +11,7 @@
 #include "Proton/PointLight.h"
 #include "Proton\Renderer\RenderCommand.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
+#include "Proton\Debug\ProfileLayer.h"
 
 namespace Proton
 {
@@ -27,10 +30,13 @@ namespace Proton
 		Shutdown();
 	}
 
-	void WindowsWindow::OnUpdate()
+	void WindowsWindow::OnUpdate(TimeStep ts)
 	{
 		input->mouseDeltaX = 0;
 		input->mouseDeltaY = 0;
+
+		input->accMouseDeltaX = 0;
+		input->accMouseDeltaY = 0;
 
 		input->releasedKeyStates.reset();
 
@@ -42,6 +48,9 @@ namespace Proton
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		input->mouseDeltaX = input->accMouseDeltaX / std::max<float>(1.0f, 1000.0f * ts);
+		input->mouseDeltaY = input->accMouseDeltaY / std::max<float>(1.0f, 1000.0f * ts);
 
 		//Dispatches an AppRenderEvent. This is done after the render 
 		//but before presenting the frame so that if any post processing
@@ -300,6 +309,7 @@ namespace Proton
 			break;
 		case WM_MOUSEMOVE:
 			{
+				PT_PROFILE_SCOPE("Mouse Move");
 				const POINTS pt = MAKEPOINTS(lParam);
 
 				input->mousePosX = pt.x;
@@ -339,6 +349,9 @@ namespace Proton
 			/****** Raw Mouse Messages *******/
 		case WM_INPUT:
 			{
+			if (Instrumentor::Profiling())
+				ProfileLayer::mouseUpdates++;
+
 				UINT size;
 				if (GetRawInputData(
 					reinterpret_cast<HRAWINPUT>(lParam),
@@ -363,11 +376,12 @@ namespace Proton
 				}
 
 				auto& ri = reinterpret_cast<const RAWINPUT&>(*rawBuffer.data());
+				
 				if (ri.header.dwType == RIM_TYPEMOUSE &&
 					(ri.data.mouse.lLastX != 0 || ri.data.mouse.lLastY != 0))
 				{
-					input->mouseDeltaX = ri.data.mouse.lLastX;
-					input->mouseDeltaY = ri.data.mouse.lLastY;
+					input->accMouseDeltaX += ri.data.mouse.lLastX;
+					input->accMouseDeltaY += ri.data.mouse.lLastY;
 				}
 			}
 		}

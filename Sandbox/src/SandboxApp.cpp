@@ -1,3 +1,4 @@
+#define NOMINMAX
 #include <Proton.h>
 
 #include "imgui\imgui.h"
@@ -10,7 +11,7 @@ public:
 		m_Camera(Proton::Application::Get().GetWindow().GetWidth(), Proton::Application::Get().GetWindow().GetHeight(), 0.5f, 1000.0f, Proton::Camera::ProjectionMode::Perspective)
 	{
 		Proton::Application::Get().GetWindow().ShowCursor();
-		light = std::make_shared<Proton::PointLight>(0.5f);
+		light = Proton::CreateRef<Proton::PointLight>(0.5f);
 	}
 
 	void OnUpdate(Proton::TimeStep ts) override
@@ -72,12 +73,13 @@ public:
 		m_CameraPos.z += localMove.z;
 		
 		DirectX::XMFLOAT3 newRot = m_Camera.GetRotation();
-
+		
 		if (enableCursor)
 		{
-			newRot.x += rotationSpeed * Proton::Input::GetMouseDeltaY() * ts;
-			newRot.y += rotationSpeed * Proton::Input::GetMouseDeltaX() * ts;
+			newRot.x += rotationSpeed * Proton::Input::GetMouseDeltaY() * std::max<float>(0.001f, ts);
+			newRot.y += rotationSpeed * Proton::Input::GetMouseDeltaX() * std::max<float>(0.001f, ts);
 		}
+
 		static bool vSync = true;
 
 		if (Proton::Input::IsKeyReleased(PT_KEY_0))
@@ -151,7 +153,7 @@ private:
 
 	DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };
 	float cameraSpeed = 15.0f;
-	float rotationSpeed = 1.5f;
+	float rotationSpeed = 0.8f;
 
 	bool enableCursor = true;
 	bool cursor = true;

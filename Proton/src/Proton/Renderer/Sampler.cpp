@@ -12,6 +12,8 @@ namespace Proton
 {
 	Ref<Sampler> Sampler::Create(const std::string& tag, int slot)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -27,13 +29,15 @@ namespace Proton
 
 	Scope<Sampler> Sampler::CreateUnique(int slot)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return std::make_unique<DirectXSampler>("", slot);
+			return CreateScope<DirectXSampler>("", slot);
 		}
 
 		assert("Unknown RendererAPI!");

@@ -162,6 +162,7 @@
     <ClInclude Include="src\Proton\Core\Window.h">
       <Filter>Proton</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Debug\ProfileLayer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -243,6 +244,7 @@
     <ClCompile Include="src\Proton\Core\Log.cpp">
       <Filter>Proton</Filter>
     </ClCompile>
+    <ClCompile Include="src\Proton\Debug\ProfileLayer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">

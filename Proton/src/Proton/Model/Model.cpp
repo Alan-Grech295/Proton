@@ -139,7 +139,7 @@ namespace Proton
 
 	Model::Model(const std::string& modelPath)
 		:
-		pWindow(std::make_unique<ModelWindow>())
+		pWindow(CreateScope<ModelWindow>())
 	{	
 		Assimp::Importer imp;
 		const auto pScene = imp.ReadFile(modelPath.c_str(),
@@ -179,6 +179,8 @@ namespace Proton
 
 	Scope<Mesh> Model::ParseMesh(const std::string& basePath, const aiMesh& mesh, const aiMaterial* const* pMaterials)
 	{
+		PT_PROFILE_FUNCTION();
+
 		namespace dx = DirectX;
 		struct Vertex
 		{
@@ -192,34 +194,40 @@ namespace Proton
 		std::vector<Vertex> vertices;
 		vertices.reserve(mesh.mNumVertices);
 
-		for (unsigned int i = 0; i < mesh.mNumVertices; i++)
 		{
-			vertices.push_back({
-				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]),
-				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]),
-				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mTangents[i]),
-				*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mBitangents[i]),
-				*reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i])
-				});
+			PT_PROFILE_SCOPE("Vertex Loading - Model::ParseMesh");
+			for (unsigned int i = 0; i < mesh.mNumVertices; i++)
+			{
+				vertices.push_back({
+					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]),
+					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]),
+					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mTangents[i]),
+					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mBitangents[i]),
+					*reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i])
+					});
+			}
 		}
 
 		std::vector<unsigned short> indices;
 		indices.reserve((UINT)mesh.mNumFaces * 3);
-		for (unsigned int i = 0; i < mesh.mNumFaces; i++)
-		{
-			const auto& face = mesh.mFaces[i];
-			assert(face.mNumIndices == 3);
-			indices.push_back(face.mIndices[0]);
-			indices.push_back(face.mIndices[1]);
-			indices.push_back(face.mIndices[2]);
-		}
-		using namespace std::string_literals;
 
-		PT_CORE_TRACE(mesh.mName.C_Str());
+		{
+			PT_PROFILE_SCOPE("Index Loading - Model::ParseMesh");
+			for (unsigned int i = 0; i < mesh.mNumFaces; i++)
+			{
+				const auto& face = mesh.mFaces[i];
+				assert(face.mNumIndices == 3);
+				indices.push_back(face.mIndices[0]);
+				indices.push_back(face.mIndices[1]);
+				indices.push_back(face.mIndices[2]);
+			}
+		}
+		
+		using namespace std::string_literals;
 
 		auto meshTag = basePath + "%" + mesh.mName.C_Str();
 
-		Scope<Mesh> pMesh = std::make_unique<Mesh>(meshTag);
+		Scope<Mesh> pMesh = CreateScope<Mesh>(meshTag);
 
 		float shininess = 40.0f;
 		bool hasAlphaGloss = false;
@@ -367,7 +375,7 @@ namespace Proton
 			curMeshPtrs.push_back(m_MeshPtrs.at(meshIdx).get());
 		}
 
-		auto pNode = std::make_unique<Node>(node.mName.C_Str(), std::move(curMeshPtrs), transform);
+		auto pNode = CreateScope<Node>(node.mName.C_Str(), std::move(curMeshPtrs), transform);
 
 		for (size_t i = 0; i < node.mNumChildren; i++)
 		{

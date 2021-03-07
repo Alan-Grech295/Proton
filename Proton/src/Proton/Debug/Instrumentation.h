@@ -27,6 +27,7 @@ namespace Proton
         InstrumentationSession* m_CurrentSession;
         std::ofstream m_OutputStream;
         int m_ProfileCount;
+        bool profiling = false;
     public:
         Instrumentor()
             : m_CurrentSession(nullptr), m_ProfileCount(0)
@@ -87,6 +88,26 @@ namespace Proton
             static Instrumentor instance;
             return instance;
         }
+
+        static bool Profiling()
+        {
+            return Instrumentor::Get().profiling;
+        }
+
+        static void StartProfiling()
+        {
+            Instrumentor::Get().profiling = true;
+        }
+
+        static void StopProfiling()
+        {
+            Instrumentor::Get().profiling = false;
+        }
+
+        static void SetProfiling(bool profiling)
+        {
+            Instrumentor::Get().profiling = profiling;
+        }
     };
 
     class InstrumentationTimer
@@ -106,13 +127,16 @@ namespace Proton
 
         void Stop()
         {
-            auto endTimepoint = std::chrono::high_resolution_clock::now();
+            if (Instrumentor::Profiling())
+            {
+                auto endTimepoint = std::chrono::high_resolution_clock::now();
 
-            long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
-            long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
+                long long start = std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch().count();
+                long long end = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch().count();
 
-            uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
-            Instrumentor::Get().WriteProfile({ m_Name, start, end, threadID });
+                uint32_t threadID = std::hash<std::thread::id>{}(std::this_thread::get_id());
+                Instrumentor::Get().WriteProfile({ m_Name, start, end, threadID });
+            }
 
             m_Stopped = true;
         }

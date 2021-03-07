@@ -10,6 +10,8 @@ namespace Proton
 {
 	Ref<Texture2D> Texture2D::Create(std::string path, int slot)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -25,13 +27,15 @@ namespace Proton
 
 	Scope<Texture2D> Texture2D::CreateUnique(std::string path, int slot)
 	{
+		PT_PROFILE_FUNCTION();
+
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return std::make_unique<DirectXTexture2D>(path, slot);
+			return CreateScope<DirectXTexture2D>(path, slot);
 		}
 
 		assert(false && "Unknown RendererAPI!");

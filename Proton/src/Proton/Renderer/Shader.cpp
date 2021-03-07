@@ -12,6 +12,7 @@ namespace Proton
 {
 	Ref<PixelShader> PixelShader::Create(std::string path)
 	{
+		PT_PROFILE_FUNCTION();
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -27,13 +28,14 @@ namespace Proton
 
 	Scope<PixelShader> PixelShader::CreateUnique(std::string path)
 	{
+		PT_PROFILE_FUNCTION();
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			assert(false && "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return std::make_unique<DirectXPixelShader>(path);
+			return CreateScope<DirectXPixelShader>(path);
 		}
 
 		assert(false && "Unknown RendererAPI!");
@@ -42,6 +44,7 @@ namespace Proton
 
 	Ref<VertexShader> VertexShader::Create(std::string path)
 	{
+		PT_PROFILE_FUNCTION();
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
@@ -57,13 +60,14 @@ namespace Proton
 
 	Scope<VertexShader> VertexShader::CreateUnique(std::string path)
 	{
+		PT_PROFILE_FUNCTION();
 		switch (Renderer::GetAPI())
 		{
 		case RendererAPI::API::None:
 			assert(false && "RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return std::make_unique<DirectXVertexShader>(path);
+			return CreateScope<DirectXVertexShader>(path);
 		}
 
 		assert(false && "Unknown RendererAPI!");
