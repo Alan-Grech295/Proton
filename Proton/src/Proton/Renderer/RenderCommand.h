@@ -24,6 +24,11 @@ namespace Proton
 			s_RendererAPI->DrawIndexed(count);
 		}
 
+		inline static void BindSwapChain()
+		{
+			s_RendererAPI->BindSwapChain();
+		}
+
 		inline static RendererAPI* GetRendererAPI() { return s_RendererAPI; }
 	private:
 		static RendererAPI* s_RendererAPI;

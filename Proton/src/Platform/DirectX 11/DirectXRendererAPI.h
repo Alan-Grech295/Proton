@@ -19,6 +19,8 @@ namespace Proton
 		ID3D11DeviceContext* GetContext() { return pContext.Get(); }
 		ID3D11RenderTargetView* GetRenderTarget() { return pTarget.Get(); }
 		void SetRenderTarget(ID3D11RenderTargetView* target) { pTarget = target; pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());}
+
+		void BindSwapChain() override;
 	private:
 		void Initialize(WindowsWindow& window, HWND hWnd);
 		void ShowFrame();
@@ -28,6 +30,8 @@ namespace Proton
 		Microsoft::WRL::ComPtr<ID3D11DeviceContext> pContext;
 		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pTarget;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
+		D3D11_VIEWPORT vp;
 
 		UINT width, height;
 

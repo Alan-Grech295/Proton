@@ -1,5 +1,5 @@
 #pragma once
-#include "SolidSphere.h"
+#include <DirectXMath.h>
 #include "Renderer\Buffer.h"
 
 namespace Proton
@@ -10,9 +10,7 @@ namespace Proton
 		PointLight(float radius = 0.5f);
 		void CreateControlWindow();
 		void Reset();
-		void SetLightData() const;
-	public:
-		mutable SolidSphere mesh;
+		void SetLightData(DirectX::FXMMATRIX& viewMatrix) const;
 	private:
 		struct PointLightCBuf
 		{

@@ -29,8 +29,9 @@ namespace Proton
 		void OnEvent(Event& e);
 
 		void PushLayer(Layer* layer);
-
 		void PushOverlay(Layer* overlay);
+
+		void Close();
 
 		static inline Application& Get() { return *s_Instance; }
 

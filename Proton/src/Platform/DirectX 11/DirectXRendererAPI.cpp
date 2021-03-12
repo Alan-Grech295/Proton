@@ -4,6 +4,7 @@
 #include "Proton\Core\Log.h"
 #include "Platform\Windows\WindowsWindow.h"
 #include <Windows.h>
+#include "Proton\Renderer\RenderCommand.h"
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -26,6 +27,16 @@ namespace Proton
 	{
 		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		pContext->DrawIndexed(count, 0u, 0u);
+	}
+
+	void DirectXRendererAPI::BindSwapChain()
+	{
+		//Bind depth stencil state
+		pContext->OMSetDepthStencilState(pDSState.Get(), 1);
+
+		pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
+
+		pContext->RSSetViewports(1, &vp);
 	}
 
 	void DirectXRendererAPI::Initialize(WindowsWindow& window, HWND hWnd)
@@ -83,11 +94,7 @@ namespace Proton
 		dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 		dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-		wrl::ComPtr<ID3D11DepthStencilState> pDSState;
 		pDevice->CreateDepthStencilState(&dsDesc, &pDSState);
-
-		//Bind depth stencil state
-		pContext->OMSetDepthStencilState(pDSState.Get(), 1);
 
 		//Create depth stencil texture
 		wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
@@ -112,18 +119,13 @@ namespace Proton
 
 		pDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &pDSV);
 
-		pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());
-
 		//Configure viewport
-		D3D11_VIEWPORT vp;
 		vp.Width = (FLOAT)width;
 		vp.Height = (FLOAT)height;
 		vp.MinDepth = 0;
 		vp.MaxDepth = 1;
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
-
-		pContext->RSSetViewports(1, &vp);
 	}
 
 	void DirectXRendererAPI::ShowFrame()

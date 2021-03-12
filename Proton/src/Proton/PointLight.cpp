@@ -6,8 +6,8 @@
 namespace Proton
 {
 	PointLight::PointLight(float radius)
-		:
-		mesh(radius)
+		//:
+		//mesh(radius)
 	{
 		Reset();
 		cbuf = PixelConstantBuffer::Create("LightDataBuffer", 0, sizeof(cbData), &cbData);
@@ -22,14 +22,14 @@ namespace Proton
 			ImGui::SliderFloat("Y", &cbData.pos.y, -60.0f, 60.0f, "%.1f");
 			ImGui::SliderFloat("Z", &cbData.pos.z, -60.0f, 60.0f, "%.1f");
 
-			mesh.SetPos(cbData.pos);
+			//mesh.SetPos(cbData.pos);
 
 			ImGui::Text("Intensity/Color");
 			ImGui::SliderFloat("Intensity", &cbData.diffuseIntensity, 0.01f, 2.0f, "%.2f");
 			ImGui::ColorEdit3("Diffuse Color", &cbData.diffuseColor.x);
 			ImGui::ColorEdit3("Ambient", &cbData.ambient.x);
 
-			mesh.colorConst.color = cbData.diffuseColor;
+			//mesh.colorConst.color = cbData.diffuseColor;
 
 			ImGui::Text("Falloff");
 			ImGui::SliderFloat("Constant", &cbData.attConst, 0.05f, 10.0f, "%.2f");
@@ -58,11 +58,11 @@ namespace Proton
 		};
 	}
 
-	void PointLight::SetLightData() const
+	void PointLight::SetLightData(DirectX::FXMMATRIX& viewMatrix) const
 	{
 		auto dataCopy = cbData;
 		const auto pos = DirectX::XMLoadFloat3(&cbData.pos);
-		DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, Renderer::GetCamera().GetViewMatrix()));
+		DirectX::XMStoreFloat3(&dataCopy.pos, DirectX::XMVector3Transform(pos, viewMatrix));
 		cbuf->SetData(sizeof(dataCopy), &dataCopy);
 		cbuf->Bind();
 	}

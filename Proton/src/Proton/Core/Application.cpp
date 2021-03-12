@@ -72,6 +72,11 @@ namespace Proton
 		overlay->OnAttach();
 	}
 
+	void Application::Close()
+	{
+		m_Window->Close();
+	}
+
 	void Application::Run()
 	{
 		RenderCommand::SetClearColor(0.02f, 0.07f, 0.2f);
@@ -82,7 +87,6 @@ namespace Proton
 
 		while (m_Running)
 		{
-			RenderCommand::Clear();
 
 			QueryPerformanceFrequency(&li);
 			double pcFreq = li.QuadPart;
@@ -97,6 +101,9 @@ namespace Proton
 			for (Layer* layer : m_LayerStack)
 				layer->OnUpdate(timeStep);
 
+			RenderCommand::BindSwapChain();
+			RenderCommand::Clear();
+
 			m_ImGuiLayer->Begin();
 
 			for (Layer* layer : m_LayerStack)
@@ -110,6 +117,7 @@ namespace Proton
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
+		PT_CORE_TRACE("Window Close Event!");
 		m_Running = false;
 		return true;
 	}

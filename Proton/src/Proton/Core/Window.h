@@ -46,6 +46,8 @@ namespace Proton
 		virtual void ConfineCursor() const = 0;
 		virtual void FreeCursor() const = 0;
 
+		virtual void Close() = 0;
+
 		//Window Attributes
 		virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
 		virtual void SetVSync(bool enabled) = 0;

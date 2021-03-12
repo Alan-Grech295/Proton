@@ -208,12 +208,20 @@ namespace Proton
 	
 	void WindowsWindow::Shutdown()
 	{
-		if(initializedImGui)
+		if (initializedImGui)
 			ImGui_ImplWin32_Shutdown();
 
 		initializedImGui = false;
 		DestroyWindow(m_HWnd);
-		PostQuitMessage(1);
+		PostQuitMessage(0);
+	}
+
+	void WindowsWindow::Close()
+	{
+		WindowCloseEvent event;
+		WindowData& data = *(WindowData*)GetClassLongPtr(m_HWnd, 0);
+		data.eventCallback(event);
+		Shutdown();
 	}
 
 	LRESULT CALLBACK WindowsWindow::HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
@@ -230,9 +238,10 @@ namespace Proton
 			//Close window message
 		case WM_CLOSE:
 			{
-				Shutdown();
 				WindowCloseEvent event;
+				WindowData& data = *(WindowData*)GetClassLongPtr(m_HWnd, 0);
 				data.eventCallback(event);
+				Shutdown();
 				return 0;
 			}
 			//Keyboard messages
@@ -349,9 +358,6 @@ namespace Proton
 			/****** Raw Mouse Messages *******/
 		case WM_INPUT:
 			{
-			if (Instrumentor::Profiling())
-				ProfileLayer::mouseUpdates++;
-
 				UINT size;
 				if (GetRawInputData(
 					reinterpret_cast<HRAWINPUT>(lParam),

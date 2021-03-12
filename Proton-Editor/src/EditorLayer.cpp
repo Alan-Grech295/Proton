@@ -1,16 +1,11 @@
-#define NOMINMAX
-#include <Proton.h>
+#include "EditorLayer.h"
 
-#include "imgui\imgui.h"
-
-using namespace Proton;
-
-class ExampleLayer : public Layer
+namespace Proton
 {
-public:
-	ExampleLayer()
-		: Layer("Example")
-		//m_Camera(Application::Get().GetWindow().GetWidth(), Application::Get().GetWindow().GetHeight(), 0.5f, 1000.0f, Camera::ProjectionMode::Perspective)
+	EditorLayer::EditorLayer()
+		:
+		Layer("EditorLayer"),
+		cameraProjection(CameraComponent(DirectX::XMMatrixIdentity()))
 	{
 		Application::Get().GetWindow().ShowCursor();
 		light = CreateRef<PointLight>(0.5f);
@@ -24,10 +19,14 @@ public:
 
 		//Temp
 		m_CameraEntity.AddComponent<CameraComponent>(DirectX::XMMatrixPerspectiveLH(1.0f, (float)Application::Get().GetWindow().GetHeight() / Application::Get().GetWindow().GetWidth(), 0.5f, 1000.0f));
-		//m_GoblinEntity.AddComponent<ModelComponent>("C:\\Dev\\Proton\\Proton\\Models\\Goblin\\GoblinX.obj");
 	}
 
-	void OnUpdate(TimeStep ts) override
+	EditorLayer::~EditorLayer()
+	{
+
+	}
+
+	void EditorLayer::OnUpdate(TimeStep ts)
 	{
 		PT_PROFILE_FUNCTION();
 
@@ -105,7 +104,7 @@ public:
 		m_ActiveScene->OnUpdate(ts, light);
 	}
 
-	void OnImGuiRender() override
+	void EditorLayer::OnImGuiRender()
 	{
 		//ImGui Dockspace
 		static bool dockspaceOpen = true;
@@ -163,12 +162,29 @@ public:
 		if (ImGui::Begin("Debug Data"))
 		{
 			ImGui::Text("Application Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-			ImGui::Image(m_ActiveScene->framebuffer->GetRenderTextureID(), ImVec2{ 720, 720 });
 		}
 
 		ImGui::End();
 
 		light->CreateControlWindow();
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
+		ImGui::Begin("Scene");
+		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+
+		if (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)
+		{
+			m_ActiveScene->framebuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
+			m_ViewportSize = viewportPanelSize;
+
+			CameraComponent& camera = m_CameraEntity.GetComponent< CameraComponent>();
+			camera.camera.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, (float)m_ViewportSize.y / m_ViewportSize.x, 0.5f, 1000.0f));
+		}
+
+		ImGui::PopStyleVar();
+
+		ImGui::Image(m_ActiveScene->framebuffer->GetRenderTextureID(), viewportPanelSize);
+		ImGui::End();
 		//
 
 		if (ImGui::BeginMenuBar())
@@ -179,7 +195,7 @@ public:
 				{
 					Application::Get().Close();
 				}
-				
+
 				ImGui::EndMenu();
 			}
 
@@ -189,60 +205,16 @@ public:
 		ImGui::End();
 	}
 
-	void OnAttach() override
+	void EditorLayer::OnAttach()
 	{
-		PT_TRACE("Attached example layer");
+
 	}
 
-	void OnEvent(Event& event) override
+	void EditorLayer::OnEvent(Event& e)
 	{
-		if (event.IsEventType(EventType::KeyPressed))
+		if (e.IsEventType(EventType::KeyPressed))
 		{
-			KeyPressedEvent& e = (KeyPressedEvent&) event;
+			KeyPressedEvent& event = (KeyPressedEvent&)e;
 		}
 	}
-private:
-	static constexpr size_t nDrawables = 150;
-	Entity m_CameraEntity;
-	Entity m_GoblinEntity;
-	Ref<PointLight> light;
-	//Model goblin{ "C:\\Dev\\Proton\\Proton\\Models\\Goblin\\GoblinX.obj" };
-
-	Ref<Scene> m_ActiveScene;
-
-	DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };
-	float cameraSpeed = 15.0f;
-	float rotationSpeed = 0.8f;
-
-	bool enableCursor = true;
-	bool cursor = true;
-
-	struct
-	{
-		float roll = 0.0f;
-		float pitch = 0.0f;
-		float yaw = 0.0f;
-		float x = 0.0f;
-		float y = 0.0f;
-		float z = 0.0f;
-	} m_Transform;
-};
-
-class Sandbox : public Application
-{
-public:
-	Sandbox()
-	{
-		PushLayer(new ExampleLayer());
-	}
-
-	~Sandbox()
-	{
-
-	}
-};
-
-/*Application* Proton::CreateApplication()
-{
-	return new Sandbox();
-}*/
+}

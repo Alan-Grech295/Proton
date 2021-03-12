@@ -15,6 +15,8 @@ namespace Proton
 		virtual void Clear() = 0;
 
 		virtual void DrawIndexed(const UINT count) = 0;
+		
+		virtual void BindSwapChain() = 0;
 
 		inline static API GetAPI() { return s_API; }
 	private:

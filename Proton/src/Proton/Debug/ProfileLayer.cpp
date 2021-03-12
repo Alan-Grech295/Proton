@@ -5,7 +5,6 @@
 
 namespace Proton
 {
-	int ProfileLayer::mouseUpdates = 0;
 	ProfileLayer::ProfileLayer()
 		:
 		Layer("ProfileLayer")
@@ -24,7 +23,6 @@ namespace Proton
 		{
 			profiling = !profiling;
 			Instrumentor::SetProfiling(profiling);
-			mouseUpdates = 0;
 		}
 
 		if (Input::IsKeyReleased(PT_KEY_O) && !profiling)
@@ -63,10 +61,6 @@ namespace Proton
 
 			if(profileMode == 1)
 				ImGui::SliderInt("Profile Frames", &profileFrames, 1, 512);
-
-			std::string str{ "Mouse Updates: " + std::to_string(mouseUpdates) };
-
-			ImGui::Text(str.c_str());
 		}
 
 		ImGui::End();

@@ -15,14 +15,14 @@ struct aiMaterial;
 namespace Proton
 {
 	using RenderCallback = std::function<void(const UINT)>;
+	class Entity;
+	class Scene;
 
 	class Mesh
 	{
-		friend class Node;
 		friend class Model;
 		friend class Renderer;
 	public:
-		//Mesh(std::vector<std::unique_ptr<Bindable>> binds);
 		Mesh(const std::string& meshTag)
 			:
 			m_Transform(DirectX::XMMatrixIdentity())
@@ -30,9 +30,10 @@ namespace Proton
 			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
 			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Transforms), new Transforms());
 		}
+		
+		void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform, DirectX::FXMMATRIX cameraView, DirectX::FXMMATRIX projectionMatrix) const;
 	private:
 		DirectX::XMMATRIX GetTransformXM() const { return m_Transform; }
-		void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform) const;
 	private:
 		DirectX::XMMATRIX m_Transform;
 
@@ -60,38 +61,12 @@ namespace Proton
 		};
 	};
 
-	class Node
-	{
-		friend class Model;
-		friend class ModelWindow;
-	public:
-		Node(std::string name, std::vector<Mesh*> meshPtrs, const DirectX::XMMATRIX transform);
-		void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform) const;
-		void SetAppliedTransform(DirectX::FXMMATRIX transform) noexcept;
-	private:
-		void AddChild(Scope<Node> pChild);
-		void ShowTree(int& nodeIndex, std::optional<int>& selectedIndex, Node*& pSelectedNode) const noexcept;
-	private:
-		std::string m_Name;
-		std::vector<Scope<Node>> m_ChildPtrs;
-		std::vector<Mesh*> m_MeshPtrs;
-		DirectX::XMMATRIX m_Transform;
-		DirectX::XMMATRIX m_AppliedTransform = DirectX::XMMatrixIdentity();
-	};
-
 	class Model
 	{
 	public:
-		Model(const std::string& modelPath);
-		void Bind(RenderCallback callback, DirectX::FXMMATRIX transform) const;
-		void ShowWindow(const char* windowName = nullptr) noexcept;
-		~Model() noexcept;
+		static Entity CreateModelEntity(const std::string& path, Scene* activeScene);
 	private:
-		static Scope<Mesh> ParseMesh(const std::string& basePath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
-		Scope<Node> ParseNode(const aiNode& node);
-	private:
-		Scope<Node> m_Root;
-		std::vector<Scope<Mesh>> m_MeshPtrs;
-		Scope<class ModelWindow> pWindow;
+		static Entity CreateChild(const aiNode& node, std::vector<Mesh*>& meshPtrs, Scene* activeScene);
+		static Mesh* ParseMesh(const std::string& basePath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
 	};
 }

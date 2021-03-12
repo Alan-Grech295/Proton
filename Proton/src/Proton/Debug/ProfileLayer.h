@@ -26,9 +26,6 @@ namespace Proton
 
 		virtual void OnUpdate(TimeStep ts) override;
 		virtual void OnImGuiRender() override;
-
-		static int mouseUpdates;
-
 	private:
 		bool profiling = false;
 		int profileMode = 0;

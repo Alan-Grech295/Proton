@@ -34,6 +34,9 @@ namespace Proton
 		bool IsVSync() const override;
 		inline virtual void* GetNativeWindow() const override { return m_HWnd; }
 
+		virtual void Shutdown();
+		virtual void Close() override;
+
 		void SetTitle(const std::string& title) override;
 
 		void InitImGui() override;
@@ -43,7 +46,6 @@ namespace Proton
 		LRESULT WINAPI HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 	private:
 		virtual void Init(const WindowProperties& props, HINSTANCE hInstance);
-		virtual void Shutdown();
 	private:
 		struct WindowData
 		{

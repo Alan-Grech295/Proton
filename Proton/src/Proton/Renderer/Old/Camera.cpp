@@ -1,7 +1,7 @@
 #include "ptpch.h"
 #include "Camera.h"
 
-namespace Proton
+namespace Proton::Depricated
 {
 	Camera::Camera(uint32_t screenWidth, uint32_t screenHeight, float nearZ, float farZ, ProjectionMode mode)
 		:
