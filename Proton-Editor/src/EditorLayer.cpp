@@ -1,24 +1,30 @@
 #include "EditorLayer.h"
+#include "CameraController.h"
 
 namespace Proton
 {
 	EditorLayer::EditorLayer()
 		:
-		Layer("EditorLayer"),
-		cameraProjection(CameraComponent(DirectX::XMMatrixIdentity()))
+		Layer("EditorLayer")
 	{
 		Application::Get().GetWindow().ShowCursor();
-		light = CreateRef<PointLight>(0.5f);
+		//light = CreateRef<PointLight>(0.5f);
 
 		m_ActiveScene = CreateRef<Scene>();
+		sceneHierarchy.SetScene(m_ActiveScene);
 
-		m_GoblinEntity = Model::CreateModelEntity("C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
+		m_Nanosuit = Model::CreateModelEntity("C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
+		m_GoblinEntity = Model::CreateModelEntity("C:\\Dev\\Proton\\Proton\\Models\\Goblin\\GoblinX.obj", m_ActiveScene.get());
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
+		m_PointLight = m_ActiveScene->CreateEntity("Point Light");
 
 		m_ActiveScene->framebuffer->SetClearCol(0.02f, 0.07f, 0.2f);
 
-		//Temp
-		m_CameraEntity.AddComponent<CameraComponent>(DirectX::XMMatrixPerspectiveLH(1.0f, (float)Application::Get().GetWindow().GetHeight() / Application::Get().GetWindow().GetWidth(), 0.5f, 1000.0f));
+		//DirectX::XMMatrixPerspectiveLH(1.0f, (float)Application::Get().GetWindow().GetHeight() / Application::Get().GetWindow().GetWidth(), 0.5f, 1000.0f)
+
+		m_CameraEntity.AddComponent<CameraComponent>();
+		m_CameraEntity.AddScript<CameraController>();
+		m_PointLight.AddComponent<LightComponent>("Point Light");
 	}
 
 	EditorLayer::~EditorLayer()
@@ -30,30 +36,10 @@ namespace Proton
 	{
 		PT_PROFILE_FUNCTION();
 
-		float speed = ts * cameraSpeed;
-
-		//Temp
-		TransformComponent& cameraTransform = m_CameraEntity.GetComponent<TransformComponent>();
-
-		DirectX::XMFLOAT3 localMove = { 0, 0, 0 };
-
-		if (Input::IsKeyPressed(PT_KEY_D))
-			localMove.x += speed;
-
-		if (Input::IsKeyPressed(PT_KEY_A))
-			localMove.x -= speed;
-
-		if (Input::IsKeyPressed(PT_KEY_E))
-			localMove.y += speed;
-
-		if (Input::IsKeyPressed(PT_KEY_Q))
-			localMove.y -= speed;
-
-		if (Input::IsKeyPressed(PT_KEY_W))
-			localMove.z += speed;
-
-		if (Input::IsKeyPressed(PT_KEY_S))
-			localMove.z -= speed;
+		if (Input::IsKeyReleased(PT_KEY_ESCAPE))
+		{
+			cursor = !cursor;
+		}
 
 		if (Input::IsKeyPressed(PT_KEY_ESCAPE))
 		{
@@ -71,28 +57,6 @@ namespace Proton
 			}
 		}
 
-		if (Input::IsKeyReleased(PT_KEY_ESCAPE))
-		{
-			cursor = !cursor;
-		}
-
-		if (Input::IsKeyReleased(PT_KEY_SPACE))
-		{
-			enableCursor = !enableCursor;
-		}
-
-		if (enableCursor)
-		{
-			cameraTransform.rotation.x += rotationSpeed * Input::GetMouseDeltaY() * std::max<float>(0.001f, ts);
-			cameraTransform.rotation.y += rotationSpeed * Input::GetMouseDeltaX() * std::max<float>(0.001f, ts);
-		}
-
-		DirectX::XMStoreFloat3(&localMove, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&localMove), DirectX::XMMatrixRotationRollPitchYaw(cameraTransform.rotation.x, cameraTransform.rotation.y, cameraTransform.rotation.z)));
-
-		cameraTransform.position.x += localMove.x;
-		cameraTransform.position.y += localMove.y;
-		cameraTransform.position.z += localMove.z;
-
 		static bool vSync = true;
 
 		if (Input::IsKeyReleased(PT_KEY_0))
@@ -101,7 +65,7 @@ namespace Proton
 			Application::Get().GetWindow().SetVSync(vSync);
 		}
 
-		m_ActiveScene->OnUpdate(ts, light);
+		m_ActiveScene->OnUpdate(ts);
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -166,8 +130,6 @@ namespace Proton
 
 		ImGui::End();
 
-		light->CreateControlWindow();
-
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Scene");
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
@@ -177,6 +139,8 @@ namespace Proton
 			m_ActiveScene->framebuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
 			m_ViewportSize = viewportPanelSize;
 
+			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+
 			CameraComponent& camera = m_CameraEntity.GetComponent< CameraComponent>();
 			camera.camera.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, (float)m_ViewportSize.y / m_ViewportSize.x, 0.5f, 1000.0f));
 		}
@@ -185,6 +149,8 @@ namespace Proton
 
 		ImGui::Image(m_ActiveScene->framebuffer->GetRenderTextureID(), viewportPanelSize);
 		ImGui::End();
+
+		sceneHierarchy.OnImGuiRender();
 		//
 
 		if (ImGui::BeginMenuBar())

@@ -173,7 +173,6 @@
     <ClInclude Include="src\Proton\ImGui\ImGuiLayer.h" />
     <ClInclude Include="src\Proton\IndexedTriangleList.h" />
     <ClInclude Include="src\Proton\Model\Model.h" />
-    <ClInclude Include="src\Proton\PointLight.h" />
     <ClInclude Include="src\Proton\Renderer\BindsCollection.h" />
     <ClInclude Include="src\Proton\Renderer\Buffer.h" />
     <ClInclude Include="src\Proton\Renderer\Camera.h" />
@@ -188,6 +187,8 @@
     <ClInclude Include="src\Proton\Scene\Components.h" />
     <ClInclude Include="src\Proton\Scene\Entity.h" />
     <ClInclude Include="src\Proton\Scene\Scene.h" />
+    <ClInclude Include="src\Proton\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Proton\Scene\ScriptableEntity.h" />
     <ClInclude Include="src\ptpch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -209,7 +210,6 @@
     <ClCompile Include="src\Proton\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Proton\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Proton\Model\Model.cpp" />
-    <ClCompile Include="src\Proton\PointLight.cpp" />
     <ClCompile Include="src\Proton\Renderer\Buffer.cpp" />
     <ClCompile Include="src\Proton\Renderer\Framebuffer.cpp" />
     <ClCompile Include="src\Proton\Renderer\Old\Camera.cpp" />
@@ -221,6 +221,7 @@
     <ClCompile Include="src\Proton\Renderer\Texture.cpp" />
     <ClCompile Include="src\Proton\Scene\Entity.cpp" />
     <ClCompile Include="src\Proton\Scene\Scene.cpp" />
+    <ClCompile Include="src\Proton\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\ptpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>

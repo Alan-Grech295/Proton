@@ -2,6 +2,7 @@
 #define NOMINMAX
 #include <Proton.h>
 #include "imgui\imgui.h"
+#include "Panels\SceneHierarchyPanel.h"
 
 namespace Proton
 {
@@ -18,20 +19,16 @@ namespace Proton
 	private:
 		Entity m_CameraEntity;
 		Entity m_GoblinEntity;
-		Ref<PointLight> light;
+		Entity m_Nanosuit;
+		Entity m_PointLight;
 
 		Ref<Scene> m_ActiveScene;
 
-		CameraComponent& cameraProjection;
+		ImVec2 m_ViewportSize;		
 
-		ImVec2 m_ViewportSize;
-
-		DirectX::XMFLOAT3 m_CameraPos{ 0, 0, -20 };
-		float cameraSpeed = 15.0f;
-		float rotationSpeed = 0.8f;
-
-		bool enableCursor = true;
 		bool cursor = true;
+
+		SceneHierarchyPanel sceneHierarchy;
 
 		struct
 		{

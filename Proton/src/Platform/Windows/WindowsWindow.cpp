@@ -5,10 +5,8 @@
 #include "Proton/Events/ApplicationEvent.h"
 #include "Proton/Events/MouseEvent.h"
 #include "Proton/Events/KeyEvent.h"
-//#include "Proton/Drawable.h"
 #include "examples\imgui_impl_win32.h"
 #include "examples\imgui_impl_dx11.h"
-#include "Proton/PointLight.h"
 #include "Proton\Renderer\RenderCommand.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
 #include "Proton\Debug\ProfileLayer.h"
@@ -172,7 +170,7 @@ namespace Proton
 
 		//Creates the window and gets HWND
 		m_HWnd = CreateWindow(className, className, 
-								 WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU,
+								 WS_SIZEBOX | WS_CAPTION | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU,
 								 CW_USEDEFAULT, CW_USEDEFAULT, wr.right - wr.left, wr.bottom - wr.top,
 								 nullptr, nullptr, hInstance, this);
 
@@ -243,6 +241,16 @@ namespace Proton
 				data.eventCallback(event);
 				Shutdown();
 				return 0;
+			}
+		case WM_SIZE:
+			{
+				if (api && api->Initialized())
+				{
+					uint32_t width = LOWORD(lParam);
+					uint32_t height = HIWORD(lParam);
+					api->Resize(width, height);
+				}
+				break;
 			}
 			//Keyboard messages
 		case WM_SYSKEYDOWN:

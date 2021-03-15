@@ -12,7 +12,6 @@
 #include "Proton\Events/KeyEvent.h"
 
 #include "Proton\Renderer\Camera.h"
-#include "Proton\PointLight.h"
 
 #include "Proton\Core\TimeStep.h"
 

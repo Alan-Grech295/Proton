@@ -21,6 +21,9 @@ namespace Proton
 		void SetRenderTarget(ID3D11RenderTargetView* target) { pTarget = target; pContext->OMSetRenderTargets(1, pTarget.GetAddressOf(), pDSV.Get());}
 
 		void BindSwapChain() override;
+
+		void Resize(uint32_t width, uint32_t height);
+		const bool Initialized() const { return m_Initialized; }
 	private:
 		void Initialize(WindowsWindow& window, HWND hWnd);
 		void ShowFrame();
@@ -33,9 +36,10 @@ namespace Proton
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
 		D3D11_VIEWPORT vp;
 
-		UINT width, height;
+		UINT m_Width, m_Height;
 
 		bool isVSync;
+		bool m_Initialized = false;
 
 		float* clearColor;
 	};

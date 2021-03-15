@@ -1,6 +1,5 @@
 #pragma once
 #include "Proton\Renderer\Buffer.h"
-#include "Proton\PointLight.h"
 #include <wrl.h>
 #include <d3d11.h>
 

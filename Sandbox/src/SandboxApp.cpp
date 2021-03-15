@@ -1,6 +1,5 @@
 #define NOMINMAX
 #include <Proton.h>
-
 #include "imgui\imgui.h"
 
 using namespace Proton;
@@ -17,7 +16,7 @@ public:
 
 		m_ActiveScene = CreateRef<Scene>();
 
-		m_GoblinEntity = Model::CreateModelEntity("C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
+		m_GoblinEntity = Model::CreateModelEntity("C:\\Dev\\Proton\\Proton\\Models\\nanosuit.gltf", m_ActiveScene.get());
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
 
 		m_ActiveScene->framebuffer->SetClearCol(0.02f, 0.07f, 0.2f);

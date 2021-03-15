@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "Proton\Core\Core.h"
 
 namespace Proton
 {

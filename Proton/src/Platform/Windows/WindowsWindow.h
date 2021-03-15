@@ -66,6 +66,6 @@ namespace Proton
 
 		std::vector<BYTE> rawBuffer;
 
-		class DirectXRendererAPI* api;
+		class DirectXRendererAPI* api = nullptr;
 	};
 }

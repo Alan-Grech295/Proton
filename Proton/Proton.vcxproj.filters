@@ -142,9 +142,6 @@
     <ClInclude Include="src\Proton\Model\Model.h">
       <Filter>Proton\Model</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\PointLight.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\Renderer\BindsCollection.h">
       <Filter>Proton\Renderer</Filter>
     </ClInclude>
@@ -188,6 +185,8 @@
       <Filter>Proton\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
+    <ClInclude Include="src\Proton\Scene\ScriptableEntity.h" />
+    <ClInclude Include="src\Proton\Scene\SceneCamera.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -244,9 +243,6 @@
     <ClCompile Include="src\Proton\Model\Model.cpp">
       <Filter>Proton\Model</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\PointLight.cpp">
-      <Filter>Proton</Filter>
-    </ClCompile>
     <ClCompile Include="src\Proton\Renderer\Buffer.cpp">
       <Filter>Proton\Renderer</Filter>
     </ClCompile>
@@ -281,6 +277,7 @@
       <Filter>Proton\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
+    <ClCompile Include="src\Proton\Scene\SceneCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">

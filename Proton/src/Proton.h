@@ -15,6 +15,7 @@
 
 #include "Proton\Scene\Scene.h"
 #include "Proton\Scene\Entity.h"
+#include "Proton\Scene\ScriptableEntity.h"
 #include "Proton\Scene\Components.h"
 
 //---Renderer---------------------
@@ -24,7 +25,5 @@
 #include "Proton\Renderer\Buffer.h"
 #include "Proton\Renderer\Camera.h"
 #include "Proton\Renderer\Shader.h"
-
-#include "Proton\PointLight.h"
 
 #include "Proton\Model\Model.h"
