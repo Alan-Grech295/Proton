@@ -15,6 +15,7 @@ namespace Proton
 
 		void Begin();
 		void End();
-	private:
+
+		void SetDarkThemeColors();
 	};
 }

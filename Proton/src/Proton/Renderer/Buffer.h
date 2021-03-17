@@ -173,5 +173,7 @@ namespace Proton
 		static Ref<PixelConstantBuffer> Create(const std::string& tag, int slot, int size, const void* data);
 
 		static Scope<PixelConstantBuffer> CreateUnique(int slot, int size, const void* data);
+
+		static PixelConstantBuffer* CreateUniquePtr(int slot, int size, const void* data);
 	};
 }

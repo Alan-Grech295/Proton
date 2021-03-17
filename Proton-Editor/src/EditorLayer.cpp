@@ -13,18 +13,15 @@ namespace Proton
 		m_ActiveScene = CreateRef<Scene>();
 		sceneHierarchy.SetScene(m_ActiveScene);
 
-		m_Nanosuit = Model::CreateModelEntity("C:\\Dev\\Proton\\Proton\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
+		m_Nanosuit = Model::CreateModelEntity("C:\\Dev\\Proton\\Proton\\Models\\nanosuit.gltf", m_ActiveScene.get());
 		m_GoblinEntity = Model::CreateModelEntity("C:\\Dev\\Proton\\Proton\\Models\\Goblin\\GoblinX.obj", m_ActiveScene.get());
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
 		m_PointLight = m_ActiveScene->CreateEntity("Point Light");
 
 		m_ActiveScene->framebuffer->SetClearCol(0.02f, 0.07f, 0.2f);
 
-		//DirectX::XMMatrixPerspectiveLH(1.0f, (float)Application::Get().GetWindow().GetHeight() / Application::Get().GetWindow().GetWidth(), 0.5f, 1000.0f)
-
 		m_CameraEntity.AddComponent<CameraComponent>();
-		m_CameraEntity.AddScript<CameraController>();
-		m_PointLight.AddComponent<LightComponent>("Point Light");
+		m_PointLight.AddComponent<LightComponent>();
 	}
 
 	EditorLayer::~EditorLayer()
@@ -35,6 +32,9 @@ namespace Proton
 	void EditorLayer::OnUpdate(TimeStep ts)
 	{
 		PT_PROFILE_FUNCTION();
+
+		if(enableCamUpdate)
+			MoveCamera(ts);
 
 		if (Input::IsKeyReleased(PT_KEY_ESCAPE))
 		{
@@ -116,11 +116,17 @@ namespace Proton
 
 		// DockSpace
 		ImGuiIO& io = ImGui::GetIO();
+		ImGuiStyle& style = ImGui::GetStyle();
+		float minWinSize = style.WindowMinSize.x;
+		style.WindowMinSize.x = 370.0f;
+
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
 			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
+
+		style.WindowMinSize.x = minWinSize;
 
 		//Custom Windows
 		if (ImGui::Begin("Debug Data"))
@@ -134,15 +140,14 @@ namespace Proton
 		ImGui::Begin("Scene");
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
+		enableCamUpdate = ImGui::IsWindowFocused();
+
 		if (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)
 		{
 			m_ActiveScene->framebuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
 			m_ViewportSize = viewportPanelSize;
 
 			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
-
-			CameraComponent& camera = m_CameraEntity.GetComponent< CameraComponent>();
-			camera.camera.SetProjection(DirectX::XMMatrixPerspectiveLH(1.0f, (float)m_ViewportSize.y / m_ViewportSize.x, 0.5f, 1000.0f));
 		}
 
 		ImGui::PopStyleVar();
@@ -182,5 +187,42 @@ namespace Proton
 		{
 			KeyPressedEvent& event = (KeyPressedEvent&)e;
 		}
+	}
+
+	void EditorLayer::MoveCamera(TimeStep ts)
+	{
+		float speed = ts * cameraSpeed;
+
+		//Temp
+		TransformComponent& cameraTransform = m_CameraEntity.GetComponent<TransformComponent>();
+
+		DirectX::XMFLOAT3 localMove = { 0, 0, 0 };
+
+		if (Input::IsKeyPressed(PT_KEY_D))
+			localMove.x += speed;
+
+		if (Input::IsKeyPressed(PT_KEY_A))
+			localMove.x -= speed;
+
+		if (Input::IsKeyPressed(PT_KEY_E))
+			localMove.y += speed;
+
+		if (Input::IsKeyPressed(PT_KEY_Q))
+			localMove.y -= speed;
+
+		if (Input::IsKeyPressed(PT_KEY_W))
+			localMove.z += speed;
+
+		if (Input::IsKeyPressed(PT_KEY_S))
+			localMove.z -= speed;
+
+		cameraTransform.rotation.x += rotationSpeed * Input::GetMouseDeltaY() * std::max<float>(0.001f, ts);
+		cameraTransform.rotation.y += rotationSpeed * Input::GetMouseDeltaX() * std::max<float>(0.001f, ts);
+
+		DirectX::XMStoreFloat3(&localMove, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&localMove), DirectX::XMMatrixRotationRollPitchYaw(cameraTransform.rotation.x, cameraTransform.rotation.y, cameraTransform.rotation.z)));
+
+		cameraTransform.position.x += localMove.x;
+		cameraTransform.position.y += localMove.y;
+		cameraTransform.position.z += localMove.z;
 	}
 }

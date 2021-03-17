@@ -16,6 +16,8 @@ namespace Proton
 		virtual void OnImGuiRender() override;
 		virtual void OnAttach() override;
 		virtual void OnEvent(Event& e) override;
+
+		void MoveCamera(TimeStep ts);
 	private:
 		Entity m_CameraEntity;
 		Entity m_GoblinEntity;
@@ -26,9 +28,12 @@ namespace Proton
 
 		ImVec2 m_ViewportSize;		
 
-		bool cursor = true;
-
 		SceneHierarchyPanel sceneHierarchy;
+
+		float cameraSpeed = 15.0f;
+		float rotationSpeed = 0.8f;
+		bool enableCamUpdate = true;
+		bool cursor = true;
 
 		struct
 		{

@@ -71,6 +71,7 @@ namespace Proton
 	struct ChildNodeComponent
 	{
 		std::vector<Entity> childNodes;
+		Entity parentEntity;
 		int numChildren = 0;
 
 		//TEMP
@@ -78,9 +79,10 @@ namespace Proton
 
 		ChildNodeComponent() = default;
 		ChildNodeComponent(const ChildNodeComponent&) = default;
-		ChildNodeComponent(DirectX::FXMMATRIX& transform, std::vector<Entity> childNodes, int numChildren)
+		ChildNodeComponent(DirectX::FXMMATRIX& transform, Entity parent, std::vector<Entity> childNodes, int numChildren)
 			: 
 			initialTransform(transform),
+			parentEntity(parent),
 			childNodes(childNodes),
 			numChildren(numChildren) {}
 	};
@@ -118,8 +120,9 @@ namespace Proton
 		float attLin;
 		float attQuad;
 
-		Ref<PixelConstantBuffer> cbuf;
+		PixelConstantBuffer* cbuf;
 
+		LightComponent(const LightComponent&) = default;
 		LightComponent()
 		{
 			ambient = { 0.05f, 0.05f, 0.05f };
@@ -128,19 +131,8 @@ namespace Proton
 			attConst = 1.0f;
 			attLin = 0.045f;
 			attQuad = 0.0075f;
-		}
 
-		LightComponent(const LightComponent&) = default;
-		LightComponent(const std::string& name)
-		{
-			ambient = { 0.05f, 0.05f, 0.05f };
-			diffuseColor = { 1.0f, 1.0f, 1.0f };
-			diffuseIntensity = 2.0f;
-			attConst = 1.0f;
-			attLin = 0.045f;
-			attQuad = 0.0075f;
-
-			cbuf = PixelConstantBuffer::Create(name, 0, sizeof(Scene::PointLightData), new Scene::PointLightData());
+			cbuf = PixelConstantBuffer::CreateUniquePtr(0, sizeof(Scene::PointLightData), new Scene::PointLightData());
 		}
 	};
 

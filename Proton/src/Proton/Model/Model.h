@@ -66,7 +66,7 @@ namespace Proton
 	public:
 		static Entity CreateModelEntity(const std::string& path, Scene* activeScene);
 	private:
-		static Entity CreateChild(const aiNode& node, std::vector<Mesh*>& meshPtrs, Scene* activeScene);
+		static Entity CreateChild(const aiNode& node, Entity parent, std::vector<Mesh*>& meshPtrs, Scene* activeScene);
 		static Mesh* ParseMesh(const std::string& basePath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
 	};
 }

@@ -30,6 +30,11 @@ namespace Proton
 		return entity;
 	}
 
+	void Scene::DestroyEntity(Entity entity)
+	{
+		m_Registry.destroy(entity);
+	}
+
 	void Scene::OnUpdate(TimeStep ts)
 	{
 		//Update Scripts
@@ -81,8 +86,8 @@ namespace Proton
 			return;
 
 		DirectX::XMMATRIX cameraView = DirectX::XMMatrixInverse(nullptr,
-			DirectX::XMMatrixRotationRollPitchYaw(cameraTransform->rotation.x, cameraTransform->rotation.y, cameraTransform->rotation.z) *
-			DirectX::XMMatrixTranslation(cameraTransform->position.x, cameraTransform->position.y, cameraTransform->position.z)
+									   DirectX::XMMatrixRotationRollPitchYaw(cameraTransform->rotation.x, cameraTransform->rotation.y, cameraTransform->rotation.z) *
+									   DirectX::XMMatrixTranslation(cameraTransform->position.x, cameraTransform->position.y, cameraTransform->position.z)
 		);
 
 		Renderer::BeginScene();

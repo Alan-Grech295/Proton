@@ -19,6 +19,7 @@ namespace Proton
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawChildNode(Entity entity);
+		void DeleteChildNode(Entity entity);
 		void DrawComponents(Entity entity);
 	private:
 		Ref<Scene> m_Scene;

@@ -146,4 +146,21 @@ namespace Proton
 		assert("Unknown RendererAPI!");
 		return nullptr;
 	}
+
+	PixelConstantBuffer* PixelConstantBuffer::CreateUniquePtr(int slot, int size, const void* data)
+	{
+		PT_PROFILE_FUNCTION();
+
+		switch (Renderer::GetAPI())
+		{
+		case RendererAPI::API::None:
+			assert("RendererAPI::None is currently not supported!");
+			return nullptr;
+		case RendererAPI::API::DirectX:
+			return new DirectXPixelConstantBuffer("", slot, size, data);
+		}
+
+		assert("Unknown RendererAPI!");
+		return nullptr;
+	}
 }

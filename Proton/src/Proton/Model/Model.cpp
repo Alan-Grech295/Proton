@@ -61,7 +61,7 @@ namespace Proton
 
 		for (size_t i = 0; i < node.mNumChildren; i++)
 		{
-			childNodes.push_back(CreateChild(*node.mChildren[i], nodeComponent.meshPtrs, activeScene));
+			childNodes.push_back(CreateChild(*node.mChildren[i], modelEntity, nodeComponent.meshPtrs, activeScene));
 		}
 
 		nodeComponent.childNodes = childNodes;
@@ -71,7 +71,7 @@ namespace Proton
 		return modelEntity;
 	}
 
-	Entity Model::CreateChild(const aiNode& node, std::vector<Mesh*>& meshPtrs, Scene* activeScene)
+	Entity Model::CreateChild(const aiNode& node, Entity parent, std::vector<Mesh*>& meshPtrs, Scene* activeScene)
 	{
 		//Node Creations
 		namespace dx = DirectX;
@@ -80,6 +80,8 @@ namespace Proton
 				reinterpret_cast<const dx::XMFLOAT4X4*>(&node.mTransformation)
 			)
 		);
+
+		Entity childEntity = activeScene->CreateEntity(node.mName.C_Str());
 
 		std::vector<Mesh*> curMeshPtrs;
 		curMeshPtrs.reserve(node.mNumMeshes);
@@ -93,11 +95,10 @@ namespace Proton
 
 		for (size_t i = 0; i < node.mNumChildren; i++)
 		{
-			childNodes.push_back(CreateChild(*node.mChildren[i], meshPtrs, activeScene));
+			childNodes.push_back(CreateChild(*node.mChildren[i], childEntity, meshPtrs, activeScene));
 		}
 
-		Entity childEntity = activeScene->CreateEntity(node.mName.C_Str());
-		ChildNodeComponent& nodeComponent = childEntity.AddComponent<ChildNodeComponent>(transform, childNodes, node.mNumChildren);
+		ChildNodeComponent& nodeComponent = childEntity.AddComponent<ChildNodeComponent>(transform, parent, childNodes, node.mNumChildren);
 		MeshComponent& meshComponent = childEntity.AddComponent<MeshComponent>(curMeshPtrs, curMeshPtrs.size());
 
 		return childEntity;

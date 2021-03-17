@@ -18,9 +18,12 @@ namespace Proton
 		~Scene();
 
 		Entity CreateEntity(const std::string& name = std::string());
+		void DestroyEntity(Entity entity);
 
 		void OnUpdate(TimeStep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
+		uint32_t GetViewportWidth() { return m_ViewportWidth; }
+		uint32_t GetViewportHeight() { return m_ViewportHeight; }
 	private:
 		void DrawChildren(TransformComponent& transform, DirectX::FXMMATRIX& accumulatedTransform, ChildNodeComponent& node, MeshComponent& mesh, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
 	public:
