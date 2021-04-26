@@ -16,7 +16,7 @@ namespace Proton
 		WindowClose, WindowResize, WindowFocus, WindowLostFocus, WindowMoved,
 		AppTick, AppUpdate, AppRender,
 		KeyPressed, KeyReleased,
-		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled, MouseLeft, MouseEntered
+		MouseButtonPressed, MouseButtonReleased, MouseMoved, MouseScrolled, MouseLeft, MouseEntered, FileDragDrop
 	 };
 
 	enum EventCategory

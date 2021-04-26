@@ -20,20 +20,30 @@ namespace Proton
 
 	class Mesh
 	{
-		friend class Model;
+		friend class ModelCreator;
 		friend class Renderer;
+		friend class AssetManager;
 	public:
-		Mesh(const std::string& meshTag)
+		Mesh(const std::string& meshTag, const std::string& name, const std::string& modelPath)
 			:
-			m_Transform(DirectX::XMMatrixIdentity())
+			m_Transform(DirectX::XMMatrixIdentity()),
+			m_Name(name),
+			m_ModelPath(modelPath)
 		{
 			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
 			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Transforms), new Transforms());
 		}
+
+		Mesh() = default;
+
+		Mesh(const Mesh& mesh) = default;
 		
 		void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform, DirectX::FXMMATRIX cameraView, DirectX::FXMMATRIX projectionMatrix) const;
 	private:
 		DirectX::XMMATRIX GetTransformXM() const { return m_Transform; }
+	public:
+		std::string m_ModelPath;
+		std::string m_Name;
 	private:
 		DirectX::XMMATRIX m_Transform;
 
@@ -61,12 +71,56 @@ namespace Proton
 		};
 	};
 
-	class Model
+	struct Node
+	{
+		Node** childNodes;
+		uint32_t numChildren;
+		DirectX::XMMATRIX transformation;
+		Mesh** meshes;
+		uint32_t numMeshes;
+		std::string name;
+
+		Node() = default;
+	};
+
+	struct PrefabNode
+	{
+		PrefabNode** childNodes;
+		uint32_t numChildren;
+		DirectX::XMMATRIX transformation;
+		Mesh** meshes;
+		uint32_t numMeshes;
+		std::string name;
+
+		DirectX::XMFLOAT3 position;
+		DirectX::XMFLOAT3 rotation;
+		DirectX::XMFLOAT3 scale;
+
+		PrefabNode() = default;
+	};
+
+	struct Model
+	{
+		Node* rootNode;
+
+		Model() = default;
+	};
+
+	struct Prefab
+	{
+		PrefabNode* rootNode;
+
+		Prefab() = default;
+	};
+
+	class ModelCreator
 	{
 	public:
 		static Entity CreateModelEntity(const std::string& path, Scene* activeScene);
+		static Entity CreatePrefabEntity(const std::string& path, Scene* activeScene);
+		static Mesh* ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
 	private:
-		static Entity CreateChild(const aiNode& node, Entity parent, std::vector<Mesh*>& meshPtrs, Scene* activeScene);
-		static Mesh* ParseMesh(const std::string& basePath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
+		static Entity CreateChild(const Node& node, Entity parent, Entity root, Scene* activeScene);
+		static Entity CreatePrefabChild(const PrefabNode& node, Entity parent, Entity root, Scene* activeScene);
 	};
 }

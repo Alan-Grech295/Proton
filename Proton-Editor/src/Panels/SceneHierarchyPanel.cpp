@@ -3,6 +3,8 @@
 #include "imgui\imgui_internal.h"
 #include "Proton\Core\Input.h"
 #include "Proton\Core\KeyCodes.h"
+#include "Proton\Scene\AssetManager.h"
+#include "AssetViewerPanel.h"
 
 namespace Proton
 {
@@ -20,7 +22,7 @@ namespace Proton
 	{
 	}
 
-	void SceneHierarchyPanel::SetScene(const Ref<Scene>& scene)
+	void SceneHierarchyPanel::SetScene(const Ref<Scene> scene)
 	{
 		m_Scene = scene;
 	}
@@ -28,9 +30,9 @@ namespace Proton
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");
-		auto& childGroup = m_Scene->m_Registry.group<TransformComponent>(entt::exclude<ChildNodeComponent>);
+		auto& childView = m_Scene->m_Registry.view<RootNodeTag>();
 
-		for (auto entityID : childGroup)
+		for (auto entityID : childView)
 		{
 			Entity entity(entityID, m_Scene.get());
 			DrawEntityNode(entity);
@@ -85,38 +87,166 @@ namespace Proton
 		ImGui::End();
 	}
 
+	static void DragProcedure(Entity entity, int& position)
+	{
+		position = -1;
+
+		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::GetDragDropPayload() && ImGui::GetDragDropPayload()->IsDataType("SceneHierarchyObject"))
+		{
+			Entity payload = *(const Entity*)ImGui::GetDragDropPayload()->Data;
+			if (payload == entity && !ImGui::IsDragDropPayloadBeingAccepted())
+			{
+				entity.SetParent(nullptr);
+			}
+		}
+
+		if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceNoPreviewTooltip | ImGuiDragDropFlags_SourceNoHoldToOpenOthers | ImGuiDragDropFlags_SourceNoDisableHover))
+		{
+			ImGui::SetDragDropPayload("SceneHierarchyObject", &entity, sizeof(Entity));
+			ImGui::EndDragDropSource();
+		}
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			float percent = (ImGui::GetMousePos().y - ImGui::GetItemRectMin().y) / ImGui::GetItemRectSize().y;
+
+			ImGuiDragDropFlags targetFlags = 0;
+			targetFlags |= (percent < 0.25f || percent > 0.75f ? ImGuiDragDropFlags_AcceptNoDrawDefaultRect : 0);
+
+			if (percent < 0.25f)
+				position = 1;
+			else if (percent > 0.75f)
+				position = 0;
+
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("SceneHierarchyObject", targetFlags))
+			{
+				Entity draggedEntity = *(const Entity*)payload->Data;
+
+				NodeComponent targetNode = entity.GetComponent<NodeComponent>();
+
+				if (percent < 0.25f)
+				{
+					position = 1;
+					if (entity.HasComponent<RootNodeTag>())
+					{
+						draggedEntity.SetParent();
+					}
+					else
+					{
+						NodeComponent entityParentNode = targetNode.m_ParentEntity.GetComponent<NodeComponent>();
+						int pos = 0;
+						for (int i = 0; i < entityParentNode.m_ChildNodes.size(); i++)
+						{
+							if (entityParentNode.m_ChildNodes[i] == entity)
+							{
+								pos = i;
+								break;
+							}
+						}
+
+						draggedEntity.SetParent(&targetNode.m_ParentEntity, pos);
+					}
+				}
+				else if (percent > 0.75f)
+				{
+					position = 0;
+					if (entity.HasComponent<RootNodeTag>())
+					{
+						draggedEntity.SetParent(&entity, 0);
+					}
+					else
+					{
+						NodeComponent entityParentNode = targetNode.m_ParentEntity.GetComponent<NodeComponent>();
+						int pos = 0;
+						for (int i = 0; i < entityParentNode.m_ChildNodes.size(); i++)
+						{
+							if (entityParentNode.m_ChildNodes[i] == entity)
+							{
+								pos = i;
+								break;
+							}
+						}
+
+						draggedEntity.SetParent(&targetNode.m_ParentEntity, pos + 1);
+					}
+				}
+				else
+				{
+					draggedEntity.SetParent(&entity);
+				}
+			}
+			ImGui::EndDragDropTarget();
+		}
+	}
+
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
 		auto& tag = entity.GetComponent<TagComponent>().tag;
+		auto& node = entity.GetComponent<NodeComponent>();
+		bool isLeaf = node.m_ChildNodes.size() == 0;
 
-		bool isLeaf = true;
+		ImGuiTreeNodeFlags flags = (m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
+			ImGuiTreeNodeFlags_OpenOnArrow |
+			ImGuiTreeNodeFlags_OpenOnDoubleClick |
+			(isLeaf ? ImGuiTreeNodeFlags_Leaf : 0) |
+			ImGuiTreeNodeFlags_SpanAvailWidth;
 
-		std::vector<Entity>* children = nullptr;
+		ImVec2 cursorPos = ImGui::GetCursorPos();
 
-		if (entity.HasComponent<ParentNodeComponent>())
+		bool opened = ImGui::TreeNodeEx((void*)((uint32_t)(entity) + 1), flags, tag.c_str());
+
+		int position = -1;
+		DragProcedure(entity, position);
+
+		ImVec2 cursorPosNow = ImGui::GetCursorPos();
+
+		if (position == 1)
+			ImGui::SetCursorPos(cursorPos);
+
+		if (position != -1)
 		{
-			auto& node = entity.GetComponent<ParentNodeComponent>();
-			isLeaf = node.numChildren == 0;
+			ImGui::PushStyleColor(ImGuiCol_Separator, { 1, 1, 0, 1 });
+			ImGui::PushItemWidth(ImGui::GetItemRectSize().x);
+
+			ImGui::Separator();
+
+			ImGui::PopItemWidth();
+			ImGui::PopStyleColor();
+			ImGui::SetCursorPos(cursorPosNow);
 		}
 
-		ImGuiTreeNodeFlags flags = (m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) | 
-									ImGuiTreeNodeFlags_OpenOnArrow |
-									ImGuiTreeNodeFlags_OpenOnDoubleClick |
-									(isLeaf ? ImGuiTreeNodeFlags_Leaf : 0) | 
-									ImGuiTreeNodeFlags_SpanAvailWidth;
-
-		bool opened =  ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.c_str());
+		ImGui::SetCursorPos({ ImGui::GetCursorPosX(), ImGui::GetCursorPosY() + 1 });
 
 		if (ImGui::IsItemClicked())
 		{
 			m_Selected = entity;
 		}
 
+		GImGui->CurrentWindow->DC.LastItemId = ((uint32_t)(entity) + 1);
+
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
 		{
 			if (ImGui::MenuItem("Delete Entity"))
 				entityDeleted = true;
+
+			if (entity.HasComponent<RootNodeTag>() && ImGui::MenuItem("Create Prefab"))
+			{
+				std::string tag = entity.GetComponent<TagComponent>().tag;
+
+				uint32_t stringLen = 0;
+
+				for (int i = tag.length() - 1; i >= 0; i--)
+				{
+					if (tag.at(i) != ' ')
+					{
+						stringLen = i;
+						break;
+					}
+				}
+
+				AssetManager::Get().CreatePrefab(entity, AssetViewerPanel::Get().GetSelectedPath().string() + "\\" + tag.substr(0, stringLen));
+			}
 
 			ImGui::EndPopup();
 		}
@@ -128,27 +258,29 @@ namespace Proton
 
 		if (opened)
 		{
-			if (entity.HasComponent<ParentNodeComponent>())
+			for (Entity e : node.m_ChildNodes)
 			{
-				ParentNodeComponent& parentNode = entity.GetComponent<ParentNodeComponent>();
-
-				for (Entity e : parentNode.childNodes)
-				{
-					DrawChildNode(e);
-				}
+				DrawEntityNode(e);
 			}
+
 			ImGui::TreePop();
 		}
 
 		if (entityDeleted)
 		{
-			if (entity.HasComponent<ParentNodeComponent>())
+			for (Entity e : node.m_ChildNodes)
 			{
-				ParentNodeComponent& parentNode = entity.GetComponent<ParentNodeComponent>();
+				DeleteChildNode(e);
+			}
 
-				for (Entity e : parentNode.childNodes)
+			if (!entity.HasComponent<RootNodeTag>())
+			{
+				NodeComponent& parentComponent = node.m_ParentEntity.GetComponent<NodeComponent>();
+
+				for (int i = 0; i < parentComponent.m_ChildNodes.size(); i++)
 				{
-					DeleteChildNode(e);
+					if (parentComponent.m_ChildNodes[i] == entity)
+						parentComponent.m_ChildNodes.erase(parentComponent.m_ChildNodes.begin() + i);
 				}
 			}
 
@@ -163,9 +295,9 @@ namespace Proton
 	{
 		auto& tag = entity.GetComponent<TagComponent>().tag;
 
-		auto& node = entity.GetComponent<ChildNodeComponent>();
+		auto& node = entity.GetComponent<NodeComponent>();
 
-		bool isLeaf = node.numChildren == 0;
+		bool isLeaf = node.m_ChildNodes.size() == 0;
 
 		ImGuiTreeNodeFlags flags = (m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
 									ImGuiTreeNodeFlags_OpenOnArrow |
@@ -173,12 +305,38 @@ namespace Proton
 									(isLeaf ? ImGuiTreeNodeFlags_Leaf : 0) |
 									ImGuiTreeNodeFlags_SpanAvailWidth;
 
+		ImVec2 cursorPos = ImGui::GetCursorPos();
+
 		bool opened = ImGui::TreeNodeEx((void*)(uint32_t)entity, flags, tag.c_str());
+
+		int position = -1;
+		DragProcedure(entity, position);
+
+		ImVec2 cursorPosNow = ImGui::GetCursorPos();
+
+		if(position == 1)
+			ImGui::SetCursorPos(cursorPos);
+
+		if (position != -1)
+		{
+			ImGui::PushStyleColor(ImGuiCol_Separator, { 1, 1, 0, 1 });
+			ImGui::PushItemWidth(ImGui::GetItemRectSize().x);
+
+			ImGui::Separator();
+
+			ImGui::PopItemWidth();
+			ImGui::PopStyleColor();
+			ImGui::SetCursorPos(cursorPosNow);
+		}
+
+		ImGui::SetCursorPos({ ImGui::GetCursorPosX(), ImGui::GetCursorPosY() + 1});
 
 		if (ImGui::IsItemClicked())
 		{
 			m_Selected = entity;
 		}
+
+		GImGui->CurrentWindow->DC.LastItemId = (uint32_t)entity;
 
 		bool entityDeleted = false;
 		if (ImGui::BeginPopupContextItem())
@@ -196,7 +354,7 @@ namespace Proton
 
 		if (opened)
 		{
-			for (Entity& e : node.childNodes)
+			for (Entity& e : node.m_ChildNodes)
 			{
 				DrawChildNode(e);
 			}
@@ -205,42 +363,21 @@ namespace Proton
 
 		if (entityDeleted)
 		{
-			for (Entity& e : node.childNodes)
+			for (Entity& e : node.m_ChildNodes)
 			{
 				DeleteChildNode(e);
 			}
 
 			//TODO: Create better entity destruction
-			if (node.parentEntity.HasComponent<ParentNodeComponent>())
+			if (!entity.HasComponent<RootNodeTag>())
 			{
-				ParentNodeComponent& parentComponent = node.parentEntity.GetComponent<ParentNodeComponent>();
-				std::vector<Entity> children;
-				parentComponent.numChildren--;
-				children.reserve(parentComponent.numChildren);
+				NodeComponent& parentComponent = node.m_ParentEntity.GetComponent<NodeComponent>();
 
-				for (Entity e : parentComponent.childNodes)
+				for (int i = 0; i < parentComponent.m_ChildNodes.size(); i++)
 				{
-					if (e != entity)
-						children.push_back(e);
+					if (parentComponent.m_ChildNodes[i] == entity)
+						parentComponent.m_ChildNodes.erase(parentComponent.m_ChildNodes.begin() + i);
 				}
-
-				parentComponent.childNodes = children;
-			}
-
-			if (node.parentEntity.HasComponent<ChildNodeComponent>())
-			{
-				ChildNodeComponent& parentComponent = node.parentEntity.GetComponent<ChildNodeComponent>();
-				std::vector<Entity> children;
-				parentComponent.numChildren--;
-				children.reserve(parentComponent.numChildren);
-
-				for (Entity e : parentComponent.childNodes)
-				{
-					if (e != entity)
-						children.push_back(e);
-				}
-
-				parentComponent.childNodes = std::move(children);
 			}
 
 			m_Scene->DestroyEntity(entity);
@@ -252,9 +389,9 @@ namespace Proton
 
 	void SceneHierarchyPanel::DeleteChildNode(Entity entity)
 	{
-		auto& node = entity.GetComponent<ChildNodeComponent>();
+		auto& node = entity.GetComponent<NodeComponent>();
 
-		for (Entity& e : node.childNodes)
+		for (Entity& e : node.m_ChildNodes)
 		{
 			DeleteChildNode(e);
 		}
@@ -397,6 +534,11 @@ namespace Proton
 			{
 				tag = std::string(buffer);
 			}
+
+			std::string entityIDText = "Entity ID: " + std::to_string(m_Scene->GetUUIDFromEntity(entity));
+
+			ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(entityIDText.c_str()).x);
+			ImGui::Text(entityIDText.c_str());
 		}
 
 		DrawComponent<TransformComponent>("Transform", entity, [](auto& transform)

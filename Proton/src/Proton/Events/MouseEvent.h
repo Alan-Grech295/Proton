@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Event.h"
+#include <filesystem>
 
 namespace Proton
 {
@@ -99,6 +100,30 @@ namespace Proton
 
 	private:
 		int m_MouseX, m_MouseY, m_WheelDelta;
+	};
+
+	class FileDragDropEvent : public Event
+	{
+	public:
+		FileDragDropEvent(const std::string& filePath)
+			: 
+			m_FilePath(filePath){}
+
+		inline std::filesystem::path GetFilePath() const { return m_FilePath; }
+
+		std::string ToString() const override
+		{
+			std::stringstream ss;
+
+			ss << "FileDragDropEvent: " << m_FilePath.string();
+			return ss.str();
+		}
+
+		EVENT_CLASS_CATEGORY(EventCategoryInput | EventCategoryMouse)
+		EVENT_CLASS_TYPE(FileDragDrop)
+
+	private:
+		std::filesystem::path m_FilePath;
 	};
 
 	class MouseButtonEvent : public Event

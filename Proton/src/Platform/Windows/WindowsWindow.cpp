@@ -202,6 +202,8 @@ namespace Proton
 		{
 			PT_CORE_ERROR("Could not initialized Raw Input Device!");
 		}
+
+		DragAcceptFiles(m_HWnd, TRUE);
 	}
 	
 	void WindowsWindow::Shutdown()
@@ -397,6 +399,29 @@ namespace Proton
 					input->accMouseDeltaX += ri.data.mouse.lLastX;
 					input->accMouseDeltaY += ri.data.mouse.lLastY;
 				}
+			}
+
+		case WM_DROPFILES:
+			{
+				HDROP hDrop = (HDROP)wParam;
+
+				uint32_t numFiles = DragQueryFileA(hDrop, 0xFFFFFFFF, nullptr, 0);
+
+				for (int i = 0; i < numFiles; i++)
+				{
+					LPSTR filePtr = nullptr;
+					UINT fileSize = 0;
+					fileSize = DragQueryFileA(hDrop, i, nullptr, 0) + 1;
+
+					filePtr = new char[fileSize];
+
+					DragQueryFileA(hDrop, i, filePtr, fileSize);
+
+					FileDragDropEvent event(filePtr);
+					data.eventCallback(event);
+				}
+			
+				break;
 			}
 		}
 

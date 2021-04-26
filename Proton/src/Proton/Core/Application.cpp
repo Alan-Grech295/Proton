@@ -117,15 +117,12 @@ namespace Proton
 
 	bool Application::OnWindowClose(WindowCloseEvent& e)
 	{
-		PT_CORE_TRACE("Window Close Event!");
 		m_Running = false;
-		return true;
+		return false;
 	}
 
 	bool Application::OnAppRender(AppRenderEvent& e)
 	{
-		
-		
-		return true;
+		return false;
 	}
 }

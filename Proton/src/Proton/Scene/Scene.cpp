@@ -2,6 +2,7 @@
 #include "Scene.h"
 #include "Components.h"
 #include "Entity.h"
+#include <cassert>
 
 namespace Proton
 {
@@ -21,11 +22,61 @@ namespace Proton
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
+		if (m_UUIDEntity[nextUUID])
+			assert(false && ("Entity already exists!"));
+
 		Entity entity = { m_Registry.create(), this };
+
+		m_EntityUUID[entity] = nextUUID;
+		m_UUIDEntity[nextUUID] = entity;
+
+		nextUUID++;
 
 		entity.AddComponent<TransformComponent>(DirectX::XMFLOAT3{ 0, 0, 0 }, DirectX::XMFLOAT3{ 0, 0, 0 });
 		auto& tag = entity.AddComponent<TagComponent>();
 		tag.tag = name.empty() ? "Entity" : name;
+
+		NodeComponent& nodeComponent = entity.AddComponent<NodeComponent>();
+		entity.AddComponent<RootNodeTag>();
+
+		nodeComponent.m_ParentEntity = Entity::Null;
+		nodeComponent.m_RootEntity = entity;
+
+		return entity;
+	}
+
+	Entity Scene::GetEntityFromUUID(uint64_t uuid)
+	{
+		return Entity{ (entt::entity)m_UUIDEntity[uuid], this };
+	}
+
+	uint64_t Scene::GetUUIDFromEntity(Entity entity)
+	{
+		return m_EntityUUID[entity];
+	}
+
+	Entity Scene::CreateEntityWithUUID(const uint64_t uuid, const std::string& name)
+	{
+		if (m_UUIDEntity[uuid])
+			assert(false && ("Entity already exists!"));
+
+		Entity entity = { m_Registry.create(), this };
+
+		m_EntityUUID[entity] = uuid;
+		m_UUIDEntity[uuid] = entity;
+
+		if (nextUUID <= uuid)
+			nextUUID = uuid + 1;
+
+		entity.AddComponent<TransformComponent>(DirectX::XMFLOAT3{ 0, 0, 0 }, DirectX::XMFLOAT3{ 0, 0, 0 });
+		auto& tag = entity.AddComponent<TagComponent>();
+		tag.tag = name.empty() ? "Entity" : name;
+
+		NodeComponent& nodeComponent = entity.AddComponent<NodeComponent>();
+		entity.AddComponent<RootNodeTag>();
+
+		nodeComponent.m_ParentEntity = Entity::Null;
+		nodeComponent.m_RootEntity = entity;
 
 		return entity;
 	}
@@ -96,7 +147,7 @@ namespace Proton
 
 		//Calculate Light Data (TEMP)
 		PointLightData lightData = {};
-
+		
 		if (lightComponent != nullptr)
 		{
 			DirectX::XMStoreFloat3(&lightData.pos, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&lightTransform->position), cameraView));
@@ -112,26 +163,27 @@ namespace Proton
 
 		//End Light Data
 
-		auto renderGroup = m_Registry.group<ParentNodeComponent, MeshComponent>();
-		for (auto entity : renderGroup)
+		auto renderView = m_Registry.view<RootNodeTag>();
+		for (auto entity : renderView)
 		{
-			auto [node, mesh] = renderGroup.get<ParentNodeComponent, MeshComponent>(entity);
-			TransformComponent& transform = m_Registry.get<TransformComponent>(entity);
+			auto& [node, transform] = m_Registry.get<NodeComponent, TransformComponent>(entity);
 
 			DirectX::XMMATRIX transformMat = transform.GetTransformMatrix() *
-											 node.initialTransform;
+											 node.m_Origin;
 
-			for (int i = 0; i < mesh.m_NumMeshes; i++)
+			if (m_Registry.has<MeshComponent>(entity))
 			{
-				mesh.m_MeshPtrs[i]->Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transformMat, cameraView, cameraComponent->camera.GetProjection());
+				auto& mesh = m_Registry.get<MeshComponent>(entity);
+
+				for (int i = 0; i < mesh.m_NumMeshes; i++)
+				{
+					mesh.m_MeshPtrs[i]->Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transformMat, cameraView, cameraComponent->camera.GetProjection());
+				}
 			}
 
-			for (int i = 0; i < node.numChildren; i++)
+			for (int i = 0; i < node.m_ChildNodes.size(); i++)
 			{
-				//TODO: Change registry to group
-				auto [childTransform, childNode, childMesh] = m_Registry.get<TransformComponent, ChildNodeComponent, MeshComponent>(node.childNodes[i]);
-
-				DrawChildren(childTransform, transformMat, childNode, childMesh, cameraView, cameraComponent->camera.GetProjection());
+				DrawChildren(node.m_ChildNodes[i], transformMat, cameraView, cameraComponent->camera.GetProjection());
 			}
 		}
 	}
@@ -153,23 +205,27 @@ namespace Proton
 		}
 	}
 
-	void Scene::DrawChildren(TransformComponent& transform, DirectX::FXMMATRIX& accumulatedTransform, ChildNodeComponent& node, MeshComponent& mesh, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection)
+	void Scene::DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection)
 	{
+		auto [transform, node] = m_Registry.get<TransformComponent, NodeComponent>(entity);
+
 		DirectX::XMMATRIX transformMat = transform.GetTransformMatrix() * 
-										 node.initialTransform * 
+										 node.m_Origin * 
 										 accumulatedTransform;
 		
-		for (int i = 0; i < mesh.m_NumMeshes; i++)
+		if (entity.HasComponent<MeshComponent>())
 		{
-			mesh.m_MeshPtrs[i]->Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transformMat, cameraView, cameraProjection);
+			MeshComponent& mesh = entity.GetComponent<MeshComponent>();
+
+			for (int i = 0; i < mesh.m_NumMeshes; i++)
+			{
+				mesh.m_MeshPtrs[i]->Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transformMat, cameraView, cameraProjection);
+			}
 		}
 
-		for (int i = 0; i < node.numChildren; i++)
+		for (int i = 0; i < node.m_ChildNodes.size(); i++)
 		{
-			//TODO: Change registry to group
-			auto [childTransform, childNode, childMesh] = m_Registry.get<TransformComponent, ChildNodeComponent, MeshComponent>(node.childNodes[i]);
-			
-			DrawChildren(childTransform, transformMat, childNode, childMesh, cameraView, cameraProjection);
+			DrawChildren(node.m_ChildNodes[i], transformMat, cameraView, cameraProjection);
 		}
 	}
 }

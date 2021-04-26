@@ -20,6 +20,8 @@ namespace Proton
 		virtual void Load(std::string path) = 0;
 		virtual Color GetPixel(int x, int y) const = 0;
 
+		virtual void* GetTexturePointer() const = 0;
+
 		virtual bool HasAlpha() const = 0;
 
 		virtual std::string GetUID() const noexcept = 0;

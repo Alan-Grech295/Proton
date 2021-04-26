@@ -175,6 +175,12 @@
     <ClInclude Include="src\Proton\Renderer\Texture.h">
       <Filter>Proton\Renderer</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Scene\AssetLoader.h">
+      <Filter>Proton\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Scene\AssetManager.h">
+      <Filter>Proton\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="src\Proton\Scene\Components.h">
       <Filter>Proton\Scene</Filter>
     </ClInclude>
@@ -184,9 +190,17 @@
     <ClInclude Include="src\Proton\Scene\Scene.h">
       <Filter>Proton\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Scene\SceneCamera.h">
+      <Filter>Proton\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Scene\SceneSerializer.h">
+      <Filter>Proton\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Scene\ScriptableEntity.h">
+      <Filter>Proton\Scene</Filter>
+    </ClInclude>
     <ClInclude Include="src\ptpch.h" />
-    <ClInclude Include="src\Proton\Scene\ScriptableEntity.h" />
-    <ClInclude Include="src\Proton\Scene\SceneCamera.h" />
+    <ClInclude Include="src\Proton\Scene\ModelCollection.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -270,14 +284,25 @@
     <ClCompile Include="src\Proton\Renderer\Texture.cpp">
       <Filter>Proton\Renderer</Filter>
     </ClCompile>
+    <ClCompile Include="src\Proton\Scene\AssetLoader.cpp">
+      <Filter>Proton\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Scene\AssetManager.cpp">
+      <Filter>Proton\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="src\Proton\Scene\Entity.cpp">
       <Filter>Proton\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Scene\Scene.cpp">
       <Filter>Proton\Scene</Filter>
     </ClCompile>
+    <ClCompile Include="src\Proton\Scene\SceneCamera.cpp">
+      <Filter>Proton\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Scene\SceneSerializer.cpp">
+      <Filter>Proton\Scene</Filter>
+    </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
-    <ClCompile Include="src\Proton\Scene\SceneCamera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">

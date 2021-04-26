@@ -2,7 +2,6 @@
 #include <DirectXMath.h>
 #include "Proton\Renderer\Camera.h"
 #include "Proton\Model\Model.h"
-#include "Proton\Model\Model.h"
 #include "ScriptableEntity.h"
 #include "Proton\Scene\SceneCamera.h"
 #include "Scene.h"
@@ -11,8 +10,6 @@
 namespace Proton
 {
 	class Entity;
-	class Mesh;
-
 	struct TransformComponent
 	{
 		DirectX::XMFLOAT3 position = { 0, 0, 0 };
@@ -57,58 +54,51 @@ namespace Proton
 	struct MeshComponent
 	{
 		std::vector<Mesh*> m_MeshPtrs;
-		int m_NumMeshes = 0;
+		uint32_t m_NumMeshes = 0;
 
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent& other) = default;
 
-		MeshComponent(std::vector<Mesh*> meshPtrs, int numMeshes)
+		MeshComponent(std::vector<Mesh*> meshPtrs, uint32_t numMeshes)
 			:
 			m_MeshPtrs(meshPtrs),
 			m_NumMeshes(numMeshes){}
 	};
 
-	struct ChildNodeComponent
+	struct NodeComponent
 	{
-		std::vector<Entity> childNodes;
-		Entity parentEntity;
-		int numChildren = 0;
+		std::vector<Entity> m_ChildNodes;
+		Entity m_ParentEntity;
+		Entity m_RootEntity;
+		std::string m_NodeName;
+		std::string m_PrefabName;
 
-		//TEMP
-		DirectX::XMMATRIX initialTransform;
+		DirectX::XMMATRIX m_Origin;
 
-		ChildNodeComponent() = default;
-		ChildNodeComponent(const ChildNodeComponent&) = default;
-		ChildNodeComponent(DirectX::FXMMATRIX& transform, Entity parent, std::vector<Entity> childNodes, int numChildren)
-			: 
-			initialTransform(transform),
-			parentEntity(parent),
-			childNodes(childNodes),
-			numChildren(numChildren) {}
+		NodeComponent()
+			:
+			m_ParentEntity(Entity::Null),
+			m_RootEntity(Entity::Null),
+			m_NodeName(""),
+			m_PrefabName("")
+		{};
+		NodeComponent(const NodeComponent&) = default;
+		NodeComponent(const std::string& nodeName, const std::string& prefabName, Entity parentEntity, Entity rootEntity, DirectX::FXMMATRIX& origin)
+			:
+			m_NodeName(nodeName),
+			m_PrefabName(prefabName),
+			m_ParentEntity(parentEntity),
+			m_RootEntity(rootEntity),
+			m_Origin(origin)
+		{}
 	};
 
-	struct ParentNodeComponent
+	struct RootNodeTag 
 	{
-		std::vector<Entity> childNodes;
-		std::vector<Mesh*> meshPtrs;
-		int numChildren = 0;
-
-		//TEMP
-		DirectX::XMMATRIX initialTransform;
-
-		ParentNodeComponent()
-			:
-			childNodes(std::vector<Entity>()),
-			numChildren(0)
-		{
-		}
-
-		ParentNodeComponent(const ParentNodeComponent&) = default;
-		ParentNodeComponent(DirectX::FXMMATRIX& transform, std::vector<Entity> childNodes, int numChildren)
-			:
-			initialTransform(transform),
-			childNodes(childNodes),
-			numChildren(numChildren) {}
+		RootNodeTag() = default;
+		RootNodeTag(const RootNodeTag&) = default;
+	private:
+		bool placeholder;
 	};
 
 	struct LightComponent

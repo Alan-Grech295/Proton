@@ -13,98 +13,156 @@
 #include "Proton\Scene\Entity.h"
 #include "Proton\Scene\Components.h"
 
+#include "Proton\Scene\AssetManager.h"
+#include "Proton\Scene\ModelCollection.h"
+
 namespace Proton
 {
-	Entity Model::CreateModelEntity(const std::string & path, Scene* activeScene)
+	Entity ModelCreator::CreateModelEntity(const std::string& path, Scene* activeScene)
 	{
 		namespace dx = DirectX;
 
-		Assimp::Importer imp;
-		const auto pScene = imp.ReadFile(path.c_str(),
-			aiProcess_Triangulate |
-			aiProcess_JoinIdenticalVertices |
-			aiProcess_ConvertToLeftHanded |
-			aiProcess_GenNormals |
-			aiProcess_CalcTangentSpace);
+		Ref<Model> model = AssetManager::Get().GetModel(path);
 
-		aiNode& node = *pScene->mRootNode;
+		Node* node = model->rootNode;
 
-		Entity modelEntity = activeScene->CreateEntity(node.mName.C_Str());
-		ParentNodeComponent& nodeComponent = modelEntity.AddComponent<ParentNodeComponent>();
+		Entity modelEntity = activeScene->CreateEntity(node->name);
+		NodeComponent& nodeComponent = modelEntity.GetComponent<NodeComponent>();
+		nodeComponent.m_PrefabName = "";
 
 		std::string basePath = std::filesystem::path(path).remove_filename().string();
 
-		nodeComponent.meshPtrs.reserve(pScene->mNumMeshes);
-
-		for (size_t i = 0; i < pScene->mNumMeshes; i++)
-		{
-			nodeComponent.meshPtrs.push_back(ParseMesh(basePath, *pScene->mMeshes[i], pScene->mMaterials));
-		}
-
 		//Parent Node Creation
-		nodeComponent.initialTransform = dx::XMMatrixTranspose(
-			dx::XMLoadFloat4x4(
-				reinterpret_cast<const dx::XMFLOAT4X4*>(&node.mTransformation)
-			)
-		);
+		nodeComponent.m_NodeName = node->name;
+		nodeComponent.m_Origin = node->transformation;
 
 		std::vector<Mesh*> curMeshPtrs;
-		curMeshPtrs.reserve(node.mNumMeshes);
+		curMeshPtrs.reserve(node->numMeshes);
 		
-		for (size_t i = 0; i < node.mNumMeshes; i++)
+		for (size_t i = 0; i < node->numMeshes; i++)
 		{
-			const auto meshIdx = node.mMeshes[i];
-			curMeshPtrs.push_back(nodeComponent.meshPtrs.at(meshIdx));
+			curMeshPtrs.push_back(node->meshes[i]);
 		}
 
-		std::vector<Entity> childNodes;
-
-		for (size_t i = 0; i < node.mNumChildren; i++)
+		for (size_t i = 0; i < node->numChildren; i++)
 		{
-			childNodes.push_back(CreateChild(*node.mChildren[i], modelEntity, nodeComponent.meshPtrs, activeScene));
+			CreateChild(*node->childNodes[i], modelEntity, modelEntity, activeScene).SetParent(&modelEntity);
 		}
 
-		nodeComponent.childNodes = childNodes;
-		nodeComponent.numChildren = childNodes.size();
 		MeshComponent& meshComponent = modelEntity.AddComponent<MeshComponent>(curMeshPtrs, curMeshPtrs.size());
 
 		return modelEntity;
 	}
 
-	Entity Model::CreateChild(const aiNode& node, Entity parent, std::vector<Mesh*>& meshPtrs, Scene* activeScene)
+	Entity ModelCreator::CreatePrefabEntity(const std::string& path, Scene* activeScene)
+	{
+		namespace dx = DirectX;
+
+		Ref<Prefab> prefab = AssetManager::Get().GetPrefab(path);
+
+		Entity modelEntity = activeScene->CreateEntity(prefab->rootNode->name);
+		TransformComponent& transformComponent = modelEntity.GetComponent<TransformComponent>();
+		NodeComponent& nodeComponent = modelEntity.GetComponent<NodeComponent>();
+		nodeComponent.m_PrefabName = path;
+
+		std::string basePath = std::filesystem::path(path).remove_filename().string();
+
+		PrefabNode* node = prefab->rootNode;
+
+		//Parent Node Creation
+		nodeComponent.m_NodeName = node->name;
+		nodeComponent.m_Origin = node->transformation;
+		transformComponent.position = node->position;
+		transformComponent.rotation = node->rotation;
+		transformComponent.scale = node->scale;
+
+		std::vector<Mesh*> curMeshPtrs;
+		curMeshPtrs.reserve(node->numMeshes);
+
+		for (size_t i = 0; i < node->numMeshes; i++)
+		{
+			curMeshPtrs.push_back(node->meshes[i]);
+		}
+
+		for (size_t i = 0; i < node->numChildren; i++)
+		{
+			CreatePrefabChild(*node->childNodes[i], modelEntity, modelEntity, activeScene).SetParent(&modelEntity);
+		}
+
+		MeshComponent& meshComponent = modelEntity.AddComponent<MeshComponent>(curMeshPtrs, curMeshPtrs.size());
+
+		return modelEntity;
+	}
+
+	Entity ModelCreator::CreateChild(const Node& node, Entity parent, Entity root, Scene* activeScene)
 	{
 		//Node Creations
 		namespace dx = DirectX;
-		const auto transform = dx::XMMatrixTranspose(
-			dx::XMLoadFloat4x4(
-				reinterpret_cast<const dx::XMFLOAT4X4*>(&node.mTransformation)
-			)
-		);
+		const auto transform = node.transformation;
 
-		Entity childEntity = activeScene->CreateEntity(node.mName.C_Str());
+		Entity childEntity = activeScene->CreateEntity(node.name);
 
 		std::vector<Mesh*> curMeshPtrs;
-		curMeshPtrs.reserve(node.mNumMeshes);
-		for (size_t i = 0; i < node.mNumMeshes; i++)
+		curMeshPtrs.reserve(node.numMeshes);
+		for (size_t i = 0; i < node.numMeshes; i++)
 		{
-			const auto meshIdx = node.mMeshes[i];
-			curMeshPtrs.push_back(meshPtrs.at(meshIdx));
+			curMeshPtrs.push_back(node.meshes[i]);
 		}
 
-		std::vector<Entity> childNodes;
+		NodeComponent& nodeComponent = childEntity.GetComponent<NodeComponent>();
+		nodeComponent.m_NodeName = node.name;
+		nodeComponent.m_Origin = transform;
+		nodeComponent.m_ParentEntity = parent;
+		nodeComponent.m_RootEntity = root;
+		nodeComponent.m_PrefabName = "";
 
-		for (size_t i = 0; i < node.mNumChildren; i++)
+		for (size_t i = 0; i < node.numChildren; i++)
 		{
-			childNodes.push_back(CreateChild(*node.mChildren[i], childEntity, meshPtrs, activeScene));
+			CreateChild(*node.childNodes[i], childEntity, root, activeScene).SetParent(&childEntity);
 		}
 
-		ChildNodeComponent& nodeComponent = childEntity.AddComponent<ChildNodeComponent>(transform, parent, childNodes, node.mNumChildren);
 		MeshComponent& meshComponent = childEntity.AddComponent<MeshComponent>(curMeshPtrs, curMeshPtrs.size());
 
 		return childEntity;
 	}
 
-	Mesh* Model::ParseMesh(const std::string& basePath, const aiMesh& mesh, const aiMaterial* const* pMaterials)
+	Entity ModelCreator::CreatePrefabChild(const PrefabNode& node, Entity parent, Entity root, Scene* activeScene)
+	{
+		//Node Creations
+		namespace dx = DirectX;
+		const auto transform = node.transformation;
+
+		Entity childEntity = activeScene->CreateEntity(node.name);
+		TransformComponent& transformComponent = childEntity.GetComponent<TransformComponent>();
+		transformComponent.position = node.position;
+		transformComponent.rotation = node.rotation;
+		transformComponent.scale = node.scale;
+
+		std::vector<Mesh*> curMeshPtrs;
+		curMeshPtrs.reserve(node.numMeshes);
+		for (size_t i = 0; i < node.numMeshes; i++)
+		{
+			curMeshPtrs.push_back(node.meshes[i]);
+		}
+
+		NodeComponent& nodeComponent = childEntity.GetComponent<NodeComponent>();
+		nodeComponent.m_NodeName = node.name;
+		nodeComponent.m_Origin = transform;
+		nodeComponent.m_ParentEntity = parent;
+		nodeComponent.m_RootEntity = root;
+		nodeComponent.m_PrefabName = "";
+
+		for (size_t i = 0; i < node.numChildren; i++)
+		{
+			CreatePrefabChild(*node.childNodes[i], childEntity, root, activeScene).SetParent(&childEntity);
+		}
+
+		MeshComponent& meshComponent = childEntity.AddComponent<MeshComponent>(curMeshPtrs, curMeshPtrs.size());
+
+		return childEntity;
+	}
+
+	Mesh* ModelCreator::ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiMaterial* const* pMaterials)
 	{
 		PT_PROFILE_FUNCTION();
 
@@ -152,9 +210,11 @@ namespace Proton
 		
 		using namespace std::string_literals;
 
-		auto meshTag = basePath + "%" + mesh.mName.C_Str();
+		auto meshTag = modelPath + "%" + mesh.mName.C_Str();
 
-		Mesh* pMesh = new Mesh(meshTag);
+		Mesh* pMesh = new Mesh(meshTag, mesh.mName.C_Str(), modelPath);
+
+		ModelCollection::AddMesh(meshTag, pMesh);
 
 		float shininess = 40.0f;
 		bool hasAlphaGloss = false;
@@ -172,7 +232,7 @@ namespace Proton
 				pMesh->hasDiffuseMap = true;
 				PT_CORE_TRACE(texFileName.C_Str());
 
-				pMesh->m_Diffuse = Texture2D::Create(basePath + texFileName.C_Str());		
+				pMesh->m_Diffuse = Texture2D::Create(basePath + texFileName.C_Str());
 			}
 			else
 			{

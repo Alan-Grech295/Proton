@@ -3,6 +3,8 @@
 #include <Proton.h>
 #include "imgui\imgui.h"
 #include "Panels\SceneHierarchyPanel.h"
+#include "Panels\AssetViewerPanel.h"
+#include <Proton\Scene\AssetManager.h>
 
 namespace Proton
 {
@@ -29,6 +31,7 @@ namespace Proton
 		ImVec2 m_ViewportSize;		
 
 		SceneHierarchyPanel sceneHierarchy;
+		AssetViewerPanel assetViewer{"C:\\Dev\\Proton\\Proton-Editor"};
 
 		float cameraSpeed = 15.0f;
 		float rotationSpeed = 0.8f;

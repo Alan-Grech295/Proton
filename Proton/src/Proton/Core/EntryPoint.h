@@ -41,7 +41,6 @@ int CALLBACK WinMain(
 	PT_PROFILE_END_SESSION();
 
 	PT_PROFILE_BEGIN_SESSION("Shutdown", "ProtonProfile-Shutdown.json");
-	PT_CORE_TRACE("Close");
 	delete app;
 	PT_PROFILE_END_SESSION();
 

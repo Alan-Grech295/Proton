@@ -18,9 +18,10 @@ IncludeDir["Assimp"] = "%{wks.location}/Proton/vendor/Assimp/include"
 IncludeDir["entt"] = "%{wks.location}/Proton/vendor/EnTT/include"
 IncludeDir["DirectXTK"] = "%{wks.location}/Proton/vendor/DirectXTK/include"
 IncludeDir["DirectXTex"] = 	"%{wks.location}/Proton/vendor/DirectXTex/include"
+IncludeDir["yaml_cpp"] = 	"%{wks.location}/Proton/vendor/yaml-cpp/include"
 
 include "Proton/vendor/imgui"
---include "Proton/vendor/Assimp"
+include "Proton/vendor/yaml-cpp"
 
 project "Proton"
 	location "Proton"
@@ -50,13 +51,14 @@ project "Proton"
 		"%{IncludeDir.DirectXTex}",
 		"%{IncludeDir.ImGui}",
 		"%{IncludeDir.Assimp}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.yaml_cpp}"
 	}
 
 	links
 	{
-		"ImGui"
-		--"assimp"
+		"ImGui",
+		"yaml-cpp"
 	}
 
 	filter "system:windows"
@@ -179,6 +181,7 @@ project "Proton-Editor"
 		"%{wks.location}/Proton/vendor/spdlog/include",
 		"%{wks.location}/Proton/src",
 		"%{wks.location}/Proton/vendor",
+		"%{IncludeDir.DirectXTex}",
 		"%{IncludeDir.entt}"
 	}
 
