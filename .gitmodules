@@ -1,3 +1,6 @@
 [submodule "Proton/vendor/spdlog"]
 	path = Proton/vendor/spdlog
 	url = https://github.com/gabime/spdlog
+[submodule "Proton/vendor/yaml-cpp"]
+	path = Proton/vendor/yaml-cpp
+	url = https://github.com/thecherno/yaml-cpp
