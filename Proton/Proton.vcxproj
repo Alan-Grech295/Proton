@@ -171,19 +171,19 @@
     <ClInclude Include="src\Proton\Events\KeyEvent.h" />
     <ClInclude Include="src\Proton\Events\MouseEvent.h" />
     <ClInclude Include="src\Proton\ImGui\ImGuiLayer.h" />
-    <ClInclude Include="src\Proton\IndexedTriangleList.h" />
     <ClInclude Include="src\Proton\Model\Model.h" />
-    <ClInclude Include="src\Proton\Renderer\BindsCollection.h" />
-    <ClInclude Include="src\Proton\Renderer\Buffer.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Bindable.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\BindsCollection.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Buffer.h" />
     <ClInclude Include="src\Proton\Renderer\Camera.h" />
     <ClInclude Include="src\Proton\Renderer\Framebuffer.h" />
-    <ClInclude Include="src\Proton\Renderer\Old\Camera.h" />
     <ClInclude Include="src\Proton\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Proton\Renderer\Renderer.h" />
     <ClInclude Include="src\Proton\Renderer\RendererAPI.h" />
-    <ClInclude Include="src\Proton\Renderer\Sampler.h" />
-    <ClInclude Include="src\Proton\Renderer\Shader.h" />
-    <ClInclude Include="src\Proton\Renderer\Texture.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Sampler.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Shader.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Texture.h" />
+    <ClInclude Include="src\Proton\Renderer\SceneRenderer.h" />
     <ClInclude Include="src\Proton\Scene\AssetLoader.h" />
     <ClInclude Include="src\Proton\Scene\AssetManager.h" />
     <ClInclude Include="src\Proton\Scene\Components.h" />
@@ -193,6 +193,8 @@
     <ClInclude Include="src\Proton\Scene\SceneCamera.h" />
     <ClInclude Include="src\Proton\Scene\SceneSerializer.h" />
     <ClInclude Include="src\Proton\Scene\ScriptableEntity.h" />
+    <ClInclude Include="src\Proton\Shader Translator\ShaderParser.h" />
+    <ClInclude Include="src\Proton\Utils\PlatformUtils.h" />
     <ClInclude Include="src\ptpch.h" />
   </ItemGroup>
   <ItemGroup>
@@ -205,6 +207,7 @@
     <ClCompile Include="src\Platform\DirectX 11\imgui_impl_dx11.cpp" />
     <ClCompile Include="src\Platform\DirectX 11\imgui_impl_win32.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
     <ClCompile Include="src\Proton\Core\Application.cpp" />
     <ClCompile Include="src\Proton\Core\Layer.cpp" />
@@ -214,50 +217,45 @@
     <ClCompile Include="src\Proton\ImGui\ImGuiBuild.cpp" />
     <ClCompile Include="src\Proton\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Proton\Model\Model.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Buffer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Buffer.cpp" />
     <ClCompile Include="src\Proton\Renderer\Framebuffer.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Old\Camera.cpp" />
     <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Proton\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Sampler.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Shader.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Texture.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Sampler.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Shader.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Texture.cpp" />
+    <ClCompile Include="src\Proton\Renderer\SceneRenderer.cpp" />
     <ClCompile Include="src\Proton\Scene\AssetLoader.cpp" />
     <ClCompile Include="src\Proton\Scene\AssetManager.cpp" />
     <ClCompile Include="src\Proton\Scene\Entity.cpp" />
     <ClCompile Include="src\Proton\Scene\Scene.cpp" />
     <ClCompile Include="src\Proton\Scene\SceneCamera.cpp" />
     <ClCompile Include="src\Proton\Scene\SceneSerializer.cpp" />
+    <ClCompile Include="src\Proton\Shader Translator\ShaderParser.cpp" />
     <ClCompile Include="src\ptpch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">
-      <ShaderType>Pixel</ShaderType>
-      <ShaderModel>5.0</ShaderModel>
+    <FxCompile Include="src\Proton\Shader\DebugPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\ColorBlendVS.hlsl">
-      <ShaderType>Vertex</ShaderType>
-      <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\ColorIndexPS.hlsl">
-      <ShaderType>Pixel</ShaderType>
-      <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\ColorIndexVS.hlsl">
-      <ShaderType>Vertex</ShaderType>
-      <ShaderModel>5.0</ShaderModel>
+    <FxCompile Include="src\Proton\Shader\DebugVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">5.0</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
@@ -330,34 +328,6 @@
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongVS.hlsl">
-      <ShaderType>Vertex</ShaderType>
-      <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\SolidPS.hlsl">
-      <ShaderType>Pixel</ShaderType>
-      <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\SolidVS.hlsl">
-      <ShaderType>Vertex</ShaderType>
-      <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\TexturePS.hlsl">
-      <ShaderType>Pixel</ShaderType>
-      <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\TextureVS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
       <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>

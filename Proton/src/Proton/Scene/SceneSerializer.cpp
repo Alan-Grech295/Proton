@@ -270,6 +270,14 @@ namespace Proton
 		YAML::Emitter out;
 		out << YAML::BeginMap;
 		out << YAML::Key << "Scene" << YAML::Value << "Untitled";
+
+		out << YAML::Key << "Editor Camera";
+
+		out << YAML::BeginMap;
+		out << YAML::Key << "Position" << YAML::Value << m_Scene->m_EditorCamPosition;
+		out << YAML::Key << "Rotation" << YAML::Value << m_Scene->m_EditorCamRotation;
+		out << YAML::EndMap;
+
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
 		auto& view = m_Scene->m_Registry.view<RootNodeTag>();
@@ -309,6 +317,8 @@ namespace Proton
 
 	bool SceneSerializer::Deserialize(const std::string& filepath)
 	{
+		m_Scene->ClearEntities();
+
 		std::ifstream stream(filepath);
 		std::stringstream strStream;
 		strStream << stream.rdbuf();
@@ -319,6 +329,13 @@ namespace Proton
 
 		std::string sceneName = data["Scene"].as<std::string>();
 		PT_CORE_TRACE("Deserializing scene {0}", sceneName);
+
+		auto editorCam = data["Editor Camera"];
+		if (editorCam)
+		{
+			m_Scene->m_EditorCamPosition = editorCam["Position"].as<DirectX::XMFLOAT3>();
+			m_Scene->m_EditorCamRotation = editorCam["Rotation"].as<DirectX::XMFLOAT3>();
+		}
 
 		auto entities = data["Entities"];
 		if (entities)

@@ -10,12 +10,10 @@ namespace Proton
 {
 	SceneHierarchyPanel::SceneHierarchyPanel()
 	{
-
 	}
 
 	SceneHierarchyPanel::SceneHierarchyPanel(const Ref<Scene>& scene)
 	{
-
 	}
 
 	SceneHierarchyPanel::~SceneHierarchyPanel()
@@ -24,28 +22,37 @@ namespace Proton
 
 	void SceneHierarchyPanel::SetScene(const Ref<Scene> scene)
 	{
-		m_Scene = scene;
+		Get().m_Scene = scene;
+		Get().m_Selected = {};
 	}
 
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");
-		auto& childView = m_Scene->m_Registry.view<RootNodeTag>();
+		if (!Get().m_Scene)
+		{
+			ImGui::End();
+			ImGui::Begin("Inspector");
+			ImGui::End();
+			return;
+		}
+
+		auto& childView = Get().m_Scene->m_Registry.view<RootNodeTag>();
 
 		for (auto entityID : childView)
 		{
-			Entity entity(entityID, m_Scene.get());
-			DrawEntityNode(entity);
+			Entity entity(entityID, Get().m_Scene.get());
+			Get().DrawEntityNode(entity);
 		}
 
 		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-			m_Selected = {};
+			Get().m_Selected = {};
 
 		//Right-Click on blank space
 		if (ImGui::BeginPopupContextWindow(0, 1, false))
 		{
 			if (ImGui::MenuItem("Create Empty Entity"))
-				m_Scene->CreateEntity("New Entity");
+				Get().m_Scene->CreateEntity("New Entity");
 
 			ImGui::EndPopup();
 		}
@@ -54,9 +61,9 @@ namespace Proton
 
 		ImGui::Begin("Inspector");
 
-		if (m_Selected)
+		if (Get().m_Selected)
 		{
-			DrawComponents(m_Selected);
+			Get().DrawComponents(Get().m_Selected);
 
 			ImGui::Separator();
 			ImGui::Text("");
@@ -69,14 +76,14 @@ namespace Proton
 			{
 				if (ImGui::MenuItem("Camera"))
 				{
-					CameraComponent& camera = m_Selected.AddComponent<CameraComponent>();
-					camera.camera.SetViewportSize(m_Scene->GetViewportWidth(), m_Scene->GetViewportHeight());
+					CameraComponent& camera = Get().m_Selected.AddComponent<CameraComponent>();
+					camera.camera.SetViewportSize(Get().m_Scene->GetViewportWidth(), Get().m_Scene->GetViewportHeight());
 					ImGui::CloseCurrentPopup();
 				}
 
 				if (ImGui::MenuItem("Light"))
 				{
-					m_Selected.AddComponent<LightComponent>();
+					Get().m_Selected.AddComponent<LightComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -245,13 +252,13 @@ namespace Proton
 					}
 				}
 
-				AssetManager::Get().CreatePrefab(entity, AssetViewerPanel::Get().GetSelectedPath().string() + "\\" + tag.substr(0, stringLen));
+				AssetManager::CreatePrefab(entity, AssetViewerPanel::GetSelectedPath().string() + "\\" + tag.substr(0, stringLen));
 			}
 
 			ImGui::EndPopup();
 		}
 
-		if (m_Selected == entity && ImGui::IsWindowHovered() && Input::IsKeyReleased(PT_KEY_DELETE))
+		if (m_Selected == entity && ImGui::IsWindowHovered() && Input::IsKeyReleased(Key::Delete))
 		{
 			entityDeleted = true;
 		}
@@ -347,7 +354,7 @@ namespace Proton
 			ImGui::EndPopup();
 		}
 
-		if (m_Selected == entity && ImGui::IsWindowHovered() && Input::IsKeyReleased(PT_KEY_DELETE))
+		if (m_Selected == entity && ImGui::IsWindowHovered() && Input::IsKeyReleased(Key::Delete))
 		{
 			entityDeleted = true;
 		}

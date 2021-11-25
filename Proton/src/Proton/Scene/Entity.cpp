@@ -15,6 +15,7 @@ namespace Proton
 
 	void Entity::SetParent(Entity* parent, int pos)
 	{
+		std::string name = GetComponent<TagComponent>().tag;
 		if (parent != nullptr)
 		{
 			NodeComponent& nodeComponent = GetComponent<NodeComponent>();
@@ -54,6 +55,8 @@ namespace Proton
 			{
 				parentNodeComponent.m_ChildNodes.push_back(*this);
 			}
+
+			PT_CORE_TRACE((uint32_t)&parentNodeComponent);
 
 			nodeComponent.m_ParentEntity = *parent;
 

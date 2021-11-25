@@ -19,7 +19,6 @@
 
 namespace Proton
 {
-#define BIND_EVENT_FN(x) std::bind(&x, this, std::placeholders::_1)
 
 	Application* Application::s_Instance = nullptr;
 
@@ -28,7 +27,7 @@ namespace Proton
 		s_Instance = this;
 		m_Window = Scope<Window>(Window::Create({"Proton Game Engine", 1280, 720}));
 
-		m_Window->SetEventCallback(BIND_EVENT_FN(Application::OnEvent));
+		m_Window->SetEventCallback(PT_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->SetVSync(true);
 
 		m_ImGuiLayer = new ImGuiLayer();
@@ -47,9 +46,9 @@ namespace Proton
 	{
 		EventDispatcher dispatcher(e);
 
-		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(Application::OnWindowClose));
+		dispatcher.Dispatch<WindowCloseEvent>(PT_BIND_EVENT_FN(Application::OnWindowClose));
 
-		dispatcher.Dispatch<AppRenderEvent>(BIND_EVENT_FN(Application::OnAppRender));
+		dispatcher.Dispatch<AppRenderEvent>(PT_BIND_EVENT_FN(Application::OnAppRender));
 
 		for (auto it = m_LayerStack.end(); it != m_LayerStack.begin();)
 		{
@@ -87,7 +86,6 @@ namespace Proton
 
 		while (m_Running)
 		{
-
 			QueryPerformanceFrequency(&li);
 			double pcFreq = li.QuadPart;
 			QueryPerformanceCounter(&li);
@@ -112,6 +110,7 @@ namespace Proton
 			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate(timeStep);
+			RenderCommand::Present();
 		}
 	}
 

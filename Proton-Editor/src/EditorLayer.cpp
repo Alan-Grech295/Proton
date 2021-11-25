@@ -1,8 +1,11 @@
 #include "EditorLayer.h"
 #include "CameraController.h"
-#include "Panels\ConsolePanel.h"
-
 #include "Proton\Scene\SceneSerializer.h"
+#include "Proton\Utils\PlatformUtils.h"
+
+//TEMP
+#include "CompileTimeTests.h"
+#include <DirectXMath.h>
 
 namespace Proton
 {
@@ -10,37 +13,74 @@ namespace Proton
 		:
 		Layer("EditorLayer")
 	{
-		AssetManager::Get().SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
-		AssetManager::Get().ScanProject();
+		AssetManager::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
+		AssetManager::ScanProject();
 
 		Application::Get().GetWindow().ShowCursor();
-		//light = CreateRef<PointLight>(0.5f);
+
+		/*FramebufferDescription desc;
+		desc.Width = 1280;
+		desc.Height = 720;
+		desc.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH };
+		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };*/
 
 		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->framebuffer->SetClearCol(0.02f, 0.07f, 0.2f);
+		//m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
 
-		sceneHierarchy.SetScene(m_ActiveScene);
-		assetViewer.SetScene(m_ActiveScene);
+		SceneHierarchyPanel::SetScene(m_ActiveScene);
+		AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
+		AssetViewerPanel::SetScene(m_ActiveScene);
 
-		//m_Nanosuit = ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
+		//m_Nanosuit = ModelCreator::CreateModelEnti++ty("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
 		//
 		//m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
 		//m_PointLight = m_ActiveScene->CreateEntity("Point Light");
 		//
 		//m_CameraEntity.AddComponent<CameraComponent>();
 		//m_PointLight.AddComponent<LightComponent>();
+		//
+		//m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
 
-		SceneSerializer serializer(m_ActiveScene);
-		serializer.Deserialize("assets/scenes/Example.proton");
+		//Shader Parsing (To Be continued later)
+		/*std::string shaderPath = "C:\\Dev\\Proton\\Proton-Editor\\assets\\Shaders\\VertexShader.shader";
 
-		m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
+		std::vector<Token> tokens = ShaderParser::LexShader(shaderPath);
 
-		ConsolePanel::LogError("This is an error");
-		ConsolePanel::LogError("This is an error");
-		ConsolePanel::LogWarning("This is a warning");
-		ConsolePanel::LogWarning("This is an warning");
-		ConsolePanel::LogTrace("This is an trace");
-		ConsolePanel::LogTrace("This is a trace");
+		std::string outputString = "";
+		uint32_t currentLine = 1;
+		for (auto token : tokens)
+		{
+			if (currentLine == token.GetLine())
+			{
+				outputString += token.ToString() + "|";
+			}
+			else if (token.GetLine() > currentLine)
+			{
+				while (currentLine < token.GetLine())
+				{
+					outputString += "\n";
+					currentLine++;
+				}
+				outputString += token.ToString() + "|";
+			}
+		}
+
+		std::ofstream stream("C:\\Dev\\Proton\\Proton-Editor\\assets\\Shaders\\shader.txt");
+		stream << outputString;
+		stream.close();
+
+		ShaderProfile* profile = ShaderParser::ParseShader(shaderPath);
+		if (profile)
+		{
+			DrawScope(profile->scope, 0);
+		}
+		else
+		{
+			for (auto error : ShaderParser::GetErrors())
+			{
+				LOG_ERROR(error.first->ToString() + " at line " + std::to_string(error.second));
+			}
+		}*/
 	}
 
 	EditorLayer::~EditorLayer()
@@ -50,18 +90,14 @@ namespace Proton
 
 	void EditorLayer::OnUpdate(TimeStep ts)
 	{
-		ConsolePanel::LogWarning("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
 		PT_PROFILE_FUNCTION();
 
-		if(enableCamUpdate)
-			MoveCamera(ts);
-
-		if (Input::IsKeyReleased(PT_KEY_ESCAPE))
+		if (Input::IsKeyReleased(Key::Escape))
 		{
 			cursor = !cursor;
 		}
 
-		if (Input::IsKeyPressed(PT_KEY_ESCAPE))
+		if (Input::IsKeyPressed(Key::Escape))
 		{
 			if (cursor)
 			{
@@ -79,13 +115,15 @@ namespace Proton
 
 		static bool vSync = true;
 
-		if (Input::IsKeyReleased(PT_KEY_0))
+		if (Input::IsKeyReleased(Key::D0))
 		{
 			vSync = !vSync;
 			Application::Get().GetWindow().SetVSync(vSync);
 		}
 
-		m_ActiveScene->OnUpdate(ts);
+		m_ActiveScene->OnEditorUpdate(ts);
+
+		//m_SceneRenderer->Render();
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -142,25 +180,16 @@ namespace Proton
 
 		if (io.ConfigFlags & ImGuiConfigFlags_DockingEnable)
 		{
-			ImGuiID dockspace_id = ImGui::GetID("MyDockSpace");
+			ImGuiID dockspace_id = ImGui::GetID("DockSpace");
 			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), dockspace_flags);
 		}
 
 		style.WindowMinSize.x = minWinSize;
 
 		//Custom Windows
-		if (ImGui::Begin("Debug Data"))
-		{
-			ImGui::Text("Application Average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		}
-
-		ImGui::End();
-
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
 		ImGui::Begin("Scene");
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
-
-		enableCamUpdate = ImGui::IsWindowFocused();
 
 		if (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)
 		{
@@ -170,13 +199,20 @@ namespace Proton
 			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
+		m_ActiveScene->SetUpdateEditorCamera(ImGui::IsWindowFocused());
+
 		ImGui::PopStyleVar();
 
-		ImGui::Image(m_ActiveScene->framebuffer->GetRenderTextureID(), viewportPanelSize);
+		static bool texID = false;
+
+		if (Input::IsKeyReleased(Key::Backspace))
+			texID = !texID;
+
+		ImGui::Image(m_ActiveScene->framebuffer->GetRenderTextureID(texID), viewportPanelSize);
 		ImGui::End();
 
-		sceneHierarchy.OnImGuiRender();
-		assetViewer.OnImGuiRender();
+		SceneHierarchyPanel::OnImGuiRender();
+		AssetViewerPanel::OnImGuiRender();
 		ConsolePanel::OnImGuiRender();
 		//
 
@@ -184,10 +220,27 @@ namespace Proton
 		{
 			if (ImGui::BeginMenu("File"))
 			{
-				if (ImGui::MenuItem("Exit", ""))
+				if (ImGui::MenuItem("New", "Ctrl+N"))
 				{
-					Application::Get().Close();
+					NewScene();
 				}
+
+				if (ImGui::MenuItem("Open...", "Ctrl+O"))
+				{
+					OpenScene();
+				}
+
+				if (ImGui::MenuItem("Save", "Ctrl+S"))
+				{
+					SaveScene();
+				}
+
+				if (ImGui::MenuItem("Save As...", "Ctrl+Shift+S"))
+				{
+					SaveSceneAs();
+				}
+
+				if (ImGui::MenuItem("Exit")) Application::Get().Close();
 
 				ImGui::EndMenu();
 			}
@@ -207,50 +260,125 @@ namespace Proton
 	{
 		if (e.IsEventType(EventType::WindowClose))
 		{
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize("assets/scenes/Example.proton");
+			
 		}
 
 		if (e.IsEventType(EventType::FileDragDrop))
 		{
-			AssetViewerPanel::Get().AddFile(((FileDragDropEvent&)e).GetFilePath());
+			AssetViewerPanel::AddFile(((FileDragDropEvent&)e).GetFilePath());
+		}
+
+		EventDispatcher dispatcher(e);
+		dispatcher.Dispatch<KeyPressedEvent>(PT_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
+	}
+
+	void EditorLayer::DrawScope(const ScopeNode* scope, uint32_t scopeLevel)
+	{
+		std::string tabs = "";
+		for (int i = 0; i < scopeLevel; i++) tabs += "=>";
+
+		for (int i = 0; i < scope->opNodes.size(); i++)
+		{
+			const auto node = scope->opNodes[i];
+
+			std::string showNode = tabs + node->ToString();
+
+			LOG_TRACE(showNode);
+
+			if (node->type == OpNode::OpType::Scope)
+				DrawScope(static_cast<ScopeNode*>(node), scopeLevel + 1);
+
+			if (Scoped* scoped = dynamic_cast<Scoped*>(node))
+				DrawScope(scoped->scope, scopeLevel + 1);
 		}
 	}
 
-	void EditorLayer::MoveCamera(TimeStep ts)
+	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
 	{
-		float speed = ts * cameraSpeed;
+		if (e.GetRepeatCount() > 1)
+			return false;
 
-		//Temp
-		TransformComponent& cameraTransform = m_CameraEntity.GetComponent<TransformComponent>();
+		bool control = Input::IsKeyPressed(Key::LeftControl) || Input::IsKeyPressed(Key::RightControl) || Input::IsKeyPressed(Key::Control);
+		bool shift = Input::IsKeyPressed(Key::LeftShift) || Input::IsKeyPressed(Key::RightShift) || Input::IsKeyPressed(Key::Shift);
 
-		DirectX::XMFLOAT3 localMove = { 0, 0, 0 };
+		switch (e.GetKeyCode())
+		{
+		case Key::N:
+			if (control)
+				NewScene();
+			break;
+		case Key::O:
+			if (control)
+				OpenScene();
+			break;
+		case Key::S:
+			if (control && shift)
+				SaveSceneAs();
+			else if (control)
+				SaveScene();
+			break;
+		}
 
-		if (Input::IsKeyPressed(PT_KEY_D))
-			localMove.x += speed;
+		return true;
+	}
 
-		if (Input::IsKeyPressed(PT_KEY_A))
-			localMove.x -= speed;
+	void EditorLayer::NewScene()
+	{
+		m_ActiveScene = CreateRef<Scene>();
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 
-		if (Input::IsKeyPressed(PT_KEY_E))
-			localMove.y += speed;
+		SceneHierarchyPanel::SetScene(m_ActiveScene);
+		AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
+		AssetViewerPanel::SetScene(m_ActiveScene);
 
-		if (Input::IsKeyPressed(PT_KEY_Q))
-			localMove.y -= speed;
+		m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
+	}
 
-		if (Input::IsKeyPressed(PT_KEY_W))
-			localMove.z += speed;
+	void EditorLayer::OpenScene()
+	{
+		std::string filepath = FileDialogs::OpenFile("Proton Scene (*.proton)\0*.proton\0");
 
-		if (Input::IsKeyPressed(PT_KEY_S))
-			localMove.z -= speed;
+		if (!filepath.empty())
+		{
+			saveFilePath = filepath;
+			m_ActiveScene = CreateRef<Scene>();
+			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 
-		cameraTransform.rotation.x += rotationSpeed * Input::GetMouseDeltaY() * std::max<float>(0.001f, ts);
-		cameraTransform.rotation.y += rotationSpeed * Input::GetMouseDeltaX() * std::max<float>(0.001f, ts);
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Deserialize(filepath);
 
-		DirectX::XMStoreFloat3(&localMove, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&localMove), DirectX::XMMatrixRotationRollPitchYaw(cameraTransform.rotation.x, cameraTransform.rotation.y, cameraTransform.rotation.z)));
+			SceneHierarchyPanel::SetScene(m_ActiveScene);
+			AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
+			AssetViewerPanel::SetScene(m_ActiveScene);
 
-		cameraTransform.position.x += localMove.x;
-		cameraTransform.position.y += localMove.y;
-		cameraTransform.position.z += localMove.z;
+			m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
+
+			//TEMP
+			m_ActiveScene->DrawDebugLine({ 0, 10, 0 }, { 0, 20, 0 }, 0, 1, 0);
+			m_ActiveScene->DrawDebugLine({ 0, 20, 0 }, { 10, 20, 0 }, 0, 1, 0);
+			m_ActiveScene->DrawDebugLine({ 10, 20, 0 }, { 10, 10, 0 }, 0, 1, 0);
+			m_ActiveScene->DrawDebugLine({ 10, 10, 0 }, { 0, 10, 0 }, 0, 1, 0);
+		}
+	}
+
+	void EditorLayer::SaveScene()
+	{
+		if (!saveFilePath.empty())
+		{
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(saveFilePath);
+		}
+	}
+
+	void EditorLayer::SaveSceneAs()
+	{
+		std::string filepath = FileDialogs::SaveFile("Proton Scene (*.proton)\0*.proton\0");
+
+		if (!filepath.empty())
+		{
+			saveFilePath = filepath;
+			SceneSerializer serializer(m_ActiveScene);
+			serializer.Serialize(filepath);
+		}
 	}
 }

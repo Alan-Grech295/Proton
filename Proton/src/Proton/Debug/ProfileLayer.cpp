@@ -19,13 +19,13 @@ namespace Proton
 
 	void ProfileLayer::OnUpdate(TimeStep ts)
 	{
-		if (Input::IsKeyReleased(PT_KEY_P))
+		if (Input::IsKeyReleased(Key::P))
 		{
 			profiling = !profiling;
 			Instrumentor::SetProfiling(profiling);
 		}
 
-		if (Input::IsKeyReleased(PT_KEY_O) && !profiling)
+		if (Input::IsKeyReleased(Key::O) && !profiling)
 		{
 			profileMode++;
 			if (profileMode > 1)

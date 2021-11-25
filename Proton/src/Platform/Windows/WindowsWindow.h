@@ -44,6 +44,9 @@ namespace Proton
 		static LRESULT WINAPI HandleMsgSetup(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		static LRESULT WINAPI HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
 		LRESULT WINAPI HandleMsg(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept;
+
+		//Windows Only calls
+		void ClearKeys();
 	private:
 		virtual void Init(const WindowProperties& props, HINSTANCE hInstance);
 	private:
@@ -65,7 +68,5 @@ namespace Proton
 		WindowsInput* input;
 
 		std::vector<BYTE> rawBuffer;
-
-		class DirectXRendererAPI* api = nullptr;
 	};
 }

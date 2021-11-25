@@ -65,10 +65,18 @@ namespace Proton
 		std::unordered_map<std::string, Message> messages;
 		std::vector<const char*> messageOrder;
 		std::vector<const char*> collapsedOrder;
-		bool collapsed = false;
+		bool collapsed = true;
 		Scope<Texture2D> traceIcon;
 		Scope<Texture2D> warningIcon;
 		Scope<Texture2D> errorIcon;
 		int selectedIndex = -1;
+
+		uint32_t errors;
+		uint32_t warnings;
+		uint32_t traces;
+
+		bool showErrors = true;
+		bool showWarnings = true;
+		bool showTraces = true;
 	};
 }

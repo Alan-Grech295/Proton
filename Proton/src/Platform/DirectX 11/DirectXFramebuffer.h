@@ -9,6 +9,12 @@
 
 namespace Proton
 {
+	struct DepthAttachment
+	{
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
+		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
+	};
+
 	class DirectXFramebuffer : public Framebuffer
 	{
 	public:
@@ -18,23 +24,25 @@ namespace Proton
 
 		virtual const FramebufferDescription& GetDescription() const override { return m_Desc; }
 
-		virtual void* GetRenderTextureID() override;
+		virtual void* GetRenderTextureID(uint32_t index) override;
 
 		virtual void Clear() override;
-		virtual void SetClearCol(float r, float g, float b) override;
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
 
 		virtual void Bind() override;
-		virtual void Unbind() override;
 	private:
 		FramebufferDescription m_Desc;
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture;
-		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTarget;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
-		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
 		D3D11_VIEWPORT vp;
-		float* clearCol;
+
+		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
+		FramebufferTextureSpecification m_DepthAttachmentSpecification = FramebufferTextureFormat::None;
+
+		std::vector<ID3D11Texture2D*> m_ColorAttachmentTextures;
+		std::vector<ID3D11RenderTargetView*> m_ColorAttachmentRenderTargets;
+		std::vector<ID3D11ShaderResourceView*> m_ColorAttachmentSRVs;
+
+		ID3D11DepthStencilView* m_DepthStencilView = nullptr;
+		ID3D11DepthStencilState* m_DSState = nullptr;
 	};
 }

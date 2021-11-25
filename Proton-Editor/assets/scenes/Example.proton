@@ -1,18 +1,181 @@
 Scene: Untitled
 Entities:
-  - Entity: 8
+  - Entity: 10
     TagComponent:
-      Tag: Camera Entity
+      Tag: Point Light
     TransformComponent:
-      Position: [-6.31147909, -3.53560042, -27.6635838]
-      Rotation: [72.8419495, 65.7335739, 0]
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     NodeComponent:
       Node Name: ""
       Is Prefab: false
       Prefab Path: ""
       Parent Entity: 9223372036854775807
-      Root Entity: 8
+      Root Entity: 10
+      Initial Transform: [-431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080]
+    LightComponent:
+      Ambient: [0.0500000007, 0.0500000007, 0.0500000007]
+      Diffuse Color: [1, 1, 1]
+      Diffuse Intensity: 2
+      Attenuation Constant: 1
+      Attenuation Linear: 0.0450000018
+      Attenuation Quadratic: 0.00749999983
+  - Entity: 1
+    TagComponent:
+      Tag: "nanosuit.obj\x00"
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: "nanosuit.obj\x00"
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 9223372036854775807
+      Root Entity: 1
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+    MeshComponent:
+      {}
+  - Entity: 2
+    TagComponent:
+      Tag: "Visor\x00"
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: "Visor\x00"
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 1
+      Root Entity: 1
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+    MeshComponent:
+      Mesh0:
+        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
+        Mesh Name: Visor
+  - Entity: 3
+    TagComponent:
+      Tag: "Legs\x00"
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: "Legs\x00"
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 1
+      Root Entity: 1
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+    MeshComponent:
+      Mesh0:
+        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
+        Mesh Name: Legs
+  - Entity: 4
+    TagComponent:
+      Tag: "hands\x00"
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: "hands\x00"
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 1
+      Root Entity: 1
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+    MeshComponent:
+      Mesh0:
+        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
+        Mesh Name: hands
+  - Entity: 5
+    TagComponent:
+      Tag: "Lights\x00"
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: "Lights\x00"
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 1
+      Root Entity: 1
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+    MeshComponent:
+      Mesh0:
+        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
+        Mesh Name: Lights
+  - Entity: 6
+    TagComponent:
+      Tag: "Arms\x00"
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: "Arms\x00"
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 1
+      Root Entity: 1
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+    MeshComponent:
+      Mesh0:
+        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
+        Mesh Name: Arms
+  - Entity: 7
+    TagComponent:
+      Tag: "Helmet\x00"
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: "Helmet\x00"
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 1
+      Root Entity: 1
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+    MeshComponent:
+      Mesh0:
+        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
+        Mesh Name: Helmet
+  - Entity: 8
+    TagComponent:
+      Tag: "Body\x00"
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: "Body\x00"
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 1
+      Root Entity: 1
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+    MeshComponent:
+      Mesh0:
+        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
+        Mesh Name: Body
+  - Entity: 9
+    TagComponent:
+      Tag: Camera Entity
+    TransformComponent:
+      Position: [1.32373726, 11.2243881, -24.0861168]
+      Rotation: [0.0752378777, 0.246834174, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: ""
+      Is Prefab: false
+      Prefab Path: ""
+      Parent Entity: 9223372036854775807
+      Root Entity: 9
       Initial Transform: [-431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080]
     CameraComponent:
       Camera:
@@ -25,70 +188,49 @@ Entities:
         OrthographicFar: 1
       Primary: true
       FixedAspectRatio: false
-  - Entity: 9
+  - Entity: 11
     TagComponent:
-      Tag: Point Light
+      Tag: nanosuit.obj
     TransformComponent:
-      Position: [0.699999988, 6.69999981, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    NodeComponent:
-      Node Name: ""
-      Is Prefab: false
-      Prefab Path: ""
-      Parent Entity: 9223372036854775807
-      Root Entity: 9
-      Initial Transform: [-431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080, -431602080]
-    LightComponent:
-      Ambient: [0.0500000007, 0.0500000007, 0.0500000007]
-      Diffuse Color: [1, 1, 1]
-      Diffuse Intensity: 2
-      Attenuation Constant: 1
-      Attenuation Linear: 0.0450000018
-      Attenuation Quadratic: 0.00749999983
-  - Entity: 10
-    TagComponent:
-      Tag: Nanosuit Prefab
-    TransformComponent:
-      Position: [6.9000001, 0, 0]
-      Rotation: [0, 0, 0]
+      Position: [8.10000038, 0, 0]
+      Rotation: [0, 0.836001337, 0]
       Scale: [1, 1, 1]
     NodeComponent:
       Node Name: nanosuit.obj
       Is Prefab: true
       Prefab Path: C:\Dev\Proton\Proton-Editor\assets\Prefabs\nanosuit.obj.prefab
       Parent Entity: 9223372036854775807
-      Root Entity: 10
+      Root Entity: 11
       Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-  - Entity: 11
+  - Entity: 12
     TagComponent:
       Tag: Visor
     TransformComponent:
       Position: [0, 0, 0]
-      Rotation: [0, 0, -0.410069555]
+      Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     NodeComponent:
       Node Name: Visor
       Is Prefab: true
       Prefab Path: ""
-      Parent Entity: 10
-      Root Entity: 10
+      Parent Entity: 11
+      Root Entity: 11
       Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-  - Entity: 12
+  - Entity: 13
     TagComponent:
-      Tag: Dem Leggies
+      Tag: Legs
     TransformComponent:
       Position: [0, 0, 0]
-      Rotation: [0, 3.14655995, 0]
+      Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     NodeComponent:
       Node Name: Legs
       Is Prefab: true
       Prefab Path: ""
-      Parent Entity: 10
-      Root Entity: 10
+      Parent Entity: 11
+      Root Entity: 11
       Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-  - Entity: 13
+  - Entity: 14
     TagComponent:
       Tag: hands
     TransformComponent:
@@ -99,10 +241,24 @@ Entities:
       Node Name: hands
       Is Prefab: true
       Prefab Path: ""
-      Parent Entity: 10
-      Root Entity: 10
+      Parent Entity: 11
+      Root Entity: 11
       Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-  - Entity: 14
+  - Entity: 15
+    TagComponent:
+      Tag: Lights
+    TransformComponent:
+      Position: [0, 0, 0]
+      Rotation: [0, 0, 0]
+      Scale: [1, 1, 1]
+    NodeComponent:
+      Node Name: Lights
+      Is Prefab: true
+      Prefab Path: ""
+      Parent Entity: 11
+      Root Entity: 11
+      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
+  - Entity: 16
     TagComponent:
       Tag: Arms
     TransformComponent:
@@ -113,24 +269,10 @@ Entities:
       Node Name: Arms
       Is Prefab: true
       Prefab Path: ""
-      Parent Entity: 10
-      Root Entity: 10
+      Parent Entity: 11
+      Root Entity: 11
       Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-  - Entity: 16
-    TagComponent:
-      Tag: Body
-    TransformComponent:
-      Position: [0, 69.3000031, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    NodeComponent:
-      Node Name: Body
-      Is Prefab: true
-      Prefab Path: ""
-      Parent Entity: 10
-      Root Entity: 10
-      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-  - Entity: 15
+  - Entity: 17
     TagComponent:
       Tag: Helmet
     TransformComponent:
@@ -141,130 +283,20 @@ Entities:
       Node Name: Helmet
       Is Prefab: true
       Prefab Path: ""
-      Parent Entity: 10
-      Root Entity: 10
+      Parent Entity: 11
+      Root Entity: 11
       Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-  - Entity: 0
+  - Entity: 18
     TagComponent:
-      Tag: "nanosuit.obj\x00"
-    TransformComponent:
-      Position: [-6.19999981, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    NodeComponent:
-      Node Name: "nanosuit.obj\x00"
-      Is Prefab: false
-      Prefab Path: ""
-      Parent Entity: 9223372036854775807
-      Root Entity: 0
-      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-    MeshComponent:
-      {}
-  - Entity: 1
-    TagComponent:
-      Tag: "Visor\x00"
+      Tag: Body
     TransformComponent:
       Position: [0, 0, 0]
       Rotation: [0, 0, 0]
       Scale: [1, 1, 1]
     NodeComponent:
-      Node Name: "Visor\x00"
-      Is Prefab: false
+      Node Name: Body
+      Is Prefab: true
       Prefab Path: ""
-      Parent Entity: 0
-      Root Entity: 0
+      Parent Entity: 11
+      Root Entity: 11
       Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-    MeshComponent:
-      Mesh0:
-        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
-        Mesh Name: Visor
-  - Entity: 5
-    TagComponent:
-      Tag: "Arms\x00"
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    NodeComponent:
-      Node Name: "Arms\x00"
-      Is Prefab: false
-      Prefab Path: ""
-      Parent Entity: 0
-      Root Entity: 0
-      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-    MeshComponent:
-      Mesh0:
-        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
-        Mesh Name: Arms
-  - Entity: 7
-    TagComponent:
-      Tag: "Body\x00"
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    NodeComponent:
-      Node Name: "Body\x00"
-      Is Prefab: false
-      Prefab Path: ""
-      Parent Entity: 0
-      Root Entity: 0
-      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-    MeshComponent:
-      Mesh0:
-        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
-        Mesh Name: Body
-  - Entity: 2
-    TagComponent:
-      Tag: "Legs\x00"
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    NodeComponent:
-      Node Name: "Legs\x00"
-      Is Prefab: false
-      Prefab Path: ""
-      Parent Entity: 0
-      Root Entity: 0
-      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-    MeshComponent:
-      Mesh0:
-        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
-        Mesh Name: Legs
-  - Entity: 3
-    TagComponent:
-      Tag: "hands\x00"
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    NodeComponent:
-      Node Name: "hands\x00"
-      Is Prefab: false
-      Prefab Path: ""
-      Parent Entity: 0
-      Root Entity: 0
-      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-    MeshComponent:
-      Mesh0:
-        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
-        Mesh Name: hands
-  - Entity: 6
-    TagComponent:
-      Tag: "Helmet\x00"
-    TransformComponent:
-      Position: [0, 0, 0]
-      Rotation: [0, 0, 0]
-      Scale: [1, 1, 1]
-    NodeComponent:
-      Node Name: "Helmet\x00"
-      Is Prefab: false
-      Prefab Path: ""
-      Parent Entity: 0
-      Root Entity: 0
-      Initial Transform: [1, 0, -0, 0, 0, 1, -0, 0, -0, -0, 1, -0, 0, 0, -0, 1]
-    MeshComponent:
-      Mesh0:
-        Model Path: C:\Dev\Proton\Proton-Editor\assets\Models\nano_textured\nanosuit.obj
-        Mesh Name: Helmet

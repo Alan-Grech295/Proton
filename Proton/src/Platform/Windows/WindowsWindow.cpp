@@ -2,6 +2,7 @@
 
 #include "ptpch.h"
 #include "WindowsWindow.h"
+#include "Proton\Core\Application.h"
 #include "Proton/Events/ApplicationEvent.h"
 #include "Proton/Events/MouseEvent.h"
 #include "Proton/Events/KeyEvent.h"
@@ -55,9 +56,6 @@ namespace Proton
 		//effect want to be applied, they will show in the frame
 		AppRenderEvent event;
 		m_Data.eventCallback(event);
-
-		//Present the frame
-		api->ShowFrame();
 	}
 
 	void WindowsWindow::ShowCursor() const
@@ -96,7 +94,7 @@ namespace Proton
 	void WindowsWindow::SetVSync(bool enabled)
 	{
 		m_Data.vSync = enabled;
-		api->isVSync = enabled;
+		RenderCommand::SetVsync(enabled);
 	}
 
 	bool WindowsWindow::IsVSync() const
@@ -117,8 +115,15 @@ namespace Proton
 	{
 		//Init ImGui Win32 Impl
 		ImGui_ImplWin32_Init(m_HWnd);
-		ImGui_ImplDX11_Init(api->pDevice.Get(), api->pContext.Get());
+		DirectXRendererAPI* api = (DirectXRendererAPI*)RenderCommand::GetRendererAPI();
+		ImGui_ImplDX11_Init(api->GetDevice(), api->GetContext());
 		initializedImGui = true;
+	}
+
+	void WindowsWindow::ClearKeys()
+	{
+		input->pressedKeyStates.reset();
+		input->releasedKeyStates.reset();
 	}
 
 	void WindowsWindow::Init(const WindowProperties& props, HINSTANCE hInstance)
@@ -129,7 +134,6 @@ namespace Proton
 		m_HInstance = hInstance;
 		m_Data.title = props.title;
 		m_Data.width = props.width;
-		m_Data.height = props.height;
 
 		//Logs window creation
 		PT_CORE_INFO("Creating window {0} ({1}, {2})", props.title, props.width, props.height);
@@ -187,10 +191,7 @@ namespace Proton
 		//Shows the window
 		ShowWindow(m_HWnd, SW_SHOWDEFAULT);
 
-		//Create graphics object
-		//pGfx = std::make_unique<WindowsGraphics>(m_HWnd, (UINT)m_Data.width, (UINT)m_Data.height);
-		api = ((DirectXRendererAPI*)RenderCommand::s_RendererAPI);
-		api->Initialize(*this, m_HWnd);
+		OnWindowInitialised(*this);
 
 		RAWINPUTDEVICE rid;
 		rid.usUsagePage = 0x01;
@@ -231,7 +232,7 @@ namespace Proton
 			return true;
 		}
 
-		WindowData& data = *(WindowData*)GetClassLongPtr(hWnd, 0);
+		WindowData& data = *(WindowData*)GetClassLongPtrW(hWnd, 0);
 
 		switch (msg)
 		{
@@ -246,12 +247,16 @@ namespace Proton
 			}
 		case WM_SIZE:
 			{
-				if (api && api->Initialized())
-				{
-					uint32_t width = LOWORD(lParam);
-					uint32_t height = HIWORD(lParam);
-					api->Resize(width, height);
-				}
+				uint32_t width = LOWORD(lParam);
+				uint32_t height = HIWORD(lParam);
+
+				RenderCommand::Resize(width, height);
+
+				if (!data.eventCallback)
+					break;
+
+				WindowResizeEvent event(width, height);
+				data.eventCallback(event);
 				break;
 			}
 			//Keyboard messages
@@ -259,6 +264,7 @@ namespace Proton
 		case WM_KEYDOWN:
 			{
 				input->pressedKeyStates[wParam] = true;
+				PT_CORE_WARN("KeyDown " + std::to_string(wParam));
 				KeyPressedEvent event(wParam, lParam & 0xffff);
 				data.eventCallback(event);
 				break;
@@ -266,6 +272,7 @@ namespace Proton
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			{
+				PT_CORE_WARN("KeyUp " + std::to_string(wParam));
 				input->pressedKeyStates[wParam] = false;
 				input->releasedKeyStates[wParam] = true;
 				KeyReleasedEvent event(wParam);
@@ -400,7 +407,6 @@ namespace Proton
 					input->accMouseDeltaY += ri.data.mouse.lLastY;
 				}
 			}
-
 		case WM_DROPFILES:
 			{
 				HDROP hDrop = (HDROP)wParam;
@@ -453,7 +459,7 @@ namespace Proton
 	LRESULT WINAPI WindowsWindow::HandleMsgThunk(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam) noexcept
 	{
 		//Retreive pointer to class
-		WindowsWindow* const pWnd = reinterpret_cast<WindowsWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		WindowsWindow* const pWnd = reinterpret_cast<WindowsWindow*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA));
 
 		//Forward message to window class handler
 		return pWnd->HandleMsg(hWnd, msg, wParam, lParam);

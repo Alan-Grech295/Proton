@@ -1,0 +1,34 @@
+Shader Type: Vertex|
+
+VarType: matrix|Variable: modelView|End of Line|
+VarType: matrix|Variable: modelViewProj|End of Line|
+
+Struct: VSOut|
+LCurly|
+VarType: float3|Variable: viewPos|End of Line|
+VarType: float3|Variable: normal|End of Line|
+VarType: float2|Variable: tc|End of Line|
+VarType: float4|Variable: pos|Semantic: SV_POSITION|End of Line|
+
+Constructor: VSOut|LParen|VarType: float3|Variable: viewPos|Comma|VarType: float3|Variable: normal|Comma|VarType: float2|Variable: tc|Comma|VarType: float4|Variable: pos|RParen|
+LCurly|
+
+Variable: this|Dot|Variable: viewPos|Equals|Variable: viewPos|End of Line|
+Variable: this|Dot|Variable: normal|Equals|Variable: normal|End of Line|
+Variable: this|Dot|Variable: tc|Equals|Variable: tc|End of Line|
+Variable: this|Dot|Variable: pos|Equals|Variable: pos|End of Line|
+RCurly|
+RCurly|
+
+VarType: VSOut|Variable: main|LParen|VarType: float3|Variable: pos|Comma|VarType: float3|Variable: n|Comma|VarType: float2|Variable: tc|RParen|
+LCurly|
+VarType: VSOut|Variable: vso|End of Line|
+Variable: vso|Dot|Variable: viewPos|Equals|LParen|Variable: vso|Dot|Variable: normal|Multiplication|Int: 2|Plus|Variable: vso|Dot|Variable: viewPos|RParen|Dot|Variable: xyz|Dot|Variable: xxx|End of Line|
+
+Variable: vso|Dot|Variable: viewPos|Dot|Variable: xyzx|Equals|VarType: float3|LParen|Int: 1|Comma|Int: 0|Comma|Int: 1|RParen|End of Line|
+Variable: vso|Dot|Variable: viewPos|Equals|LParen|VarType: float4|LParen|Variable: pos|Plus|Float: 3|Multiplication|Variable: vso|Dot|Variable: tc|Plus|Float: 2|Comma|Float: 1|Multiplication|Variable: modelView|RParen|RParen|Dot|Variable: xyz|End of Line|
+Variable: vso|Dot|Variable: normal|Equals|LParen|Variable: n|Multiplication|LParen|VarType: float3x3|RParen|Variable: modelView|RParen|Dot|Variable: xyz|End of Line|
+Variable: vso|Dot|Variable: pos|Equals|VarType: float4|LParen|Variable: pos|Plus|Float: 3|Multiplication|Variable: vso|Dot|Variable: tc|Plus|Float: 2|Comma|Float: 1|RParen|Multiplication|Variable: modelViewProj|End of Line|
+Variable: vso|Dot|Variable: tc|Equals|Variable: tc|End of Line|
+Return|Variable: vso|End of Line|
+RCurly|

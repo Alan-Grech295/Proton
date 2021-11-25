@@ -19,14 +19,9 @@ namespace Proton
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateSamplerState(&samplerDesc, &pSampler);
 	}
 
-	void DirectXSampler::Bind() const
+	void DirectXSampler::Bind()
 	{
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->PSSetSamplers(m_Slot, 1, pSampler.GetAddressOf());
-	}
-
-	void DirectXSampler::Unbind() const
-	{
-
 	}
 
 	std::string DirectXSampler::GetUID() const noexcept

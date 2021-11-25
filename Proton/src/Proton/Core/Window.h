@@ -6,6 +6,7 @@
 #include <random>
 #include <DirectXMath.h>
 #include "Proton\Core\TimeStep.h"
+#include "Proton\Renderer\RenderCommand.h"
 
 namespace Proton
 {
@@ -59,5 +60,10 @@ namespace Proton
 		virtual void InitImGui() = 0;
 
 		static Window* Create(const WindowProperties& props = WindowProperties());
+	protected:
+		void OnWindowInitialised(const Window& window)
+		{
+			RenderCommand::GetRendererAPI()->Initialise(window);
+		}
 	};
 }

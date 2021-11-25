@@ -6,21 +6,13 @@ namespace fs = std::filesystem;
 
 namespace Proton
 {
-	AssetViewerPanel* AssetViewerPanel::assetViewer = nullptr;
 	AssetViewerPanel::AssetViewerPanel()
-	{
-
-	}
-
-	AssetViewerPanel::AssetViewerPanel(const std::string& assetPath)
 		:
-		startPath(assetPath),
-		m_SelectedPath(assetPath),
+		startPath(""),
+		m_SelectedPath(""),
 		folderIcon(Texture2D::CreateUnique("icons\\Folder-icon.png")),
 		fileIcon(Texture2D::CreateUnique("icons\\Document-Blank-icon.png"))
-	{
-		assetViewer = this;
-	}
+	{}
 
 	AssetViewerPanel::~AssetViewerPanel()
 	{
@@ -30,13 +22,19 @@ namespace Proton
 	void AssetViewerPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Asset Viewer");
+		if (Get().startPath.empty() || !Get().m_ActiveScene)
+		{
+			ImGui::End();
+			return;
+		}
+
 		ImGui::Columns(2);
 
-		DrawDirectories();
+		Get().DrawDirectories();
 
 		ImGui::NextColumn();
 
-		DrawFiles();
+		Get().DrawFiles();
 
 		ImGui::Columns(1);
 		ImGui::End();
@@ -46,7 +44,7 @@ namespace Proton
 	{
 		std::ifstream inStream(filePath, std::ios::in | std::ios::binary);
 
-		std::string savePath = m_SelectedPath.string() + "\\";
+		std::string savePath = Get().m_SelectedPath.string() + "\\";
 		std::string saveName = filePath.filename().replace_extension().string();
 		std::string extension = filePath.extension().string();
 
@@ -102,9 +100,7 @@ namespace Proton
 		bool defaultOpen = pathString.size() != m_SelectedPathString.size() && pathString == m_SelectedPathString.substr(0, pathString.size());
 
 		for (const auto& entry : fs::directory_iterator(pathToScan)) {
-			const auto filenameStr = entry.path().filename().string();
 			if (entry.is_directory()) {
-
 				isLeaf = false;
 				break;
 			}
@@ -126,9 +122,7 @@ namespace Proton
 		if (opened)
 		{
 			for (const auto& entry : fs::directory_iterator(pathToScan)) {
-				const auto filenameStr = entry.path().filename().string();
 				if (entry.is_directory()) {
-
 					DrawDirectory(entry);
 				}
 			}

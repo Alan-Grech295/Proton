@@ -1,5 +1,5 @@
 #pragma once
-#include "Proton\Renderer\Texture.h"
+#include "Proton\Renderer\Bindables\Texture.h"
 #include <wrl.h>
 #include <DirectXTex.h>
 
@@ -12,8 +12,8 @@ namespace Proton
 		//DirectXTexture2D(uint32_t assetID, int slot = 0);
 		virtual ~DirectXTexture2D() {}
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual void Bind() override;
+
 		virtual void Load(std::string path) override;
 		//virtual void Load(uint32_t assetID) override;
 		virtual Color GetPixel(int x, int y) const override;

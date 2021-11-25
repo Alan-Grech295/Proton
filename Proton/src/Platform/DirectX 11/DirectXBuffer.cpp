@@ -28,99 +28,125 @@ namespace Proton
 		return DXGI_FORMAT_UNKNOWN;
 	}
 	//Vertex Buffer
-	DirectXVertexBuffer::DirectXVertexBuffer(const std::string& tag, int stride, const void* vertices, uint32_t size)
+	DirectXVertexBuffer::DirectXVertexBuffer(const std::string& tag, BufferLayout& layout, VertexShader* vertexShader)
 		:
-		stride(stride),
-		uid(tag)
+		m_InputLayoutDesc(new D3D11_INPUT_ELEMENT_DESC[layout.size()])
 	{
-		D3D11_BUFFER_DESC bd = {};
-		bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		bd.Usage = D3D11_USAGE_DEFAULT;
-		bd.CPUAccessFlags = 0u;
-		bd.MiscFlags = 0u;
-		bd.ByteWidth = UINT(stride * size);
-		bd.StructureByteStride = stride;
-		D3D11_SUBRESOURCE_DATA sd = {};
-		sd.pSysMem = vertices;
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&bd, &sd, &pVertexBuffer);
-	}
-
-	void DirectXVertexBuffer::Bind() const
-	{
-		DirectXRendererAPI* api = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI());
-
-		const UINT offset = 0u;
-		api->GetContext()->IASetVertexBuffers(0, 1u, pVertexBuffer.GetAddressOf(), &stride, &offset);
-		api->GetContext()->IASetInputLayout(pInputLayout.Get());
-	}
-
-	void DirectXVertexBuffer::Unbind() const
-	{
-
-	}
-
-	std::string DirectXVertexBuffer::GetUID() const noexcept
-	{
-		return uid;
-	}
-
-	void DirectXVertexBuffer::SetLayout(const BufferLayout& layout, VertexShader* vertexShader)
-	{
+		m_Uid = tag;
 		m_Layout = layout;
-		std::vector<BufferElement> elements = layout.GetElements();
-		pInputLayoutDesc = new D3D11_INPUT_ELEMENT_DESC[elements.size()];
 
-		for (int i = 0; i < elements.size(); i++)
+		for (int i = 0; i < m_Layout.size(); i++)
 		{
-			pInputLayoutDesc[i] = { elements[i].Name.c_str(), 0, ShaderDataTypeToDXGIFormat(elements[i].Type), 0, elements[i].Offset, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+			m_InputLayoutDesc[i] = { m_Layout[i].Name.c_str(), 0, ShaderDataTypeToDXGIFormat(m_Layout[i].Type), 0, m_Layout[i].Offset, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 		}
 
 		DirectXVertexShader& dxVertexShader = *(DirectXVertexShader*)(vertexShader);
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateInputLayout(
-			pInputLayoutDesc, elements.size(),
+			m_InputLayoutDesc, layout.size(),
 			dxVertexShader.pBytecodeBlob->GetBufferPointer(),
 			dxVertexShader.pBytecodeBlob->GetBufferSize(),
-			&pInputLayout
+			&m_InputLayout
 		);
 	}
 
+	void DirectXVertexBuffer::Bind()
+	{
+		if (m_Changed)
+		{
+			RecreateBuffer();
+			m_Changed = false;
+		}
+
+		DirectXRendererAPI* api = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI());
+
+		const static UINT offset = 0u;
+		api->GetContext()->IASetVertexBuffers(0, 1u, m_VertexBuffer.GetAddressOf(), &m_Layout.stride, &offset);
+		api->GetContext()->IASetInputLayout(m_InputLayout.Get());
+	}
+
+	std::string DirectXVertexBuffer::GetUID() const noexcept
+	{
+		return m_Uid;
+	}
+
+	void DirectXVertexBuffer::RecreateBuffer()
+	{
+		if (m_PastBufferSize == m_Data.size())
+		{
+			D3D11_MAPPED_SUBRESOURCE msr;
+			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
+				m_VertexBuffer.Get(), 0,
+				D3D11_MAP_WRITE_DISCARD, 0,
+				&msr
+			);
+
+			memcpy(msr.pData, m_Data.data(), m_Data.size());
+
+			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(m_VertexBuffer.Get(), 0);
+		}
+		else
+		{
+			m_PastBufferSize = m_Data.size();
+
+			D3D11_BUFFER_DESC bd = {};
+			bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			bd.Usage = D3D11_USAGE_DEFAULT;
+			bd.CPUAccessFlags = 0u;
+			bd.MiscFlags = 0u;
+			bd.ByteWidth = m_Data.size();
+			//bd.StructureByteStride = m_Stride;
+			D3D11_SUBRESOURCE_DATA sd = {};
+			sd.pSysMem = m_Data.data();
+			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&bd, &sd, &m_VertexBuffer);
+		}
+	}
+
 	//Index Buffer
-	DirectXIndexBuffer::DirectXIndexBuffer(const std::string& tag, unsigned short* indices, uint32_t size)
-		:
-		count(size),
-		uid(tag)
+	DirectXIndexBuffer::DirectXIndexBuffer(const std::string& tag)
 	{
-		D3D11_BUFFER_DESC ibd = {};
-		ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		ibd.Usage = D3D11_USAGE_DEFAULT;
-		ibd.CPUAccessFlags = 0u;
-		ibd.MiscFlags = 0u;
-		ibd.ByteWidth = UINT(count * sizeof(unsigned short));
-		ibd.StructureByteStride = sizeof(unsigned short);
-		D3D11_SUBRESOURCE_DATA isd = {};
-		isd.pSysMem = indices;
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&ibd, &isd, &pIndexBuffer);
+		m_Uid = tag;
 	}
 
-	void DirectXIndexBuffer::Bind() const
+	void DirectXIndexBuffer::Bind()
 	{
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
+		if (m_Changed)
+		{
+			RecreateBuffer();
+			m_Changed = false;
+		}
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->IASetIndexBuffer(m_IndexBuffer.Get(), DXGI_FORMAT_R32_UINT, 0u);
 	}
 
-	void DirectXIndexBuffer::Unbind() const
+	void DirectXIndexBuffer::RecreateBuffer()
 	{
+		if (m_PastBufferSize == m_Indices.size())
+		{
+			D3D11_MAPPED_SUBRESOURCE msr;
+			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
+				m_IndexBuffer.Get(), 0,
+				D3D11_MAP_WRITE_DISCARD, 0,
+				&msr
+			);
 
-	}
+			memcpy(msr.pData, m_Indices.data(), m_Indices.size() * sizeof(uint32_t));
 
-	std::string DirectXIndexBuffer::GetUID() const noexcept
-	{
-		return uid;
-	}
-
-	unsigned int DirectXIndexBuffer::GetCount() const
-	{
-		return count;
+			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(m_IndexBuffer.Get(), 0);
+		}
+		else
+		{
+			m_PastBufferSize = m_Indices.size();
+			D3D11_BUFFER_DESC ibd = {};
+			ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			ibd.Usage = D3D11_USAGE_DEFAULT;
+			ibd.CPUAccessFlags = 0u;
+			ibd.MiscFlags = 0u;
+			ibd.ByteWidth = m_Indices.size() * sizeof(uint32_t);
+			//ibd.StructureByteStride = sizeof(unsigned short);
+			D3D11_SUBRESOURCE_DATA isd = {};
+			isd.pSysMem = m_Indices.data();
+			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&ibd, &isd, &m_IndexBuffer);
+		}
 	}
 
 	//Vertex Constant Buffer
@@ -139,7 +165,7 @@ namespace Proton
 
 		D3D11_SUBRESOURCE_DATA csd = {};
 		csd.pSysMem = data;
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&cbd, data ? &csd : nullptr, &pConstantBuffer);
 	}
 
 	void DirectXVertexConstantBuffer::SetData(int size, const void* data)
@@ -156,14 +182,9 @@ namespace Proton
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(pConstantBuffer.Get(), 0);
 	}
 
-	void DirectXVertexConstantBuffer::Bind() const
+	void DirectXVertexConstantBuffer::Bind()
 	{
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->VSSetConstantBuffers(mSlot, 1, pConstantBuffer.GetAddressOf());
-	}
-
-	void DirectXVertexConstantBuffer::Unbind() const
-	{
-
 	}
 
 	std::string DirectXVertexConstantBuffer::GetUID() const noexcept
@@ -204,15 +225,11 @@ namespace Proton
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(pConstantBuffer.Get(), 0);
 	}
 
-	void DirectXPixelConstantBuffer::Bind() const
+	void DirectXPixelConstantBuffer::Bind()
 	{
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->PSSetConstantBuffers(mSlot, 1, pConstantBuffer.GetAddressOf());
 	}
 
-	void DirectXPixelConstantBuffer::Unbind() const
-	{
-
-	}
 	std::string DirectXPixelConstantBuffer::GetUID() const noexcept
 	{
 		return uid;

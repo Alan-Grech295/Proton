@@ -136,26 +136,14 @@
     <ClInclude Include="src\Proton\ImGui\ImGuiLayer.h">
       <Filter>Proton\ImGui</Filter>
     </ClInclude>
-    <ClInclude Include="src\Proton\IndexedTriangleList.h">
-      <Filter>Proton</Filter>
-    </ClInclude>
     <ClInclude Include="src\Proton\Model\Model.h">
       <Filter>Proton\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Renderer\BindsCollection.h">
-      <Filter>Proton\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Renderer\Buffer.h">
-      <Filter>Proton\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Renderer\Camera.h">
       <Filter>Proton\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Renderer\Framebuffer.h">
       <Filter>Proton\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Renderer\Old\Camera.h">
-      <Filter>Proton\Renderer\Old</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Renderer\RenderCommand.h">
       <Filter>Proton\Renderer</Filter>
@@ -164,15 +152,6 @@
       <Filter>Proton\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Renderer\RendererAPI.h">
-      <Filter>Proton\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Renderer\Sampler.h">
-      <Filter>Proton\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Renderer\Shader.h">
-      <Filter>Proton\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Proton\Renderer\Texture.h">
       <Filter>Proton\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Scene\AssetLoader.h">
@@ -185,6 +164,9 @@
       <Filter>Proton\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Scene\Entity.h">
+      <Filter>Proton\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Scene\ModelCollection.h">
       <Filter>Proton\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Scene\Scene.h">
@@ -200,7 +182,25 @@
       <Filter>Proton\Scene</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
-    <ClInclude Include="src\Proton\Scene\ModelCollection.h" />
+    <ClInclude Include="src\Proton\Shader Translator\ShaderParser.h" />
+    <ClInclude Include="src\Proton\Utils\PlatformUtils.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Bindable.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\BindsCollection.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Bindables\Buffer.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Bindables\Sampler.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Bindables\Shader.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\Bindables\Texture.h">
+      <Filter>Proton\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Proton\Renderer\SceneRenderer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -257,14 +257,8 @@
     <ClCompile Include="src\Proton\Model\Model.cpp">
       <Filter>Proton\Model</Filter>
     </ClCompile>
-    <ClCompile Include="src\Proton\Renderer\Buffer.cpp">
-      <Filter>Proton\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="src\Proton\Renderer\Framebuffer.cpp">
       <Filter>Proton\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Renderer\Old\Camera.cpp">
-      <Filter>Proton\Renderer\Old</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp">
       <Filter>Proton\Renderer</Filter>
@@ -273,15 +267,6 @@
       <Filter>Proton\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp">
-      <Filter>Proton\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Renderer\Sampler.cpp">
-      <Filter>Proton\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Renderer\Shader.cpp">
-      <Filter>Proton\Renderer</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Proton\Renderer\Texture.cpp">
       <Filter>Proton\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Scene\AssetLoader.cpp">
@@ -303,20 +288,23 @@
       <Filter>Proton\Scene</Filter>
     </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
+    <ClCompile Include="src\Proton\Shader Translator\ShaderParser.cpp" />
+    <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Buffer.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Bindables\Sampler.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Bindables\Shader.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\Bindables\Texture.cpp">
+      <Filter>Proton\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Renderer\SceneRenderer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="src\Proton\Shader\ColorBlendPS.hlsl">
-      <Filter>Proton\Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\ColorBlendVS.hlsl">
-      <Filter>Proton\Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\ColorIndexPS.hlsl">
-      <Filter>Proton\Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\ColorIndexVS.hlsl">
-      <Filter>Proton\Shader</Filter>
-    </FxCompile>
     <FxCompile Include="src\Proton\Shader\Includes\LightVectorData.hlsl">
       <Filter>Proton\Shader\Includes</Filter>
     </FxCompile>
@@ -350,17 +338,7 @@
     <FxCompile Include="src\Proton\Shader\PhongVS.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\SolidPS.hlsl">
-      <Filter>Proton\Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\SolidVS.hlsl">
-      <Filter>Proton\Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\TexturePS.hlsl">
-      <Filter>Proton\Shader</Filter>
-    </FxCompile>
-    <FxCompile Include="src\Proton\Shader\TextureVS.hlsl">
-      <Filter>Proton\Shader</Filter>
-    </FxCompile>
+    <FxCompile Include="src\Proton\Shader\DebugVS.hlsl" />
+    <FxCompile Include="src\Proton\Shader\DebugPS.hlsl" />
   </ItemGroup>
 </Project>

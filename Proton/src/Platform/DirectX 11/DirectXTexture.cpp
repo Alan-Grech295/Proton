@@ -15,14 +15,9 @@ namespace Proton
 		Load(path);
 	}
 
-	void DirectXTexture2D::Bind() const
+	void DirectXTexture2D::Bind()
 	{
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->PSSetShaderResources(m_Slot, 1, pTextureView.GetAddressOf());
-	}
-
-	void DirectXTexture2D::Unbind() const
-	{
-		
 	}
 
 	/*void DirectXTexture2D::Load(std::string path)
@@ -83,7 +78,7 @@ namespace Proton
 
 	void DirectXTexture2D::Load(std::string path)
 	{
-		Ref<Image> image = AssetManager::Get().GetImage(path);
+		Ref<Image> image = AssetManager::GetImage(path);
 
 		if (image == nullptr)
 		{
@@ -138,7 +133,10 @@ namespace Proton
 
 		HRESULT hr = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&desc, &srd, &pTexture);
 
-		LAST_ERROR(hr);
+		if (FAILED(hr))
+		{
+			LAST_ERROR(hr);
+		}
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
 		srvDesc.Format = format;

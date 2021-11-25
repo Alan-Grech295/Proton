@@ -2,7 +2,11 @@
 #include <memory>
 
 #ifdef PT_PLATFORM_WINDOWS
-	
+	#define DX_CHECK_ERROR(x) hr = x; \
+								if(FAILED(hr)) \
+								{ \
+									LAST_ERROR(); \
+								} 
 #else
 	#error Proton only supports windows!
 #endif

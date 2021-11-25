@@ -2,6 +2,8 @@
 #include "entt.hpp"
 #include "Proton\Core\TimeStep.h"
 #include "Proton\Renderer\Framebuffer.h"
+#include "Proton\Renderer\Bindables\Buffer.h"
+#include "SceneCamera.h"
 #include <unordered_map>
 
 namespace Proton
@@ -13,10 +15,13 @@ namespace Proton
 
 	class Scene
 	{
+		//TODO: Remove friend class?
 		friend class Entity;
 		friend class SceneSerializer;
 		friend class SceneHierarchyPanel;
 		friend class EditorLayer;
+
+		friend class SceneRenderer;
 	public:
 		Scene();
 		~Scene();
@@ -24,7 +29,8 @@ namespace Proton
 		Entity CreateEntity(const std::string& name = std::string());
 		void DestroyEntity(Entity entity);
 
-		void OnUpdate(TimeStep ts);
+		void OnRuntimeUpdate(TimeStep ts);
+		void OnEditorUpdate(TimeStep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 		uint32_t GetViewportWidth() { return m_ViewportWidth; }
 		uint32_t GetViewportHeight() { return m_ViewportHeight; }
@@ -33,6 +39,8 @@ namespace Proton
 		uint64_t GetUUIDFromEntity(Entity entity);
 
 		Entity FindEntityWithTag(const std::string& tag);
+
+		void SetUpdateEditorCamera(bool update) { m_UpdateEditorCam = update; }
 
 		template<typename T>
 		inline Entity FindEntityWithComponent()
@@ -44,6 +52,14 @@ namespace Proton
 			else
 				return Entity{ view[0], this };
 		}
+
+		void ClearEntities()
+		{
+			m_Registry = entt::registry();
+		}
+
+		//TEMP
+		void DrawDebugLine(DirectX::XMFLOAT3 pointA, DirectX::XMFLOAT3 pointB, float r, float g, float b);
 	private:
 		Entity CreateEntityWithUUID(const uint64_t uuid = 0, const std::string& name = std::string());
 		void DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
@@ -68,5 +84,19 @@ namespace Proton
 
 		std::unordered_map<uint32_t, uint64_t> m_EntityUUID;
 		std::unordered_map<uint64_t, uint32_t> m_UUIDEntity;
+
+		//Editor Camera TEMP
+		DirectX::XMFLOAT3 m_EditorCamPosition = { 0, 0, 0 };
+		DirectX::XMFLOAT3 m_EditorCamRotation = { 0, 0, 0 };
+		SceneCamera m_EditorCam;
+		float m_EditorCamSpeed = 15.0f;
+		float m_EditorCamRotationSpeed = 0.8f;
+		bool m_UpdateEditorCam = false;
+
+		//TEMP (for debug lines)
+		Scope<VertexBuffer> m_DebugVertBuffer;
+		Scope<VertexShader> m_DebugVertShader;
+		Scope<PixelShader> m_DebugPixShader;
+		Scope<VertexConstantBuffer> m_ViewProjBuffer;
 	};
 }

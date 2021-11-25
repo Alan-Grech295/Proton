@@ -25,8 +25,29 @@ namespace Proton
 
 	void DirectXRendererAPI::DrawIndexed(const UINT count)
 	{
-		pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		//pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		pContext->DrawIndexed(count, 0u, 0u);
+	}
+
+	void DirectXRendererAPI::Draw(const UINT count)
+	{
+		pContext->Draw(count, 0u);
+	}
+
+	void DirectXRendererAPI::SetTopology(const Topology topology)
+	{
+		switch (topology)
+		{
+		case Topology::Triangle:
+			pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			break;
+		case Topology::Line:
+			pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
+			break;
+		case Topology::Point:
+			pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
+			break;
+		}
 	}
 
 	void DirectXRendererAPI::BindSwapChain()
@@ -39,56 +60,7 @@ namespace Proton
 		pContext->RSSetViewports(1, &vp);
 	}
 
-	void DirectXRendererAPI::Resize(uint32_t width, uint32_t height)
-	{
-		m_Width = width;
-		m_Height = height;
-
-		pTarget->Release();
-
-		pSwap->ResizeBuffers(0, m_Width, m_Height, DXGI_FORMAT_UNKNOWN, 0);
-
-		wrl::ComPtr<ID3D11Resource> pBackBuffer;
-		pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer);
-		pDevice->CreateRenderTargetView(
-			pBackBuffer.Get(),
-			nullptr,
-			&pTarget
-		);
-
-		//Create depth stencil texture
-		wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
-		D3D11_TEXTURE2D_DESC descDepth = {};
-		descDepth.Width = m_Width;
-		descDepth.Height = m_Height;
-		descDepth.MipLevels = 1;
-		descDepth.ArraySize = 1;
-		descDepth.Format = DXGI_FORMAT_D32_FLOAT;
-		descDepth.SampleDesc.Count = 1;
-		descDepth.SampleDesc.Quality = 0;
-		descDepth.Usage = D3D11_USAGE_DEFAULT;
-		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
-
-		pDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil);
-
-		//Create depth stencil view
-		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
-		descDSV.Format = DXGI_FORMAT_D32_FLOAT;
-		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-		descDSV.Texture2D.MipSlice = 0;
-
-		pDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &pDSV);
-
-		//Configure viewport
-		vp.Width = (FLOAT)m_Width;
-		vp.Height = (FLOAT)m_Height;
-		vp.MinDepth = 0;
-		vp.MaxDepth = 1;
-		vp.TopLeftX = 0;
-		vp.TopLeftY = 0;
-	}
-
-	void DirectXRendererAPI::Initialize(WindowsWindow& window, HWND hWnd)
+	void DirectXRendererAPI::Initialise(const Window& window)
 	{
 		PT_CORE_INFO("Created DirectX RendererAPI");
 		m_Width = window.GetWidth();
@@ -107,7 +79,7 @@ namespace Proton
 		sd.SampleDesc.Quality = 0;
 		sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 		sd.BufferCount = 1;
-		sd.OutputWindow = hWnd;
+		sd.OutputWindow = (HWND)window.GetNativeWindow();
 		sd.Windowed = TRUE;
 		sd.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 		sd.Flags = 0;
@@ -175,12 +147,62 @@ namespace Proton
 		vp.MaxDepth = 1;
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
-
-		m_Initialized = true;
 	}
 
-	void DirectXRendererAPI::ShowFrame()
+	void DirectXRendererAPI::Present()
 	{
 		pSwap->Present(isVSync, 0);
+	}
+
+	void DirectXRendererAPI::Resize(uint32_t width, uint32_t height)
+	{
+		m_Width = width;
+		m_Height = height;
+
+		if (!pTarget)
+			return;
+
+		pTarget->Release();
+
+		pSwap->ResizeBuffers(0, m_Width, m_Height, DXGI_FORMAT_UNKNOWN, 0);
+
+		wrl::ComPtr<ID3D11Resource> pBackBuffer;
+		pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer);
+		pDevice->CreateRenderTargetView(
+			pBackBuffer.Get(),
+			nullptr,
+			&pTarget
+		);
+
+		//Create depth stencil texture
+		wrl::ComPtr<ID3D11Texture2D> pDepthStencil;
+		D3D11_TEXTURE2D_DESC descDepth = {};
+		descDepth.Width = m_Width;
+		descDepth.Height = m_Height;
+		descDepth.MipLevels = 1;
+		descDepth.ArraySize = 1;
+		descDepth.Format = DXGI_FORMAT_D32_FLOAT;
+		descDepth.SampleDesc.Count = 1;
+		descDepth.SampleDesc.Quality = 0;
+		descDepth.Usage = D3D11_USAGE_DEFAULT;
+		descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+
+		pDevice->CreateTexture2D(&descDepth, nullptr, &pDepthStencil);
+
+		//Create depth stencil view
+		D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
+		descDSV.Format = DXGI_FORMAT_D32_FLOAT;
+		descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		descDSV.Texture2D.MipSlice = 0;
+
+		pDevice->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, &pDSV);
+
+		//Configure viewport
+		vp.Width = (FLOAT)m_Width;
+		vp.Height = (FLOAT)m_Height;
+		vp.MinDepth = 0;
+		vp.MaxDepth = 1;
+		vp.TopLeftX = 0;
+		vp.TopLeftY = 0;
 	}
 }

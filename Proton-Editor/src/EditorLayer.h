@@ -4,6 +4,8 @@
 #include "imgui\imgui.h"
 #include "Panels\SceneHierarchyPanel.h"
 #include "Panels\AssetViewerPanel.h"
+#include "Panels\ConsolePanel.h"
+#include <Proton\Renderer\SceneRenderer.h>
 #include <Proton\Scene\AssetManager.h>
 
 namespace Proton
@@ -19,7 +21,14 @@ namespace Proton
 		virtual void OnAttach() override;
 		virtual void OnEvent(Event& e) override;
 
-		void MoveCamera(TimeStep ts);
+		void DrawScope(const ScopeNode* scope, uint32_t scopeLevel);
+	private:
+		bool OnKeyPressed(KeyPressedEvent& e);
+
+		void NewScene();
+		void OpenScene();
+		void SaveScene();
+		void SaveSceneAs();
 	private:
 		Entity m_CameraEntity;
 		Entity m_GoblinEntity;
@@ -27,15 +36,12 @@ namespace Proton
 		Entity m_PointLight;
 
 		Ref<Scene> m_ActiveScene;
+		//Scope<SceneRenderer> m_SceneRenderer;
 
 		ImVec2 m_ViewportSize;		
 
-		SceneHierarchyPanel sceneHierarchy;
-		AssetViewerPanel assetViewer{"C:\\Dev\\Proton\\Proton-Editor"};
+		std::string saveFilePath;
 
-		float cameraSpeed = 15.0f;
-		float rotationSpeed = 0.8f;
-		bool enableCamUpdate = true;
 		bool cursor = true;
 
 		struct
@@ -49,3 +55,7 @@ namespace Proton
 		} m_Transform;
 	};
 }
+
+#define LOG_ERROR(x) Proton::ConsolePanel::LogError(x)
+#define LOG_WARNING(x) Proton::ConsolePanel::LogWarning(x)
+#define LOG_TRACE(x) Proton::ConsolePanel::LogTrace(x)

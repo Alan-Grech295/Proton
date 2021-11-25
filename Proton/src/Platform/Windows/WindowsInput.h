@@ -24,13 +24,13 @@ namespace Proton
 		std::bitset<nKeys> pressedKeyStates;
 		std::bitset<nKeys> releasedKeyStates;
 		std::bitset<nMouseButtons> mbStates;
-		float mousePosX;
-		float mousePosY;
-		float mouseDeltaX;
-		float mouseDeltaY;
+		float mousePosX = 0;
+		float mousePosY = 0;
+		float mouseDeltaX = 0;
+		float mouseDeltaY = 0;
 
-		float accMouseDeltaX;
-		float accMouseDeltaY;
+		float accMouseDeltaX = 0;
+		float accMouseDeltaY = 0;
 	private:
 		static WindowsInput* s_Instance;
 	};

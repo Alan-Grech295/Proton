@@ -8,6 +8,8 @@ namespace fs = std::filesystem;
 
 namespace Proton
 {
+	AssetManager AssetManager::manager = AssetManager();
+
 	AssetManager::AssetManager()
 		:
 		m_ProjectPath("")
@@ -20,20 +22,20 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
-		m_PostModelImports.clear();
+		manager.m_PostModelImports.clear();
 
-		ScanDirectory(m_ProjectPath);
+		manager.ScanDirectory(manager.m_ProjectPath);
 
-		for (auto& path : m_PostImageImports)
+		for (auto& path : manager.m_PostImageImports)
 		{
-			File* file = WriteImageData(path);
+			File* file = manager.WriteImageData(path);
 
 			file->WriteFile();
 
 			delete file;
 		}
 
-		for (auto& pair : m_PostModelReads)
+		for (auto& pair : manager.m_PostModelReads)
 		{
 			std::string modelPath = fs::path(pair.first).replace_extension().string();
 
@@ -42,26 +44,26 @@ namespace Proton
 
 			file.Read<uint32_t>();
 
-			m_ModelAssets[modelPath] = ImportModelAsset(file, fs::path(pair.first).remove_filename().string());
+			manager.m_ModelAssets[modelPath] = manager.ImportModelAsset(file, fs::path(pair.first).remove_filename().string());
 
 			//delete& file;
 		}
 
-		for (auto& path : m_PostModelImports)
+		for (auto& path : manager.m_PostModelImports)
 		{
-			File* file = WriteModelData(path);
+			File* file = manager.WriteModelData(path);
 
 			file->WriteFile();
 
 			delete file;
 		}
 
-		for (auto& path : m_PostPrefabReads)
+		for (auto& path : manager.m_PostPrefabReads)
 		{
 			File& file = *new File(path, 0);
 			file.ReadFile();
 
-			m_Prefabs[path] = ImportPrefab(file);
+			manager.m_Prefabs[path] = manager.ImportPrefab(file);
 
 			delete &file;
 		}
@@ -69,22 +71,22 @@ namespace Proton
 
 	void AssetManager::SetProjectPath(const std::filesystem::path path)
 	{
-		m_ProjectPath = path;
+		manager.m_ProjectPath = path;
 	}
 
 	Ref<Image> AssetManager::GetImage(const std::string& path)
 	{
-		return m_ImageAssets[path];
+		return manager.m_ImageAssets[path];
 	}
 
 	Ref<Model> AssetManager::GetModel(const std::string& path)
 	{
-		return m_ModelAssets[path];
+		return manager.m_ModelAssets[path];
 	}
 
 	Ref<Prefab> AssetManager::GetPrefab(const std::string& path)
 	{
-		return m_Prefabs[path];
+		return manager.m_Prefabs[path];
 	}
 
 	void AssetManager::CreatePrefab(Entity& parentEntity, std::string savePath)
@@ -123,7 +125,7 @@ namespace Proton
 
 		buffer->WriteString(parentEntity.GetComponent<TagComponent>().tag);
 		buffer->Write(transformationMatrix);
-		buffer->Write(parent.m_ChildNodes.size());
+		buffer->Write((uint32_t)parent.m_ChildNodes.size());
 
 		if (parentEntity.HasComponent<MeshComponent>())
 		{
@@ -135,7 +137,7 @@ namespace Proton
 			{
 				Mesh& curMesh = *mesh.m_MeshPtrs[i];
 
-				uint32_t modelID = GetOrAdd(modelPaths, curMesh.m_ModelPath);
+				uint32_t modelID = manager.GetOrAdd(modelPaths, curMesh.m_ModelPath);
 
 				buffer->Write(modelID);
 				buffer->WriteString(curMesh.m_Name);
@@ -150,7 +152,7 @@ namespace Proton
 		for (int i = 0; i < parent.m_ChildNodes.size(); i++)
 		{
 			nodeIndex++;
-			WriteNode(buffer, modelPaths, 0, nodeIndex, parent.m_ChildNodes[i]);
+			manager.WriteNode(buffer, modelPaths, 0, nodeIndex, parent.m_ChildNodes[i]);
 		}
 
 		uint64_t fileSize = buffer->size() + 8;
@@ -174,7 +176,7 @@ namespace Proton
 
 		file.WriteFile();
 
-		m_Prefabs[savePath] = CreatePrefabFromEntity(savePath, parentEntity);
+		manager.m_Prefabs[savePath] = manager.CreatePrefabFromEntity(savePath, parentEntity);
 
 		delete &file;
 	}
@@ -340,7 +342,7 @@ namespace Proton
 		buffer->WriteString(entity.GetComponent<TagComponent>().tag);
 		buffer->Write(parentIndex);
 		buffer->Write(transformationMatrix);
-		buffer->Write(child.m_ChildNodes.size());
+		buffer->Write((uint32_t)child.m_ChildNodes.size());
 		buffer->Write(transform.position);
 		buffer->Write(transform.rotation);
 		buffer->Write(transform.scale);
@@ -373,12 +375,6 @@ namespace Proton
 			nodeIndex++;
 			WriteNode(buffer, modelPaths, currentIndex, nodeIndex, child.m_ChildNodes[i]);
 		}
-	}
-
-	AssetManager& AssetManager::Get()
-	{
-		static AssetManager manager;
-		return manager;
 	}
 
 	void AssetManager::ScanDirectory(const std::filesystem::path& path)
@@ -492,7 +488,7 @@ namespace Proton
 		};
 
 		std::vector<std::vector<Vertex>> allVerts;
-		std::vector<std::vector<uint16_t>> allIndices;
+		std::vector<std::vector<uint32_t>> allIndices;
 
 		allVerts.resize(pScene->mNumMeshes);
 		allIndices.resize(pScene->mNumMeshes);
@@ -515,7 +511,7 @@ namespace Proton
 			meshes[i] = ModelCreator::ParseMesh(basePath, modelPath.string(), mesh, pScene->mMaterials);
 
 			allVerts[i].reserve(mesh.mNumVertices);
-			for (unsigned int j = 0; j < mesh.mNumVertices; j++)
+			for (uint32_t j = 0; j < mesh.mNumVertices; j++)
 			{
 				allVerts[i].push_back({
 					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[j]),
@@ -528,7 +524,7 @@ namespace Proton
 
 			bufferSize += sizeof(uint32_t) + sizeof(Vertex) * allVerts[i].size();		//Vertex data
 
-			allIndices[i].reserve((UINT)mesh.mNumFaces * 3);
+			allIndices[i].reserve(mesh.mNumFaces * 3);
 			for (unsigned int j = 0; j < mesh.mNumFaces; j++)
 			{
 				const auto& face = mesh.mFaces[j];
@@ -538,7 +534,7 @@ namespace Proton
 				allIndices[i].push_back(face.mIndices[2]);
 			}
 
-			bufferSize += sizeof(uint32_t) + sizeof(uint16_t) * allIndices[i].size();	//Index data
+			bufferSize += sizeof(uint32_t) + sizeof(uint32_t) * allIndices[i].size();	//Index data
 
 			bufferSize += 15;
 
@@ -587,7 +583,7 @@ namespace Proton
 			uint32_t numVertBytes = sizeof(Vertex) * allVerts[i].size();
 			file->Write(allVerts[i].data(), numVertBytes);
 
-			uint32_t numIndexBytes = sizeof(uint16_t) * allIndices[i].size();
+			uint32_t numIndexBytes = sizeof(uint32_t) * allIndices[i].size();
 			file->Write(allIndices[i].data(), numIndexBytes);
 
 			std::string diffuseAssetPath = "";
@@ -708,6 +704,7 @@ namespace Proton
 
 	Ref<Model> AssetManager::ImportModelAsset(File& file, const std::string& basePath)
 	{
+		//TODO: Change model import and export
 		namespace dx = DirectX;
 		Ref<Model> modelAsset = CreateRef<Model>();
 
@@ -734,7 +731,7 @@ namespace Proton
 			Vertex* vertices = file.ReadArray<Vertex>(numVertBytes);
 
 			uint32_t numIndexBytes;
-			uint16_t* indices = file.ReadArray<uint16_t>(numIndexBytes);
+			uint32_t* indices = file.ReadArray<uint32_t>(numIndexBytes);
 
 			std::string diffuseAssetPath = "";
 			std::string specularAssetPath = "";
@@ -779,37 +776,34 @@ namespace Proton
 			if (mesh->hasSpecular || mesh->hasNormalMap || mesh->hasDiffuseMap)
 				mesh->m_Sampler = Sampler::Create(meshTag);
 
-			mesh->m_IndexBuffer = IndexBuffer::Create(meshTag, indices, (uint32_t)(numIndexBytes / (float)sizeof(uint16_t)));
-
-			Ref<VertexShader> vs;
-
 			if (mesh->hasSpecular && !mesh->hasNormalMap)
 			{
 				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
-				vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (mesh->hasNormalMap && !mesh->hasSpecular)
 			{
 				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
-				vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (mesh->hasNormalMap && mesh->hasSpecular)
 			{
 				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
-				vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (!mesh->hasNormalMap && !mesh->hasSpecular && mesh->hasDiffuseMap)
 			{
 				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
-				vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 			}
 			else
 			{
 				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
-				vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 			}
 
-			mesh->m_VertShader = vs;
+			mesh->m_IndexBuffer = IndexBuffer::Create(meshTag);
+			mesh->m_IndexBuffer->SetRawData(indices, numIndexBytes / sizeof(uint32_t));
 
 			BufferLayout layout = {
 				{"POSITION", ShaderDataType::Float3},
@@ -819,11 +813,11 @@ namespace Proton
 				{"TEXCOORD", ShaderDataType::Float2}
 			};
 
-			Ref<VertexBuffer> vertBuffer = VertexBuffer::Create(meshTag, sizeof(Vertex), vertices, (uint32_t)(numVertBytes / sizeof(Vertex)));
-
-			vertBuffer->SetLayout(layout, &*vs);
-
-			mesh->m_VertBuffer = vertBuffer;
+			//TODO: Set actually dynamic vertices
+			//Currently the vertex data is passed directly to the buffer, but in the future
+			//will have to filter out certain data
+			mesh->m_VertBuffer = VertexBuffer::Create(meshTag, layout, mesh->m_VertShader.get());
+			mesh->m_VertBuffer->SetRawData((char*)vertices, numVertBytes);
 
 			if (!mesh->hasDiffuseMap && !mesh->hasSpecular && !mesh->hasNormalMap)
 			{

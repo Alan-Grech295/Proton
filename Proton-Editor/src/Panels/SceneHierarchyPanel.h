@@ -13,14 +13,20 @@ namespace Proton
 		SceneHierarchyPanel(const Ref<Scene>& scene);
 		~SceneHierarchyPanel();
 
-		void SetScene(const Ref<Scene> scene);
+		static void SetScene(const Ref<Scene> scene);
 
-		void OnImGuiRender();
+		static void OnImGuiRender();
 	private:
 		void DrawEntityNode(Entity entity);
 		void DrawChildNode(Entity entity);
 		void DeleteChildNode(Entity entity);
 		void DrawComponents(Entity entity);
+
+		static SceneHierarchyPanel& Get()
+		{
+			static SceneHierarchyPanel panel;
+			return panel;
+		}
 	private:
 		Ref<Scene> m_Scene;
 		Entity m_Selected;

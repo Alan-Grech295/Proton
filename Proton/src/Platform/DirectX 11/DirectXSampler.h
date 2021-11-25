@@ -1,5 +1,5 @@
 #pragma once
-#include "Proton\Renderer\Sampler.h"
+#include "Proton\Renderer\Bindables\Sampler.h"
 #include <wrl.h>
 #include <d3d11.h>
 
@@ -13,8 +13,7 @@ namespace Proton
 		DirectXSampler(const std::string& tag, int slot = 0);
 		virtual ~DirectXSampler() {}
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual void Bind() override;
 
 		virtual std::string GetUID() const noexcept override;
 	private:

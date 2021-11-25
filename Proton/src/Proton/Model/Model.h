@@ -1,7 +1,7 @@
 #pragma once
-#include "Proton\Renderer\Buffer.h"
-#include "Proton\Renderer\Texture.h"
-#include "Proton\Renderer\Sampler.h"
+#include "Proton\Renderer\Bindables\Buffer.h"
+#include "Proton\Renderer\Bindables\Texture.h"
+#include "Proton\Renderer\Bindables\Sampler.h"
 #include <DirectXMath.h>
 #include <memory>
 #include <vector>

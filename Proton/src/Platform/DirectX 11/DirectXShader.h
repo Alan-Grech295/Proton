@@ -1,5 +1,5 @@
 #pragma once
-#include "Proton\Renderer\Shader.h"
+#include "Proton\Renderer\Bindables\Shader.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
 #include "Proton\Renderer\RenderCommand.h"
 #include <wrl.h>
@@ -17,8 +17,7 @@ namespace Proton
 		DirectXPixelShader(std::string path);
 		virtual ~DirectXPixelShader() {}
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual void Bind() override;
 
 		virtual std::string GetUID() const noexcept override;
 	private:
@@ -34,8 +33,7 @@ namespace Proton
 		DirectXVertexShader(std::string path);
 		virtual ~DirectXVertexShader() {}
 
-		virtual void Bind() const override;
-		virtual void Unbind() const override;
+		virtual void Bind() override;
 
 		virtual std::string GetUID() const noexcept override;
 	private:

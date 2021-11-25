@@ -15,25 +15,25 @@ namespace Proton
 
 			DirectX::XMFLOAT3 localMove = { 0, 0, 0 };
 
-			if (Input::IsKeyPressed(PT_KEY_D))
+			if (Input::IsKeyPressed(Key::D))
 				localMove.x += speed;
 
-			if (Input::IsKeyPressed(PT_KEY_A))
+			if (Input::IsKeyPressed(Key::A))
 				localMove.x -= speed;
 
-			if (Input::IsKeyPressed(PT_KEY_E))
+			if (Input::IsKeyPressed(Key::E))
 				localMove.y += speed;
 
-			if (Input::IsKeyPressed(PT_KEY_Q))
+			if (Input::IsKeyPressed(Key::Q))
 				localMove.y -= speed;
 
-			if (Input::IsKeyPressed(PT_KEY_W))
+			if (Input::IsKeyPressed(Key::W))
 				localMove.z += speed;
 
-			if (Input::IsKeyPressed(PT_KEY_S))
+			if (Input::IsKeyPressed(Key::S))
 				localMove.z -= speed;
 
-			if (Input::IsKeyReleased(PT_KEY_SPACE))
+			if (Input::IsKeyReleased(Key::Space))
 			{
 				enableCursor = !enableCursor;
 			}

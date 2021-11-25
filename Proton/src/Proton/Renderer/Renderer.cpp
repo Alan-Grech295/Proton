@@ -4,8 +4,6 @@
 
 namespace Proton
 {
-	Camera* Renderer::m_Camera = nullptr;
-
 	void Renderer::BeginScene()
 	{
 		
@@ -19,15 +17,13 @@ namespace Proton
 	void Renderer::Submit(Model& model)
 	{
 		PT_PROFILE_FUNCTION();
-
-		//model.Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), DirectX::XMMatrixIdentity());
 	}
 
-	void Renderer::Submit(const VertexBuffer* vertBuffer, const IndexBuffer* indexBuffer)
+	void Renderer::Submit(VertexBuffer* vertBuffer, IndexBuffer* indexBuffer)
 	{
 		vertBuffer->Bind();
 		indexBuffer->Bind();
-		RenderCommand::DrawIndexed(indexBuffer->GetCount());
+		RenderCommand::DrawIndexed(indexBuffer->size());
 	}
 
 	void Renderer::DrawCall(const UINT count)

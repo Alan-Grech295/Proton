@@ -106,17 +106,15 @@ namespace Proton
 		AssetManager();
 		~AssetManager();
 
-		void ScanProject();
-		void SetProjectPath(const std::filesystem::path path);
-		Ref<Image> GetImage(const std::string& path);
+		static void ScanProject();
+		static void SetProjectPath(const std::filesystem::path path);
+		static Ref<Image> GetImage(const std::string& path);
 
-		Ref<Model> GetModel(const std::string& path);
+		static Ref<Model> GetModel(const std::string& path);
 
-		Ref<Prefab> GetPrefab(const std::string& path);
+		static Ref<Prefab> GetPrefab(const std::string& path);
 
-		void CreatePrefab(Entity& parentEntity, std::string savePath);
-
-		static AssetManager& Get();
+		static void CreatePrefab(Entity& parentEntity, std::string savePath);
 	private:
 		void ScanDirectory(const std::filesystem::path& path);
 		void HandleFile(const std::filesystem::path& path);
@@ -158,6 +156,8 @@ namespace Proton
 
 		uint32_t m_NextImageID = 1;
 		uint32_t m_NextModelID = 1;
+
+		static AssetManager manager;
 	};
 
 	template<typename T>

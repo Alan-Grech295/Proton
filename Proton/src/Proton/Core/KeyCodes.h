@@ -1,123 +1,139 @@
 #pragma once
-#define PT_BACKSPACE			0x08
-#define PT_TAB					0x09
-#define PT_CLEAR				0x0C
-#define PT_ENTER				0x0D
-#define PT_SHIFT				0x10
-#define PT_CONTROL				0x11
-#define PT_MENU					0x12
-#define PT_PAUSE				0x13
-#define PT_CAPITAL				0x14
 
-#define PT_KEY_SPACE			0x20
-#define PT_KEY_PRIOR			0x21
-#define PT_KEY_NEXT				0x22
-#define PT_KEY_END				0x23
-#define PT_KEY_HOME				0x24
-#define PT_KEY_LEFT				0x25
-#define PT_KEY_UP				0x26
-#define PT_KEY_RIGHT			0x27
-#define PT_KEY_DOWN				0x28
-#define PT_KEY_SELECT			0x29
-#define PT_KEY_PRINT			0x2A
-#define PT_KEY_EXECUTE			0x2B
-#define PT_KEY_SNAPSHOT			0x2C
-#define PT_KEY_INSERT			0x2D
-#define PT_KEY_DELETE			0x2E
-#define PT_KEY_HELP				0x2F
-#define PT_KEY_ESCAPE			0x1B
+namespace Proton 
+{
+	using KeyCode = uint16_t;
 
-#define PT_KEY_0				0x30
-#define PT_KEY_1				0x31
-#define PT_KEY_2				0x32
-#define PT_KEY_3				0x33
-#define PT_KEY_4				0x34
-#define PT_KEY_5				0x35
-#define PT_KEY_6				0x36
-#define PT_KEY_7				0x37
-#define PT_KEY_8				0x38
-#define PT_KEY_9				0x39
+	namespace Key
+	{
+		enum : KeyCode
+		{
+			//Windows keys
+			A					= 0x41,
+			B					= 0x42,
+			C					= 0x43,
+			D					= 0x44,
+			E					= 0x45,
+			F					= 0x46,
+			G					= 0x47,
+			H					= 0x48,
+			I					= 0x49,
+			J					= 0x4A,
+			K					= 0x4B,
+			L					= 0x4C,
+			M					= 0x4D,
+			N					= 0x4E,
+			O					= 0x4F,
+			P					= 0x50,
+			Q					= 0x51,
+			R					= 0x52,
+			S					= 0x53,
+			T					= 0x54,
+			U					= 0x55,
+			V					= 0x56,
+			W					= 0x57,
+			X					= 0x58,
+			Y					= 0x59,
+			Z					= 0x5A,
 
-#define PT_KEY_A				0x41
-#define PT_KEY_B				0x42
-#define PT_KEY_C				0x43
-#define PT_KEY_D				0x44
-#define PT_KEY_E				0x45
-#define PT_KEY_F				0x46
-#define PT_KEY_G				0x47
-#define PT_KEY_H				0x48
-#define PT_KEY_I				0x49
-#define PT_KEY_J				0x4A
-#define PT_KEY_K				0x4B
-#define PT_KEY_L				0x4C
-#define PT_KEY_M				0x4D
-#define PT_KEY_N				0x4E
-#define PT_KEY_O				0x4F
-#define PT_KEY_P				0x50
-#define PT_KEY_Q				0x51
-#define PT_KEY_R				0x52
-#define PT_KEY_S				0x53
-#define PT_KEY_T				0x54
-#define PT_KEY_U				0x55
-#define PT_KEY_V				0x56
-#define PT_KEY_W				0x57
-#define PT_KEY_X				0x58
-#define PT_KEY_Y				0x59
-#define PT_KEY_Z				0x5A
+			D0					= 0x30,	/* 0 */
+			D1					= 0x31,	/* 1 */
+			D2					= 0x32,	/* 2 */
+			D3					= 0x33,	/* 3 */
+			D4					= 0x34,	/* 4 */
+			D5					= 0x35,	/* 5 */
+			D6					= 0x36,	/* 6 */
+			D7					= 0x37,	/* 7 */
+			D8					= 0x38,	/* 8 */
+			D9					= 0x39,	/* 9 */
 
-#define PT_KEY_COMMA			0xBC
-#define PT_KEY_FULLSTOP			0xBE
-#define PT_KEY_FSLASH			0xBF
-#define PT_KEY_BSLASH			0xDC
-#define PT_EQUALS				0xBB
-#define PT_DASH					0xBD
+			Left				= 0x25,
+			Up					= 0x26,
+			Right				= 0x27,
+			Down				= 0x28,
+			PageUp				= 0x21,
+			PageDown			= 0x22,
+			End					= 0x23,
+			Home				= 0x24,
 
-#define PT_SLEEP				0x5F
+			Comma				= 0xBC,
+			Period				= 0xBE,
+			ForwardSlash		= 0xBF,
+			BackwardSlash		= 0xDC,
+			Equals				= 0xBB,
+			Minus				= 0xBD,
 
-#define PT_NUMPAD0				0x60
-#define PT_NUMPAD1				0x61
-#define PT_NUMPAD2				0x62
-#define PT_NUMPAD3				0x63
-#define PT_NUMPAD4				0x64
-#define PT_NUMPAD5				0x65
-#define PT_NUMPAD6				0x66
-#define PT_NUMPAD7				0x67
-#define PT_NUMPAD8				0x68
-#define PT_NUMPAD9				0x69
-#define PT_MULTIPLY				0x6A
-#define PT_KEY_ADD				0x6B
-#define PT_KEY_SEPARATOR		0x6C
-#define PT_KEY_SUBTRACT			0x6D
-#define PT_KEY_DECIMAL			0x6E
-#define PT_KEY_DIVIDE			0x6F
-#define PT_F1					0x70
-#define PT_F2					0x71
-#define PT_F3					0x72
-#define PT_F4					0x73
-#define PT_F5					0x74
-#define PT_F6					0x75
-#define PT_F7					0x76
-#define PT_F8					0x77
-#define PT_F9					0x78
-#define PT_F10					0x79
-#define PT_F11					0x7A
-#define PT_F12					0x7B
-#define PT_F13					0x7C
-#define PT_F14					0x7D
-#define PT_F15					0x7E
-#define PT_F16					0x7F
-#define PT_F17					0x80
-#define PT_F18					0x81
-#define PT_F19					0x82
-#define PT_F20					0x83
-#define PT_F21					0x84
-#define PT_F22					0x85
-#define PT_F23					0x86
-#define PT_F24					0x87
+			Backspace			= 0x08,
+			Tab					= 0x09,
+			Clear				= 0x0C,
+			Enter				= 0x0D,
+			Shift				= 0x10,
+			Control				= 0x11,
+			Alt					= 0x12,
+			Pause				= 0x13,
+			CapsLock			= 0x14,
+			Space				= 0x20,
 
-#define PT_LSHIFT				0xA0
-#define PT_RSHIFT				0xA1
-#define PT_LCONTROL				0xA2
-#define PT_RCONTROL				0xA3
-#define PT_LMENU				0xA4
-#define PT_RMENU				0xA5
+			Select				= 0x29,
+			Print				= 0x2A,
+			Execute				= 0x2B,
+			PrintScreen			= 0x2C,
+			Insert				= 0x2D,
+			Delete				= 0x2E,
+			Help				= 0x2F,
+			Escape				= 0x1B,
+
+			LeftShift			= 0xA0,
+			RightShift			= 0xA1,
+			LeftControl			= 0xA2,
+			RightControl		= 0xA3,
+			LMenu				= 0xA4,
+			RMenu				= 0xA5,
+
+			/*Keypad*/
+			KP0					= 0x60,	
+			KP1					= 0x61,	
+			KP2					= 0x62,	
+			KP3					= 0x63,	
+			KP4					= 0x64,	
+			KP5					= 0x65,	
+			KP6					= 0x66,	
+			KP7					= 0x67,	
+			KP8					= 0x68,	
+			KP9					= 0x69,	
+								
+			Multiply			= 0x6A,
+			Add					= 0x6B,
+			Separator			= 0x6C,
+			Subtract			= 0x6D,
+			Decimal				= 0x6E,
+			Divide				= 0x6F,
+
+			/* Function Keys */
+			F1					= 0x70,
+			F2					= 0x71,
+			F3					= 0x72,
+			F4					= 0x73,
+			F5					= 0x74,
+			F6					= 0x75,
+			F7					= 0x76,
+			F8					= 0x77,
+			F9					= 0x78,
+			F10					= 0x79,
+			F11					= 0x7A,
+			F12					= 0x7B,
+			F13					= 0x7C,
+			F14					= 0x7D,
+			F15					= 0x7E,
+			F16					= 0x7F,
+			F17					= 0x80,
+			F18					= 0x81,
+			F19					= 0x82,
+			F20					= 0x83,
+			F21					= 0x84,
+			F22					= 0x85,
+			F23					= 0x86,
+			F24					= 0x87,	
+		};
+	}
+}

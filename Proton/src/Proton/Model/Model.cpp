@@ -22,13 +22,15 @@ namespace Proton
 	{
 		namespace dx = DirectX;
 
-		Ref<Model> model = AssetManager::Get().GetModel(path);
+		Ref<Model> model = AssetManager::GetModel(path);
 
 		Node* node = model->rootNode;
 
 		Entity modelEntity = activeScene->CreateEntity(node->name);
 		NodeComponent& nodeComponent = modelEntity.GetComponent<NodeComponent>();
 		nodeComponent.m_PrefabName = "";
+
+		PT_CORE_TRACE((uint32_t)&nodeComponent);
 
 		std::string basePath = std::filesystem::path(path).remove_filename().string();
 
@@ -51,6 +53,11 @@ namespace Proton
 
 		MeshComponent& meshComponent = modelEntity.AddComponent<MeshComponent>(curMeshPtrs, curMeshPtrs.size());
 
+		for (auto child : nodeComponent.m_ChildNodes)
+		{
+			PT_CORE_TRACE(child.GetComponent<TagComponent>().tag);
+		}
+
 		return modelEntity;
 	}
 
@@ -58,7 +65,7 @@ namespace Proton
 	{
 		namespace dx = DirectX;
 
-		Ref<Prefab> prefab = AssetManager::Get().GetPrefab(path);
+		Ref<Prefab> prefab = AssetManager::GetPrefab(path);
 
 		Entity modelEntity = activeScene->CreateEntity(prefab->rootNode->name);
 		TransformComponent& transformComponent = modelEntity.GetComponent<TransformComponent>();
@@ -112,8 +119,8 @@ namespace Proton
 		NodeComponent& nodeComponent = childEntity.GetComponent<NodeComponent>();
 		nodeComponent.m_NodeName = node.name;
 		nodeComponent.m_Origin = transform;
-		nodeComponent.m_ParentEntity = parent;
-		nodeComponent.m_RootEntity = root;
+		//nodeComponent.m_ParentEntity = parent;
+		//nodeComponent.m_RootEntity = root;
 		nodeComponent.m_PrefabName = "";
 
 		for (size_t i = 0; i < node.numChildren; i++)
@@ -148,8 +155,6 @@ namespace Proton
 		NodeComponent& nodeComponent = childEntity.GetComponent<NodeComponent>();
 		nodeComponent.m_NodeName = node.name;
 		nodeComponent.m_Origin = transform;
-		nodeComponent.m_ParentEntity = parent;
-		nodeComponent.m_RootEntity = root;
 		nodeComponent.m_PrefabName = "";
 
 		for (size_t i = 0; i < node.numChildren; i++)
@@ -167,47 +172,7 @@ namespace Proton
 		PT_PROFILE_FUNCTION();
 
 		namespace dx = DirectX;
-		struct Vertex
-		{
-			dx::XMFLOAT3 pos;
-			dx::XMFLOAT3 n;
-			dx::XMFLOAT3 tangent;
-			dx::XMFLOAT3 bitangent;
-			dx::XMFLOAT2 uv;
-		};
 
-		std::vector<Vertex> vertices;
-		vertices.reserve(mesh.mNumVertices);
-
-		{
-			PT_PROFILE_SCOPE("Vertex Loading - Model::ParseMesh");
-			for (unsigned int i = 0; i < mesh.mNumVertices; i++)
-			{
-				vertices.push_back({
-					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]),
-					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]),
-					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mTangents[i]),
-					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mBitangents[i]),
-					*reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i])
-					});
-			}
-		}
-
-		std::vector<unsigned short> indices;
-		indices.reserve((UINT)mesh.mNumFaces * 3);
-
-		{
-			PT_PROFILE_SCOPE("Index Loading - Model::ParseMesh");
-			for (unsigned int i = 0; i < mesh.mNumFaces; i++)
-			{
-				const auto& face = mesh.mFaces[i];
-				assert(face.mNumIndices == 3);
-				indices.push_back(face.mIndices[0]);
-				indices.push_back(face.mIndices[1]);
-				indices.push_back(face.mIndices[2]);
-			}
-		}
-		
 		using namespace std::string_literals;
 
 		auto meshTag = modelPath + "%" + mesh.mName.C_Str();
@@ -215,6 +180,82 @@ namespace Proton
 		Mesh* pMesh = new Mesh(meshTag, mesh.mName.C_Str(), modelPath);
 
 		ModelCollection::AddMesh(meshTag, pMesh);
+
+		/*struct Vertex
+		{
+			dx::XMFLOAT3 pos;
+			dx::XMFLOAT3 n;
+			dx::XMFLOAT3 tangent;
+			dx::XMFLOAT3 bitangent;
+			dx::XMFLOAT2 uv;
+		};*/
+
+		if (pMesh->hasSpecular && !pMesh->hasNormalMap)
+		{
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
+			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+		}
+		else if (pMesh->hasNormalMap && !pMesh->hasSpecular)
+		{
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
+			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+		}
+		else if (pMesh->hasNormalMap && pMesh->hasSpecular)
+		{
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
+			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+		}
+		else if (!pMesh->hasNormalMap && !pMesh->hasSpecular && pMesh->hasDiffuseMap)
+		{
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
+			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+		}
+		else
+		{
+			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
+			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+		}
+
+		//std::vector<Vertex> vertices;
+		//vertices.reserve(mesh.mNumVertices);
+
+		BufferLayout layout = {
+			{"POSITION", ShaderDataType::Float3},
+			{"NORMAL", ShaderDataType::Float3},
+			{"TANGENT", ShaderDataType::Float3},
+			{"BITANGENT", ShaderDataType::Float3},
+			{"TEXCOORD", ShaderDataType::Float2}
+		};
+
+		pMesh->m_VertBuffer = VertexBuffer::Create(meshTag, layout, pMesh->m_VertShader.get());
+
+		{
+			PT_PROFILE_SCOPE("Vertex Loading - Model::ParseMesh");
+			for (unsigned int i = 0; i < mesh.mNumVertices; i++)
+			{
+				pMesh->m_VertBuffer->EmplaceBack(
+					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]),
+					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]),
+					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mTangents[i]),
+					*reinterpret_cast<dx::XMFLOAT3*>(&mesh.mBitangents[i]),
+					*reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i])
+					);
+			}
+		}
+
+		pMesh->m_IndexBuffer = IndexBuffer::Create(meshTag);
+		//indices.reserve((UINT)mesh.mNumFaces * 3);
+		{
+			PT_PROFILE_SCOPE("Index Loading - Model::ParseMesh");
+			for (unsigned int i = 0; i < mesh.mNumFaces; i++)
+			{
+				const auto& face = mesh.mFaces[i];
+				assert(face.mNumIndices == 3);
+				pMesh->m_IndexBuffer->EmplaceBack(face.mIndices[0]);
+				pMesh->m_IndexBuffer->EmplaceBack(face.mIndices[1]);
+				pMesh->m_IndexBuffer->EmplaceBack(face.mIndices[2]);
+			}
+		}
 
 		float shininess = 40.0f;
 		bool hasAlphaGloss = false;
@@ -264,52 +305,6 @@ namespace Proton
 			if(pMesh->hasSpecular || pMesh->hasNormalMap || pMesh->hasDiffuseMap)
 				pMesh->m_Sampler = Sampler::Create(meshTag);
 		}
-
-		pMesh->m_IndexBuffer = IndexBuffer::Create(meshTag, indices.data(), (uint32_t)indices.size());
-
-		Ref<VertexShader> vs;
-
-		if (pMesh->hasSpecular && !pMesh->hasNormalMap)
-		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
-			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
-		}
-		else if (pMesh->hasNormalMap && !pMesh->hasSpecular)
-		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
-			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
-		}
-		else if (pMesh->hasNormalMap && pMesh->hasSpecular)
-		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
-			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
-		}
-		else if (!pMesh->hasNormalMap && !pMesh->hasSpecular && pMesh->hasDiffuseMap)
-		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
-			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
-		}
-		else
-		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
-			vs = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
-		}
-		
-		pMesh->m_VertShader = vs;
-
-		BufferLayout layout = {
-			{"POSITION", ShaderDataType::Float3},
-			{"NORMAL", ShaderDataType::Float3},
-			{"TANGENT", ShaderDataType::Float3},
-			{"BITANGENT", ShaderDataType::Float3},
-			{"TEXCOORD", ShaderDataType::Float2}
-		};
-
-		Ref<VertexBuffer> vertBuffer = VertexBuffer::Create(meshTag, sizeof(Vertex), vertices.data(), (uint32_t)vertices.size());
-
-		vertBuffer->SetLayout(layout, &*vs);
-
-		pMesh->m_VertBuffer = vertBuffer;
 
 		if (!pMesh->hasDiffuseMap && !pMesh->hasSpecular && !pMesh->hasNormalMap)
 		{
@@ -384,6 +379,6 @@ namespace Proton
 			m_Sampler->Bind();
 		}
 
-		callback(m_IndexBuffer->GetCount());
+		callback(m_IndexBuffer->size());
 	}
 }

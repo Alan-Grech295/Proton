@@ -8,12 +8,16 @@ namespace Proton
 {
 	class DirectXRendererAPI : public RendererAPI
 	{
-		friend class WindowsWindow;
 	public:
 		virtual void SetClearColor(float r, float g, float b) override;
 		virtual void Clear() override;
 
 		virtual void DrawIndexed(const UINT count) override;
+		virtual void Draw(const UINT count) override;
+
+		virtual void SetTopology(const Topology topology) override;
+
+		virtual void SetVsync(bool vsync) override { isVSync = vsync; }
 
 		ID3D11Device* GetDevice() { return pDevice.Get(); }
 		ID3D11DeviceContext* GetContext() { return pContext.Get(); }
@@ -22,11 +26,11 @@ namespace Proton
 
 		void BindSwapChain() override;
 
-		void Resize(uint32_t width, uint32_t height);
-		const bool Initialized() const { return m_Initialized; }
-	private:
-		void Initialize(WindowsWindow& window, HWND hWnd);
-		void ShowFrame();
+		virtual void Initialise(const Window& window) override;
+
+		virtual void Present() override;
+
+		virtual void Resize(uint32_t width, uint32_t height) override;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
@@ -39,7 +43,6 @@ namespace Proton
 		UINT m_Width, m_Height;
 
 		bool isVSync;
-		bool m_Initialized = false;
 
 		float* clearColor;
 	};
