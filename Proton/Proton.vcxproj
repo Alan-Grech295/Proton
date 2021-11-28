@@ -171,6 +171,7 @@
     <ClInclude Include="src\Proton\Events\KeyEvent.h" />
     <ClInclude Include="src\Proton\Events\MouseEvent.h" />
     <ClInclude Include="src\Proton\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Proton\Math\Math.h" />
     <ClInclude Include="src\Proton\Model\Model.h" />
     <ClInclude Include="src\Proton\Renderer\Bindables\Bindable.h" />
     <ClInclude Include="src\Proton\Renderer\Bindables\BindsCollection.h" />

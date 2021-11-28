@@ -43,6 +43,14 @@ namespace Proton
 		static void LogError(const std::string& msg);
 		static void LogWarning(const std::string& msg);
 		static void LogTrace(const std::string& msg);
+
+		//TEMP
+		template<typename ...Params>
+		static void LogError(Params&&... params);
+		template<typename ...Params>
+		static void LogWarning(Params&&... params);
+		template<typename ...Params>
+		static void LogTrace(Params&&... params);
 	private:
 		static void OnImGuiRender();
 		void Clear();
@@ -55,6 +63,20 @@ namespace Proton
 		}
 
 		static void LogMessage(const std::string& msg, Message::MessageType msgType);
+
+		//TEMP
+		template<typename T>
+		static void CompileMessage(std::ostringstream& oss, T obj)
+		{
+			oss << obj << ", ";
+		}
+
+		template<typename First, typename ...Rest>
+		static void CompileMessage(std::ostringstream& oss, First&& first, Rest&&... rest)
+		{
+			CompileMessage(oss, std::forward<First>(first));
+			CompileMessage(oss, std::forward<Rest>(rest)...);
+		}
 	private:
 		static ConsolePanel& Get()
 		{
@@ -79,4 +101,30 @@ namespace Proton
 		bool showWarnings = true;
 		bool showTraces = true;
 	};
+	template<typename ...Params>
+	inline void ConsolePanel::LogError(Params&& ...params)
+	{
+		std::ostringstream oss;
+		CompileMessage(oss, std::forward<Params>(params)...);
+		LogMessage(oss.str(), Message::MessageType::Error);
+		Get().errors++;
+	}
+
+	template<typename ...Params>
+	inline void ConsolePanel::LogWarning(Params&& ...params)
+	{
+		std::ostringstream oss;
+		CompileMessage(oss, std::forward<Params>(params)...);
+		LogMessage(oss.str(), Message::MessageType::Warning);
+		Get().warnings++;
+	}
+
+	template<typename ...Params>
+	inline void ConsolePanel::LogTrace(Params&& ...params)
+	{
+		std::ostringstream oss;
+		CompileMessage(oss, std::forward<Params>(params)...);
+		LogMessage(oss.str(), Message::MessageType::Trace);
+		Get().traces++;
+	}
 }

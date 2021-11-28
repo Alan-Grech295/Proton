@@ -201,6 +201,7 @@
       <Filter>Proton\Renderer</Filter>
     </ClInclude>
     <ClInclude Include="src\Proton\Renderer\SceneRenderer.h" />
+    <ClInclude Include="src\Proton\Math\Math.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">

@@ -2,6 +2,7 @@
 #include "CameraController.h"
 #include "Proton\Scene\SceneSerializer.h"
 #include "Proton\Utils\PlatformUtils.h"
+#include <Proton\Math\Math.h>
 
 //TEMP
 #include "CompileTimeTests.h"

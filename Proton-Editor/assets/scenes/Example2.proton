@@ -1,7 +1,7 @@
 Scene: Untitled
 Editor Camera:
-  Position: [-10.1756248, 15.6931801, -25.3722725]
-  Rotation: [0.258867949, 0.485387772, 0]
+  Position: [7.49628735, 15.9818125, -28.2648716]
+  Rotation: [0.191975847, 6.21229219, 0]
 Entities:
   - Entity: 10
     TagComponent:
