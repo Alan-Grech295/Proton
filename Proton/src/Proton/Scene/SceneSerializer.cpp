@@ -265,7 +265,7 @@ namespace Proton
 		}
 	}
 
-	void SceneSerializer::Serialize(const std::string& filepath)
+	void SceneSerializer::Serialize(const std::string& filepath, const EditorCamera& editorCam)
 	{
 		YAML::Emitter out;
 		out << YAML::BeginMap;
@@ -274,8 +274,16 @@ namespace Proton
 		out << YAML::Key << "Editor Camera";
 
 		out << YAML::BeginMap;
-		out << YAML::Key << "Position" << YAML::Value << m_Scene->m_EditorCamPosition;
-		out << YAML::Key << "Rotation" << YAML::Value << m_Scene->m_EditorCamRotation;
+		XMFLOAT3 focalPoint;
+		DirectX::XMStoreFloat3(&focalPoint, editorCam.m_FocalPoint);
+
+		out << YAML::Key << "Focal Point" << YAML::Value << focalPoint;
+		out << YAML::Key << "Distance" << YAML::Value << editorCam.m_Distance;
+		out << YAML::Key << "Yaw" << YAML::Value << editorCam.m_Yaw;
+		out << YAML::Key << "Pitch" << YAML::Value << editorCam.m_Pitch;
+		out << YAML::Key << "FOV" << YAML::Value << editorCam.m_FOV;
+		out << YAML::Key << "Near Clip" << YAML::Value << editorCam.m_NearClip;
+		out << YAML::Key << "Far Clip" << YAML::Value << editorCam.m_FarClip;
 		out << YAML::EndMap;
 
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
@@ -315,7 +323,7 @@ namespace Proton
 		assert("Not Implemented!");
 	}
 
-	bool SceneSerializer::Deserialize(const std::string& filepath)
+	bool SceneSerializer::Deserialize(const std::string& filepath, EditorCamera& editorCamera)
 	{
 		m_Scene->ClearEntities();
 
@@ -333,8 +341,14 @@ namespace Proton
 		auto editorCam = data["Editor Camera"];
 		if (editorCam)
 		{
-			m_Scene->m_EditorCamPosition = editorCam["Position"].as<DirectX::XMFLOAT3>();
-			m_Scene->m_EditorCamRotation = editorCam["Rotation"].as<DirectX::XMFLOAT3>();
+			editorCamera.m_FocalPoint = XMLoadFloat3(&editorCam["Focal Point"].as<XMFLOAT3>());
+			editorCamera.m_Distance = editorCam["Distance"].as<float>();
+			editorCamera.m_Yaw = editorCam["Yaw"].as<float>();
+			editorCamera.m_Pitch = editorCam["Pitch"].as<float>();
+			editorCamera.m_FOV = editorCam["FOV"].as<float>();
+			editorCamera.m_NearClip = editorCam["Near Clip"].as<float>();
+			editorCamera.m_FarClip = editorCam["Far Clip"].as<float>();
+			editorCamera.UpdateView();
 		}
 
 		auto entities = data["Entities"];

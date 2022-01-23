@@ -15,7 +15,7 @@ namespace Proton
 		virtual void DrawIndexed(const UINT count) override;
 		virtual void Draw(const UINT count) override;
 
-		virtual void SetTopology(const Topology topology) override;
+		virtual void SetTopology(const TopologyType topology) override;
 
 		virtual void SetVsync(bool vsync) override { isVSync = vsync; }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "RendererAPI.h"
+#include "Proton\Renderer\Bindables\Topology.h"
 
 namespace Proton
 {
@@ -26,7 +27,7 @@ namespace Proton
 			s_RendererAPI->Draw(count);
 		}
 
-		inline static void SetTopology(const RendererAPI::Topology topology)
+		inline static void SetTopology(const TopologyType topology)
 		{
 			s_RendererAPI->SetTopology(topology);
 		}

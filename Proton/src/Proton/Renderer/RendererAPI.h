@@ -1,5 +1,6 @@
 #pragma once
 #include "Bindables\Buffer.h"
+#include "Bindables\Topology.h"
 
 namespace Proton
 {
@@ -10,10 +11,6 @@ namespace Proton
 		{
 			None = 0, DirectX = 1
 		};
-		enum class Topology
-		{
-			None = 0, Triangle, Line, Point
-		};
 	public:
 		virtual void SetClearColor(float r, float g, float b) = 0;
 		virtual void Clear() = 0;
@@ -21,7 +18,7 @@ namespace Proton
 		virtual void DrawIndexed(const UINT count) = 0;
 		virtual void Draw(const UINT count) = 0;
 
-		virtual void SetTopology(const Topology topology) = 0;
+		virtual void SetTopology(const TopologyType topology) = 0;
 		
 		virtual void BindSwapChain() = 0;
 

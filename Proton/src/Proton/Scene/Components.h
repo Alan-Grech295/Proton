@@ -110,7 +110,7 @@ namespace Proton
 		float attLin;
 		float attQuad;
 
-		PixelConstantBuffer* cbuf;
+		//PixelConstantBuffer* cbuf;
 
 		LightComponent(const LightComponent&) = default;
 		LightComponent()
@@ -122,7 +122,7 @@ namespace Proton
 			attLin = 0.045f;
 			attQuad = 0.0075f;
 
-			cbuf = PixelConstantBuffer::CreateUniquePtr(0, sizeof(Scene::PointLightData), new Scene::PointLightData());
+			//cbuf = PixelConstantBuffer::CreateUniquePtr(0, sizeof(Scene::PointLightData), new Scene::PointLightData());
 		}
 	};
 

@@ -761,46 +761,61 @@ namespace Proton
 			
 			bool hasAlphaGloss = false;
 
+			//TODO: Change asset loading
+			//TEMP
+			Technique technique = Technique("Opaque");
+			Step step = Step("Lambertian");
+
+			step.AddBindable(mesh->m_TransformCBuf);
+			step.AddBindable(mesh->m_TransformCBufPix);
+
 			if (mesh->hasDiffuseMap)
-				mesh->m_Diffuse = Texture2D::Create(diffuseAssetPath);
+				step.AddBindable(Texture2D::Create(diffuseAssetPath));
 
 			if (mesh->hasSpecular)
 			{
-				mesh->m_Specular = Texture2D::Create(specularAssetPath, 1);
-				hasAlphaGloss = mesh->m_Specular->HasAlpha();
+				Ref<Texture2D> spec = Texture2D::Create(specularAssetPath, 1);
+				hasAlphaGloss = spec->HasAlpha();
+				step.AddBindable(spec);
 			}
 
 			if (mesh->hasNormalMap)
-				mesh->m_Normal = Texture2D::Create(normalsAssetPath, 2);
+				step.AddBindable(Texture2D::Create(normalsAssetPath, 2));
 
 			if (mesh->hasSpecular || mesh->hasNormalMap || mesh->hasDiffuseMap)
-				mesh->m_Sampler = Sampler::Create(meshTag);
+				step.AddBindable(Sampler::Create(meshTag));
+
+			Ref<PixelShader> pixShader;
+			Ref<VertexShader> vertShader;
 
 			if (mesh->hasSpecular && !mesh->hasNormalMap)
 			{
-				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
-				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
+				vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (mesh->hasNormalMap && !mesh->hasSpecular)
 			{
-				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
-				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
+				vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (mesh->hasNormalMap && mesh->hasSpecular)
 			{
-				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
-				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
+				vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (!mesh->hasNormalMap && !mesh->hasSpecular && mesh->hasDiffuseMap)
 			{
-				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
-				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+				pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
+				vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 			}
 			else
 			{
-				mesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
-				mesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+				pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
+				vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 			}
+
+			step.AddBindable(vertShader);
+			step.AddBindable(pixShader);
 
 			mesh->m_IndexBuffer = IndexBuffer::Create(meshTag);
 			mesh->m_IndexBuffer->SetRawData(indices, numIndexBytes / sizeof(uint32_t));
@@ -816,8 +831,10 @@ namespace Proton
 			//TODO: Set actually dynamic vertices
 			//Currently the vertex data is passed directly to the buffer, but in the future
 			//will have to filter out certain data
-			mesh->m_VertBuffer = VertexBuffer::Create(meshTag, layout, mesh->m_VertShader.get());
+			mesh->m_VertBuffer = VertexBuffer::Create(meshTag, layout, vertShader.get());
 			mesh->m_VertBuffer->SetRawData((char*)vertices, numVertBytes);
+
+			mesh->m_Topology = Topology::Create(TopologyType::TriangleList);
 
 			if (!mesh->hasDiffuseMap && !mesh->hasSpecular && !mesh->hasNormalMap)
 			{
@@ -832,7 +849,7 @@ namespace Proton
 				pmc.specularPower = shininess;
 				pmc.specularColor = { specularColor.r, specularColor.g, specularColor.b, 1.0f};
 				pmc.materialColor = { diffuseColor.r, diffuseColor.g, diffuseColor.b, 1.0f };
-				mesh->m_MaterialCBuf = PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc);
+				step.AddBindable(PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc));
 			}
 			else
 			{
@@ -847,10 +864,13 @@ namespace Proton
 				pmc.specularPower = shininess;
 				pmc.specularIntensity = (specularColor.r + specularColor.g + specularColor.b) / 3.0f;
 				pmc.hasAlphaGloss = hasAlphaGloss ? TRUE : FALSE;
-				mesh->m_MaterialCBuf = PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc);
+				step.AddBindable(PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc));
 			}
 
 			meshes[i] = mesh;
+			technique.AddStep(step);
+			mesh->m_Techniques.push_back(technique);
+
 			ModelCollection::AddMesh(meshTag, mesh);
 		}
 

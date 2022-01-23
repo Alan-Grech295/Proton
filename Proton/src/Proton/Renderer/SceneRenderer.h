@@ -1,5 +1,6 @@
 #pragma once
 #include "Proton\Scene\Scene.h"
+#include "EditorCamera.h"
 
 namespace Proton
 {
@@ -15,26 +16,32 @@ namespace Proton
 			m_FrameBuffer = Framebuffer::Create(framebufferDesc);
 
 			//TEMP (debug lines)
-			/*m_DebugPixShader = PixelShader::CreateUnique("C:\\Dev\\Proton\\Proton\\DebugPS.cso");
+			m_DebugPixShader = PixelShader::CreateUnique("C:\\Dev\\Proton\\Proton\\DebugPS.cso");
 			m_DebugVertShader = VertexShader::CreateUnique("C:\\Dev\\Proton\\Proton\\DebugVS.cso");
-			m_ViewProjBuffer = VertexConstantBuffer::CreateUnique(0, sizeof(DirectX::XMMATRIX), nullptr);*/
+			m_ViewProjBuffer = VertexConstantBuffer::CreateUnique(0, sizeof(DirectX::XMMATRIX), nullptr);
 		}
 
 		//TODO: Replace with camera object 
-		void Render(const Camera& camera, DirectX::FXMMATRIX& cameraView);
+		void Render(const EditorCamera& editorCam);
+
+		void SetScene(const Ref<Scene> scene) { m_Scene = scene; }
+
+		void Resize(float width, float height) { m_FrameBuffer->Resize(width, height); }
+
+		void* GetRenderTextureID(int index) { return m_FrameBuffer->GetRenderTextureID(index); }
 
 	private:
-		void DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
-	public:
+		void SubmitChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
+		//void DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
+	private:
 		Ref<Framebuffer> m_FrameBuffer;
-	private:
-		const Ref<Scene> m_Scene;
+		Ref<Scene> m_Scene;
 
-		/*TEMP (for debug lines)
+		//TEMP (for debug lines)
 		Scope<VertexBuffer> m_DebugVertBuffer;
 		Scope<VertexShader> m_DebugVertShader;
 		Scope<PixelShader> m_DebugPixShader;
-		Scope<VertexConstantBuffer> m_ViewProjBuffer;*/
+		Scope<VertexConstantBuffer> m_ViewProjBuffer;
 
 	private:
 		//TEMP
@@ -48,6 +55,9 @@ namespace Proton
 			float attLin;
 			float attQuad;
 		};
+
+		//TEMP
+		Scope<PixelConstantBuffer> lightCBuf = PixelConstantBuffer::CreateUnique(0, sizeof(PointLightData), new PointLightData());
 
 	};
 }

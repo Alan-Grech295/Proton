@@ -202,6 +202,12 @@
     </ClInclude>
     <ClInclude Include="src\Proton\Renderer\SceneRenderer.h" />
     <ClInclude Include="src\Proton\Math\Math.h" />
+    <ClInclude Include="src\Proton\Renderer\EditorCamera.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Job.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Step.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Technique.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Pass.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Topology.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -304,6 +310,9 @@
       <Filter>Proton\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Renderer\SceneRenderer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\EditorCamera.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Topology.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Render Queue\Step.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Shader\Includes\LightVectorData.hlsl">

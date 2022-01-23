@@ -8,25 +8,33 @@
 #include "CompileTimeTests.h"
 #include <DirectXMath.h>
 
+#include "imgui\imgui.h"
+#include "imgui\imgui_internal.h"
+
 namespace Proton
 {
 	EditorLayer::EditorLayer()
 		:
 		Layer("EditorLayer")
 	{
+	}
+
+	void EditorLayer::OnAttach()
+	{
 		AssetManager::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
 		AssetManager::ScanProject();
 
 		Application::Get().GetWindow().ShowCursor();
 
-		/*FramebufferDescription desc;
+		FramebufferDescription desc;
 		desc.Width = 1280;
 		desc.Height = 720;
 		desc.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH };
-		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };*/
+		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };
 
 		m_ActiveScene = CreateRef<Scene>();
-		//m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
+		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 1000.0f);
+		m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
 
 		SceneHierarchyPanel::SetScene(m_ActiveScene);
 		AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
@@ -122,9 +130,94 @@ namespace Proton
 			Application::Get().GetWindow().SetVSync(vSync);
 		}
 
-		m_ActiveScene->OnEditorUpdate(ts);
+		//TEMP
+		/*m_ActiveScene->DrawDebugLine({ 0, 10, 0 }, { 0, 20, 0 }, 0, 1, 0);
+		m_ActiveScene->DrawDebugLine({ 0, 20, 0 }, { 10, 20, 0 }, 0, 1, 0);
+		m_ActiveScene->DrawDebugLine({ 10, 20, 0 }, { 10, 10, 0 }, 0, 1, 0);
+		m_ActiveScene->DrawDebugLine({ 10, 10, 0 }, { 0, 10, 0 }, 0, 1, 0);*/
 
-		//m_SceneRenderer->Render();
+		if (m_UpdateEditorCam)
+			m_EditorCam.OnUpdate(ts);
+
+		m_ActiveScene->OnEditorUpdate(ts, m_EditorCam);
+
+		m_SceneRenderer->Render(m_EditorCam);
+	}
+
+	//TEMP
+	static void DrawFloat3Control(const std::string& label, DirectX::XMFLOAT3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
+	{
+		ImGuiIO& io = ImGui::GetIO();
+		auto boldFont = io.Fonts->Fonts[0];
+
+		ImGui::PushID(label.c_str());
+
+		ImGui::Columns(2, 0, false);
+		ImGui::SetColumnWidth(0, columnWidth);
+		ImGui::Text(label.c_str());
+		ImGui::NextColumn();
+
+		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
+
+		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
+		ImVec2 buttonSize = { lineHeight + 3, lineHeight };
+
+		//X
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
+
+		ImGui::PushFont(boldFont);
+		if (ImGui::Button("X", buttonSize))
+			values.x = resetValue;
+
+		ImGui::PopFont();
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		//Y
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
+
+		ImGui::PushFont(boldFont);
+		if (ImGui::Button("Y", buttonSize))
+			values.y = resetValue;
+
+		ImGui::PopFont();
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+		ImGui::SameLine();
+
+		//Z
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
+
+		ImGui::PushFont(boldFont);
+		if (ImGui::Button("Z", buttonSize))
+			values.z = resetValue;
+
+		ImGui::PopFont();
+		ImGui::PopStyleColor(3);
+
+		ImGui::SameLine();
+		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
+		ImGui::PopItemWidth();
+
+		ImGui::PopStyleVar();
+
+		ImGui::Columns(1);
+
+		ImGui::PopID();
 	}
 
 	void EditorLayer::OnImGuiRender()
@@ -194,13 +287,14 @@ namespace Proton
 
 		if (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)
 		{
-			m_ActiveScene->framebuffer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
+			m_SceneRenderer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
 			m_ViewportSize = viewportPanelSize;
 
 			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-		m_ActiveScene->SetUpdateEditorCamera(ImGui::IsWindowFocused());
+		m_UpdateEditorCam = ImGui::IsWindowFocused();
 
 		ImGui::PopStyleVar();
 
@@ -209,7 +303,7 @@ namespace Proton
 		if (Input::IsKeyReleased(Key::Backspace))
 			texID = !texID;
 
-		ImGui::Image(m_ActiveScene->framebuffer->GetRenderTextureID(texID), viewportPanelSize);
+		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID), viewportPanelSize);
 		ImGui::End();
 
 		SceneHierarchyPanel::OnImGuiRender();
@@ -252,13 +346,11 @@ namespace Proton
 		ImGui::End();
 	}
 
-	void EditorLayer::OnAttach()
-	{
-
-	}
-
 	void EditorLayer::OnEvent(Event& e)
 	{
+		if(m_UpdateEditorCam)
+			m_EditorCam.OnEvent(e);
+
 		if (e.IsEventType(EventType::WindowClose))
 		{
 			
@@ -327,6 +419,8 @@ namespace Proton
 	{
 		m_ActiveScene = CreateRef<Scene>();
 		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+		m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+		m_SceneRenderer->SetScene(m_ActiveScene);
 
 		SceneHierarchyPanel::SetScene(m_ActiveScene);
 		AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
@@ -344,21 +438,17 @@ namespace Proton
 			saveFilePath = filepath;
 			m_ActiveScene = CreateRef<Scene>();
 			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+			m_SceneRenderer->SetScene(m_ActiveScene);
 
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(filepath);
+			serializer.Deserialize(filepath, m_EditorCam);
 
 			SceneHierarchyPanel::SetScene(m_ActiveScene);
 			AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
 			AssetViewerPanel::SetScene(m_ActiveScene);
 
 			m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
-
-			//TEMP
-			m_ActiveScene->DrawDebugLine({ 0, 10, 0 }, { 0, 20, 0 }, 0, 1, 0);
-			m_ActiveScene->DrawDebugLine({ 0, 20, 0 }, { 10, 20, 0 }, 0, 1, 0);
-			m_ActiveScene->DrawDebugLine({ 10, 20, 0 }, { 10, 10, 0 }, 0, 1, 0);
-			m_ActiveScene->DrawDebugLine({ 10, 10, 0 }, { 0, 10, 0 }, 0, 1, 0);
 		}
 	}
 
@@ -367,7 +457,7 @@ namespace Proton
 		if (!saveFilePath.empty())
 		{
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(saveFilePath);
+			serializer.Serialize(saveFilePath, m_EditorCam);
 		}
 	}
 
@@ -379,7 +469,7 @@ namespace Proton
 		{
 			saveFilePath = filepath;
 			SceneSerializer serializer(m_ActiveScene);
-			serializer.Serialize(filepath);
+			serializer.Serialize(filepath, m_EditorCam);
 		}
 	}
 }

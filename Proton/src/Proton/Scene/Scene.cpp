@@ -10,23 +10,23 @@ namespace Proton
 {
 	Scene::Scene()
 	{
-		FramebufferDescription desc;
+		/*FramebufferDescription desc;
 		desc.Width = 1280;
 		desc.Height = 720;
 		desc.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH };
 		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };
 	
-		framebuffer = Framebuffer::Create(desc);
+		framebuffer = Framebuffer::Create(desc);*/
 
 		//Creates camera entity
 		CreateEntity("Camera").AddComponent<CameraComponent>();
 
 		//Editor Camera
-		m_EditorCam.SetProjectionType(SceneCamera::ProjectionType::Perspective);
-		m_EditorCam.SetPerspective(45, 0.1f, 1000);
+		//m_EditorCam.SetProjectionType(SceneCamera::ProjectionType::Perspective);
+		//m_EditorCam.SetPerspective(45, 0.1f, 1000);
 
 		//TEMP (debug lines)
-		m_DebugPixShader = PixelShader::CreateUnique("C:\\Dev\\Proton\\Proton\\DebugPS.cso");
+		/*m_DebugPixShader = PixelShader::CreateUnique("C:\\Dev\\Proton\\Proton\\DebugPS.cso");
 		m_DebugVertShader = VertexShader::CreateUnique("C:\\Dev\\Proton\\Proton\\DebugVS.cso");
 		m_ViewProjBuffer = VertexConstantBuffer::CreateUnique(0, sizeof(DirectX::XMMATRIX), nullptr);
 
@@ -34,7 +34,7 @@ namespace Proton
 			{"Position", ShaderDataType::Float3},
 			{"Color", ShaderDataType::Float3}
 		};
-		m_DebugVertBuffer = VertexBuffer::CreateUnique(layout, m_DebugVertShader.get());
+		m_DebugVertBuffer = VertexBuffer::CreateUnique(layout, m_DebugVertShader.get());*/
 	}
 
 	Scene::~Scene()
@@ -77,11 +77,11 @@ namespace Proton
 		return m_EntityUUID[entity];
 	}
 
-	void Scene::DrawDebugLine(DirectX::XMFLOAT3 pointA, DirectX::XMFLOAT3 pointB, float r, float g, float b)
+	/*void Scene::DrawDebugLine(DirectX::XMFLOAT3 pointA, DirectX::XMFLOAT3 pointB, float r, float g, float b)
 	{
 		m_DebugVertBuffer->EmplaceBack(pointA, DirectX::XMFLOAT3{ r, g, b });
 		m_DebugVertBuffer->EmplaceBack(pointB, DirectX::XMFLOAT3{ r, g, b });
-	}
+	}*/
 
 	Entity Scene::CreateEntityWithUUID(const uint64_t uuid, const std::string& name)
 	{
@@ -134,7 +134,7 @@ namespace Proton
 				});
 		}
 
-		framebuffer->Bind();
+		/*framebuffer->Bind();
 		//Render
 		auto& cameraGroup = m_Registry.view<TransformComponent, CameraComponent>();
 		CameraComponent* cameraComponent = nullptr;
@@ -213,12 +213,12 @@ namespace Proton
 			{
 				DrawChildren(node.m_ChildNodes[i], transformMat, cameraView, cameraComponent->camera.GetProjection());
 			}
-		}
+		}*/
 	}
 
-	void Scene::OnEditorUpdate(TimeStep ts)
+	void Scene::OnEditorUpdate(TimeStep ts, EditorCamera& camera)
 	{
-		if (m_UpdateEditorCam)
+		/*if (m_UpdateEditorCam)
 		{
 			float speed = ts * m_EditorCamSpeed;
 
@@ -250,9 +250,9 @@ namespace Proton
 			m_EditorCamPosition.x += localMove.x;
 			m_EditorCamPosition.y += localMove.y;
 			m_EditorCamPosition.z += localMove.z;
-		}
+		}*/
 		
-		framebuffer->Bind();
+		/*framebuffer->Bind();
 		//Render
 
 		LightComponent* lightComponent = nullptr;
@@ -264,10 +264,7 @@ namespace Proton
 			lightTransform = &m_Registry.get<TransformComponent>(light);
 		}
 
-		DirectX::XMMATRIX cameraView = DirectX::XMMatrixInverse(nullptr,
-									   DirectX::XMMatrixRotationRollPitchYaw(m_EditorCamRotation.x, m_EditorCamRotation.y, m_EditorCamRotation.z) *
-									   DirectX::XMMatrixTranslation(m_EditorCamPosition.x, m_EditorCamPosition.y, m_EditorCamPosition.z)
-		);
+		DirectX::XMMATRIX cameraView = camera.GetViewMatrix();
 
 
 
@@ -307,28 +304,30 @@ namespace Proton
 
 				for (int i = 0; i < mesh.m_NumMeshes; i++)
 				{
-					mesh.m_MeshPtrs[i]->Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transformMat, cameraView, m_EditorCam.GetProjection());
+					mesh.m_MeshPtrs[i]->Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transformMat, cameraView, camera.GetProjection());
 				}
 			}
 
 			for (int i = 0; i < node.m_ChildNodes.size(); i++)
 			{
-				DrawChildren(node.m_ChildNodes[i], transformMat, cameraView, m_EditorCam.GetProjection());
+				DrawChildren(node.m_ChildNodes[i], transformMat, cameraView, camera.GetProjection());
 			}
-		}
+		}*/
 
 		//TEMP Render Debug Lines
-		m_DebugVertBuffer->Bind();
+		/*m_DebugVertBuffer->Bind();
 		m_DebugVertShader->Bind();
 		m_DebugPixShader->Bind();
 
-		DirectX::XMMATRIX viewProj = DirectX::XMMatrixTranspose(cameraView * m_EditorCam.GetProjection());
+		DirectX::XMMATRIX viewProj = DirectX::XMMatrixTranspose(camera.GetViewProjection());
 
 		m_ViewProjBuffer->SetData(sizeof(viewProj), &viewProj);
 		m_ViewProjBuffer->Bind();
 
 		RenderCommand::SetTopology(RendererAPI::Topology::Line);
 		RenderCommand::Draw(m_DebugVertBuffer->size());
+
+		m_DebugVertBuffer->Clear();*/
 	}
 
 	void Scene::OnViewportResize(uint32_t width, uint32_t height)
@@ -336,7 +335,7 @@ namespace Proton
 		m_ViewportWidth = width;
 		m_ViewportHeight = height;
 
-		m_EditorCam.SetViewportSize(width, height);
+		//m_EditorCam.SetViewportSize(width, height);
 
 		auto view = m_Registry.view<CameraComponent>();
 		for (auto entity : view)
@@ -350,7 +349,7 @@ namespace Proton
 		}
 	}
 
-	void Scene::DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection)
+	/*void Scene::DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection)
 	{
 		auto [transform, node] = m_Registry.get<TransformComponent, NodeComponent>(entity);
 
@@ -372,5 +371,5 @@ namespace Proton
 		{
 			DrawChildren(node.m_ChildNodes[i], transformMat, cameraView, cameraProjection);
 		}
-	}
+	}*/
 }

@@ -106,7 +106,7 @@ namespace Proton
 	{
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
-		LogMessage(oss.str(), Message::MessageType::Error);
+		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Error);
 		Get().errors++;
 	}
 
@@ -115,7 +115,7 @@ namespace Proton
 	{
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
-		LogMessage(oss.str(), Message::MessageType::Warning);
+		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Warning);
 		Get().warnings++;
 	}
 
@@ -124,7 +124,7 @@ namespace Proton
 	{
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
-		LogMessage(oss.str(), Message::MessageType::Trace);
+		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Trace);
 		Get().traces++;
 	}
 }

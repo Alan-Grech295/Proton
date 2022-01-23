@@ -2,6 +2,8 @@
 #include "Proton\Renderer\Bindables\Buffer.h"
 #include "Proton\Renderer\Bindables\Texture.h"
 #include "Proton\Renderer\Bindables\Sampler.h"
+#include "Proton\Renderer\Bindables\Topology.h"
+#include "Proton\Renderer\Render Queue\Technique.h"
 #include <DirectXMath.h>
 #include <memory>
 #include <vector>
@@ -22,6 +24,7 @@ namespace Proton
 	{
 		friend class ModelCreator;
 		friend class Renderer;
+		friend class SceneRenderer;
 		friend class AssetManager;
 	public:
 		Mesh(const std::string& meshTag, const std::string& name, const std::string& modelPath)
@@ -30,15 +33,15 @@ namespace Proton
 			m_Name(name),
 			m_ModelPath(modelPath)
 		{
-			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
-			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Transforms), new Transforms());
+			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Mesh::Transforms), new Mesh::Transforms());
+			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Mesh::Transforms), new Mesh::Transforms());
 		}
 
 		Mesh() = default;
 
 		Mesh(const Mesh& mesh) = default;
 		
-		void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform, DirectX::FXMMATRIX cameraView, DirectX::FXMMATRIX projectionMatrix) const;
+		//void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform, DirectX::FXMMATRIX cameraView, DirectX::FXMMATRIX projectionMatrix) const;
 	private:
 		DirectX::XMMATRIX GetTransformXM() const { return m_Transform; }
 	public:
@@ -49,7 +52,15 @@ namespace Proton
 
 		Ref<VertexBuffer> m_VertBuffer;
 		Ref<IndexBuffer> m_IndexBuffer;
-		Ref<VertexShader> m_VertShader;
+		Ref<Topology> m_Topology = Topology::Create(TopologyType::TriangleList);
+		std::vector<Technique> m_Techniques;
+
+		//TODO: Change pointer to proxy
+		Ref<VertexConstantBuffer> m_TransformCBuf;
+		Ref<PixelConstantBuffer> m_TransformCBufPix;
+
+		//TEMP
+		/*Ref<VertexShader> m_VertShader;
 		Ref<PixelShader> m_PixelShader;
 		Ref<class Texture2D> m_Diffuse;
 		Ref<class Texture2D> m_Specular;
@@ -58,7 +69,7 @@ namespace Proton
 
 		Scope<PixelConstantBuffer> m_MaterialCBuf;
 		Scope<VertexConstantBuffer> m_TransformCBuf;
-		Scope<PixelConstantBuffer> m_TransformCBufPix;
+		Scope<PixelConstantBuffer> m_TransformCBufPix;*/
 
 		bool hasSpecular = false;
 		bool hasNormalMap = false;

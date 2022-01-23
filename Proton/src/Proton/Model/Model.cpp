@@ -190,31 +190,94 @@ namespace Proton
 			dx::XMFLOAT2 uv;
 		};*/
 
+		//Technique creation
+		Technique technique = Technique("Opaque");
+		Step step = Step("Lambertian");
+
+		step.AddBindable(pMesh->m_TransformCBuf);
+		step.AddBindable(pMesh->m_TransformCBufPix);
+
+		float shininess = 40.0f;
+		bool hasAlphaGloss = false;
+		dx::XMFLOAT4 diffuseColor = { 1.0f,0.0f,1.0f,1.0f };
+		dx::XMFLOAT4 specularColor = { 0.18f,0.18f,0.18f,1.0f };
+
+		if (mesh.mMaterialIndex >= 0)
+		{
+			auto& material = *pMaterials[mesh.mMaterialIndex];
+
+			aiString texFileName;
+
+			if (material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasDiffuseMap = true;
+				PT_CORE_TRACE(texFileName.C_Str());
+
+				step.AddBindable(Texture2D::Create(basePath + texFileName.C_Str()));
+			}
+			else
+			{
+				material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(diffuseColor));
+			}
+
+			if (material.GetTexture(aiTextureType_SPECULAR, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasSpecular = true;
+				Ref<Texture2D> spec = Texture2D::Create(basePath + texFileName.C_Str(), 1);
+				step.AddBindable(spec);
+				hasAlphaGloss = spec->HasAlpha();
+			}
+			else
+			{
+				material.Get(AI_MATKEY_COLOR_SPECULAR, reinterpret_cast<aiColor3D&>(specularColor));
+			}
+
+			if (!hasAlphaGloss)
+			{
+				material.Get(AI_MATKEY_SHININESS, shininess);
+			}
+
+			if (material.GetTexture(aiTextureType_NORMALS, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasNormalMap = true;
+				step.AddBindable(Texture2D::Create(basePath + texFileName.C_Str(), 2));
+			}
+
+			if (pMesh->hasSpecular || pMesh->hasNormalMap || pMesh->hasDiffuseMap)
+				step.AddBindable(Sampler::Create(meshTag));
+		}
+
+		Ref<PixelShader> pixShader;
+		Ref<VertexShader> vertShader;
+
 		if (pMesh->hasSpecular && !pMesh->hasNormalMap)
 		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
-			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
+			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 		}
 		else if (pMesh->hasNormalMap && !pMesh->hasSpecular)
 		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
-			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
+			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 		}
 		else if (pMesh->hasNormalMap && pMesh->hasSpecular)
 		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
-			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
+			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 		}
 		else if (!pMesh->hasNormalMap && !pMesh->hasSpecular && pMesh->hasDiffuseMap)
 		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
-			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
+			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 		}
 		else
 		{
-			pMesh->m_PixelShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
-			pMesh->m_VertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
+			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
 		}
+
+		step.AddBindable(vertShader);
+		step.AddBindable(pixShader);
 
 		//std::vector<Vertex> vertices;
 		//vertices.reserve(mesh.mNumVertices);
@@ -227,7 +290,7 @@ namespace Proton
 			{"TEXCOORD", ShaderDataType::Float2}
 		};
 
-		pMesh->m_VertBuffer = VertexBuffer::Create(meshTag, layout, pMesh->m_VertShader.get());
+		pMesh->m_VertBuffer = VertexBuffer::Create(meshTag, layout, vertShader.get());
 
 		{
 			PT_PROFILE_SCOPE("Vertex Loading - Model::ParseMesh");
@@ -257,55 +320,6 @@ namespace Proton
 			}
 		}
 
-		float shininess = 40.0f;
-		bool hasAlphaGloss = false;
-		dx::XMFLOAT4 diffuseColor = { 1.0f,0.0f,1.0f,1.0f };
-		dx::XMFLOAT4 specularColor = { 0.18f,0.18f,0.18f,1.0f };
-
-		if (mesh.mMaterialIndex >= 0)
-		{
-			auto& material = *pMaterials[mesh.mMaterialIndex];
-
-			aiString texFileName;
-
-			if (material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName) == aiReturn_SUCCESS)
-			{
-				pMesh->hasDiffuseMap = true;
-				PT_CORE_TRACE(texFileName.C_Str());
-
-				pMesh->m_Diffuse = Texture2D::Create(basePath + texFileName.C_Str());
-			}
-			else
-			{
-				material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(diffuseColor));
-			}
-
-			if (material.GetTexture(aiTextureType_SPECULAR, 0, &texFileName) == aiReturn_SUCCESS)
-			{
-				pMesh->hasSpecular = true;
-				pMesh->m_Specular = Texture2D::Create(basePath + texFileName.C_Str(), 1);
-				hasAlphaGloss = pMesh->m_Specular->HasAlpha();
-			}
-			else
-			{
-				material.Get(AI_MATKEY_COLOR_SPECULAR, reinterpret_cast<aiColor3D&>(specularColor));
-			}
-
-			if (!hasAlphaGloss)
-			{
-				material.Get(AI_MATKEY_SHININESS, shininess);
-			}
-
-			if (material.GetTexture(aiTextureType_NORMALS, 0, &texFileName) == aiReturn_SUCCESS)
-			{
-				pMesh->hasNormalMap = true;
-				pMesh->m_Normal = Texture2D::Create(basePath + texFileName.C_Str(), 2);
-			}
-
-			if(pMesh->hasSpecular || pMesh->hasNormalMap || pMesh->hasDiffuseMap)
-				pMesh->m_Sampler = Sampler::Create(meshTag);
-		}
-
 		if (!pMesh->hasDiffuseMap && !pMesh->hasSpecular && !pMesh->hasNormalMap)
 		{
 			struct PSMaterialConstantNoTex
@@ -319,7 +333,7 @@ namespace Proton
 			pmc.specularPower = shininess;
 			pmc.specularColor = specularColor;
 			pmc.materialColor = diffuseColor;
-			pMesh->m_MaterialCBuf = PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc);
+			step.AddBindable(PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc));
 		}
 		else
 		{
@@ -334,13 +348,17 @@ namespace Proton
 			pmc.specularPower = shininess;
 			pmc.specularIntensity = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
 			pmc.hasAlphaGloss = hasAlphaGloss ? TRUE : FALSE;
-			pMesh->m_MaterialCBuf = PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc);
+			step.AddBindable(PixelConstantBuffer::CreateUnique(1, sizeof(pmc), &pmc));
 		}
+
+		technique.AddStep(step);
+
+		pMesh->m_Techniques.push_back(std::move(technique));
 
 		return pMesh;
 	}
 
-	void Mesh::Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform, DirectX::FXMMATRIX cameraView, DirectX::FXMMATRIX projectionMatrix) const
+	/*void Mesh::Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform, DirectX::FXMMATRIX cameraView, DirectX::FXMMATRIX projectionMatrix) const
 	{
 		const auto modelView = accumulatedTransform * cameraView;
 		const Transforms tf =
@@ -380,5 +398,5 @@ namespace Proton
 		}
 
 		callback(m_IndexBuffer->size());
-	}
+	}*/
 }

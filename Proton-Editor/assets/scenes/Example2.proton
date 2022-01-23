@@ -1,7 +1,12 @@
 Scene: Untitled
 Editor Camera:
-  Position: [7.49628735, 15.9818125, -28.2648716]
-  Rotation: [0.191975847, 6.21229219, 0]
+  Focal Point: [4.36864901, 4.42947388, 2.19217873]
+  Distance: 33.5086288
+  Yaw: -0.636916518
+  Pitch: -0.047736045
+  FOV: 45
+  Near Clip: 0.100000001
+  Far Clip: 1000
 Entities:
   - Entity: 10
     TagComponent:

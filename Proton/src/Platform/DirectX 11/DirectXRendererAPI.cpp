@@ -3,8 +3,8 @@
 #include "Proton\Core\Application.h"
 #include "Proton\Core\Log.h"
 #include "Platform\Windows\WindowsWindow.h"
-#include <Windows.h>
 #include "Proton\Renderer\RenderCommand.h"
+#include <Windows.h>
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -20,12 +20,13 @@ namespace Proton
 	void DirectXRendererAPI::Clear()
 	{
 		pContext->ClearRenderTargetView(pTarget.Get(), clearColor);
-		pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		//TEMP
+		if(pDSV.Get())
+			pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
 	void DirectXRendererAPI::DrawIndexed(const UINT count)
 	{
-		//pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		pContext->DrawIndexed(count, 0u, 0u);
 	}
 
@@ -34,17 +35,17 @@ namespace Proton
 		pContext->Draw(count, 0u);
 	}
 
-	void DirectXRendererAPI::SetTopology(const Topology topology)
+	void DirectXRendererAPI::SetTopology(const TopologyType topology)
 	{
 		switch (topology)
 		{
-		case Topology::Triangle:
+		case TopologyType::TriangleList:
 			pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			break;
-		case Topology::Line:
+		case TopologyType::LineList:
 			pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 			break;
-		case Topology::Point:
+		case TopologyType::PointList:
 			pContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_POINTLIST);
 			break;
 		}

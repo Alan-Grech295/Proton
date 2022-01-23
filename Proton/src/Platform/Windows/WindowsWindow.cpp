@@ -333,6 +333,38 @@ namespace Proton
 				}
 			}
 			break;
+		case WM_MBUTTONDOWN:
+		{
+			input->mbStates[2] = true;
+			const POINTS pt = MAKEPOINTS(lParam);
+			MouseButtonPressedEvent event(2, pt.x, pt.y);
+			data.eventCallback(event);
+
+			if (pt.x < 0 || pt.x >= (SHORT)m_Data.width || pt.y < 0 || pt.y >= (SHORT)m_Data.height)
+			{
+				ReleaseCapture();
+				MouseLeftEvent event(pt.x, pt.y);
+				data.eventCallback(event);
+				receivingMouseInput = false;
+			}
+		}
+		break;
+		case WM_MBUTTONUP:
+			{
+				input->mbStates[2] = false;
+				const POINTS pt = MAKEPOINTS(lParam);
+				MouseButtonReleasedEvent event(2, pt.x, pt.y);
+				data.eventCallback(event);
+
+				if (pt.x < 0 || pt.x >= (SHORT)m_Data.width || pt.y < 0 || pt.y >= (SHORT)m_Data.height)
+				{
+					ReleaseCapture();
+					MouseLeftEvent event(pt.x, pt.y);
+					data.eventCallback(event);
+					receivingMouseInput = false;
+				}
+			}
+		break;
 		case WM_MOUSEMOVE:
 			{
 				PT_PROFILE_SCOPE("Mouse Move");

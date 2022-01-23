@@ -197,7 +197,7 @@ namespace Proton
 
 	void DirectXFramebuffer::Bind()
 	{
-		if (m_DSState != nullptr)
+		if (m_DSState)
 		{
 			//Bind depth stencil state
 			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetDepthStencilState(m_DSState, 1);

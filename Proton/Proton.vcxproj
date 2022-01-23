@@ -176,8 +176,14 @@
     <ClInclude Include="src\Proton\Renderer\Bindables\Bindable.h" />
     <ClInclude Include="src\Proton\Renderer\Bindables\BindsCollection.h" />
     <ClInclude Include="src\Proton\Renderer\Bindables\Buffer.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Topology.h" />
     <ClInclude Include="src\Proton\Renderer\Camera.h" />
+    <ClInclude Include="src\Proton\Renderer\EditorCamera.h" />
     <ClInclude Include="src\Proton\Renderer\Framebuffer.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Pass.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Job.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Step.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Technique.h" />
     <ClInclude Include="src\Proton\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Proton\Renderer\Renderer.h" />
     <ClInclude Include="src\Proton\Renderer\RendererAPI.h" />
@@ -219,7 +225,10 @@
     <ClCompile Include="src\Proton\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Proton\Model\Model.cpp" />
     <ClCompile Include="src\Proton\Renderer\Bindables\Buffer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Topology.cpp" />
+    <ClCompile Include="src\Proton\Renderer\EditorCamera.cpp" />
     <ClCompile Include="src\Proton\Renderer\Framebuffer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Render Queue\Step.cpp" />
     <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Proton\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp" />

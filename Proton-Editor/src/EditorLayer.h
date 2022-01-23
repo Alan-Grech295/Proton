@@ -6,7 +6,9 @@
 #include "Panels\AssetViewerPanel.h"
 #include "Panels\ConsolePanel.h"
 #include <Proton\Renderer\SceneRenderer.h>
+#include <Proton\Renderer\EditorCamera.h>
 #include <Proton\Scene\AssetManager.h>
+#include "Proton\Renderer\EditorCamera.h"
 
 namespace Proton
 {
@@ -36,7 +38,11 @@ namespace Proton
 		Entity m_PointLight;
 
 		Ref<Scene> m_ActiveScene;
-		//Scope<SceneRenderer> m_SceneRenderer;
+		Scope<SceneRenderer> m_SceneRenderer;
+
+		EditorCamera m_EditorCam;
+
+		bool m_UpdateEditorCam = true;
 
 		ImVec2 m_ViewportSize;		
 

@@ -3,6 +3,8 @@
 #include "DirectXShader.h"
 #include "Proton\Core\Log.h"
 
+#include "Proton\Core\Core.h"
+
 #pragma comment(lib, "d3d11.lib")
 
 namespace Proton
@@ -75,11 +77,12 @@ namespace Proton
 		if (m_PastBufferSize == m_Data.size())
 		{
 			D3D11_MAPPED_SUBRESOURCE msr;
-			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
+			ZeroMemory(&msr, sizeof(D3D11_MAPPED_SUBRESOURCE));
+			DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
 				m_VertexBuffer.Get(), 0,
 				D3D11_MAP_WRITE_DISCARD, 0,
 				&msr
-			);
+			));
 
 			memcpy(msr.pData, m_Data.data(), m_Data.size());
 
@@ -91,8 +94,8 @@ namespace Proton
 
 			D3D11_BUFFER_DESC bd = {};
 			bd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-			bd.Usage = D3D11_USAGE_DEFAULT;
-			bd.CPUAccessFlags = 0u;
+			bd.Usage = D3D11_USAGE_DYNAMIC;
+			bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			bd.MiscFlags = 0u;
 			bd.ByteWidth = m_Data.size();
 			//bd.StructureByteStride = m_Stride;
