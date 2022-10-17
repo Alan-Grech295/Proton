@@ -87,8 +87,6 @@ namespace Proton
 			{
 				SubmitChildren(node.m_ChildNodes[i], transformMat, editorCam.GetViewMatrix(), editorCam.GetProjection());
 			}
-
-			
 		}
 
 		Renderer::Render();

@@ -3,7 +3,7 @@
 #include "Proton\Renderer\RenderCommand.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
 #include <cassert>
-#include "Proton\Scene\AssetManager.h"
+#include "Proton\Asset Loader\AssetManager.h"
 
 namespace Proton
 {

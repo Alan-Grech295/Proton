@@ -26,19 +26,19 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -77,7 +77,7 @@
       <PrecompiledHeaderFile>ptpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PT_PLATFORM_WINDOWS;PT_BUILD_DLL;PT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\Assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -90,6 +90,9 @@
     <Lib>
       <AdditionalDependencies>vendor\DirectXTK\Debug-windows-x86_64\DirectXTK.lib;vendor\DirectXTex\Debug-windows-x86_64\DirectXTex.lib;vendor\Assimp\Debug-windows-x86_64\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -97,7 +100,7 @@
       <PrecompiledHeaderFile>ptpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PT_PLATFORM_WINDOWS;PT_BUILD_DLL;PT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\Assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -114,6 +117,9 @@
     <Lib>
       <AdditionalDependencies>vendor\DirectXTK\Release-windows-x86_64\DirectXTK.lib;vendor\DirectXTex\Release-windows-x86_64\DirectXTex.lib;vendor\Assimp\Release-windows-x86_64\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
@@ -121,7 +127,7 @@
       <PrecompiledHeaderFile>ptpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PT_PLATFORM_WINDOWS;PT_BUILD_DLL;PT_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\Assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -138,6 +144,9 @@
     <Lib>
       <AdditionalDependencies>vendor\DirectXTK\Dist-windows-x86_64\DirectXTK.lib;vendor\DirectXTex\Dist-windows-x86_64\DirectXTex.lib;vendor\Assimp\Dist-windows-x86_64\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
+    <FxCompile>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Platform\DirectX 11\DirectXBuffer.h" />
@@ -151,6 +160,10 @@
     <ClInclude Include="src\Platform\Windows\WindowsInput.h" />
     <ClInclude Include="src\Platform\Windows\WindowsWindow.h" />
     <ClInclude Include="src\Proton.h" />
+    <ClInclude Include="src\Proton\Asset Loader\AssetLoader.h" />
+    <ClInclude Include="src\Proton\Asset Loader\AssetManager.h" />
+    <ClInclude Include="src\Proton\Asset Loader\AssetSerializer.h" />
+    <ClInclude Include="src\Proton\Asset Loader\MetaFileSerializer.h" />
     <ClInclude Include="src\Proton\Core\Application.h" />
     <ClInclude Include="src\Proton\Core\Base.h" />
     <ClInclude Include="src\Proton\Core\Core.h" />
@@ -171,28 +184,27 @@
     <ClInclude Include="src\Proton\Events\KeyEvent.h" />
     <ClInclude Include="src\Proton\Events\MouseEvent.h" />
     <ClInclude Include="src\Proton\ImGui\ImGuiLayer.h" />
+    <ClInclude Include="src\Proton\IndexedTriangleList.h" />
     <ClInclude Include="src\Proton\Math\Math.h" />
     <ClInclude Include="src\Proton\Model\Model.h" />
     <ClInclude Include="src\Proton\Renderer\Bindables\Bindable.h" />
     <ClInclude Include="src\Proton\Renderer\Bindables\BindsCollection.h" />
     <ClInclude Include="src\Proton\Renderer\Bindables\Buffer.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Sampler.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Shader.h" />
+    <ClInclude Include="src\Proton\Renderer\Bindables\Texture.h" />
     <ClInclude Include="src\Proton\Renderer\Bindables\Topology.h" />
     <ClInclude Include="src\Proton\Renderer\Camera.h" />
     <ClInclude Include="src\Proton\Renderer\EditorCamera.h" />
     <ClInclude Include="src\Proton\Renderer\Framebuffer.h" />
-    <ClInclude Include="src\Proton\Renderer\Render Queue\Pass.h" />
     <ClInclude Include="src\Proton\Renderer\Render Queue\Job.h" />
+    <ClInclude Include="src\Proton\Renderer\Render Queue\Pass.h" />
     <ClInclude Include="src\Proton\Renderer\Render Queue\Step.h" />
     <ClInclude Include="src\Proton\Renderer\Render Queue\Technique.h" />
     <ClInclude Include="src\Proton\Renderer\RenderCommand.h" />
     <ClInclude Include="src\Proton\Renderer\Renderer.h" />
     <ClInclude Include="src\Proton\Renderer\RendererAPI.h" />
-    <ClInclude Include="src\Proton\Renderer\Bindables\Sampler.h" />
-    <ClInclude Include="src\Proton\Renderer\Bindables\Shader.h" />
-    <ClInclude Include="src\Proton\Renderer\Bindables\Texture.h" />
     <ClInclude Include="src\Proton\Renderer\SceneRenderer.h" />
-    <ClInclude Include="src\Proton\Scene\AssetLoader.h" />
-    <ClInclude Include="src\Proton\Scene\AssetManager.h" />
     <ClInclude Include="src\Proton\Scene\Components.h" />
     <ClInclude Include="src\Proton\Scene\Entity.h" />
     <ClInclude Include="src\Proton\Scene\ModelCollection.h" />
@@ -216,6 +228,10 @@
     <ClCompile Include="src\Platform\Windows\WindowsInput.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsPlatformUtils.cpp" />
     <ClCompile Include="src\Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="src\Proton\Asset Loader\AssetLoader.cpp" />
+    <ClCompile Include="src\Proton\Asset Loader\AssetManager.cpp" />
+    <ClCompile Include="src\Proton\Asset Loader\AssetSerializer.cpp" />
+    <ClCompile Include="src\Proton\Asset Loader\MetaFileSerializer.cpp" />
     <ClCompile Include="src\Proton\Core\Application.cpp" />
     <ClCompile Include="src\Proton\Core\Layer.cpp" />
     <ClCompile Include="src\Proton\Core\LayerStack.cpp" />
@@ -225,6 +241,9 @@
     <ClCompile Include="src\Proton\ImGui\ImGuiLayer.cpp" />
     <ClCompile Include="src\Proton\Model\Model.cpp" />
     <ClCompile Include="src\Proton\Renderer\Bindables\Buffer.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Sampler.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Shader.cpp" />
+    <ClCompile Include="src\Proton\Renderer\Bindables\Texture.cpp" />
     <ClCompile Include="src\Proton\Renderer\Bindables\Topology.cpp" />
     <ClCompile Include="src\Proton\Renderer\EditorCamera.cpp" />
     <ClCompile Include="src\Proton\Renderer\Framebuffer.cpp" />
@@ -232,12 +251,7 @@
     <ClCompile Include="src\Proton\Renderer\RenderCommand.cpp" />
     <ClCompile Include="src\Proton\Renderer\Renderer.cpp" />
     <ClCompile Include="src\Proton\Renderer\RendererAPI.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Bindables\Sampler.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Bindables\Shader.cpp" />
-    <ClCompile Include="src\Proton\Renderer\Bindables\Texture.cpp" />
     <ClCompile Include="src\Proton\Renderer\SceneRenderer.cpp" />
-    <ClCompile Include="src\Proton\Scene\AssetLoader.cpp" />
-    <ClCompile Include="src\Proton\Scene\AssetManager.cpp" />
     <ClCompile Include="src\Proton\Scene\Entity.cpp" />
     <ClCompile Include="src\Proton\Scene\Scene.cpp" />
     <ClCompile Include="src\Proton\Scene\SceneCamera.cpp" />
@@ -248,27 +262,45 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="src\Proton\Depricated\ColorBlendPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Depricated\ColorBlendVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Depricated\ColorIndexPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Depricated\ColorIndexVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Depricated\SolidPS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Depricated\SolidVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Depricated\TexturePS.hlsl">
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="src\Proton\Depricated\TextureVS.hlsl">
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
+    </FxCompile>
     <FxCompile Include="src\Proton\Shader\DebugPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ShaderType>Pixel</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\DebugVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">5.0</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
+      <ShaderType>Vertex</ShaderType>
+      <ShaderModel>5.0</ShaderModel>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\Includes\LightVectorData.hlsl">
       <ShaderModel>5.0</ShaderModel>
@@ -291,58 +323,34 @@
     <FxCompile Include="src\Proton\Shader\PhongNoTexPS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongNoTexVS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongNormalMapPS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongNormalMapSpecPS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongNormalMapVS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongPS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongSpecularPS.hlsl">
       <ShaderType>Pixel</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongVS.hlsl">
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
-      <ObjectFileOutput Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ProjectDir)%(Filename).cso</ObjectFileOutput>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

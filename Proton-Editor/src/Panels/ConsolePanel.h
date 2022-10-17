@@ -35,9 +35,9 @@ namespace Proton
 	public:
 		ConsolePanel()
 			:
-			traceIcon(Texture2D::CreateUnique("C:\\Dev\\Proton\\Proton-Editor\\icons\\trace.png")),
-			warningIcon(Texture2D::CreateUnique("C:\\Dev\\Proton\\Proton-Editor\\icons\\warning.png")),
-			errorIcon(Texture2D::CreateUnique("C:\\Dev\\Proton\\Proton-Editor\\icons\\error.png"))
+			traceIcon(Texture2D::CreateUnique("D:\\Dev\\Proton\\Proton-Editor\\icons\\trace.png")),
+			warningIcon(Texture2D::CreateUnique("D:\\Dev\\Proton\\Proton-Editor\\icons\\warning.png")),
+			errorIcon(Texture2D::CreateUnique("D:\\Dev\\Proton\\Proton-Editor\\icons\\error.png"))
 		{}
 	public:
 		static void LogError(const std::string& msg);

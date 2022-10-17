@@ -13,7 +13,7 @@
 #include "Proton\Scene\Entity.h"
 #include "Proton\Scene\Components.h"
 
-#include "Proton\Scene\AssetManager.h"
+#include "Proton\Asset Loader\AssetManager.h"
 #include "Proton\Scene\ModelCollection.h"
 
 namespace Proton
@@ -252,28 +252,28 @@ namespace Proton
 
 		if (pMesh->hasSpecular && !pMesh->hasNormalMap)
 		{
-			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
-			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+			pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
+			vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 		}
 		else if (pMesh->hasNormalMap && !pMesh->hasSpecular)
 		{
-			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
-			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+			pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
+			vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 		}
 		else if (pMesh->hasNormalMap && pMesh->hasSpecular)
 		{
-			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
-			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+			pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
+			vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
 		}
 		else if (!pMesh->hasNormalMap && !pMesh->hasSpecular && pMesh->hasDiffuseMap)
 		{
-			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongPS.cso");
-			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+			pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongPS.cso");
+			vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongVS.cso");
 		}
 		else
 		{
-			pixShader = PixelShader::Create("C:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
-			vertShader = VertexShader::Create("C:\\Dev\\Proton\\Proton\\PhongVS.cso");
+			pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
+			vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongVS.cso");
 		}
 
 		step.AddBindable(vertShader);

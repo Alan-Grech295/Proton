@@ -3,7 +3,7 @@
 #include "imgui\imgui_internal.h"
 #include "Proton\Core\Input.h"
 #include "Proton\Core\KeyCodes.h"
-#include "Proton\Scene\AssetManager.h"
+#include "Proton\Asset Loader\AssetManager.h"
 #include "AssetViewerPanel.h"
 
 namespace Proton

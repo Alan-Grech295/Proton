@@ -21,7 +21,7 @@ namespace Proton
 
 	void EditorLayer::OnAttach()
 	{
-		AssetManager::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
+		AssetManager::SetProjectPath("D:\\Dev\\Proton\\Proton-Editor");
 		AssetManager::ScanProject();
 
 		Application::Get().GetWindow().ShowCursor();
@@ -37,7 +37,7 @@ namespace Proton
 		m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
 
 		SceneHierarchyPanel::SetScene(m_ActiveScene);
-		AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
+		AssetViewerPanel::SetProjectPath("D:\\Dev\\Proton\\Proton-Editor");
 		AssetViewerPanel::SetScene(m_ActiveScene);
 
 		//m_Nanosuit = ModelCreator::CreateModelEnti++ty("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
@@ -423,7 +423,7 @@ namespace Proton
 		m_SceneRenderer->SetScene(m_ActiveScene);
 
 		SceneHierarchyPanel::SetScene(m_ActiveScene);
-		AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
+		AssetViewerPanel::SetProjectPath("D:\\Dev\\Proton\\Proton-Editor");
 		AssetViewerPanel::SetScene(m_ActiveScene);
 
 		m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
@@ -445,7 +445,7 @@ namespace Proton
 			serializer.Deserialize(filepath, m_EditorCam);
 
 			SceneHierarchyPanel::SetScene(m_ActiveScene);
-			AssetViewerPanel::SetProjectPath("C:\\Dev\\Proton\\Proton-Editor");
+			AssetViewerPanel::SetProjectPath("D:\\Dev\\Proton\\Proton-Editor");
 			AssetViewerPanel::SetScene(m_ActiveScene);
 
 			m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
