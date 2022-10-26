@@ -354,48 +354,40 @@ namespace Proton
 		virtual ~ExtraData() = default;
 	};
 
-	//Extra data for Asset
-	/*struct Struct : public ExtraData
+	struct ElementRef
 	{
-		Struct(const std::string& structKey)
-		{
-			m_StructKey = structKey;
-		}
-
-		std::string m_StructKey;
-	};
-
-	struct Array : public ExtraData
-	{
-		Array(TypeElement& typeTemplate, uint32_t size, bool constElementSize, std::optional<std::string> structKey = std::nullopt)
+	public:
+		ElementRef(byte* data, Type type)
 			:
-			m_TypeTemplate(typeTemplate),
-			m_Size(size),
-			m_constElementSize(constElementSize),
-			m_StructKey(structKey)
+			m_Data(data),
+			m_Type(type)
 		{
-			assert("No struct key was given" && (m_constElementSize || (!m_constElementSize && structKey.has_value())));
+			switch (type)
+			{
+			#define X(el) case Type::el: m_Size = Map<Type::el>::SizeBytes(data); break;
+				ELEMENT_TYPES
+			#undef X
+			default:
+				assert("Invalid type!");
+			}
 		}
 
-		TypeElement m_TypeTemplate;
-		uint32_t m_Size;
-		bool m_constElementSize;
-		std::optional<std::string> m_StructKey;
-	};
+		template<typename T>
+		operator T&()
+		{
+			if (m_Type != Type::String)
+				assert("Element being cast to type of incompatible size!" && sizeof(T) == m_Size);
+			else
+				assert("Element being cast to type of incompatible size!" && std::is_same<T, std::string>::value || std::is_same<T, char*>::value);
+		
+			return *((T*)m_Data);
+		}
 
-	struct ElementData
-	{
-		friend class Asset;
-	public:
-		ElementData() = default;
-
-		ElementData(const std::string& name, Type type, byte* dataPtr, TypeElement::DataBase* elementData = nullptr, std::string structKey = "");
-	public:
-		Type m_Type;
-		std::string m_Name;
+	private:
 		byte* m_Data;
-		ExtraData* m_ExtraData = nullptr;
-	};*/
+		Type m_Type;
+		uint32_t m_Size;
+	};
 
 	class Asset
 	{

@@ -77,11 +77,12 @@
       <PrecompiledHeaderFile>ptpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PT_PLATFORM_WINDOWS;PT_BUILD_DLL;PT_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\Assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -90,9 +91,6 @@
     <Lib>
       <AdditionalDependencies>vendor\DirectXTK\Debug-windows-x86_64\DirectXTK.lib;vendor\DirectXTex\Debug-windows-x86_64\DirectXTex.lib;vendor\Assimp\Debug-windows-x86_64\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
-    <FxCompile>
-      <ShaderModel>5.0</ShaderModel>
-    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -100,7 +98,7 @@
       <PrecompiledHeaderFile>ptpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PT_PLATFORM_WINDOWS;PT_BUILD_DLL;PT_RELEASE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\Assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -108,6 +106,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -117,9 +116,6 @@
     <Lib>
       <AdditionalDependencies>vendor\DirectXTK\Release-windows-x86_64\DirectXTK.lib;vendor\DirectXTex\Release-windows-x86_64\DirectXTex.lib;vendor\Assimp\Release-windows-x86_64\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
-    <FxCompile>
-      <ShaderModel>5.0</ShaderModel>
-    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">
     <ClCompile>
@@ -127,7 +123,7 @@
       <PrecompiledHeaderFile>ptpch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>PT_PLATFORM_WINDOWS;PT_BUILD_DLL;PT_DIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>src;vendor\spdlog\include;vendor\DirectXTK\include;vendor\DirectXTex\include;vendor\imgui;vendor\Assimp\include;vendor\EnTT\include;vendor\yaml-cpp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -135,6 +131,7 @@
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -144,9 +141,6 @@
     <Lib>
       <AdditionalDependencies>vendor\DirectXTK\Dist-windows-x86_64\DirectXTK.lib;vendor\DirectXTex\Dist-windows-x86_64\DirectXTex.lib;vendor\Assimp\Dist-windows-x86_64\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
-    <FxCompile>
-      <ShaderModel>5.0</ShaderModel>
-    </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\Platform\DirectX 11\DirectXBuffer.h" />
@@ -302,23 +296,17 @@
       <ShaderType>Vertex</ShaderType>
       <ShaderModel>5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\Includes\LightVectorData.hlsl">
+    <FxCompile Include="src\Proton\Shader\Includes\LightVectorDataInc.hlsl">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
       <ShaderModel>5.0</ShaderModel>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\Includes\PointLight.hlsl">
+    <FxCompile Include="src\Proton\Shader\Includes\PointLightInc.hlsl">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
       <ShaderModel>5.0</ShaderModel>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\Includes\ShaderUtils.hlsl">
+    <FxCompile Include="src\Proton\Shader\Includes\ShaderUtilsInc.hlsl">
+      <ExcludedFromBuild>true</ExcludedFromBuild>
       <ShaderModel>5.0</ShaderModel>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Dist|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongNoTexPS.hlsl">
       <ShaderType>Pixel</ShaderType>

@@ -100,6 +100,9 @@
     <ClInclude Include="src\Proton\Asset Loader\AssetManager.h">
       <Filter>Proton\Asset Loader</Filter>
     </ClInclude>
+    <ClInclude Include="src\Proton\Asset Loader\AssetSerializer.h">
+      <Filter>Proton\Asset Loader</Filter>
+    </ClInclude>
     <ClInclude Include="src\Proton\Asset Loader\MetaFileSerializer.h">
       <Filter>Proton\Asset Loader</Filter>
     </ClInclude>
@@ -254,7 +257,6 @@
       <Filter>Proton\Utils</Filter>
     </ClInclude>
     <ClInclude Include="src\ptpch.h" />
-    <ClInclude Include="src\Proton\Asset Loader\AssetSerializer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Platform\DirectX 11\DirectXBuffer.cpp">
@@ -294,6 +296,9 @@
       <Filter>Proton\Asset Loader</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Asset Loader\AssetManager.cpp">
+      <Filter>Proton\Asset Loader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Proton\Asset Loader\AssetSerializer.cpp">
       <Filter>Proton\Asset Loader</Filter>
     </ClCompile>
     <ClCompile Include="src\Proton\Asset Loader\MetaFileSerializer.cpp">
@@ -375,7 +380,6 @@
       <Filter>Proton\Shader Translator</Filter>
     </ClCompile>
     <ClCompile Include="src\ptpch.cpp" />
-    <ClCompile Include="src\Proton\Asset Loader\AssetSerializer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="src\Proton\Depricated\ColorBlendPS.hlsl">
@@ -408,13 +412,13 @@
     <FxCompile Include="src\Proton\Shader\DebugVS.hlsl">
       <Filter>Proton\Shader</Filter>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\Includes\LightVectorData.hlsl">
+    <FxCompile Include="src\Proton\Shader\Includes\LightVectorDataInc.hlsl">
       <Filter>Proton\Shader\Includes</Filter>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\Includes\PointLight.hlsl">
+    <FxCompile Include="src\Proton\Shader\Includes\PointLightInc.hlsl">
       <Filter>Proton\Shader\Includes</Filter>
     </FxCompile>
-    <FxCompile Include="src\Proton\Shader\Includes\ShaderUtils.hlsl">
+    <FxCompile Include="src\Proton\Shader\Includes\ShaderUtilsInc.hlsl">
       <Filter>Proton\Shader\Includes</Filter>
     </FxCompile>
     <FxCompile Include="src\Proton\Shader\PhongNoTexPS.hlsl">

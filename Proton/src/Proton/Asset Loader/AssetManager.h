@@ -2,9 +2,6 @@
 #include <unordered_map>
 #include <filesystem>
 #include <vector>
-#include <assimp/Importer.hpp>
-#include <assimp/postprocess.h>
-#include <assimp/scene.h>
 #include "AssetLoader.h"
 #include "Proton\Model\Model.h"
 #include "Proton\Scene\Components.h"

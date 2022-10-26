@@ -1,4 +1,9 @@
 #include "ptpch.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
+#include <assimp/scene.h>
+
 #include "AssetManager.h"
 #include <Platform\DirectX 11\DirectXTexture.h>
 #include "Proton\Model\Model.h"
@@ -23,7 +28,7 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
-		Asset& desAsset = AssetSerializer::DeserializeAsset("D:\\Dev\\Proton\\Proton-Editor\\assets\\Prefabs\\asset.asset");
+		Asset& desAsset = AssetSerializer::DeserializeAsset("C:\\Dev\\Proton\\Proton-Editor\\assets\\Prefabs\\asset.asset");
 
 		RawAsset rawAsset;
 		rawAsset.Add("Name", std::string("Alan"));
@@ -128,7 +133,7 @@ namespace Proton
 
 		Asset asset(rawAsset);
 
-		AssetSerializer::SerializeAsset("D:\\Dev\\Proton\\Proton-Editor\\assets\\Prefabs\\asset.asset", asset);
+		AssetSerializer::SerializeAsset("C:\\Dev\\Proton\\Proton-Editor\\assets\\Prefabs\\asset.asset", asset);
 
 		//159 bytes, 25 elements
 

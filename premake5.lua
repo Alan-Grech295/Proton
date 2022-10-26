@@ -14,7 +14,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 --Include Directories relative to root folder
 IncludeDir = {}
 IncludeDir["ImGui"] = "%{wks.location}/Proton/vendor/imgui"
-IncludeDir["Assimp"] = "%{wks.location}/Proton/vendor/assimp/include"
+IncludeDir["Assimp"] = "%{wks.location}/Proton/vendor/Assimp/include"
 IncludeDir["entt"] = "%{wks.location}/Proton/vendor/EnTT/include"
 IncludeDir["DirectXTK"] = "%{wks.location}/Proton/vendor/DirectXTK/include"
 IncludeDir["DirectXTex"] = 	"%{wks.location}/Proton/vendor/DirectXTex/include"
@@ -104,6 +104,9 @@ project "Proton"
 
 	filter { "files:**CS.hlsl" }
    		shadertype "Compute"
+
+	filter {"files:**Inc.hlsl"}
+		flags {"ExcludeFromBuild"}
 	
 
 project "Sandbox"
