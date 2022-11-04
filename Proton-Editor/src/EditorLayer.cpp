@@ -21,7 +21,17 @@ namespace Proton
 
 	void EditorLayer::OnAttach()
 	{
-		AssetManager::SetProjectPath("D:\\Dev\\Proton\\Proton-Editor");
+		std::string projectPath = __FILE__;
+		int directoryCounter = 0;
+		while (directoryCounter < 2)
+		{
+			if (projectPath.back() == '\\')
+				directoryCounter++;
+
+			projectPath.pop_back();
+		}
+
+		AssetManager::SetProjectPath(projectPath);
 		AssetManager::ScanProject();
 
 		Application::Get().GetWindow().ShowCursor();
@@ -37,7 +47,7 @@ namespace Proton
 		m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
 
 		SceneHierarchyPanel::SetScene(m_ActiveScene);
-		AssetViewerPanel::SetProjectPath("D:\\Dev\\Proton\\Proton-Editor");
+		AssetViewerPanel::SetProjectPath(projectPath);
 		AssetViewerPanel::SetScene(m_ActiveScene);
 
 		//m_Nanosuit = ModelCreator::CreateModelEnti++ty("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());

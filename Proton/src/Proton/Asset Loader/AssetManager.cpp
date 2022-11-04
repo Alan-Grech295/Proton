@@ -28,7 +28,16 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
-		Asset& desAsset = AssetSerializer::DeserializeAsset("C:\\Dev\\Proton\\Proton-Editor\\assets\\Prefabs\\asset.asset");
+		Asset& desAsset = AssetSerializer::DeserializeAsset(manager.m_ProjectPath.generic_string() + "/assets/Prefabs/asset.asset");
+
+		std::string name = desAsset["Name"];
+		int age = desAsset["Age"];
+		float height = desAsset["Height"];
+
+		char* id = desAsset["Data"]["ID"];
+		int houseNum = desAsset["Data"]["House Number"];
+		std::string postCode = desAsset["Data"]["Post Code"];
+		byte test = desAsset["Data"]["Test"];
 
 		RawAsset rawAsset;
 		rawAsset.Add("Name", std::string("Alan"));
@@ -99,9 +108,6 @@ namespace Proton
 		rawAsset["Array Of Array"][2].Add(TypeElement::Create(863.71f));
 		rawAsset["Array Of Array"][2].Add(TypeElement::Create(1.72f));
 
-
-
-
 		rawAsset.Add("3D Array", Type::Array);
 		auto& a1 = rawAsset["3D Array"].SetType(Type::Array);
 		auto& a2 = rawAsset["3D Array"].GetType().SetType(Type::Array);
@@ -133,7 +139,7 @@ namespace Proton
 
 		Asset asset(rawAsset);
 
-		AssetSerializer::SerializeAsset("C:\\Dev\\Proton\\Proton-Editor\\assets\\Prefabs\\asset.asset", asset);
+		AssetSerializer::SerializeAsset(manager.m_ProjectPath.generic_string() + "/assets/Prefabs/asset.asset", asset);
 
 		//159 bytes, 25 elements
 

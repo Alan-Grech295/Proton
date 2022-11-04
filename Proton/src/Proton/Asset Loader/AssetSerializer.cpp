@@ -573,8 +573,6 @@ namespace Proton
 			AddElement(e, m_Data, nextData, m_MetaFile, nextStructTag);
 			//e.AddElementToMetaFile((uint32_t)(nextData - m_Data), m_MetaFile);
 		}
-
-		bool a = false;
 	}
 
 	void Asset::GetNumElementsAndSize(Element& element, uint32_t& numElements, uint32_t& size)
@@ -650,8 +648,8 @@ namespace Proton
 	//~ is the symbol for an array struct
 	void Asset::AddElement(Element& element, const byte* dataPtr, byte*& nextDataPtr, Meta::Addable& addable, std::string& nextStructTag, std::string structTag)
 	{
-		//bool isStructArr = element.m_Type == Type::Array && !element.m_Data->as<Data::Array>().m_constElementSize;
 		Meta::Element& metaElement = AddMetaElement(element, addable, (uint32_t)(nextDataPtr - dataPtr));
+		
 		if (element.m_Type == Type::Struct)
 		{
 			for (Element& e : element.m_Data->as<Data::Struct&>().m_Elements)
@@ -734,6 +732,29 @@ namespace Proton
 		}
 	}
 
+	ElementRef& ElementRef::operator[](const std::string& name)
+	{
+		Meta::Element& metaElement = m_MetaElement[name];
+		return ElementRef(m_Data + (metaElement.m_DataOffset - m_MetaElement.m_DataOffset), metaElement.m_Type, metaElement);
+	}
+
+	ElementRef& ElementRef::operator[](const char* name)
+	{
+		return (*this)[std::string(name)];
+	}
+
+	/*ElementRef ElementRef::operator[](uint32_t index)
+	{
+		Meta::Element& metaElement = m_MetaElement[index];
+		return ElementRef(m_Data + metaElement.m_DataOffset, metaElement.m_Type, metaElement);
+	}*/
+
+	ElementRef& Asset::operator[](const std::string& name)
+	{
+		Meta::Element& metaElement = m_MetaFile[name];
+		return ElementRef(m_Data + metaElement.m_DataOffset, metaElement.m_Type, metaElement);
+	}
+
 	void AssetSerializer::SerializeAsset(const std::string& filepath, Asset& asset)
 	{
 		Meta::MetaFileSerializer::SerializeMetaFile(filepath + ".meta", asset.m_MetaFile);
@@ -765,6 +786,24 @@ namespace Proton
 		fileBuf->sgetn((char*)asset.m_Data, asset.m_DataSize);
 
 		inStream.close();
+
+		//Display Bytes
+		std::string byteStr = "";
+		int lastMod = 1;
+		for (int i = 0; i < asset.m_DataSize; i++)
+		{
+			byte b = asset.m_Data[i];
+			byteStr += std::to_string(b) + ' ';
+			if (byteStr.length() % 50 < lastMod)
+				byteStr += '\n';
+
+			lastMod = byteStr.length() % 50;
+		}
+		byteStr += "\n\n";
+
+		byteStr = "\n Asset byte data: \n" + byteStr;
+
+		PT_CORE_TRACE(byteStr);
 
 		return asset;
 	}

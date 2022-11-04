@@ -357,10 +357,11 @@ namespace Proton
 	struct ElementRef
 	{
 	public:
-		ElementRef(byte* data, Type type)
+		ElementRef(byte* data, Type type, Meta::Element metaElement)
 			:
 			m_Data(data),
-			m_Type(type)
+			m_Type(type),
+			m_MetaElement(metaElement)
 		{
 			switch (type)
 			{
@@ -372,21 +373,34 @@ namespace Proton
 			}
 		}
 
+		ElementRef& operator[](const std::string& name);
+
+		ElementRef& operator[](const char* name);
+
+		ElementRef& operator[](uint32_t index);
+
 		template<typename T>
-		operator T&()
+		operator T& ()
 		{
-			if (m_Type != Type::String)
-				assert("Element being cast to type of incompatible size!" && sizeof(T) == m_Size);
-			else
-				assert("Element being cast to type of incompatible size!" && std::is_same<T, std::string>::value || std::is_same<T, char*>::value);
-		
+			assert("Element being cast to type of incompatible size!" && sizeof(T) == m_Size);
 			return *((T*)m_Data);
+		}
+
+		operator std::string&()
+		{
+			return *(new std::string((char*)m_Data, strlen((char*)m_Data)));
+		}
+
+		operator char*()
+		{
+			return (char*)m_Data;
 		}
 
 	private:
 		byte* m_Data;
 		Type m_Type;
-		uint32_t m_Size;
+		uint32_t m_Size = 0;
+		Meta::Element m_MetaElement;
 	};
 
 	class Asset
@@ -401,6 +415,8 @@ namespace Proton
 		{}
 
 		Asset(RawAsset rawAsset);
+
+		ElementRef& operator[](const std::string& name);
 
 	private:
 		void GetNumElementsAndSize(Element& element, uint32_t& numElements, uint32_t& size);
