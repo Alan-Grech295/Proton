@@ -40,7 +40,7 @@ namespace Proton
 		class Addable
 		{
 		public:
-			virtual class Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset = std::nullopt, uint32_t numStructChildren = 0) = 0;
+			virtual class Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset = std::nullopt) = 0;
 		};
 
 		class Element : public Addable
@@ -65,10 +65,10 @@ namespace Proton
 			//Element(const std::string& name);
 
 			//Value Constructor
-			Element(const char* name, Type type, uint32_t dataOffset, class MetaFile* metaFile = nullptr, std::string parentStructTag = "", uint32_t numStructChildren = 0);
+			Element(const char* name, Type type, uint32_t dataOffset);
 			
 			//Value Constructor
-			Element(std::string name, Type type, uint32_t dataOffset, class MetaFile* metaFile = nullptr, std::string parentStructTag = "", uint32_t numStructChildren = 0);
+			Element(std::string name, Type type, uint32_t dataOffset);
 
 
 			//Array constructor
@@ -87,7 +87,7 @@ namespace Proton
 			void ToBytes(std::vector<byte>& bytes);
 
 			//Struct Only
-			virtual Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset = std::nullopt, uint32_t numStructChildren = 0) override;
+			virtual Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset = std::nullopt) override;
 
 			Element& operator[](const std::string& name);
 
@@ -100,11 +100,20 @@ namespace Proton
 
 			Element& SetElementOffsets(std::vector<uint32_t> offsets);
 
+			//Size of the data in bytes
+			uint32_t GetSizeInBytes()
+			{
+				assert("Size is 0" && m_SizeBytes > 0);
+				return m_SizeBytes;
+			}
+
 		private:
 			//The data in bytes when stored in an array element
 			uint32_t CalculateSizeInArray();
+			//Size of bytes when saved
+			uint32_t CalculateSizeBytes();
 
-			std::pair<byte*, uint32_t> GetDataForArray();
+			std::vector<byte> GetDataForArray();
 
 			//Struct Only
 			//void Add(Element element);
@@ -115,6 +124,8 @@ namespace Proton
 			//The byte offset to access the data
 			uint32_t m_DataOffset;
 
+			//IMP: HAVE TO SET IT DIRECTLY (cannot through constructor)
+			uint32_t m_SizeBytes;
 		};
 
 		class MetaFile : public Addable
@@ -133,11 +144,11 @@ namespace Proton
 				m_ElementLocator[m_Elements.back().m_Name] = &m_Elements.back();
 			}*/
 
-			virtual Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset = std::nullopt, uint32_t numStructChildren = 0) override
+			virtual Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset = std::nullopt) override
 			{
 				assert("No data offset was given!" && dataOffset.has_value());
 				auto [it, succeded] = m_ElementLocator.emplace(name, (m_Elements.data() + m_Elements.size()));
-				m_Elements.push_back(Element(it->first.c_str(), type, dataOffset.value(), this, "", numStructChildren));
+				m_Elements.push_back(Element(it->first.c_str(), type, dataOffset.value()));
 				return m_Elements.back();
 			}
 
@@ -158,45 +169,9 @@ namespace Proton
 				return *m_ElementLocator[name];
 			}
 
-			//private:
-			//TODO: Set to private function
-			std::string GetNextStructTag()
-			{
-				std::string out;
-				if (m_NextStructTag <= 0xF)
-				{
-					out = std::string((const char*)(&m_NextStructTag), 1);
-				}
-				else if (m_NextStructTag <= 0xFF)
-				{
-					out = std::string((const char*)(&m_NextStructTag), 2);
-				}
-				else if (m_NextStructTag <= 0xFFF)
-				{
-					out = std::string((const char*)(&m_NextStructTag), 3);
-				}
-				else
-				{
-					out = std::string((const char*)(&m_NextStructTag), 4);
-				}
-				m_NextStructTag++;
-				if (m_NextStructTag == (int)'|')
-					m_NextStructTag++;
-				return out;
-			}
-
-			void AddStructElement(const std::string& name, Type type, uint32_t dataOffset, uint32_t numStructChildren, const std::string& structTag, std::vector<Element>& elements)
-			{
-				auto [it, succeded] = m_ElementLocator.emplace(structTag + name, (Element*)(elements.data() + elements.size()));
-				elements.push_back(Element(it->first.c_str() + structTag.length(), type, dataOffset, this, structTag, numStructChildren));
-			}
-
 		private:
 			std::vector<Element> m_Elements;
 			std::unordered_map<std::string, Element*> m_ElementLocator;
-			
-			//Next struct tag
-			uint32_t m_NextStructTag = 1;
 		};
 
 		class MetaFileSerializer
@@ -212,10 +187,11 @@ namespace Proton
 			static void SerializeMetaFile(const std::string& path, MetaFile& file);
 
 		private:
-			static Element ReadElement(byte*& data, MetaFile& file, Element::ExtraDataBase* structData = nullptr);
+			static Element ReadElement(byte*& data, Addable& addable);
 
 			//TODO: Support non-const size arrays
-			static Element& ReadArrayElement(byte*& data);
+			//readName - Reads the names of variables in a struct
+			static Element ReadArrayElement(byte*& data, bool readName = false);
 		};
 
 		template<typename T>
@@ -224,6 +200,8 @@ namespace Proton
 			return static_cast<T&>(*this);
 		}
 
-#define COPY_DATA(dest, src, size) memcpy(dest, src, size); ptr += size
+//#define COPY_DATA(dest, src, size) memcpy(dest, src, size); ptr += size
+#define COPY_DATA_OFFSET(start, offset, src, size) memcpy((start + offset), src, size); offset += size
+
 }
 }

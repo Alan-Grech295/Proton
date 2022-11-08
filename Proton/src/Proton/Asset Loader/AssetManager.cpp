@@ -39,6 +39,37 @@ namespace Proton
 		std::string postCode = desAsset["Data"]["Post Code"];
 		byte test = desAsset["Data"]["Test"];
 
+		double a0 = desAsset["Family members ages"][0];
+		double a1 = desAsset["Family members ages"][1];
+		double a2 = desAsset["Family members ages"][2];
+
+		//TODO: Test arrays of arrays and arrays of structs
+		std::string f0 = desAsset["Family members"][0];
+		char* f1 = desAsset["Family members"][1];
+		std::string f2 = desAsset["Family members"][2];
+
+		ElementRef& array0 = desAsset["Array Of Array"][0];
+		float val00 = array0[0];
+		float val01 = array0[1];
+		float val02 = array0[2];
+
+		float val10 = desAsset["Array Of Array"][1][0];
+		float val11 = desAsset["Array Of Array"][1][1];
+
+		float val20 = desAsset["Array Of Array"][2][0];
+		float val21 = desAsset["Array Of Array"][2][1];
+
+		float val = desAsset["3D Array"][1][1][1];
+
+		//TODO: Fix issue (convert struct to storing data internally)
+		ElementRef& str1 = desAsset["Previous houses"][0];
+		std::string road1 = str1["Road"];
+		//INCORRECT NUMBER (Data offset not stored)
+		int16_t num1 = str1["Number"];
+
+		std::string road2 = desAsset["Previous houses"][1]["Road"];
+		int16_t num2 = desAsset["Previous houses"][1]["Number"];
+
 		RawAsset rawAsset;
 		rawAsset.Add("Name", std::string("Alan"));
 		rawAsset.Add("Age", 18);
@@ -99,6 +130,7 @@ namespace Proton
 		rawAsset["Array Of Array"].Add(TypeElement(Type::Array).SetType(Type::Float));
 		rawAsset["Array Of Array"][0].Add(TypeElement::Create(61.61f));
 		rawAsset["Array Of Array"][0].Add(TypeElement::Create(812.1f));
+		rawAsset["Array Of Array"][0].Add(TypeElement::Create(812.1f));
 
 		rawAsset["Array Of Array"].Add(TypeElement(Type::Array).SetType(Type::Float));
 		rawAsset["Array Of Array"][1].Add(TypeElement::Create(863.71f));
@@ -109,9 +141,9 @@ namespace Proton
 		rawAsset["Array Of Array"][2].Add(TypeElement::Create(1.72f));
 
 		rawAsset.Add("3D Array", Type::Array);
-		auto& a1 = rawAsset["3D Array"].SetType(Type::Array);
-		auto& a2 = rawAsset["3D Array"].GetType().SetType(Type::Array);
-		auto& a3 = rawAsset["3D Array"].GetType().GetType().SetType(Type::Float).SetSize(2);
+		rawAsset["3D Array"].SetType(Type::Array);
+		rawAsset["3D Array"].GetType().SetType(Type::Array);
+		rawAsset["3D Array"].GetType().GetType().SetType(Type::Float).SetSize(2);
 
 		TypeElement arr1 = TypeElement(Type::Array);
 		arr1.SetType(Type::Array).GetType().SetType(Type::Float);

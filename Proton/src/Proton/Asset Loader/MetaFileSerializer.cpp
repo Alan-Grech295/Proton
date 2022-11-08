@@ -20,48 +20,30 @@ namespace Proton
 		{
 			struct Struct : public Element::ExtraDataBase
 			{
-				//If no meta file is provided then it is assumed that this struct is an array template
-				Struct(MetaFile* metaFile, uint32_t numChildren, std::optional<std::string> parentStructTag = std::nullopt)
-					:
-					m_MetaFile(metaFile),
-					m_StructChildren(numChildren)
-				{
-					if (metaFile)
-						m_StructTag = parentStructTag.value_or("") + metaFile->GetNextStructTag() + "|";
+				Struct()
+				{}
 
-					m_Elements.reserve(numChildren);
-				}
-
-				//WARN: Setting num elements after assigning elements can cause malfunctions
-				void SetNumElements(uint32_t numChildren)
+				Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset)
 				{
-					m_Elements.reserve(numChildren);
-					m_StructChildren = numChildren;
-				}
-
-				Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset, uint32_t numStructChildren = 0)
-				{
-					assert("Adding more children than capacity!" && (m_Elements.size() < m_StructChildren));
 					//If data offset has no value then it is assumed that the element is used as an array type template
-					if (dataOffset.has_value())
-					{
-						m_MetaFile->AddStructElement(name, type, dataOffset.value(), numStructChildren, m_StructTag, m_Elements);
-					}
-					else
-					{
-						m_Elements.push_back(Element(name, type, 0, nullptr, "", numStructChildren));
-					}
+					m_Elements.push_back(Element(name, type, dataOffset.value_or(0)));
 
 					return m_Elements.back();
 				}
 
-				std::vector<Element> m_Elements;
-				std::string m_StructTag;
-				//Meta file reference to add any child elements to element locator
-				MetaFile* m_MetaFile;
+				Element& operator[](const std::string& name)
+				{
+					for (Element& e : m_Elements)
+					{
+						if (e.m_Name == name)
+							return e;
+					}
 
-				//Used for validity checks
-				uint32_t m_StructChildren;
+					assert("Element not found" && false);
+					return Element::Empty();
+				}
+
+				std::vector<Element> m_Elements;
 			};
 
 			struct Array : public Element::ExtraDataBase
@@ -83,6 +65,8 @@ namespace Proton
 
 				//Only used if the array type is not constant size
 				std::optional<std::vector<uint32_t>> m_ElementOffsets;
+				//The size in bytes of the element of the child array (only used by non-const type arrays with array type templates)
+				uint32_t m_ChildStride;
 			};
 		};
 
@@ -94,7 +78,7 @@ namespace Proton
 			m_ExtraData = new ExtraData::Struct();
 		}*/
 
-		Element::Element(const char* name, Type type, uint32_t dataOffset, MetaFile* metaFile, std::string parentStructTag, uint32_t numStructChildren)
+		Element::Element(const char* name, Type type, uint32_t dataOffset)
 			:
 			m_Name(name),
 			m_Type(type),
@@ -104,7 +88,7 @@ namespace Proton
 			if (type == Type::Struct)
 			{
 				//assert("Struct cannot have no children" && numStructChildren > 0);
-				m_ExtraData = new ExtraData::Struct(metaFile, numStructChildren, parentStructTag.empty() ? std::nullopt : std::optional<std::string>(parentStructTag));
+				m_ExtraData = new ExtraData::Struct();
 			}
 			else if (type == Type::Array)
 			{
@@ -112,7 +96,7 @@ namespace Proton
 			}
 		}
 
-		Element::Element(std::string name, Type type, uint32_t dataOffset, MetaFile* metaFile, std::string parentStructTag, uint32_t numStructChildren)
+		Element::Element(std::string name, Type type, uint32_t dataOffset)
 			:
 			m_Type(type),
 			m_ExtraData(nullptr),
@@ -122,8 +106,7 @@ namespace Proton
 			memcpy(const_cast<char*>(m_Name), name.c_str(), name.length() + 1);
 			if (type == Type::Struct)
 			{
-				assert("Struct cannot have no children" && numStructChildren == 0);
-				m_ExtraData = new ExtraData::Struct(metaFile, numStructChildren, parentStructTag.empty() ? std::nullopt : std::optional<std::string>(parentStructTag));
+				m_ExtraData = new ExtraData::Struct();
 			}
 			else if (type == Type::Array)
 			{
@@ -165,38 +148,33 @@ namespace Proton
 
 		void Element::ToBytes(std::vector<byte>& bytes)
 		{
-			/*Value Elements: Name, Type, Data Offset,
-			  Struct Elements: Name, Type, Data Offset, Num elements, {Elements}
-			  Array Elements: Name, Type, Data Offset, Element Type, Size, Constant element size*/
+			/*Value Elements:	Name, Type, Data Offset, Size Bytes
+			  Struct Elements:	Name, Type, Data Offset, Size Bytes, Num elements, {Elements}
+			  Array Elements:	Name, Type, Data Offset, Size Bytes, Element Type, Size, Constant element size, {If not const size and array type template : Child Stride}*/
 
-			//				Name Length			Name					Type			Data Offset
-			uint32_t size = sizeof(uint32_t) + strlen(m_Name) + sizeof(uint32_t) + sizeof(uint32_t);
+			uint32_t size = CalculateSizeBytes();
 
+			uint32_t offset = bytes.size();
 			bytes.resize(bytes.size() + size);
-
-			byte* ptr = &bytes.back() - size + 1;
 
 			//Data required
 			uint32_t nameLength = strlen(m_Name);
 			uint32_t type = (uint32_t)m_Type;
 
-			COPY_DATA(ptr, &nameLength, sizeof(uint32_t));
-			COPY_DATA(ptr, m_Name, nameLength);
-			COPY_DATA(ptr, &type, sizeof(uint32_t));
-			COPY_DATA(ptr, &m_DataOffset, sizeof(uint32_t));
+			COPY_DATA_OFFSET(bytes.data(), offset, &nameLength, sizeof(uint32_t));
+			COPY_DATA_OFFSET(bytes.data(), offset, m_Name, nameLength);
+			COPY_DATA_OFFSET(bytes.data(), offset, &type, sizeof(uint32_t));
+			COPY_DATA_OFFSET(bytes.data(), offset, &m_DataOffset, sizeof(uint32_t));
+			COPY_DATA_OFFSET(bytes.data(), offset, &m_SizeBytes, sizeof(uint32_t));
 
 			if (m_Type == Type::Struct)
 			{
 				ExtraData::Struct& structData = static_cast<ExtraData::Struct&>(*m_ExtraData);
 
-				bytes.resize(bytes.size() + sizeof(uint32_t));
-
-				ptr = &bytes.back() - sizeof(uint32_t) + 1;
-
 				//Data required
 				uint32_t numElements = structData.m_Elements.size();
 
-				COPY_DATA(ptr, &numElements, sizeof(uint32_t));
+				COPY_DATA_OFFSET(bytes.data(), offset, &numElements, sizeof(uint32_t));
 
 				for (Element& e : structData.m_Elements)
 					e.ToBytes(bytes);
@@ -204,34 +182,30 @@ namespace Proton
 			else if (m_Type == Type::Array)
 			{
 				ExtraData::Array& arrayData = static_cast<ExtraData::Array&>(*m_ExtraData);
-				//			Type Data										Size			Constant Size											Num Offsets							{Offsets}
-				size = arrayData.m_TypeTemplate.CalculateSizeInArray() + sizeof(uint32_t) + sizeof(boolean) + (arrayData.m_constElementSize ? 0 : sizeof(uint32_t) + sizeof(uint32_t) * arrayData.m_ElementOffsets.value().size());
 
-				bytes.resize(bytes.size() + size);
-
-				byte* ptr = &bytes.back() - size + 1;
-
-				auto [elementData, dataSize] = arrayData.m_TypeTemplate.GetDataForArray();
-				COPY_DATA(ptr, elementData, dataSize);
-				COPY_DATA(ptr, &arrayData.m_Size, sizeof(uint32_t));
-				COPY_DATA(ptr, &arrayData.m_constElementSize, sizeof(bool));
+				std::vector<byte> typeData = arrayData.m_TypeTemplate.GetDataForArray();
+				COPY_DATA_OFFSET(bytes.data(), offset, typeData.data(), typeData.size());
+				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_Size, sizeof(uint32_t));
+				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_constElementSize, sizeof(bool));
 
 				if (!arrayData.m_constElementSize)
 				{
 					uint32_t numOffsets = arrayData.m_ElementOffsets.value().size();
-					COPY_DATA(ptr, &numOffsets, sizeof(uint32_t));
-					COPY_DATA(ptr, arrayData.m_ElementOffsets.value().data(), numOffsets * sizeof(uint32_t));
+					COPY_DATA_OFFSET(bytes.data(), offset, &numOffsets, sizeof(uint32_t));
+					COPY_DATA_OFFSET(bytes.data(), offset, arrayData.m_ElementOffsets.value().data(), numOffsets * sizeof(uint32_t));
+					if (arrayData.m_TypeTemplate.m_Type == Type::Array)
+					{
+						COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_ChildStride, sizeof(uint32_t));
+					}
 				}
-
-				delete[] elementData;
 			}
 		}
 
-		Element& Element::Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset, uint32_t numStructChildren)
+		Element& Element::Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset)
 		{
 			assert("Element is not a struct!" && m_Type == Type::Struct);
 			ExtraData::Struct& data = static_cast<ExtraData::Struct&>(*m_ExtraData);
-			return data.Add(name, type, dataOffset, numStructChildren);
+			return data.Add(name, type, dataOffset);
 		}
 
 		/*void Element::Add(Element element)
@@ -247,9 +221,7 @@ namespace Proton
 			assert("Element is not a struct!" && m_Type == Type::Struct);
 			ExtraData::Struct& structData = static_cast<ExtraData::Struct&>(*m_ExtraData);
 
-			std::string search = structData.m_StructTag + name;
-
-			return (*structData.m_MetaFile)[search];
+			return structData[name];
 		}
 
 		Element& Element::GetType()
@@ -270,7 +242,7 @@ namespace Proton
 		Element& Element::SetType(Type type)
 		{
 			ExtraData::Array& arrayData = static_cast<ExtraData::Array&>(*m_ExtraData);
-			arrayData.m_TypeTemplate = Element(nullptr, type, 0, nullptr, "", 5);
+			arrayData.m_TypeTemplate = Element(nullptr, type, 0);
 			return *this;
 		}
 
@@ -292,7 +264,7 @@ namespace Proton
 
 				for (Element& e : data.m_Elements)
 				{
-					size += e.CalculateSizeInArray();
+					size += sizeof(uint32_t) + strlen(e.m_Name) + e.CalculateSizeInArray();
 				}
 
 				return size;
@@ -311,65 +283,79 @@ namespace Proton
 			}
 		}
 
-		//Gets the byte data when stored for array type template (i.e no name is stored)
-		//TODO: Add non-constant size arrays
-		std::pair<byte*, uint32_t> Element::GetDataForArray()
+		uint32_t Element::CalculateSizeBytes()
 		{
+			//				Name Length			Name					Type			Data Offset         Size Bytes
+			uint32_t size = sizeof(uint32_t) + strlen(m_Name) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
+			
 			if (m_Type == Type::Struct)
 			{
-				//Type, Size, {Element types}
+				//Num elements
+				size += sizeof(uint32_t);
+			}
+			else if (m_Type == Type::Array)
+			{
+				ExtraData::Array& arrayData = static_cast<ExtraData::Array&>(*m_ExtraData);
+				//			Type Data										Size			Constant Size											Num Offsets							{Offsets}                                                               {If not const size and array type template : Child Stride}
+				size += arrayData.m_TypeTemplate.CalculateSizeInArray() + sizeof(uint32_t) + sizeof(boolean) + (arrayData.m_constElementSize ? 0 : sizeof(uint32_t) + sizeof(uint32_t) * arrayData.m_ElementOffsets.value().size()) + (arrayData.m_TypeTemplate.m_Type == Type::Array && !arrayData.m_constElementSize ? sizeof(uint32_t) : 0);
+			}
+
+			return size;
+		}
+
+		//Gets the byte data when stored for array type template (i.e no name is stored)
+		//TODO: Add non-constant size arrays
+		std::vector<byte> Element::GetDataForArray()
+		{
+			std::vector<byte> bytes;
+			bytes.resize(sizeof(uint32_t));
+
+			//Type being stored
+			uint32_t* type = new uint32_t((uint32_t)m_Type);
+			memcpy(bytes.data(), type, sizeof(uint32_t));
+
+			uint32_t offset = sizeof(uint32_t);
+
+			if (m_Type == Type::Struct)
+			{
+				//Size, {Elements}
+
 				ExtraData::Struct& structData = static_cast<ExtraData::Struct&>(*m_ExtraData);
-				uint32_t size = 2 * sizeof(uint32_t);
 
-				for (Element& e : structData.m_Elements)
-				{
-					size += e.CalculateSizeInArray();
-				}
+				bytes.resize(bytes.size() + sizeof(uint32_t));
 
-				byte* bytes = new byte[size];
-				byte* ptr = bytes;
-
-				//Data to copy
 				uint32_t numElements = structData.m_Elements.size();
-				uint32_t type = (uint32_t)Type::Struct;
 
-				COPY_DATA(ptr, &type, sizeof(uint32_t));
-				COPY_DATA(ptr, &numElements, sizeof(uint32_t));
+				COPY_DATA_OFFSET(bytes.data(), offset, &numElements, sizeof(uint32_t));
 
 				for (Element& e : structData.m_Elements)
 				{
-					auto [data, dataSize] = e.GetDataForArray();
-					COPY_DATA(ptr, data, dataSize);
-					delete[] data;
-				}
+					std::vector<byte> elData = e.GetDataForArray();
+					uint32_t nameLength = strlen(e.m_Name);
 
-				return { bytes, size };
+					bytes.resize(bytes.size() + sizeof(uint32_t) + nameLength + elData.size());
+
+					COPY_DATA_OFFSET(bytes.data(), offset, &nameLength, sizeof(uint32_t));
+					COPY_DATA_OFFSET(bytes.data(), offset, e.m_Name, nameLength);
+					COPY_DATA_OFFSET(bytes.data(), offset, elData.data(), elData.size());
+				}
 			}
 			else if (m_Type == Type::Array)
 			{
 				ExtraData::Array& arrayData = static_cast<ExtraData::Array&>(*m_ExtraData);
 
-				//Type, Elements Type, size
-				uint32_t size = arrayData.m_TypeTemplate.CalculateSizeInArray() + 2 * sizeof(uint32_t);
-				byte* data = new byte[size];
-				byte* ptr = data;
+				//Elements Type, Size
+				uint32_t size = arrayData.m_TypeTemplate.CalculateSizeInArray() + sizeof(uint32_t);
 
-				uint32_t type = (uint32_t)Type::Array;
-				COPY_DATA(ptr, &type, sizeof(uint32_t));
-				auto [typeData, dataSize] = arrayData.m_TypeTemplate.GetDataForArray();
-				COPY_DATA(ptr, typeData, dataSize);
-				COPY_DATA(ptr, &arrayData.m_Size, sizeof(uint32_t));
+				bytes.resize(bytes.size() + size);
 
-				delete[] typeData;
+				std::vector<byte> typeData = arrayData.m_TypeTemplate.GetDataForArray();
 
-				return { data, size };
+				COPY_DATA_OFFSET(bytes.data(), offset, typeData.data(), typeData.size());
+				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_Size, sizeof(uint32_t));
 			}
-			else
-			{
-				//Only type is returned
-				uint32_t* type = new uint32_t((uint32_t)m_Type);
-				return { (byte*)type, sizeof(uint32_t) };
-			}
+
+			return bytes;
 		}
 
 		MetaFile& MetaFileSerializer::DeserializeMetaFile(const std::string& path)
@@ -455,26 +441,27 @@ namespace Proton
 		}
 
 		//Reads the element from the bytes
-		Element MetaFileSerializer::ReadElement(byte*& data, MetaFile& file, Element::ExtraDataBase* structData)
+		Element MetaFileSerializer::ReadElement(byte*& data, Addable& addable)
 		{
-			/*Value: Name, Type, Data Offset
-			  Struct: Name, Type, Data Offset, Num Elements, {Elements}
-			  Array: Name, Type, Data Offset, Type Template, Size, Constant Element Size, (Num Offsets, {Offsets})*/
+			/*Value:	Name, Type, Data Offset, Size Bytes
+			  Struct:	Name, Type, Data Offset, Size Bytes, Num Elements, {Elements}
+			  Array:	Name, Type, Data Offset, Size Bytes, Type Template, Size, Constant Element Size, (Num Offsets, {Offsets}), {If not const size and array type template : Child Stride}*/
 			uint32_t nameLength = *(uint32_t*)data; data += sizeof(uint32_t);
 			std::string name = std::string((char*)data, nameLength); data += nameLength;
 			Type type = (Type) * (uint32_t*)data; data += sizeof(uint32_t);
 			uint32_t dataOffset = *(uint32_t*)data; data += sizeof(uint32_t);
+			uint32_t sizeBytes = *(uint32_t*)data; data += sizeof(uint32_t);
 
-			Element& element = structData ? ((ExtraData::Struct*)structData)->Add(name, type, dataOffset) : file.Add(name, type, dataOffset);
+			Element& element = addable.Add(name, type, dataOffset);
+			element.m_SizeBytes = sizeBytes;
 
 			if (type == Type::Struct)
 			{
 				ExtraData::Struct* structData = static_cast<ExtraData::Struct*>(element.m_ExtraData);
 				uint32_t numElements = *(uint32_t*)data; data += sizeof(uint32_t);
-				structData->SetNumElements(numElements); 
 
 				for (int i = 0; i < numElements; i++)
-					ReadElement(data, file, structData);
+					ReadElement(data, element);
 			}
 			else if (type == Type::Array)
 			{
@@ -489,6 +476,10 @@ namespace Proton
 					uint32_t numOffsets = *(uint32_t*)data; data += sizeof(uint32_t);
 					arrayData.m_ElementOffsets = std::vector<uint32_t>((uint32_t*)data, (uint32_t*)(data + numOffsets * sizeof(uint32_t)));
 					data += numOffsets * sizeof(uint32_t);
+					if (arrayData.m_TypeTemplate.m_Type == Type::Array)
+					{
+						arrayData.m_ChildStride = *(uint32_t*)data; data += sizeof(uint32_t);
+					}
 				}
 			}
 
@@ -497,19 +488,27 @@ namespace Proton
 
 		//Reads the element data when stored for the use of an array (i.e no name is saved)
 		//TODO: Support non-const size arrays
-		Element& MetaFileSerializer::ReadArrayElement(byte*& data)
+		Element MetaFileSerializer::ReadArrayElement(byte*& data, bool readName)
 		{
+			std::string name = "";
+			if (readName)
+			{
+				uint32_t nameLength = *(uint32_t*)data; data += sizeof(uint32_t);
+				name = std::string((char*)data, nameLength); data += nameLength;
+			}
+
 			Type type = (Type) * (uint32_t*)data; data += sizeof(uint32_t);
-			Element& element = Element("", type, 0);
+			Element element = Element(name, type, 0);
 
 			if (type == Type::Struct)
 			{
 				uint32_t numElements = *(uint32_t*)data; data += sizeof(uint32_t);
 				ExtraData::Struct& structData = static_cast<ExtraData::Struct&>(*element.m_ExtraData);
-				structData.SetNumElements(numElements);
 
 				for (int i = 0; i < numElements; i++)
-					structData.m_Elements.push_back(ReadArrayElement(data));
+				{
+					structData.m_Elements.push_back(ReadArrayElement(data, true));
+				}
 			}
 			else if (type == Type::Array)
 			{
@@ -521,5 +520,26 @@ namespace Proton
 			
 			return element;
 		}
+
+		/*
+		std::vector<byte> Element::GetDataForArray()
+		{
+			if (m_Type == Type::Struct)
+			{
+
+				for (Element& e : structData.m_Elements)
+				{
+					std::vector<byte> elData = e.GetDataForArray();
+					uint32_t nameLength = strlen(e.m_Name);
+
+					bytes.resize(bytes.size() + sizeof(uint32_t) + nameLength + elData.size());
+
+					COPY_DATA_OFFSET(bytes.data(), offset, &nameLength, sizeof(uint32_t));
+					COPY_DATA_OFFSET(bytes.data(), offset, e.m_Name, nameLength);
+					COPY_DATA_OFFSET(bytes.data(), offset, elData.data(), elData.size());
+				}
+			}
+		}
+		*/
 	}
 }

@@ -357,7 +357,7 @@ namespace Proton
 	struct ElementRef
 	{
 	public:
-		ElementRef(byte* data, Type type, Meta::Element metaElement)
+		ElementRef(byte* data, Type type, Meta::Element& metaElement)
 			:
 			m_Data(data),
 			m_Type(type),
@@ -373,22 +373,25 @@ namespace Proton
 			}
 		}
 
-		ElementRef& operator[](const std::string& name);
+		ElementRef operator[](const std::string& name);
 
-		ElementRef& operator[](const char* name);
+		ElementRef operator[](const char* name);
 
-		ElementRef& operator[](uint32_t index);
+		ElementRef operator[](int index);
 
 		template<typename T>
 		operator T& ()
 		{
+			assert("Cannot convert structs or arrays to data type!" && m_Type != Type::Struct && m_Type != Type::Array);
 			assert("Element being cast to type of incompatible size!" && sizeof(T) == m_Size);
 			return *((T*)m_Data);
 		}
 
 		operator std::string&()
 		{
-			return *(new std::string((char*)m_Data, strlen((char*)m_Data)));
+			char* data = (char*)m_Data;
+			uint32_t len = strlen(data);
+			return *(new std::string(data, len));
 		}
 
 		operator char*()
@@ -416,7 +419,7 @@ namespace Proton
 
 		Asset(RawAsset rawAsset);
 
-		ElementRef& operator[](const std::string& name);
+		ElementRef operator[](const std::string& name);
 
 	private:
 		void GetNumElementsAndSize(Element& element, uint32_t& numElements, uint32_t& size);
@@ -429,8 +432,6 @@ namespace Proton
 	
 		void SetMetaArrayTemplate(TypeElement::DataBase& arrayData, Meta::Element& metaElement);
 	private:
-		//std::unordered_map<std::string, ElementData*> m_ElementLocator;
-		//ElementData* m_ElementData;
 		byte* m_Data;
 		uint32_t m_DataSize = 0;
 		Meta::MetaFile m_MetaFile;
