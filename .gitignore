@@ -1,7 +1,7 @@
 # Binaries
+**/bin/
 !vendor/
 bin-int/
-**/bin/
 
 # Proton files
 *.log
