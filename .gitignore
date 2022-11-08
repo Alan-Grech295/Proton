@@ -1,6 +1,6 @@
 # Binaries
 **/bin/
-!vendor/
+!vendor/bin
 bin-int/
 
 # Proton files
