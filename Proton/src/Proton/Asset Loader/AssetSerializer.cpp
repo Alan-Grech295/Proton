@@ -94,21 +94,16 @@ namespace Proton
 					arrayData.m_constElementSize = typeData.m_constElementSize;
 					arrayData.m_TypeTemplate = typeData.m_TypeTemplate;
 				}
-
-				if (m_TypeTemplate->m_Type == Type::Struct)
+				else if (m_TypeTemplate->m_Type == Type::Struct)
 				{
 					Data::Struct& elementData = e.m_Data->as<Data::Struct&>();
-					Data::Struct& typeData = m_TypeTemplate->m_Data->as<Data::Struct&>();
 
 					if (!m_ElementOffsets.has_value())
-						m_ElementOffsets = std::vector<uint32_t>({0});
-
-					//{5, 8, 16}
-					//0, 5, 13, 
+						m_ElementOffsets = std::vector<uint32_t>({ 0 });
 
 					for (Element& e : elementData.m_Elements)
 					{
-						
+						m_ElementOffsets->push_back(m_ElementOffsets->back() + e.GetSizeInBytes());
 					}
 				}
 
@@ -119,17 +114,20 @@ namespace Proton
 			{
 				if (!m_constElementSize)
 				{
-					m_ElementOffsets = std::vector<uint32_t>({ 0 });
-					uint32_t lastOffset = 0;
-
-					for (auto it = m_Elements.begin(); it != (m_Elements.end() - 1); it++)
+					if(m_TypeTemplate->m_Type != Type::Struct)
 					{
-						lastOffset += it->GetSizeInBytes();
-						m_ElementOffsets->push_back(lastOffset);
-					}
+						m_ElementOffsets = std::vector<uint32_t>({ 0 });
+						uint32_t lastOffset = 0;
 
-					if (m_TypeTemplate->m_Type == Type::Array)
-						m_ChildStride = m_Elements[0].m_Data->as<Data::Array&>().m_Elements[0].GetSizeInBytes();
+						for (auto it = m_Elements.begin(); it != (m_Elements.end() - 1); it++)
+						{
+							lastOffset += it->GetSizeInBytes();
+							m_ElementOffsets->push_back(lastOffset);
+						}
+
+						if (m_TypeTemplate->m_Type == Type::Array)
+							m_ChildStride = m_Elements[0].m_Data->as<Data::Array&>().m_Elements[0].GetSizeInBytes();
+					}
 				}
 			}
 
@@ -225,7 +223,7 @@ namespace Proton
 			{
 				Data::Struct& structData = type.m_Data->as<Data::Struct&>();
 				structData.m_IsTypeTemplate = true;
-				data.m_constElementSize = !structData.ContainsNonConsistentElement();
+				data.m_constElementSize = false;// !structData.ContainsNonConsistentElement();
 			}
 			else if (type.m_Type == Type::Array)
 			{
@@ -778,14 +776,40 @@ namespace Proton
 		else
 		{
 			Meta::Element metaElement = Meta::Element(arrayData.m_TypeTemplate);
-			metaElement.m_SizeBytes = index == arrayData.m_Size - 1 ? m_MetaElement.GetSizeInBytes() - arrayData.m_ElementOffsets.value()[index] : arrayData.m_ElementOffsets.value()[index + 1] - arrayData.m_ElementOffsets.value()[index];
-			
-			if (metaElement.m_Type == Type::Array)
+			byte* data;
+			std::vector<uint32_t>& elementOffsets = arrayData.m_ElementOffsets.value();
+
+			if (arrayData.m_TypeTemplate.m_Type == Type::Struct)
 			{
-				metaElement.m_ExtraData->as<Meta::ExtraData::Array&>().m_Size = metaElement.m_SizeBytes / arrayData.m_ChildStride;
+				metaElement.m_ExtraData = new Meta::ExtraData::Struct();
+				Meta::ExtraData::Struct& elementData = metaElement.m_ExtraData->as<Meta::ExtraData::Struct&>();
+				Meta::ExtraData::Struct& typeData = arrayData.m_TypeTemplate.m_ExtraData->as<Meta::ExtraData::Struct&>();
+		
+				uint32_t base = typeData.m_Elements.size() * index;
+				uint32_t baseOffset = elementOffsets[base];
+				data = m_Data + baseOffset;
+
+				metaElement.m_SizeBytes = elementOffsets[base + typeData.m_Elements.size()] - elementOffsets[base];
+				metaElement.m_DataOffset = baseOffset + m_MetaElement.m_DataOffset;
+
+				for (int i = 0; i < typeData.m_Elements.size(); i++)
+				{
+					Meta::Element& el = typeData.m_Elements[i];
+					elementData.Add(el.m_Name, el.m_Type, elementOffsets[base + i] + m_MetaElement.m_DataOffset);
+				}
+			}
+			else
+			{
+				metaElement.m_SizeBytes = index == arrayData.m_Size - 1 ? m_MetaElement.GetSizeInBytes() - elementOffsets[index] : elementOffsets[index + 1] - elementOffsets[index];
+				data = m_Data + elementOffsets[index];
+
+				if (metaElement.m_Type == Type::Array)
+				{
+					metaElement.m_ExtraData->as<Meta::ExtraData::Array&>().m_Size = metaElement.m_SizeBytes / arrayData.m_ChildStride;
+				}
 			}
 
-			return ElementRef(m_Data + arrayData.m_ElementOffsets.value()[index], arrayData.m_TypeTemplate.m_Type, metaElement);
+			return ElementRef(data, arrayData.m_TypeTemplate.m_Type, metaElement);
 		}		
 	}
 

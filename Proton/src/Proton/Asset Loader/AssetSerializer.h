@@ -373,12 +373,6 @@ namespace Proton
 			}
 		}
 
-		ElementRef operator[](const std::string& name);
-
-		ElementRef operator[](const char* name);
-
-		ElementRef operator[](int index);
-
 		template<typename T>
 		operator T& ()
 		{
@@ -398,6 +392,12 @@ namespace Proton
 		{
 			return (char*)m_Data;
 		}
+
+		ElementRef operator[](const std::string& name);
+
+		ElementRef operator[](const char* name);
+
+		ElementRef operator[](int index);
 
 	private:
 		byte* m_Data;

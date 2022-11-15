@@ -63,7 +63,6 @@ namespace Proton
 
 		ElementRef& str1 = desAsset["Previous houses"][0];
 		std::string road1 = str1["Road"];
-		//INCORRECT NUMBER (Data offset not stored)
 		int16_t num1 = str1["Number"];
 
 		std::string road2 = desAsset["Previous houses"][1]["Road"];
