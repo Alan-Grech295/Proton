@@ -49,21 +49,30 @@ namespace Proton
 			{
 				for (Element& e : m_Elements)
 				{
-					if (e.m_Type == Type::String || e.m_Type == Type::Array)
+					if (e.m_Type == Type::String || e.m_Type == Type::Array || e.m_Type == Type::Struct)
 						return true;
 
-					if (e.m_Type == Type::Struct)
+					/*if (e.m_Type == Type::Struct)
 					{
 						Data::Struct& structData = e.m_Data->as<Data::Struct&>();
 						if (structData.ContainsNonConsistentElement())
 							return true;
-					}
+					}*/
 				}
 
 				return false;
 			}
 
+			void Add(Element entry)
+			{
+				assert("Element with same name already exists!" && !Contains(entry.m_Name));
+				assert("Cannot add array or struct to type template!" && !(m_IsTypeTemplate && (entry.m_Type == Type::Array || entry.m_Type == Type::Struct)));
+				
+				m_Elements.push_back(std::move(entry));
+			}
+
 			std::vector<Element> m_Elements;
+			bool m_IsTypeTemplate = false;
 		};
 
 		struct Array : public TypeElement::DataBase
@@ -86,7 +95,22 @@ namespace Proton
 					arrayData.m_TypeTemplate = typeData.m_TypeTemplate;
 				}
 
-				//assert("Attempt to add more elements than capacity");
+				if (m_TypeTemplate->m_Type == Type::Struct)
+				{
+					Data::Struct& elementData = e.m_Data->as<Data::Struct&>();
+					Data::Struct& typeData = m_TypeTemplate->m_Data->as<Data::Struct&>();
+
+					if (!m_ElementOffsets.has_value())
+						m_ElementOffsets = std::vector<uint32_t>({0});
+
+					//{5, 8, 16}
+					//0, 5, 13, 
+
+					for (Element& e : elementData.m_Elements)
+					{
+						
+					}
+				}
 
 				m_Elements.push_back(e);
 			}
@@ -200,6 +224,7 @@ namespace Proton
 			if (type.m_Type == Type::Struct)
 			{
 				Data::Struct& structData = type.m_Data->as<Data::Struct&>();
+				structData.m_IsTypeTemplate = true;
 				data.m_constElementSize = !structData.ContainsNonConsistentElement();
 			}
 			else if (type.m_Type == Type::Array)
@@ -482,8 +507,7 @@ namespace Proton
 		if (m_Type == Type::Struct)
 		{
 			Data::Struct& structData = static_cast<Data::Struct&>(*m_Data);
-			assert("Element with same name already exists!" && !structData.Contains(entry.m_Name));
-			structData.m_Elements.push_back(std::move(entry));
+			structData.Add(entry);
 		}
 		else
 		{

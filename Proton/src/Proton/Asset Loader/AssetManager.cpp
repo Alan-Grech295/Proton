@@ -61,7 +61,6 @@ namespace Proton
 
 		float val = desAsset["3D Array"][1][1][1];
 
-		//TODO: Fix issue (convert struct to storing data internally)
 		ElementRef& str1 = desAsset["Previous houses"][0];
 		std::string road1 = str1["Road"];
 		//INCORRECT NUMBER (Data offset not stored)
