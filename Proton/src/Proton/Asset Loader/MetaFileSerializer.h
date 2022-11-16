@@ -37,6 +37,7 @@ namespace Proton
 			{Type::Array, "Array"}
 		};
 
+		//Virtual class for Element and MetaFile so that elements can be added to them
 		class Addable
 		{
 		public:
@@ -57,27 +58,16 @@ namespace Proton
 			friend struct ExtraData;
 
 		public:
-			//Arrays are always constructed by (name, arrayType, [size])
-
 			Element() = default;
 
-			//Struct constructor
-			//Element(const std::string& name);
-
-			//Value Constructor
 			Element(const char* name, Type type, uint32_t dataOffset);
 			
-			//Value Constructor
 			Element(std::string name, Type type, uint32_t dataOffset);
-
-
-			//Array constructor
-			//TODO: Confirm that given type has constant size
-			//Element(const std::string& name, Type arrayType, uint32_t size, bool constElementSize = true);
 
 			//Debug only
 			std::string ToString();
 
+			//Empty Element
 			static Element& Empty()
 			{
 				static Element empty = { "", Type::None, 0 };
@@ -125,7 +115,7 @@ namespace Proton
 			uint32_t m_DataOffset;
 
 			//IMP: HAVE TO SET IT DIRECTLY (cannot through constructor)
-			uint32_t m_SizeBytes;
+			uint32_t m_SizeBytes = 0;
 		};
 
 		class MetaFile : public Addable
@@ -135,23 +125,22 @@ namespace Proton
 		public:
 			MetaFile(uint32_t numElements)
 			{
+				//Elements are reserved so that the vector is not reallocated
+				//so m_ElementLocator can access the elements by pointer
 				m_Elements.reserve(numElements);
 			}
-
-			/*void Add(Element element)
-			{
-				m_Elements.push_back(std::move(element));
-				m_ElementLocator[m_Elements.back().m_Name] = &m_Elements.back();
-			}*/
 
 			virtual Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset = std::nullopt) override
 			{
 				assert("No data offset was given!" && dataOffset.has_value());
+				//Emplacing the pointer in the element locator before creating the element so that
+				//the same name char* of the element locator key can be used as the name of the element
 				auto [it, succeded] = m_ElementLocator.emplace(name, (m_Elements.data() + m_Elements.size()));
 				m_Elements.push_back(Element(it->first.c_str(), type, dataOffset.value()));
 				return m_Elements.back();
 			}
 
+			//For debug only
 			std::string ToString()
 			{
 				std::string str;
@@ -177,11 +166,6 @@ namespace Proton
 		class MetaFileSerializer
 		{
 		public:
-			MetaFileSerializer()
-			{
-
-			}
-
 			static MetaFile& DeserializeMetaFile(const std::string& path);
 
 			static void SerializeMetaFile(const std::string& path, MetaFile& file);
@@ -189,8 +173,7 @@ namespace Proton
 		private:
 			static Element ReadElement(byte*& data, Addable& addable);
 
-			//TODO: Support non-const size arrays
-			//readName - Reads the names of variables in a struct
+			//readName - Reads the names of variables in a struct (only when struct is a type template)
 			static Element ReadArrayElement(byte*& data, bool readName = false);
 		};
 
@@ -200,8 +183,7 @@ namespace Proton
 			return static_cast<T&>(*this);
 		}
 
-//#define COPY_DATA(dest, src, size) memcpy(dest, src, size); ptr += size
-#define COPY_DATA_OFFSET(start, offset, src, size) memcpy((start + offset), src, size); offset += size
-
-}
+	//Copies data to a memory location based on a base value and offset, then increases the offset
+	#define COPY_DATA_OFFSET(start, offset, src, size) memcpy((start + offset), src, size); offset += size
+	}
 }
