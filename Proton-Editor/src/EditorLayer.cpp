@@ -23,7 +23,7 @@ namespace Proton
 	{
 		std::string projectPath = __FILE__;
 		int directoryCounter = 0;
-		while (directoryCounter < 2)
+		while (directoryCounter < 3)
 		{
 			if (projectPath.back() == '\\')
 				directoryCounter++;

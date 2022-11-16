@@ -28,7 +28,7 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
-		Asset& desAsset = AssetSerializer::DeserializeAsset(manager.m_ProjectPath.generic_string() + "/assets/Prefabs/asset.asset");
+		Asset& desAsset = AssetSerializer::DeserializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset");
 
 		std::string name = desAsset["Name"];
 		int age = desAsset["Age"];
@@ -169,7 +169,7 @@ namespace Proton
 
 		Asset asset(rawAsset);
 
-		AssetSerializer::SerializeAsset(manager.m_ProjectPath.generic_string() + "/assets/Prefabs/asset.asset", asset);
+		AssetSerializer::SerializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset", asset);
 
 		//159 bytes, 25 elements
 
@@ -991,28 +991,28 @@ namespace Proton
 
 			if (mesh->hasSpecular && !mesh->hasNormalMap)
 			{
-				pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso");
-				vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				pixShader = PixelShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongSpecularPS.cso");
+				vertShader = VertexShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (mesh->hasNormalMap && !mesh->hasSpecular)
 			{
-				pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso");
-				vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				pixShader = PixelShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongNormalMapPS.cso");
+				vertShader = VertexShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (mesh->hasNormalMap && mesh->hasSpecular)
 			{
-				pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso");
-				vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso");
+				pixShader = PixelShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongNormalMapSpecPS.cso");
+				vertShader = VertexShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongNormalMapVS.cso");
 			}
 			else if (!mesh->hasNormalMap && !mesh->hasSpecular && mesh->hasDiffuseMap)
 			{
-				pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongPS.cso");
-				vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongVS.cso");
+				pixShader = PixelShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongPS.cso");
+				vertShader = VertexShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongVS.cso");
 			}
 			else
 			{
-				pixShader = PixelShader::Create("D:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso");
-				vertShader = VertexShader::Create("D:\\Dev\\Proton\\Proton\\PhongVS.cso");
+				pixShader = PixelShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongNoTexPS.cso");
+				vertShader = VertexShader::Create(manager.m_ProjectPath.generic_string() + "\\Proton\\PhongVS.cso");
 			}
 
 			step.AddBindable(vertShader);
