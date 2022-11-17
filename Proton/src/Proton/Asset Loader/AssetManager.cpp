@@ -76,18 +76,18 @@ namespace Proton
 		//13 bytes, 3 elements
 
 		rawAsset.Add("Data", Type::Struct);
-		rawAsset["Data"].Add(Element::Create("ID", std::string("0184804L")));
-		rawAsset["Data"].Add(Element::Create("House Number", 13));
-		rawAsset["Data"].Add(Element::Create("Post Code", std::string("ATD 2253")));
-		rawAsset["Data"].Add(Element::Create("Test", (byte)17));
+		rawAsset["Data"].Add("ID", std::string("0184804L"));
+		rawAsset["Data"].Add("House Number", 13);
+		rawAsset["Data"].Add("Post Code", std::string("ATD 2253"));
+		rawAsset["Data"].Add("Test", (byte)17);
 
 		//36 bytes, 8 elements
 
 		rawAsset.Add("Family members ages", Type::Array);
 		rawAsset["Family members ages"].SetType(Type::Double);
-		rawAsset["Family members ages"].Add(TypeElement::Create(52.02));
-		rawAsset["Family members ages"].Add(TypeElement::Create(55.83));
-		rawAsset["Family members ages"].Add(TypeElement::Create(21.24));
+		rawAsset["Family members ages"].Add(52.02);
+		rawAsset["Family members ages"].Add(55.83);
+		rawAsset["Family members ages"].Add(21.24);
 
 		//60 bytes, 9 elements
 
@@ -105,6 +105,7 @@ namespace Proton
 		rawAsset.Add("Previous houses", Type::Array);
 		rawAsset["Previous houses"].SetType(TypeElement({Element("Road", Type::String), 
 														 Element("Number", Type::Int16)}));
+
 		rawAsset["Previous houses"].Add(TypeElement({ Element::Create("Road", std::string("Triq L-Istwiel")),
 													  Element::Create("Number", (int16_t)13) }));
 
@@ -115,9 +116,9 @@ namespace Proton
 
 		rawAsset.Add("Family members", Type::Array);
 		rawAsset["Family members"].SetType(Type::String);
-		rawAsset["Family members"].Add(TypeElement::Create(std::string("Cynthia")));
-		rawAsset["Family members"].Add(TypeElement::Create(std::string("Manuel")));
-		rawAsset["Family members"].Add(TypeElement::Create(std::string("Daniel")));
+		rawAsset["Family members"].Add(std::string("Cynthia"));
+		rawAsset["Family members"].Add(std::string("Manuel"));
+		rawAsset["Family members"].Add(std::string("Daniel"));
 
 		//135 bytes, 21 elements
 
@@ -126,17 +127,17 @@ namespace Proton
 		rawAsset["Array Of Array"].GetType().SetType(Type::Float);
 
 		rawAsset["Array Of Array"].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["Array Of Array"][0].Add(TypeElement::Create(61.61f));
-		rawAsset["Array Of Array"][0].Add(TypeElement::Create(812.1f));
-		rawAsset["Array Of Array"][0].Add(TypeElement::Create(812.1f));
+		rawAsset["Array Of Array"][0].Add(61.61f);
+		rawAsset["Array Of Array"][0].Add(812.1f);
+		rawAsset["Array Of Array"][0].Add(812.1f);
 
 		rawAsset["Array Of Array"].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["Array Of Array"][1].Add(TypeElement::Create(863.71f));
-		rawAsset["Array Of Array"][1].Add(TypeElement::Create(1.72f));
+		rawAsset["Array Of Array"][1].Add(863.71f);
+		rawAsset["Array Of Array"][1].Add(1.72f);
 
 		rawAsset["Array Of Array"].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["Array Of Array"][2].Add(TypeElement::Create(863.71f));
-		rawAsset["Array Of Array"][2].Add(TypeElement::Create(1.72f));
+		rawAsset["Array Of Array"][2].Add(863.71f);
+		rawAsset["Array Of Array"][2].Add(1.72f);
 
 		rawAsset.Add("3D Array", Type::Array);
 		rawAsset["3D Array"].SetType(Type::Array);
@@ -151,77 +152,27 @@ namespace Proton
 
 		rawAsset["3D Array"].Add(arr1);
 		rawAsset["3D Array"][0].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["3D Array"][0][0].Add(TypeElement::Create(8123.61f));
-		rawAsset["3D Array"][0][0].Add(TypeElement::Create(-81.2f));
+		rawAsset["3D Array"][0][0].Add(8123.61f);
+		rawAsset["3D Array"][0][0].Add(-81.2f);
 
 		rawAsset["3D Array"][0].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["3D Array"][0][1].Add(TypeElement::Create(91.52f));
-		rawAsset["3D Array"][0][1].Add(TypeElement::Create(-61.2f));
+		rawAsset["3D Array"][0][1].Add(91.52f);
+		rawAsset["3D Array"][0][1].Add(-61.2f);
 
 		rawAsset["3D Array"].Add(arr2);
 		rawAsset["3D Array"][1].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["3D Array"][1][0].Add(TypeElement::Create(8123.61f));
-		rawAsset["3D Array"][1][0].Add(TypeElement::Create(-81.2f));
+		rawAsset["3D Array"][1][0].Add(8123.61f);
+		rawAsset["3D Array"][1][0].Add(-81.2f);
 
 		rawAsset["3D Array"][1].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["3D Array"][1][1].Add(TypeElement::Create(91.52f));
-		rawAsset["3D Array"][1][1].Add(TypeElement::Create(-61.2f));
+		rawAsset["3D Array"][1][1].Add(91.52f);
+		rawAsset["3D Array"][1][1].Add(-61.2f);
 
 		Asset asset(rawAsset);
 
 		AssetSerializer::SerializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset", asset);
 
 		//159 bytes, 25 elements
-
-		//{
-		//	using namespace Meta;
-		//	MetaFile metaFile = MetaFile(100);
-
-		//	metaFile.Add("Name", Type::String, 0);
-		//	Meta::Element e = metaFile.Add("Age", Type::Int32, 5);
-
-		//	e = metaFile.Add("Struct", Type::Struct, 10, 4);
-		//	e = metaFile["Struct"].Add("Data1", Type::Float, 12);
-		//	e = metaFile["Struct"].Add("Data2", Type::String, 16);
-		//	e = metaFile["Struct"].Add("Data3", Type::Byte, 21);
-		//	e = metaFile["Struct"].Add("Struct2", Type::Struct, 23, 2);
-		//	e = metaFile["Struct"]["Struct2"].Add("Data", Type::Double, 26);
-		//	e = metaFile["Struct"]["Struct2"].Add("Array", Type::Array, 26);
-		//	e = metaFile["Struct"]["Struct2"]["Array"].SetType(Type::String).SetSize(13).SetElementOffsets(std::vector<uint32_t>({
-		//		1,2,3,4,5,6
-		//		}));
-
-		//	e = metaFile.Add("Array", Type::Array, 25);
-		//	metaFile["Array"].SetType(Type::Double).SetSize(62);
-
-		//	metaFile.Add("Array2", Type::Array, 42);
-		//	metaFile["Array2"].SetType(Type::String).SetSize(12).SetElementOffsets(
-		//		std::vector<uint32_t>({
-		//		42, 47, 51, 55, 61, 67
-		//		}));
-
-		//	e = metaFile["Array2"];
-
-		//	metaFile.Add("Array3", Type::Array, 78);
-		//	metaFile["Array3"].SetType(Type::Struct).SetSize(9);
-		//	metaFile["Array3"].GetType().Add("Data1", Type::Int16);
-		//	metaFile["Array3"].GetType().Add("Data2", Type::String);
-		//	metaFile["Array3"].GetType().Add("Data3", Type::Float);
-
-		//	e = metaFile["Array3"];
-
-		//	metaFile.Add("Array4", Type::Array, 42);
-		//	metaFile["Array4"].SetType(Type::Array);
-		//	metaFile["Array4"].GetType().SetType(Type::String).SetSize(12);
-
-		//	e = metaFile["Array4"];
-
-		//	//TODO: Store struct type template children with names (currently only types are stored)
-
-		//	MetaFileSerializer::SerializeMetaFile("D:\\Dev\\Proton\\Proton-Editor\\assets\\Prefabs\\metafile.meta", metaFile);
-
-		//	MetaFile& deserializedMetaFile = MetaFileSerializer::DeserializeMetaFile("D:\\Dev\\Proton\\Proton-Editor\\assets\\Prefabs\\metafile.meta");
-		//}
 
 		manager.m_PostModelImports.clear();
 
