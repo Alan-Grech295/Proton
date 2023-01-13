@@ -34,6 +34,7 @@ namespace Proton
 		int age = desAsset["Age"];
 		float height = desAsset["Height"];
 
+		ElementRef& str = desAsset["Data"];
 		char* id = desAsset["Data"]["ID"];
 		int houseNum = desAsset["Data"]["House Number"];
 		std::string postCode = desAsset["Data"]["Post Code"];
@@ -53,6 +54,16 @@ namespace Proton
 		float val01 = array0[1];
 		float val02 = array0[2];
 
+		ElementRef& vector = desAsset["Vector3"];
+		ElementRef& vector1 = vector[0];
+		float x = vector1["x"];
+		float y = vector1["y"];
+		float z = vector1["z"];
+
+		float x2 = vector[1]["x"];
+		float y2 = vector[1]["y"];
+		float z2 = vector[1]["z"];
+
 		float val10 = desAsset["Array Of Array"][1][0];
 		float val11 = desAsset["Array Of Array"][1][1];
 
@@ -66,12 +77,25 @@ namespace Proton
 		int16_t num1 = str1["Number"];
 
 		std::string road2 = desAsset["Previous houses"][1]["Road"];
-		int16_t num2 = desAsset["Previous houses"][1]["Number"];
+		int16_t num2 = desAsset["Previous houses"][1]["Number"];//*/
 
 		RawAsset rawAsset;
 		rawAsset.Add("Name", std::string("Alan"));
 		rawAsset.Add("Age", 18);
 		rawAsset.Add("Height", 178.12f);
+
+		rawAsset.Add("Vector3", Type::Array);
+		rawAsset["Vector3"].SetType(TypeElement({ Element("x", Type::Float),
+													Element("y", Type::Float),
+													Element("z", Type::Float) }));
+		rawAsset["Vector3"].Add(TypeElement({ Element::Create("x", 12.4f),
+											  Element::Create("y", 823.12f),
+											  Element::Create("z", 72.4f) }));
+
+		rawAsset["Vector3"].Add(TypeElement({ Element::Create("x", 71.0f),
+											  Element::Create("y", 13.2f),
+											  Element::Create("z", 8712.4f) }));
+
 
 		//13 bytes, 3 elements
 

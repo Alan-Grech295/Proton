@@ -62,7 +62,7 @@ namespace Proton
 			{
 				Data::Struct& structData = type.m_Data->as<Data::Struct&>();
 				structData.m_IsTypeTemplate = true;
-				data.m_constElementSize = false;
+				data.m_constElementSize = structData.ConstantSize();
 			}
 			else if (type.m_Type == Type::Array)
 			{
@@ -484,6 +484,28 @@ namespace Proton
 		{
 			Meta::Element metaElement = Meta::Element(arrayData.m_TypeTemplate);
 			metaElement.m_SizeBytes = (m_MetaElement.GetSizeInBytes() / arrayData.m_Size);
+			if (metaElement.m_Type == Type::Struct)
+			{
+				Meta::ExtraData::Struct& elementData = metaElement.m_ExtraData->as<Meta::ExtraData::Struct&>();
+				metaElement.m_DataOffset = m_MetaElement.m_DataOffset + (index * metaElement.m_SizeBytes);
+				int nextOffset = metaElement.m_DataOffset;
+				for (Meta::Element& element : elementData.m_Elements)
+				{
+					element.m_DataOffset = nextOffset;
+					switch (element.m_Type)
+					{
+						//Null ptr used as strings are not going to be accepted
+#define X(el) case Type::el: \
+						element.m_SizeBytes = Map<Type::el>::SizeBytes(nullptr); \
+						break;
+						ELEMENT_TYPES
+#undef X
+					}
+
+					nextOffset += element.m_SizeBytes;
+				}
+				//int 
+			}
 
 			return ElementRef(m_Data + metaElement.m_SizeBytes * index, arrayData.m_TypeTemplate.m_Type, metaElement);
 		}

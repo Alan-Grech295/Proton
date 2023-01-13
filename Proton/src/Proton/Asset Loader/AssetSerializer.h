@@ -353,22 +353,22 @@ namespace Proton
 			}
 
 			//Checks if the struct contains an element of non const size
-			bool ContainsNonConsistentElement()
+			bool ConstantSize()
 			{
 				for (Element& e : m_Elements)
 				{
-					if (e.m_Type == Type::String || e.m_Type == Type::Array || e.m_Type == Type::Struct)
-						return true;
+					if (e.m_Type == Type::String || e.m_Type == Type::Array)
+						return false;
 
-					/*if (e.m_Type == Type::Struct)
+					if (e.m_Type == Type::Struct)
 					{
 						Data::Struct& structData = e.m_Data->as<Data::Struct&>();
-						if (structData.ContainsNonConsistentElement())
-							return true;
-					}*/
+						if (!structData.ConstantSize())
+							return false;
+					}
 				}
 
-				return false;
+				return true;
 			}
 
 			void Add(Element entry)
