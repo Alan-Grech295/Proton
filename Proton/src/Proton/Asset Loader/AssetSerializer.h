@@ -35,9 +35,9 @@ namespace Proton
 		TypeElement(Type type, byte* data);
 
 		//Array Add function
-		void Add(TypeElement entry);
+		Element& Add(TypeElement entry);
 		template<typename T>
-		void Add(T&& data);
+		Element& Add(T&& data);
 
 		//Array set type function
 		TypeElement& SetType(TypeElement type);
@@ -107,14 +107,16 @@ namespace Proton
 
 		//Struct Add function
 		template<typename T>
-		void Add(const char* name, T&& data);
+		Element& Add(const char* name, T&& data);
+
+		Element& Add(std::initializer_list<Element> elements);
 
 		//Array Add function
-		void Add(TypeElement entry);
+		Element& Add(TypeElement entry);
 		template<typename T>
-		void Add(T&& data)
+		Element& Add(T&& data)
 		{
-			((TypeElement*)this)->Add(std::forward<T>(data));
+			return ((TypeElement*)this)->Add(std::forward<T>(data));
 		}
 
 		//Compare operator for type and element
@@ -149,137 +151,6 @@ namespace Proton
 	public:
 		const char* m_Name;
 	};
-
-	template<Type type>
-	struct Map
-	{
-		static constexpr bool valid = false;
-	};
-	template<> struct Map<Type::Byte>
-	{
-		using SysType = byte; // type used in the CPU side
-		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
-
-		static byte* GetData(SysType& data)
-		{
-			return &data;
-		}
-
-		static uint32_t SizeBytes(const byte* data)
-		{
-			return sizeof(SysType);
-		}
-	};
-	template<> struct Map<Type::Int16>
-	{
-		using SysType = int16_t; // type used in the CPU side
-		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
-
-		static byte* GetData(SysType& data)
-		{
-			return (byte*)&data;
-		}
-
-		static uint32_t SizeBytes(const byte* data)
-		{
-			return sizeof(SysType);
-		}
-	};
-	template<> struct Map<Type::Int32>
-	{
-		using SysType = int32_t; // type used in the CPU side
-		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
-
-		static byte* GetData(SysType& data)
-		{
-			return (byte*)&data;
-		}
-
-		static uint32_t SizeBytes(const byte* data)
-		{
-			return sizeof(SysType);
-		}
-	};
-	template<> struct Map<Type::Int64>
-	{
-		using SysType = int64_t; // type used in the CPU side
-		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
-
-		static byte* GetData(SysType& data)
-		{
-			return (byte*)&data;
-		}
-
-		static uint32_t SizeBytes(const byte* data)
-		{
-			return sizeof(SysType);
-		}
-	};
-	template<> struct Map<Type::Float>
-	{
-		using SysType = float; // type used in the CPU side
-		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
-
-		static byte* GetData(SysType& data)
-		{
-			return (byte*)&data;
-		}
-
-		static uint32_t SizeBytes(const byte* data)
-		{
-			return sizeof(SysType);
-		}
-	};
-	template<> struct Map<Type::Double>
-	{
-		using SysType = double; // type used in the CPU side
-		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
-
-		static byte* GetData(SysType& data)
-		{
-			return (byte*)&data;
-		}
-
-		static uint32_t SizeBytes(const byte* data)
-		{
-			return sizeof(SysType);
-		}
-	};
-	template<> struct Map<Type::String>
-	{
-		using SysType = std::string; // type used in the CPU side
-		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
-
-		static byte* GetData(SysType& data)
-		{
-			return (byte*)data.c_str();
-		}
-
-		static uint32_t SizeBytes(const byte* data)
-		{
-			return strlen((const char*)data) + 1;
-		}
-	};
-
-	// ensures that every leaf type in master list has an entry in the static attribute map
-	#define X(el) static_assert(Map<Type::el>::valid,"Missing map implementation for " #el);
-	ELEMENT_TYPES
-	#undef X
-
-	// enables reverse lookup from SysType to leaf type
-	template<typename T>
-	struct ReverseMap
-	{
-		static constexpr bool valid = false;
-	};
-	#define X(el) \
-	template<> struct ReverseMap<typename Map<Type::el>::SysType> \
-	{ \
-		static constexpr Type type = Type::el; \
-		static constexpr bool valid = true; \
-	};
-	ELEMENT_TYPES
-	#undef X
 
 	class RawAsset
 	{
@@ -371,16 +242,31 @@ namespace Proton
 				return true;
 			}
 
+			void SetConstElementSize()
+			{
+				for (Element& e : m_Elements)
+				{
+					if (e.m_Type == Type::Struct)
+					{
+						Data::Struct& structData = e.m_Data->as<Data::Struct&>();
+						structData.m_ConstSize = true;
+					}
+				}
+			}
+
 			void Add(Element entry)
 			{
 				assert("Element with same name already exists!" && !Contains(entry.m_Name));
-				assert("Cannot add array or struct to type template!" && !(m_IsTypeTemplate && (entry.m_Type == Type::Array || entry.m_Type == Type::Struct)));
-
+				assert("Cannot add string or array to type template!" && !(m_ConstSize && (entry.m_Type == Type::String || entry.m_Type == Type::Array)));
 				m_Elements.push_back(std::move(entry));
+				if (entry.m_Type == Type::Struct)
+				{
+					m_Elements.back().m_Data->as<Data::Struct&>().m_ConstSize = true;
+				}
 			}
 
 			std::vector<Element> m_Elements;
-			bool m_IsTypeTemplate = false;
+			bool m_ConstSize = false;
 		};
 
 		struct Array : public TypeElement::DataBase
@@ -569,7 +455,7 @@ namespace Proton
 	};
 
 	template<typename T>
-	inline void Element::Add(const char* name, T&& data)
+	inline Element& Element::Add(const char* name, T&& data)
 	{
 		assert("Element is not a struct or array!" && (m_Type == Type::Struct || m_Type == Type::Array));
 		static_assert(ReverseMap<std::remove_const_t<T>>::valid, "Unsupported SysType used in pointer conversion");
@@ -580,10 +466,12 @@ namespace Proton
 			m_Data->as<Data::Struct&>().Add(entry);
 		else
 			((TypeElement*)this)->Add(static_cast<TypeElement>(entry));
+
+		return *this;
 	}
 
 	template<typename T>
-	inline void TypeElement::Add(T&& data)
+	inline Element& TypeElement::Add(T&& data)
 	{
 		assert("Element is not an array!" && m_Type == Type::Array);
 		static_assert(ReverseMap<std::remove_const_t<T>>::valid, "Unsupported SysType used in pointer conversion");
@@ -591,6 +479,7 @@ namespace Proton
 		TypeElement entry = TypeElement(type, Map<type>::GetData(data));
 
 		((TypeElement*)this)->Add(static_cast<TypeElement>(entry));
+		return m_Data->as<Data::Array&>().m_Elements.back();
 	}
 
 	template<typename T>

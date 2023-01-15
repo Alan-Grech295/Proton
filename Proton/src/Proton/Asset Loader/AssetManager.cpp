@@ -54,16 +54,6 @@ namespace Proton
 		float val01 = array0[1];
 		float val02 = array0[2];
 
-		ElementRef& vector = desAsset["Vector3"];
-		ElementRef& vector1 = vector[0];
-		float x = vector1["x"];
-		float y = vector1["y"];
-		float z = vector1["z"];
-
-		float x2 = vector[1]["x"];
-		float y2 = vector[1]["y"];
-		float z2 = vector[1]["z"];
-
 		float val10 = desAsset["Array Of Array"][1][0];
 		float val11 = desAsset["Array Of Array"][1][1];
 
@@ -77,24 +67,48 @@ namespace Proton
 		int16_t num1 = str1["Number"];
 
 		std::string road2 = desAsset["Previous houses"][1]["Road"];
-		int16_t num2 = desAsset["Previous houses"][1]["Number"];//*/
+		int16_t num2 = desAsset["Previous houses"][1]["Number"];
+		
+		ElementRef& models = desAsset["Model"];
+		ElementRef& model1 = models[0];
+		int id1 = model1["id"];
+		ElementRef& pos1 = model1["position"];
+		float x1 = pos1["x"];
+		float y1 = pos1["y"];
+		float z1 = pos1["z"];
+
+		ElementRef& model2 = models[1];
+		int id2 = model2["id"];
+		ElementRef& pos2 = model2["position"];
+		float x2 = pos2["x"];
+		float y2 = pos2["y"];
+		float z2 = pos2["z"];
+		
+		
+		//*/
 
 		RawAsset rawAsset;
 		rawAsset.Add("Name", std::string("Alan"));
 		rawAsset.Add("Age", 18);
 		rawAsset.Add("Height", 178.12f);
 
-		rawAsset.Add("Vector3", Type::Array);
-		rawAsset["Vector3"].SetType(TypeElement({ Element("x", Type::Float),
-													Element("y", Type::Float),
-													Element("z", Type::Float) }));
-		rawAsset["Vector3"].Add(TypeElement({ Element::Create("x", 12.4f),
-											  Element::Create("y", 823.12f),
-											  Element::Create("z", 72.4f) }));
+		rawAsset.Add("Model", Type::Array);
+		rawAsset["Model"].SetType(TypeElement({		Element("id", Type::Int32),
+													Element("position", Type::Struct),
+														}));
+		rawAsset["Model"].GetType()["position"].Add({	Element("x", Type::Float),
+														Element("y", Type::Float),
+														Element("z", Type::Float) });
 
-		rawAsset["Vector3"].Add(TypeElement({ Element::Create("x", 71.0f),
-											  Element::Create("y", 13.2f),
-											  Element::Create("z", 8712.4f) }));
+		rawAsset["Model"].Add(TypeElement({ Element::Create("id", 81),
+											Element("position", Type::Struct).Add({ Element::Create("x", 812.32f),
+																					Element::Create("y", 116.2f),
+																					Element::Create("z", -192.5f) }) }));
+
+		rawAsset["Model"].Add(TypeElement({ Element::Create("id", 17),
+											Element("position", Type::Struct).Add({ Element::Create("x", 8712.7612f),
+																					Element::Create("y", -1.26f),
+																					Element::Create("z", -6512.0f) }) }));
 
 
 		//13 bytes, 3 elements

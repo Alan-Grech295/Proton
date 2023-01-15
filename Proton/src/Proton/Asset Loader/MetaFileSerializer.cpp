@@ -42,6 +42,37 @@ namespace Proton
 					return Element::Empty();
 				}
 
+				//Calculates the size of the struct if it were constant size
+				int CalcStructSize(int offset)
+				{
+					int size = 0;
+					for (Element& element : m_Elements)
+					{
+						element.m_DataOffset = size + offset;
+						assert("Struct not of constant size" && !(element.m_Type == Type::String || element.m_Type == Type::Array));
+						if (element.m_Type == Type::Struct)
+						{
+							element.m_SizeBytes = element.m_ExtraData->as<Struct&>().CalcStructSize(offset + size);
+							size += element.m_SizeBytes;
+						}
+						else
+						{
+							switch (element.m_Type)
+							{
+								//Null ptr used as strings are not going to be accepted
+							#define X(el) case Type::el: \
+							size += Map<Type::el>::SizeBytes(nullptr); \
+							break;
+									ELEMENT_TYPES
+							#undef X
+							}
+						}
+						
+					}
+
+					return size;
+				}
+
 				std::vector<Element> m_Elements;
 			};
 

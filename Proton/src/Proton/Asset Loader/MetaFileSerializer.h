@@ -5,27 +5,10 @@
 #include <unordered_map>
 #include <assert.h>
 #include <optional>
+#include "TypeMap.h"
 
 namespace Proton
 {
-#define ELEMENT_TYPES \
-				X(Byte)\
-				X(Int16)\
-				X(Int32)\
-				X(Int64)\
-				X(Float)\
-				X(Double)\
-				X(String)\
-
-	enum class Type {
-		None = 0,
-		#define X(el) el,
-		ELEMENT_TYPES
-		#undef X
-		Struct,
-		Array
-	};
-
 	namespace Meta
 	{
 		//For debug only
