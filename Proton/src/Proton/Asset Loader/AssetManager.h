@@ -116,22 +116,22 @@ namespace Proton
 	private:
 		void ScanDirectory(const std::filesystem::path& path);
 		void HandleFile(const std::filesystem::path& path);
-		File* WriteModelData(std::filesystem::path& modelPath);
+		//File* WriteModelData(std::filesystem::path& modelPath);
 		File* WriteImageData(const std::filesystem::path& imagePath);
 
-		void WriteNode(WriteableBuffer* buffer, std::vector<std::string>& modelPaths, uint32_t parentIndex, uint32_t& nodeIndex, Entity& entity);
+		//void WriteNode(WriteableBuffer* buffer, std::vector<std::string>& modelPaths, uint32_t parentIndex, uint32_t& nodeIndex, Entity& entity);
 
-		Ref<Model> ImportModelAsset(File& file, const std::string& basePath);
+		//Ref<Model> ImportModelAsset(File& file, const std::string& basePath);
 		Ref<Image> ImportImageAsset(File& file);
-		Ref<Prefab> ImportPrefab(File& file);
+		//Ref<Prefab> ImportPrefab(File& file);
 
-		Ref<Prefab> CreatePrefabFromEntity(std::string prefabPath, Entity& parentEntity);
-		PrefabNode* CreateChildPrefab(std::string prefabPath, Entity& childEntity);
+		//Ref<Prefab> CreatePrefabFromEntity(std::string prefabPath, Entity& parentEntity);
+		//PrefabNode* CreateChildPrefab(std::string prefabPath, Entity& childEntity);
 
-		void NodeTreeSizeCheck(aiNode& node, uint32_t& bufferSize, uint32_t& numChildren);
-		void AddNodeTree(aiNode& node, uint32_t& nodeIndex, std::vector<uint32_t>& tree);
-		Node* CreateNodeTree(aiNode& node, Mesh** meshes);
-		Node* ReadNodeTree(const uint32_t* data, Mesh** meshes, uint32_t nodeIndex);
+		//void NodeTreeSizeCheck(aiNode& node, uint32_t& bufferSize, uint32_t& numChildren);
+		//void AddNodeTree(aiNode& node, uint32_t& nodeIndex, std::vector<uint32_t>& tree);
+		//Node* CreateNodeTree(aiNode& node, Mesh** meshes);
+		//Node* ReadNodeTree(const uint32_t* data, Mesh** meshes, uint32_t nodeIndex);
 
 		template<typename T>
 		bool Contains(std::vector<T>& vector, T& obj);

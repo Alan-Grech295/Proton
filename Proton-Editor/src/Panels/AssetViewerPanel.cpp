@@ -207,7 +207,8 @@ namespace Proton
 
 					if (doubleClicked)
 					{
-						ModelCreator::CreatePrefabEntity(entry.path().string(), m_ActiveScene.get());
+						//TODO: Add
+						//ModelCreator::CreatePrefabEntity(entry.path().string(), m_ActiveScene.get());
 					}
 				}
 			}

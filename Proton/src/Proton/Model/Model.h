@@ -9,6 +9,8 @@
 #include <vector>
 #include <optional>
 #include <cassert>
+#include "Proton/Asset Loader/AssetSerializer.h"
+#include <assimp/scene.h>
 
 struct aiNode;
 struct aiMesh;
@@ -127,11 +129,12 @@ namespace Proton
 	class ModelCreator
 	{
 	public:
-		static Entity CreateModelEntity(const std::string& path, Scene* activeScene);
-		static Entity CreatePrefabEntity(const std::string& path, Scene* activeScene);
-		static Mesh* ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
+		//static Entity CreateModelEntity(const std::string& path, Scene* activeScene);
+		//static Entity CreatePrefabEntity(const std::string& path, Scene* activeScene);
+		//static Mesh* ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
+		static Element ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene);
 	private:
-		static Entity CreateChild(const Node& node, Entity parent, Entity root, Scene* activeScene);
-		static Entity CreatePrefabChild(const PrefabNode& node, Entity parent, Entity root, Scene* activeScene);
+		//static Entity CreateChild(const Node& node, Entity parent, Entity root, Scene* activeScene);
+		//static Entity CreatePrefabChild(const PrefabNode& node, Entity parent, Entity root, Scene* activeScene);
 	};
 }

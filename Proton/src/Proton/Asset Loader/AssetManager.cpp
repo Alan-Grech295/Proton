@@ -225,7 +225,7 @@ namespace Proton
 			delete file;
 		}
 
-		for (auto& pair : manager.m_PostModelReads)
+		/*for (auto& pair : manager.m_PostModelReads)
 		{
 			std::string modelPath = fs::path(pair.first).replace_extension().string();
 
@@ -256,7 +256,7 @@ namespace Proton
 			manager.m_Prefabs[path] = manager.ImportPrefab(file);
 
 			delete &file;
-		}
+		}*/
 	}
 
 	void AssetManager::SetProjectPath(const std::filesystem::path path)
@@ -281,7 +281,7 @@ namespace Proton
 
 	void AssetManager::CreatePrefab(Entity& parentEntity, std::string savePath)
 	{
-		if (!parentEntity.HasComponent<RootNodeTag>())
+		/*if (!parentEntity.HasComponent<RootNodeTag>())
 		{
 			assert(false && "Entity has to be a root node!");
 			return;
@@ -368,10 +368,10 @@ namespace Proton
 
 		manager.m_Prefabs[savePath] = manager.CreatePrefabFromEntity(savePath, parentEntity);
 
-		delete &file;
+		delete &file;*/
 	}
 
-	Ref<Prefab> AssetManager::ImportPrefab(File& file)
+	/*Ref<Prefab> AssetManager::ImportPrefab(File& file)
 	{
 		std::vector<std::string> modelPaths;
 		uint32_t numModelPaths = file.Read<uint32_t>();
@@ -565,7 +565,7 @@ namespace Proton
 			nodeIndex++;
 			WriteNode(buffer, modelPaths, currentIndex, nodeIndex, child.m_ChildNodes[i]);
 		}
-	}
+	}*/
 
 	void AssetManager::ScanDirectory(const std::filesystem::path& path)
 	{
@@ -582,7 +582,7 @@ namespace Proton
 
 	void AssetManager::HandleFile(const std::filesystem::path& path)
 	{
-		if (path.extension() == ".rawAsset")
+		/*if (path.extension() == ".rawAsset")
 		{
 			fs::path pathCopy = fs::path(path);
 			if (!fs::exists(pathCopy.replace_extension()))
@@ -647,10 +647,10 @@ namespace Proton
 				return;
 
 			m_PostImageImports.push_back(path);
-		}
+		}*/
 	}
 
-	File* AssetManager::WriteModelData(std::filesystem::path& modelPath)
+	/*File* AssetManager::WriteModelData(std::filesystem::path& modelPath)
 	{
 		namespace dx = DirectX;
 		Assimp::Importer imp;
@@ -834,7 +834,7 @@ namespace Proton
 		delete[] meshes;
 
 		return file;
-	}
+	}*/
 
 	File* AssetManager::WriteImageData(const std::filesystem::path& imagePath)
 	{
@@ -892,7 +892,7 @@ namespace Proton
 		return file;
 	}
 
-	Ref<Model> AssetManager::ImportModelAsset(File& file, const std::string& basePath)
+	/*Ref<Model> AssetManager::ImportModelAsset(File& file, const std::string& basePath)
 	{
 		//TODO: Change model import and export
 		namespace dx = DirectX;
@@ -1072,7 +1072,7 @@ namespace Proton
 		delete[] meshes;
 
 		return modelAsset;
-	}
+	}*/
 
 	Ref<Image> AssetManager::ImportImageAsset(File& file)
 	{
@@ -1094,7 +1094,7 @@ namespace Proton
 		return imageAsset;
 	}
 
-	void AssetManager::NodeTreeSizeCheck(aiNode& node, uint32_t& bufferSize, uint32_t& numChildren)
+	/*void AssetManager::NodeTreeSizeCheck(aiNode& node, uint32_t& bufferSize, uint32_t& numChildren)
 	{
 		//Need to add:
 		//		uint32_t for node location
@@ -1231,7 +1231,7 @@ namespace Proton
 		}
 
 		return node;
-	}
+	}*/
 
 	File::File(std::filesystem::path path, uint64_t fileSize)
 		:

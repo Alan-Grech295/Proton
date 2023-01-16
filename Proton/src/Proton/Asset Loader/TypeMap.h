@@ -2,6 +2,8 @@
 
 namespace Proton
 {
+	typedef unsigned char byte;
+
 #define ELEMENT_TYPES \
 				X(Byte)\
 				X(Int16)\

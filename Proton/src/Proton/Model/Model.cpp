@@ -18,7 +18,7 @@
 
 namespace Proton
 {
-	Entity ModelCreator::CreateModelEntity(const std::string& path, Scene* activeScene)
+	/*Entity ModelCreator::CreateModelEntity(const std::string& path, Scene* activeScene)
 	{
 		namespace dx = DirectX;
 
@@ -188,7 +188,7 @@ namespace Proton
 			dx::XMFLOAT3 tangent;
 			dx::XMFLOAT3 bitangent;
 			dx::XMFLOAT2 uv;
-		};*/
+		};//*//*
 
 		//Technique creation
 		Technique technique = Technique("Opaque");
@@ -207,7 +207,7 @@ namespace Proton
 			auto& material = *pMaterials[mesh.mMaterialIndex];
 
 			aiString texFileName;
-
+			
 			if (material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName) == aiReturn_SUCCESS)
 			{
 				pMesh->hasDiffuseMap = true;
@@ -356,6 +356,64 @@ namespace Proton
 		pMesh->m_Techniques.push_back(std::move(technique));
 
 		return pMesh;
+	}*/
+
+	Element ModelCreator::ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene)
+	{
+		PT_PROFILE_FUNCTION();
+
+		namespace dx = DirectX;
+
+		using namespace std::string_literals;
+
+		Element retElement = Element(modelPath.c_str(), Type::Struct);
+
+		/*if (mesh.mMaterialIndex >= 0)
+		{
+			auto& material = *scene->mMaterials[mesh.mMaterialIndex];
+
+			aiString texFileName;
+
+			if (material.GetTexture(aiTextureType_DIFFUSE, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasDiffuseMap = true;
+				PT_CORE_TRACE(texFileName.C_Str());
+
+				step.AddBindable(Texture2D::Create(basePath + texFileName.C_Str()));
+			}
+			else
+			{
+				material.Get(AI_MATKEY_COLOR_DIFFUSE, reinterpret_cast<aiColor3D&>(diffuseColor));
+			}
+
+			if (material.GetTexture(aiTextureType_SPECULAR, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasSpecular = true;
+				Ref<Texture2D> spec = Texture2D::Create(basePath + texFileName.C_Str(), 1);
+				step.AddBindable(spec);
+				hasAlphaGloss = spec->HasAlpha();
+			}
+			else
+			{
+				material.Get(AI_MATKEY_COLOR_SPECULAR, reinterpret_cast<aiColor3D&>(specularColor));
+			}
+
+			if (!hasAlphaGloss)
+			{
+				material.Get(AI_MATKEY_SHININESS, shininess);
+			}
+
+			if (material.GetTexture(aiTextureType_NORMALS, 0, &texFileName) == aiReturn_SUCCESS)
+			{
+				pMesh->hasNormalMap = true;
+				step.AddBindable(Texture2D::Create(basePath + texFileName.C_Str(), 2));
+			}
+
+			if (pMesh->hasSpecular || pMesh->hasNormalMap || pMesh->hasDiffuseMap)
+				step.AddBindable(Sampler::Create(meshTag));
+		}*/
+
+		return retElement;
 	}
 
 	/*void Mesh::Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform, DirectX::FXMMATRIX cameraView, DirectX::FXMMATRIX projectionMatrix) const
