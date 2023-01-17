@@ -108,9 +108,9 @@ namespace Proton
 		static void SetProjectPath(const std::filesystem::path path);
 		static Ref<Image> GetImage(const std::string& path);
 
-		static Ref<Model> GetModel(const std::string& path);
+		//static Ref<Model> GetModel(const std::string& path);
 
-		static Ref<Prefab> GetPrefab(const std::string& path);
+		//static Ref<Prefab> GetPrefab(const std::string& path);
 
 		static void CreatePrefab(Entity& parentEntity, std::string savePath);
 	private:
@@ -142,8 +142,8 @@ namespace Proton
 		std::filesystem::path m_ProjectPath;
 
 		std::unordered_map<std::filesystem::path, Ref<Image>, path_hash> m_ImageAssets;
-		std::unordered_map<std::filesystem::path, Ref<Model>, path_hash> m_ModelAssets;
-		std::unordered_map<std::filesystem::path, Ref<Prefab>, path_hash> m_Prefabs;
+		//std::unordered_map<std::filesystem::path, Ref<Model>, path_hash> m_ModelAssets;
+		//std::unordered_map<std::filesystem::path, Ref<Prefab>, path_hash> m_Prefabs;
 
 		std::vector<std::filesystem::path> m_PostModelImports;
 		std::vector<std::pair<std::filesystem::path, char*>> m_PostModelReads;

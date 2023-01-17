@@ -269,7 +269,7 @@ namespace Proton
 		return manager.m_ImageAssets[path];
 	}
 
-	Ref<Model> AssetManager::GetModel(const std::string& path)
+	/*Ref<Model> AssetManager::GetModel(const std::string& path)
 	{
 		return manager.m_ModelAssets[path];
 	}
@@ -277,7 +277,7 @@ namespace Proton
 	Ref<Prefab> AssetManager::GetPrefab(const std::string& path)
 	{
 		return manager.m_Prefabs[path];
-	}
+	}*/
 
 	void AssetManager::CreatePrefab(Entity& parentEntity, std::string savePath)
 	{

@@ -395,14 +395,14 @@ namespace Proton
 
 				if (node["Is Prefab"].as<bool>())
 				{
-					MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
+					/*MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
 					PrefabNode* node = ModelCollection::GetPrefabNode(childNodeComponent.m_RootEntity.GetComponent<NodeComponent>().m_PrefabName, childNodeComponent.m_NodeName);
 
 					for (int i = 0; i < node->numMeshes; i++)
 					{
 						meshComponent.m_MeshPtrs.push_back(node->meshes[i]);
 						meshComponent.m_NumMeshes++;
-					}
+					}*/
 				}
 
 				//MeshComponent
@@ -416,13 +416,13 @@ namespace Proton
 					YAML::Node meshDataNode;
 					while (meshDataNode = meshNode["Mesh" + std::to_string(i)])
 					{
-						std::string modelPath = meshDataNode["Model Path"].as<std::string>();
+						/*std::string modelPath = meshDataNode["Model Path"].as<std::string>();
 						std::string meshName = meshDataNode["Mesh Name"].as<std::string>();
 
 						meshComponent.m_MeshPtrs.push_back(ModelCollection::GetMesh(modelPath, meshName));
 						meshComponent.m_NumMeshes++;
 
-						i++;
+						i++;*/
 					}
 				}
 

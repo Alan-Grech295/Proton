@@ -5,7 +5,7 @@
 
 namespace Proton
 {
-	class Mesh;
+	/*class Mesh;
 	class ModelCollection
 	{
 	public:
@@ -56,5 +56,5 @@ namespace Proton
 		std::unordered_map<std::string, Mesh*> meshes;
 
 		std::unordered_map<std::string, struct PrefabNode*> prefabNodes;
-	};
+	};*/
 }

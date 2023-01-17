@@ -80,8 +80,10 @@ namespace Proton
 			m_ParentEntity(Entity::Null),
 			m_RootEntity(Entity::Null),
 			m_NodeName(""),
-			m_PrefabName("")
+			m_PrefabName(""),
+			m_Origin(DirectX::XMMatrixIdentity())
 		{};
+
 		NodeComponent(const NodeComponent&) = default;
 		NodeComponent(const std::string& nodeName, const std::string& prefabName, Entity parentEntity, Entity rootEntity, DirectX::FXMMATRIX& origin)
 			:

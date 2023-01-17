@@ -28,15 +28,20 @@ namespace Proton
 		friend class Renderer;
 		friend class SceneRenderer;
 		friend class AssetManager;
+	private:
+		struct Transforms
+		{
+			DirectX::XMMATRIX modelViewProj;
+			DirectX::XMMATRIX model;
+		};
 	public:
 		Mesh(const std::string& meshTag, const std::string& name, const std::string& modelPath)
 			:
-			m_Transform(DirectX::XMMatrixIdentity()),
 			m_Name(name),
 			m_ModelPath(modelPath)
 		{
-			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Mesh::Transforms), new Mesh::Transforms());
-			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Mesh::Transforms), new Mesh::Transforms());
+			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
+			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Transforms), new Transforms());
 		}
 
 		Mesh() = default;
@@ -44,14 +49,10 @@ namespace Proton
 		Mesh(const Mesh& mesh) = default;
 		
 		//void Bind(RenderCallback callback, DirectX::FXMMATRIX accumulatedTransform, DirectX::FXMMATRIX cameraView, DirectX::FXMMATRIX projectionMatrix) const;
-	private:
-		DirectX::XMMATRIX GetTransformXM() const { return m_Transform; }
 	public:
 		std::string m_ModelPath;
 		std::string m_Name;
 	private:
-		DirectX::XMMATRIX m_Transform;
-
 		Ref<VertexBuffer> m_VertBuffer;
 		Ref<IndexBuffer> m_IndexBuffer;
 		Ref<Topology> m_Topology = Topology::Create(TopologyType::TriangleList);
@@ -76,15 +77,9 @@ namespace Proton
 		bool hasSpecular = false;
 		bool hasNormalMap = false;
 		bool hasDiffuseMap = false;
-
-		struct Transforms
-		{
-			DirectX::XMMATRIX modelViewProj;
-			DirectX::XMMATRIX model;
-		};
 	};
 
-	struct Node
+	/*struct Node
 	{
 		Node** childNodes;
 		uint32_t numChildren;
@@ -124,7 +119,7 @@ namespace Proton
 		PrefabNode* rootNode;
 
 		Prefab() = default;
-	};
+	};*/
 
 	class ModelCreator
 	{

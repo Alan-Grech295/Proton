@@ -24,6 +24,11 @@ namespace Proton
 			m_Bindables.push_back(std::move(bindable));
 		}
 
+		void AddBindable(Scope<Bindable> bindable)
+		{
+			m_Bindables.push_back(std::move(bindable));
+		}
+
 		std::vector<Ref<Bindable>>::iterator begin()
 		{
 			return m_Bindables.begin();
