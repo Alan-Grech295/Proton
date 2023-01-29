@@ -66,6 +66,10 @@ namespace Proton
 				job.m_Mesh->m_VertBuffer->Bind();
 				job.m_Mesh->m_Topology->Bind();
 
+				//
+				job.m_Mesh->m_TransformCBuf->Bind();
+				job.m_Mesh->m_TransformCBufPix->Bind();
+
 				for (Ref<Bindable> bind : *job.m_Step)
 				{
 					bind->Bind();

@@ -32,7 +32,7 @@ namespace Proton
 			lightData.attConst = lightComponent->attConst;
 			lightData.attLin = lightComponent->attLin;
 			lightData.attQuad = lightComponent->attQuad;
-			lightCBuf->SetData(sizeof(PointLightData), &lightData);
+			lightCBuf->SetData(&lightData);
 			lightCBuf->Bind();
 		}
 
@@ -71,8 +71,8 @@ namespace Proton
 						)
 					};
 
-					m->m_TransformCBuf->SetData(sizeof(Transforms), &tf);
-					m->m_TransformCBufPix->SetData(sizeof(Transforms), &tf);
+					m->m_TransformCBuf->SetData(&tf);
+					m->m_TransformCBufPix->SetData(&tf);
 
 					Renderer::Submit(m);
 				}
@@ -135,8 +135,8 @@ namespace Proton
 					)
 				};
 
-				m->m_TransformCBuf->SetData(sizeof(Transforms), &tf);
-				m->m_TransformCBufPix->SetData(sizeof(Transforms), &tf);
+				m->m_TransformCBuf->SetData(&tf);
+				m->m_TransformCBufPix->SetData(&tf);
 
 				Renderer::Submit(m);
 			}

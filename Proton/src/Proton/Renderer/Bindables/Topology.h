@@ -1,6 +1,7 @@
 #pragma once
 #include "Bindable.h"
 #include <string>
+#include <assert.h>
 
 namespace Proton
 {
@@ -38,6 +39,12 @@ namespace Proton
 		static Ref<Topology> Create(TopologyType type);
 
 		static Scope<Topology> CreateUnique(TopologyType type);
+
+		static Scope<Topology> CreateUnique(Ref<Bindable> other)
+		{
+			assert("No need for unique topology" && false);
+			return CreateScope<Topology>(TopologyType::None);
+		}
 
 	private:
 		TopologyType m_Topology;

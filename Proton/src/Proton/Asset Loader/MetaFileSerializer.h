@@ -17,7 +17,8 @@ namespace Proton
 			ELEMENT_TYPES
 			#undef X
 			{Type::Struct, "Struct"},
-			{Type::Array, "Array"}
+			{Type::Array, "Array"},
+			{Type::Pointer, "Pointer"}
 		};
 
 		//Virtual class for Element and MetaFile so that elements can be added to them
@@ -46,6 +47,9 @@ namespace Proton
 			Element(const char* name, Type type, uint32_t dataOffset);
 			
 			Element(std::string name, Type type, uint32_t dataOffset);
+
+			//Copy contructor
+			Element(const Element& element);
 
 			//Debug only
 			std::string ToString();

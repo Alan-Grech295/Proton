@@ -19,6 +19,9 @@ namespace Proton
 		static Ref<PixelShader> Create(std::string path);
 
 		static Scope<PixelShader> CreateUnique(std::string path);
+		static Scope<PixelShader> CreateUnique(Ref<Bindable> other);
+	protected:
+		std::string m_Path;
 	};
 
 	class VertexShader : public Bindable
@@ -35,5 +38,8 @@ namespace Proton
 		static Ref<VertexShader> Create(std::string path);
 
 		static Scope<VertexShader> CreateUnique(std::string path);
+		static Scope<VertexShader> CreateUnique(Ref<Bindable> other);
+	protected:
+		std::string m_Path;
 	};
 }

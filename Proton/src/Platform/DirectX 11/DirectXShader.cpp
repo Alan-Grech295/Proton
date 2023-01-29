@@ -5,9 +5,9 @@
 namespace Proton
 {
 	DirectXPixelShader::DirectXPixelShader(std::string path)
-		:
-		m_Path(path)
 	{
+		m_Path = path;
+
 		std::wstring wpath = std::wstring(path.begin(), path.end());
 		D3DReadFileToBlob(wpath.c_str(), &pBytecodeBlob);
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreatePixelShader(pBytecodeBlob->GetBufferPointer(), pBytecodeBlob->GetBufferSize(), nullptr, &pPixelShader);
@@ -24,9 +24,9 @@ namespace Proton
 	}
 
 	DirectXVertexShader::DirectXVertexShader(std::string path)
-		:
-		m_Path(path)
 	{
+		m_Path = path;
+
 		std::wstring wpath = std::wstring(path.begin(), path.end());
 		D3DReadFileToBlob(wpath.c_str(), &pBytecodeBlob);
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateVertexShader(pBytecodeBlob->GetBufferPointer(), pBytecodeBlob->GetBufferSize(), nullptr, &pVertexShader);

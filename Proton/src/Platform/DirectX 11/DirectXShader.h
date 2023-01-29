@@ -23,7 +23,6 @@ namespace Proton
 	private:
 		Microsoft::WRL::ComPtr<ID3DBlob> pBytecodeBlob;
 		Microsoft::WRL::ComPtr<ID3D11PixelShader> pPixelShader;
-		std::string m_Path;
 	};
 
 	class DirectXVertexShader : public VertexShader
@@ -39,6 +38,5 @@ namespace Proton
 	private:
 		Microsoft::WRL::ComPtr<ID3DBlob> pBytecodeBlob;
 		Microsoft::WRL::ComPtr<ID3D11VertexShader> pVertexShader;
-		std::string m_Path;
 	};
 }

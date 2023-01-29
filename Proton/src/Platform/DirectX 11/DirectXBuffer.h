@@ -48,13 +48,14 @@ namespace Proton
 		DirectXVertexConstantBuffer(const std::string& tag, int slot, int size, const void* data);
 		virtual ~DirectXVertexConstantBuffer() {}
 
-		virtual void SetData(int size, const void* data) override;
+		virtual void SetData(const void* data) override;
+		virtual void* GetData() override;
 		virtual void Bind() override;
 
 		virtual std::string GetUID() const noexcept override;
 	private:
-		UINT mSlot;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
+		void* m_Data;
 		std::string uid;
 	};
 
@@ -64,13 +65,14 @@ namespace Proton
 		DirectXPixelConstantBuffer(const std::string& tag, int slot, int size, const void* data);
 		virtual ~DirectXPixelConstantBuffer() {}
 
-		virtual void SetData(int size, const void* data) override;
+		virtual void SetData(const void* data) override;
+		virtual void* GetData() override;
 		virtual void Bind() override;
 
 		virtual std::string GetUID() const noexcept override;
 	private:
-		UINT mSlot;
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
+		void* m_Data;
 		std::string uid;
 	};
 }

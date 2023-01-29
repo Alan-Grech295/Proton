@@ -17,7 +17,6 @@ namespace Proton
 
 		virtual std::string GetUID() const noexcept override;
 	private:
-		int m_Slot = 0;
 		Microsoft::WRL::ComPtr<ID3D11SamplerState> pSampler;
 		std::string uid;
 	};

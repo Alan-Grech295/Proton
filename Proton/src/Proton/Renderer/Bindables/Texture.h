@@ -33,5 +33,9 @@ namespace Proton
 		static Ref<Texture2D> Create(std::string path, int slot = 0);
 
 		static Scope<Texture2D> CreateUnique(std::string path, int slot = 0);
+		static Scope<Texture2D> CreateUnique(Ref<Bindable> other);
+	protected:
+		std::string m_Path;
+		uint32_t m_Slot;
 	};
 }

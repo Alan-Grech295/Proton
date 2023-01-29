@@ -191,17 +191,20 @@ namespace Proton
 
 		virtual const BufferLayout& GetLayout() const = 0;
 
-		static Ref<VertexBuffer> Create(const std::string& tag, BufferLayout& layout, VertexShader* vertexShader);
+		static Ref<VertexBuffer> Create(const std::string& tag, BufferLayout& layout, VertexShader* vertexShader, uint32_t numElements);
 		
-		static Scope<VertexBuffer> CreateUnique(BufferLayout& layout, VertexShader* vertexShader);
+		static Scope<VertexBuffer> CreateUnique(BufferLayout& layout, VertexShader* vertexShader, uint32_t numElements);
+
+		static Scope<VertexBuffer> CreateUnique(Ref<Bindable> other);
 	
 		//Vertex Buffer Interface Functions
 		template<typename ...Params>
 		Vertex& EmplaceBack(Params&&... params)
 		{
-			m_Data.resize(m_Data.size() + m_Layout.stride);
-			Vertex vert = Vertex{ m_Data.data() + (m_Data.size() - m_Layout.stride), m_Layout, &m_Changed };
+			Vertex vert = Vertex{ m_End, m_Layout, &m_Changed };
 			vert.Set(std::forward<Params>(params)...);
+
+			m_End += m_Layout.stride;
 
 			m_Changed = true;
 
@@ -210,24 +213,34 @@ namespace Proton
 
 		Vertex& operator[](int index)
 		{
-			return Vertex{ m_Data.data() + index * m_Layout.stride, m_Layout, &m_Changed };
+			return Vertex{ m_Data + index * m_Layout.stride, m_Layout, &m_Changed };
 		}
 
 		void SetRawData(char* rawData, uint32_t size)
 		{
-			m_Data.assign(rawData, rawData + size);
+			if (m_MaxSize != size)
+			{
+				delete[] m_Data;
+				m_Data = (char*)malloc(size);
+			}
+			memcpy(m_Data, rawData, size);
+			m_End = m_Data + size;
 			m_Changed = true;
 		}
 
 		void Clear()
 		{
-			m_Data.clear();
+			delete[] m_Data;
+			m_Data = nullptr;
+			m_End = nullptr;
 			m_Changed = true;
 		}
 
-		uint32_t size() { return m_Data.size() / m_Layout.stride; }
+		uint32_t size() { return (m_End - m_Data) / m_Layout.stride; }
 
-		uint32_t sizeBytes() { return m_Data.size(); }
+		uint32_t capacity() { return m_MaxSize; }
+
+		uint32_t sizeBytes() { return m_End - m_Data; }
 
 		//IMP: Go back to protected (public for testing)
 	//protected:
@@ -245,7 +258,9 @@ namespace Proton
 	protected:
 		std::string m_Uid;
 		VertexShader* m_Shader;
-		std::vector<char> m_Data;
+		char* m_Data;
+		char* m_End;
+		uint32_t m_MaxSize = 0;
 		BufferLayout m_Layout;
 		bool m_Changed = true;
 
@@ -285,9 +300,11 @@ namespace Proton
 			return m_Indices[index];
 		}
 
-		static Ref<IndexBuffer> Create(const std::string& tag);
+		static Ref<IndexBuffer> Create(const std::string& tag, uint32_t size);
 		
-		static Scope<IndexBuffer> CreateUnique();
+		static Scope<IndexBuffer> CreateUnique(uint32_t size);
+
+		static Scope<IndexBuffer> CreateUnique(Ref<Bindable> other);
 
 	protected:
 		virtual void RecreateBuffer() = 0;
@@ -310,8 +327,9 @@ namespace Proton
 	public:
 		virtual ~VertexConstantBuffer() {}
 
-		virtual void SetData(int size, const void* data) = 0;
+		virtual void SetData(const void* data) = 0;
 		virtual void Bind() = 0;
+		virtual void* GetData() = 0;
 
 		virtual std::string GetUID() const noexcept = 0;
 
@@ -321,6 +339,12 @@ namespace Proton
 		static Ref<VertexConstantBuffer> Create(const std::string& tag, int slot, int size, const void* data);
 		
 		static Scope<VertexConstantBuffer> CreateUnique(int slot, int size, const void* data);
+
+		static Scope<VertexConstantBuffer> CreateUnique(Ref<Bindable> other);
+
+	protected:
+		uint32_t m_Size;
+		uint32_t m_Slot;
 	};
 
 	class PixelConstantBuffer : public Bindable
@@ -328,9 +352,9 @@ namespace Proton
 	public:
 		virtual ~PixelConstantBuffer() {}
 
-		virtual void SetData(int size, const void* data) = 0;
-
+		virtual void SetData(const void* data) = 0;
 		virtual void Bind() = 0;
+		virtual void* GetData() = 0;
 
 		virtual std::string GetUID() const noexcept = 0;
 
@@ -341,6 +365,12 @@ namespace Proton
 
 		static Scope<PixelConstantBuffer> CreateUnique(int slot, int size, const void* data);
 
+		static Scope<PixelConstantBuffer> CreateUnique(Ref<Bindable> other);
+
 		static PixelConstantBuffer* CreateUniquePtr(int slot, int size, const void* data);
+
+	protected:
+		uint32_t m_Size;
+		uint32_t m_Slot;
 	};
 }

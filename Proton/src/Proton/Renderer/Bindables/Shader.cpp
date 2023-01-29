@@ -42,6 +42,12 @@ namespace Proton
 		return nullptr;
 	}
 
+	Scope<PixelShader> PixelShader::CreateUnique(Ref<Bindable> other)
+	{
+		assert("Test first before using!" && false);
+		return PixelShader::CreateUnique(dynamic_cast<PixelShader&>(*other).m_Path);
+	}
+
 	Ref<VertexShader> VertexShader::Create(std::string path)
 	{
 		PT_PROFILE_FUNCTION();
@@ -72,5 +78,10 @@ namespace Proton
 
 		assert(false && "Unknown RendererAPI!");
 		return nullptr;
+	}
+	Scope<VertexShader> VertexShader::CreateUnique(Ref<Bindable> other)
+	{
+		assert("Test first before using!" && false);
+		return VertexShader::CreateUnique(dynamic_cast<VertexShader&>(*other).m_Path);
 	}
 }

@@ -8,10 +8,9 @@
 namespace Proton
 {
 	DirectXTexture2D::DirectXTexture2D(std::string path, int slot)
-		:
-		m_Slot(slot),
-		m_Path(path)
 	{
+		m_Slot = slot;
+		m_Path = path;
 		Load(path);
 	}
 

@@ -42,4 +42,10 @@ namespace Proton
 		assert(false && "Unknown RendererAPI!");
 		return nullptr;
 	}
+	Scope<Texture2D> Texture2D::CreateUnique(Ref<Bindable> other)
+	{
+		assert("Test first before using!" && false);
+		Texture2D& tex = dynamic_cast<Texture2D&>(*other);
+		return Texture2D::CreateUnique(tex.m_Path, tex.m_Slot);
+	}
 }

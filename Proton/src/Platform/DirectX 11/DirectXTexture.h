@@ -27,8 +27,6 @@ namespace Proton
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView;
-		int m_Slot = 0;
-		std::string m_Path;
 		bool hasAlpha;
 		int width, height;
 		DirectX::ScratchImage scratch;

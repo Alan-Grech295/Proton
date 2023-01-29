@@ -29,6 +29,7 @@ namespace Proton
 					return i;
 			}
 
+			assert("Pass name not found!" && false);
 			return -1;
 		}
 

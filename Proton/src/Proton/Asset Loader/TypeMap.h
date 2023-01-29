@@ -5,13 +5,17 @@ namespace Proton
 	typedef unsigned char byte;
 
 #define ELEMENT_TYPES \
+				X(Bool)\
 				X(Byte)\
 				X(Int16)\
 				X(Int32)\
 				X(Int64)\
+				X(UInt16)\
+				X(UInt32)\
+				X(UInt64)\
 				X(Float)\
 				X(Double)\
-				X(String)\
+				X(String)
 
 	enum class Type {
 		None = 0,
@@ -19,13 +23,29 @@ namespace Proton
 		ELEMENT_TYPES
 #undef X
 		Struct,
-		Array
+		Array,
+		Pointer
 	};
 
 	template<Type type>
 	struct Map
 	{
 		static constexpr bool valid = false;
+	};
+	template<> struct Map<Type::Bool>
+	{
+		using SysType = bool; // type used in the CPU side
+		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
+
+		static byte* GetData(SysType& data)
+		{
+			return (byte*)&data;
+		}
+
+		static uint32_t SizeBytes(const byte* data)
+		{
+			return sizeof(SysType);
+		}
 	};
 	template<> struct Map<Type::Byte>
 	{
@@ -87,6 +107,53 @@ namespace Proton
 			return sizeof(SysType);
 		}
 	};
+
+	template<> struct Map<Type::UInt16>
+	{
+		using SysType = uint16_t; // type used in the CPU side
+		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
+
+		static byte* GetData(SysType& data)
+		{
+			return (byte*)&data;
+		}
+
+		static uint32_t SizeBytes(const byte* data)
+		{
+			return sizeof(SysType);
+		}
+	};
+	template<> struct Map<Type::UInt32>
+	{
+		using SysType = uint32_t; // type used in the CPU side
+		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
+
+		static byte* GetData(SysType& data)
+		{
+			return (byte*)&data;
+		}
+
+		static uint32_t SizeBytes(const byte* data)
+		{
+			return sizeof(SysType);
+		}
+	};
+	template<> struct Map<Type::UInt64>
+	{
+		using SysType = uint64_t; // type used in the CPU side
+		static constexpr bool valid = true; // metaprogramming flag to check validity of Map <param>
+
+		static byte* GetData(SysType& data)
+		{
+			return (byte*)&data;
+		}
+
+		static uint32_t SizeBytes(const byte* data)
+		{
+			return sizeof(SysType);
+		}
+	};
+
 	template<> struct Map<Type::Float>
 	{
 		using SysType = float; // type used in the CPU side
@@ -152,4 +219,19 @@ namespace Proton
 	};
 	ELEMENT_TYPES
 #undef X
+
+	static uint32_t GetSize(Type type)
+	{
+		assert("Cannot get size of string" && type != Type::String);
+
+		switch (type)
+		{
+#define X(el) case Type::el: return Map<Type::el>::SizeBytes(nullptr);
+			ELEMENT_TYPES
+#undef X
+		}
+
+		assert("Invalid type" && false);
+		return 0;
+	}
 }

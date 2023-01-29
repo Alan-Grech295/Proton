@@ -43,5 +43,11 @@ namespace Proton
 		assert("Unknown RendererAPI!");
 		return nullptr;
 	}
+
+	Scope<Sampler> Sampler::CreateUnique(Ref<Bindable> other)
+	{
+		assert("Test first before using!" && false);
+		return Sampler::CreateUnique(dynamic_cast<Sampler&>(*other).m_Slot);
+	}
 }
 

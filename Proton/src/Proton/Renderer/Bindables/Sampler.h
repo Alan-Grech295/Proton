@@ -19,5 +19,9 @@ namespace Proton
 		static Ref<Sampler> Create(const std::string& tag, int slot = 0);
 
 		static Scope<Sampler> CreateUnique(int slot = 0);
+
+		static Scope<Sampler> CreateUnique(Ref<Bindable> other);
+	protected:
+		uint32_t m_Slot;
 	};
 }

@@ -2,7 +2,6 @@
 #include <unordered_map>
 #include <filesystem>
 #include <vector>
-#include "AssetLoader.h"
 #include "Proton\Model\Model.h"
 #include "Proton\Scene\Components.h"
 #include "Proton/Asset Loader/AssetSerializer.h"

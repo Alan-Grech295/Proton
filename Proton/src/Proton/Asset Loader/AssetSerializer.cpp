@@ -4,25 +4,34 @@
 
 namespace Proton
 {
+	const std::string Data::Pointer::tag = "%ptr_";
+	ElementRef& ElementRef::NULL_ELEMENT = ElementRef(nullptr, Type::None, Asset(), Meta::Element());
+
 	TypeElement::TypeElement(std::initializer_list<Element> elements)
 		:
 		m_Type(Type::Struct),
 		m_Data(new Data::Struct())
 	{
+		Data::Struct& structData = m_Data->as<Data::Struct>();
 		//TODO: Check struct child names
-		std::vector<Element>& el = m_Data->as<Data::Struct&>().m_Elements;
-		el = elements;
+		for (Element el : elements)
+		{
+			structData.Add(std::move(el));
+		}
 	}
 
 	TypeElement::TypeElement(Type type)
 		:
-		m_Type(type),
-		m_Data(new Data::Value())
+		m_Type(type)
 	{
 		if (type == Type::Struct)
 			m_Data = new Data::Struct();
 		else if (type == Type::Array)
 			m_Data = new Data::Array();
+		else if (type == Type::Pointer)
+			m_Data = new Data::Pointer();
+		else
+			m_Data = new Data::Value();
 	}
 
 	TypeElement::TypeElement(Type type, byte* data)
@@ -52,35 +61,36 @@ namespace Proton
 	TypeElement& Proton::TypeElement::SetType(TypeElement type)
 	{
 		assert("Element is not an array!" && m_Type == Type::Array);
-		Data::Array& data = static_cast<Data::Array&>(*m_Data);
-		assert("Cannot change array type after elements are added!" && data.m_Elements.empty());
+		Data::Array& arrayData = static_cast<Data::Array&>(*m_Data);
+		assert("Cannot change array type after elements are added!" && arrayData.m_Elements.empty());
 
 		//Check if array contains type template whose size is not consistent
-		data.m_constElementSize = type.m_Type != Type::String;
-		if (data.m_constElementSize)
+		arrayData.m_constElementSize = type.m_Type != Type::String;
+		if (arrayData.m_constElementSize)
 		{
 			if (type.m_Type == Type::Struct)
 			{
 				Data::Struct& structData = type.m_Data->as<Data::Struct&>();
-				structData.m_ConstSize = true;
 				structData.SetConstElementSize();
-				data.m_constElementSize = structData.ConstantSize();
+
+				if (arrayData.m_CanBeNonConst)
+					structData.m_OnlyConstElements = false;
 			}
 			else if (type.m_Type == Type::Array)
 			{
-				Data::Array& arrayData = type.m_Data->as<Data::Array&>();
+				Data::Array& typeData = type.m_Data->as<Data::Array&>();
 				//Does not allow the type template to have non-const elements
-				arrayData.m_CanBeNonConst = false;
+				typeData.m_CanBeNonConst = false;
 
 				//If m_Size has a value then size restrictions need to be set
-				if (data.m_Size.has_value() || !data.m_CanBeNonConst)
-					arrayData.m_Size = 0;
+				if (arrayData.m_Size.has_value() || !arrayData.m_CanBeNonConst)
+					typeData.m_Size = 0;
 			}
 		}
 
-		assert("This array cannot have a non-const type template!" && data.m_CanBeNonConst || data.m_constElementSize);
+		assert("This array cannot have a non-const type template!" && arrayData.m_CanBeNonConst || arrayData.m_constElementSize);
 
-		data.m_TypeTemplate = std::move(type);
+		arrayData.m_TypeTemplate = std::move(type);
 
 		return *this;
 	}
@@ -99,8 +109,16 @@ namespace Proton
 		assert("Cannot set array size after elements are added!" && data.m_Elements.empty());
 		assert("Size must be set before assigning array type template!" && !(data.m_TypeTemplate.has_value() && data.m_TypeTemplate->m_Type == Type::Array));
 		data.m_Size = size;
+		data.m_Elements.reserve(size);
 
 		return *this;
+	}
+
+	void TypeElement::SetPointer(Type type, RawAsset& asset)
+	{
+		assert("Type is not a pointer" && m_Type == Type::Pointer);
+
+		m_Data->as<Data::Pointer&>().SetPointer(asset.AddPointer(type), asset);
 	}
 
 	//Gets the size in bytes of the element data
@@ -142,8 +160,11 @@ namespace Proton
 		{
 		#define X(el) case Type::el: return Map<Type::el>::SizeBytes(m_Data->as<Data::Value&>().m_Data);
 			ELEMENT_TYPES
-		#undef X
+#undef X
+			case Type::Pointer: return sizeof(uint32_t);
 		}
+		assert("Invalid type" && false);
+		return 0;
 	}
 
 	TypeElement::operator Element()
@@ -198,16 +219,16 @@ namespace Proton
 			Data::Array& thisData = m_Data->as<Data::Array>();
 			Data::Array& otherData = other.m_Data->as<Data::Array>();
 
-			if (thisData.m_Elements.size() != otherData.m_Elements.size())
+			if(thisData.m_Size.value_or(0xFFFFFFFF) != otherData.m_Size.value_or(0xFFFFFFFF))
 				return false;
 
-			//Check if the elements of the array are equal 
+			/*//Check if the elements of the array are equal 
 			for (auto it1 = thisData.m_Elements.begin(), it2 = otherData.m_Elements.begin();
 				it1 != thisData.m_Elements.end(); it1++, it2++)
 			{
 				if (*it1 != *it2)
 					return false;
-			}
+			}*/
 
 			return thisData.m_TypeTemplate.value().Equals(otherData.m_TypeTemplate.value());
 		}
@@ -251,16 +272,17 @@ namespace Proton
 				Data::Array& thisData = m_Data->as<Data::Array>();
 				Data::Array& otherData = other.m_Data->as<Data::Array>();
 
-				if (thisData.m_Elements.size() != otherData.m_Elements.size())
+				if (thisData.m_Size.value_or(0xFFFFFFFF) != otherData.m_Size.value_or(0xFFFFFFFF))
 					return false;
 
+				/*
 				//Check if the elements of the array are equal 
 				for (auto it1 = thisData.m_Elements.begin(), it2 = otherData.m_Elements.begin();
 					it1 != thisData.m_Elements.end(); it1++, it2++)
 				{
 					if (*it1 != *it2)
 						return false;
-				}
+				}*/
 
 				return thisData.m_TypeTemplate.value().Equals(otherData.m_TypeTemplate.value());
 			}
@@ -288,28 +310,60 @@ namespace Proton
 	{
 	}
 
-	Element& Element::Add(std::initializer_list<Element> elements)
+	Element::Element(const char* name, std::initializer_list<Element> elements)
+		:
+		TypeElement(std::move(elements)),
+		m_Name(name)
 	{
-		Data::Struct& structData = m_Data->as<Data::Struct&>();
-		for (const Element el : elements)
+	}
+
+	Element& TypeElement::Add(const char* name, Type type)
+	{
+		assert("Element is not a struct" && m_Type == Type::Struct);
+
+		Data::Struct& structData = m_Data->as<Data::Struct>();
+		structData.Add(Element(name, type));
+		return structData.m_Elements.back();
+	}
+
+	Element& TypeElement::Add(std::initializer_list<Element> elements)
+	{
+		assert("Element is not a struct or array" && (m_Type == Type::Struct || m_Type == Type::Array));
+
+		if (m_Type == Type::Struct)
 		{
-			assert("Name already exists in struct" && !structData.Contains(el.m_Name));
-			if (el.m_Type == Type::Struct)
+			Data::Struct& structData = m_Data->as<Data::Struct&>();
+			structData.m_Elements.reserve(structData.m_Elements.size() + elements.size());
+			for (Element el : elements)
 			{
-				el.m_Data->as<Data::Struct&>().m_ConstSize = structData.m_ConstSize;
+				structData.Add(std::move(el));
 			}
 		}
-		int prevSize = structData.m_Elements.size();
-		structData.m_Elements.resize(prevSize + elements.size());
-		void* copyStart = (void*)(structData.m_Elements.data() + prevSize);
-		memcpy(copyStart, elements.begin(), elements.size() * sizeof(Element));
+		else
+		{
+			Data::Array& arrayData = m_Data->as<Data::Array&>();
+			//TODO: Change to copy
+			for (Element el : elements)
+			{
+				arrayData.Add(std::move(el));
+			}
+		}
 
 		return *this;
 	}
 
-	Element& Element::Add(TypeElement element)
+	Element& TypeElement::Add(std::initializer_list<TypeElement> elements)
 	{
-		return ((TypeElement*)this)->Add(static_cast<TypeElement>(element));
+		assert("Element is not an array" && m_Type == Type::Array);
+
+		Data::Array& arrayData = m_Data->as<Data::Array&>();
+		//TODO: Change to copy
+		for (TypeElement el : elements)
+		{
+			arrayData.Add(std::move(el));
+		}
+
+		return *this;
 	}
 
 	Element& TypeElement::operator[](const std::string& name)
@@ -325,6 +379,17 @@ namespace Proton
 		}
 
 		return Element::Empty();
+	}
+
+	TypeElement* TypeElement::operator->()
+	{
+		assert("Type is not pointer " && m_Type == Type::Pointer);
+		Data::Pointer& pointerData = m_Data->as<Data::Pointer>();
+
+		if (pointerData.m_Pointer == 0)
+			return nullptr;
+
+		return &(*pointerData.m_Asset)[pointerData.m_PointerToString];
 	}
 
 	TypeElement& TypeElement::operator[](uint32_t index)
@@ -377,6 +442,12 @@ namespace Proton
 			if (arrayData.m_Size.has_value() && *arrayData.m_Size > arrayData.m_Elements.size())
 				nextDataPtr += arrayData.m_Elements.back().GetSizeInBytes() * (*arrayData.m_Size - arrayData.m_Elements.size());
 		}
+		else if (element.m_Type == Type::Pointer)
+		{
+			uint32_t* data = &(element.m_Data->as<Data::Pointer&>().m_Pointer);
+			memcpy(nextDataPtr, data, sizeof(uint32_t));
+			nextDataPtr += sizeof(uint32_t);
+		}
 		else
 		{
 			uint32_t dataSize = 0;
@@ -415,9 +486,16 @@ namespace Proton
 			if (arrayData.m_Size.has_value() && *arrayData.m_Size > arrayData.m_Elements.size())
 				nextDataPtr += arrayData.m_Elements.back().GetSizeInBytes() * (*arrayData.m_Size - arrayData.m_Elements.size());
 		}
+		else if (element.m_Type == Type::Pointer)
+		{
+			uint32_t* data = &(element.m_Data->as<Data::Pointer&>().m_Pointer);
+			memcpy(nextDataPtr, data, sizeof(uint32_t));
+			nextDataPtr += sizeof(uint32_t);
+		}
 		else
 		{
 			//TODO: Optimize so that data size is passed in not searched for every time
+			//NOTE: It is a copy of add element
 			uint32_t dataSize = 0;
 			byte* data = element.m_Data->as<Data::Value&>().m_Data;
 
@@ -453,16 +531,17 @@ namespace Proton
 		else if (element.m_Type == Type::Array)
 		{
 			Data::Array& arrayData = element.m_Data->as<Data::Array&>();
+			arrayData.CalcStride();
 			//Sets the type template of the meta element
 			SetMetaArrayTemplate(*element.m_Data, metaElement);
 			metaElement.SetSize(arrayData.m_Elements.size());
-			
+			metaElement.m_ExtraData->as<Meta::ExtraData::Array&>().m_Stride = arrayData.m_Stride;
+
 			if (!arrayData.m_constElementSize)
 			{
 				arrayData.CalcElementOffsets();
 
 				metaElement.SetElementOffsets(arrayData.m_ElementOffsets.value());
-				metaElement.m_ExtraData->as<Meta::ExtraData::Array&>().m_ChildStride = arrayData.m_ChildStride;
 			}
 		}
 
@@ -486,15 +565,19 @@ namespace Proton
 		{
 			//Sets the type template of this array
 			SetMetaArrayTemplate(*typeTemplate.m_Data, metaElement.GetType());
+			Data::Array& typeArrData = typeTemplate.m_Data->as<Data::Array>();
 			//A size of 0 means no size is set
-			metaElement.GetType().SetSize(typeTemplate.m_Data->as<Data::Array&>().m_Size.value_or(0));
+			metaElement.GetType().SetSize(typeArrData.m_Size.value_or(0));
+			metaElement.GetType().m_ExtraData->as<Meta::ExtraData::Array>().m_Stride = typeArrData.m_Stride;
 		}
 	}
 
 	ElementRef ElementRef::operator[](const std::string& name)
 	{
 		Meta::Element& metaElement = m_MetaElement[name];
-		return ElementRef(m_Data + (metaElement.m_DataOffset - m_MetaElement.m_DataOffset), metaElement.m_Type, metaElement);
+		ElementRef& ref = ElementRef(m_Data + (metaElement.m_DataOffset - m_MetaElement.m_DataOffset), metaElement.m_Type, m_Asset, metaElement);
+		//ref.CalcSize();
+		return ref;
 	}
 
 	ElementRef ElementRef::operator[](const char* name)
@@ -509,42 +592,19 @@ namespace Proton
 
 		assert("Index out of bounds" && index < arrayData.m_Size);
 
-		if (arrayData.m_constElementSize)
+		if (arrayData.m_ConstElementSize)
 		{
 			Meta::Element metaElement = Meta::Element(arrayData.m_TypeTemplate);
 			metaElement.m_SizeBytes = (m_MetaElement.GetSizeInBytes() / arrayData.m_Size);
+			metaElement.m_DataOffset = m_MetaElement.m_DataOffset + (index * metaElement.m_SizeBytes);
+
 			if (metaElement.m_Type == Type::Struct)
 			{
-				Meta::ExtraData::Struct& elementData = metaElement.m_ExtraData->as<Meta::ExtraData::Struct&>();
-				metaElement.m_DataOffset = m_MetaElement.m_DataOffset + (index * metaElement.m_SizeBytes);
-				int nextOffset = metaElement.m_DataOffset;
-				for (Meta::Element& element : elementData.m_Elements)
-				{
-					element.m_DataOffset = nextOffset;
-
-					if (element.m_Type == Type::Struct)
-					{
-						element.m_SizeBytes = element.m_ExtraData->as<Meta::ExtraData::Struct&>().CalcStructSize(nextOffset);
-					}
-					else
-					{
-						switch (element.m_Type)
-						{
-							//Null ptr used as strings are not going to be accepted
-#define X(el) case Type::el: \
-						element.m_SizeBytes = Map<Type::el>::SizeBytes(nullptr); \
-						break;
-							ELEMENT_TYPES
-#undef X
-						}
-					}
-					
-					nextOffset += element.m_SizeBytes;
-				}
-				//int 
+				Meta::ExtraData::Struct& elementData = metaElement.m_ExtraData->as<Meta::ExtraData::Struct>();
+				elementData.SetConstChildSizes(metaElement.m_DataOffset);
 			}
 
-			return ElementRef(m_Data + metaElement.m_SizeBytes * index, arrayData.m_TypeTemplate.m_Type, metaElement);
+			return ElementRef(m_Data + metaElement.m_SizeBytes * index, arrayData.m_TypeTemplate.m_Type, m_Asset, metaElement);
 		}
 		else
 		{
@@ -555,7 +615,6 @@ namespace Proton
 			//Note: Element offsets for structs are the offsets of every element in the struct
 			if (arrayData.m_TypeTemplate.m_Type == Type::Struct)
 			{
-				metaElement.m_ExtraData = new Meta::ExtraData::Struct();
 				Meta::ExtraData::Struct& elementData = metaElement.m_ExtraData->as<Meta::ExtraData::Struct&>();
 				Meta::ExtraData::Struct& typeData = arrayData.m_TypeTemplate.m_ExtraData->as<Meta::ExtraData::Struct&>();
 		
@@ -567,35 +626,54 @@ namespace Proton
 				data = m_Data + baseOffset;
 
 				//Size is the difference between two element offsets
-				metaElement.m_SizeBytes = elementOffsets[base + typeData.m_Elements.size()] - elementOffsets[base];
 				metaElement.m_DataOffset = baseOffset + m_MetaElement.m_DataOffset;
 
-				for (int i = 0; i < typeData.m_Elements.size(); i++)
-				{
-					Meta::Element& el = typeData.m_Elements[i];
-					elementData.Add(el.m_Name, el.m_Type, elementOffsets[base + i] + m_MetaElement.m_DataOffset);
-				}
+				std::vector<uint32_t> offsets = std::vector<uint32_t>(elementOffsets.begin() + base, elementOffsets.begin() + base + typeData.m_Elements.size() + 1);
+				metaElement.m_SizeBytes = elementData.SetChildSizes(m_MetaElement.m_DataOffset, offsets);
 			}
 			else
 			{
 				//Size is the difference between two element offsets
 				metaElement.m_SizeBytes = index == arrayData.m_Size - 1 ? m_MetaElement.GetSizeInBytes() - elementOffsets[index] : elementOffsets[index + 1] - elementOffsets[index];
-				data = m_Data + elementOffsets[index];
+				metaElement.m_DataOffset = elementOffsets[index];
+				data = m_Data + metaElement.m_DataOffset;
 
 				//Calculates the size of the array using the child stride
 				if (metaElement.m_Type == Type::Array)
-					metaElement.m_ExtraData->as<Meta::ExtraData::Array&>().m_Size = metaElement.m_SizeBytes / arrayData.m_ChildStride;
-
+				{
+					Meta::ExtraData::Array& elementData = metaElement.m_ExtraData->as<Meta::ExtraData::Array>();
+					elementData.m_Size = metaElement.m_SizeBytes / elementData.m_Stride;
+				}
 			}
 
-			return ElementRef(data, arrayData.m_TypeTemplate.m_Type, metaElement);
+			return ElementRef(data, arrayData.m_TypeTemplate.m_Type, m_Asset, metaElement);
 		}		
 	}
+
+	/*ElementRef Asset::operator[](const std::string& name)
+	{
+		Meta::Element& metaElement = m_MetaFile[name];
+		ElementRef& ref = ElementRef(m_Data + metaElement.m_DataOffset, metaElement.m_Type, this, metaElement);
+		//ref.CalcSize();
+		return ref;
+	}*/
 
 	ElementRef Asset::operator[](const std::string& name)
 	{
 		Meta::Element& metaElement = m_MetaFile[name];
-		return ElementRef(m_Data + metaElement.m_DataOffset, metaElement.m_Type, metaElement);
+		ElementRef ref = ElementRef(m_Data + metaElement.m_DataOffset, metaElement.m_Type, *this, metaElement);
+		//ref.CalcSize();
+		return ref;
+	}
+
+	ElementRef& ElementRef::operator*()
+	{
+		assert("Type is not a pointer" && m_Type == Type::Pointer);
+		if ((*(uint32_t*)m_Data) == 0)
+		{
+			return NULL_ELEMENT;
+		}
+		return m_Asset[Data::Pointer::GetTag(*(uint32_t*)m_Data)];
 	}
 
 	void AssetSerializer::SerializeAsset(const std::string& filepath, Asset& asset)
@@ -651,5 +729,14 @@ namespace Proton
 		PT_CORE_TRACE(byteStr);*/
 
 		return asset;
+	}
+
+	uint32_t RawAsset::AddPointer(Type type)
+	{
+		auto [it, succeded] = m_ElementLocator.try_emplace(Data::Pointer::GetTag(m_NextPtr), m_Elements.size());
+		assert("Element with same name already exists!" && succeded);
+		m_Elements.push_back(Element(it->first.c_str(), type));
+		m_NextPtr++;
+		return m_NextPtr - 1;
 	}
 }

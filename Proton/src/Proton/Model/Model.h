@@ -11,6 +11,7 @@
 #include <cassert>
 #include "Proton/Asset Loader/AssetSerializer.h"
 #include <assimp/scene.h>
+#include "Bindables/ConstructableBindable.h"
 
 struct aiNode;
 struct aiMesh;
@@ -28,7 +29,7 @@ namespace Proton
 		friend class Renderer;
 		friend class SceneRenderer;
 		friend class AssetManager;
-	private:
+	public:
 		struct Transforms
 		{
 			DirectX::XMMATRIX modelViewProj;
@@ -79,6 +80,103 @@ namespace Proton
 		bool hasDiffuseMap = false;
 	};
 
+	struct StepData
+	{
+	public:
+		StepData(const std::string& name)
+			:
+			m_ID(Renderer::GetPassIDFromName(name))
+		{}
+
+		void AddBindable(Ref<ConstructableBindable> bindable)
+		{
+			m_Bindables.push_back(bindable);
+		}
+
+		template<typename T>
+		T* GetResource(ConstructableBindable::ResourceType resource) const
+		{
+			for (Ref<ConstructableBindable> bindable : m_Bindables)
+			{
+				if (bindable->m_ResourceType == resource)
+					return (T*)bindable.get()->GetRef().get();
+			}
+
+			return nullptr;
+		}
+	public:
+		std::vector<Ref<ConstructableBindable>> m_Bindables;
+		int m_ID;
+	};
+
+	struct TechniqueData
+	{
+	public:
+		TechniqueData()
+			:
+			m_Name("")
+		{}
+		TechniqueData(const std::string& name)
+			:
+			m_Name(name)
+		{}
+	public:
+		std::vector<StepData> m_Steps = std::vector<StepData>();
+		std::string m_Name;
+	};
+
+	struct MaterialData
+	{
+	public:
+		MaterialData()
+		{
+			m_Techniques = std::vector<TechniqueData>();
+		}
+
+	public:
+		std::vector<TechniqueData> m_Techniques;
+
+		bool hasSpecular = false;
+		bool hasNormalMap = false;
+		bool hasDiffuseMap = false;
+	};
+
+	struct MeshData
+	{
+	public:
+		MeshData() {}
+		void Create(const std::string& meshTag, const std::string& name, const std::string& modelPath)
+		{
+			m_Name = name;
+			m_ModelPath = modelPath;
+			m_TransformCBuf = CreateRef<UniqueBindable>(ConstructableBindable::ResourceType::VertexConstantBuffer);
+			m_TransformCBuf->Initialize<VertexConstantBuffer>(0, sizeof(Mesh::Transforms), new Mesh::Transforms());
+
+			m_TransformCBufPix = CreateRef<UniqueBindable>(ConstructableBindable::ResourceType::PixelConstantBuffer);
+			m_TransformCBufPix->Initialize<PixelConstantBuffer>(2, sizeof(Mesh::Transforms), new Mesh::Transforms());
+		
+			m_Topology = CreateRef<SharedBindable>(ConstructableBindable::ResourceType::Topology, "TriangleList");
+			m_Topology->m_Bindable = Topology::Create(TopologyType::TriangleList);
+		}
+	public:
+		std::string m_ModelPath;
+		std::string m_Name;
+
+		Ref<SharedBindable> m_VertBuffer;
+		Ref<SharedBindable> m_IndexBuffer;
+		Ref<SharedBindable> m_Topology;
+		uint32_t m_MatIndex;
+
+		Ref<UniqueBindable> m_TransformCBuf;
+		Ref<UniqueBindable> m_TransformCBufPix;
+	};
+
+	struct ModelData
+	{
+		std::vector<MeshData> m_Meshes;
+		std::vector<MaterialData> m_Materials;
+	};
+
 	/*struct Node
 	{
 		Node** childNodes;
@@ -121,13 +219,18 @@ namespace Proton
 		Prefab() = default;
 	};*/
 
+
+
 	class ModelCreator
 	{
 	public:
 		//static Entity CreateModelEntity(const std::string& path, Scene* activeScene);
 		//static Entity CreatePrefabEntity(const std::string& path, Scene* activeScene);
 		//static Mesh* ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
-		static Element ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene);
+		static void ParseModel(const std::string& path);
+		static TypeElement ParseMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const std::vector<MaterialData>& materials);
+		static void ParseMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat);
+		static void ParseNode(aiNode* node, RawAsset& asset);
 	private:
 		//static Entity CreateChild(const Node& node, Entity parent, Entity root, Scene* activeScene);
 		//static Entity CreatePrefabChild(const PrefabNode& node, Entity parent, Entity root, Scene* activeScene);

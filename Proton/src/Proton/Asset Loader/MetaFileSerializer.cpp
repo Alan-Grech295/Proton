@@ -22,6 +22,15 @@ namespace Proton
 			//Struct extra data
 			struct Struct : public Element::ExtraDataBase
 			{
+				Struct() = default;
+
+				Struct(Element::ExtraDataBase* other)
+				{
+					Struct& structData = other->as<Struct>();
+					m_Elements.resize(structData.m_Elements.size());
+					memcpy(m_Elements.data(), structData.m_Elements.data(), sizeof(Element) * structData.m_Elements.size());
+				}
+
 				Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset)
 				{
 					//If data offset has no value then it is assumed that the element is used as an array type template
@@ -57,17 +66,58 @@ namespace Proton
 						}
 						else
 						{
-							switch (element.m_Type)
-							{
-								//Null ptr used as strings are not going to be accepted
-							#define X(el) case Type::el: \
-							size += Map<Type::el>::SizeBytes(nullptr); \
-							break;
-									ELEMENT_TYPES
-							#undef X
-							}
+							size += GetSize(element.m_Type);
 						}
 						
+					}
+
+					return size;
+				}
+
+				uint32_t SetConstChildSizes(uint32_t dataOffset)
+				{
+					uint32_t size = 0;
+					for (Element& el : m_Elements)
+					{
+						assert("Struct is meant to be const" && el.m_Type != Type::String);
+						el.m_DataOffset = size + dataOffset;
+
+						if (el.m_Type == Type::Struct)
+						{
+							el.m_SizeBytes = el.m_ExtraData->as<Struct>().SetConstChildSizes(el.m_DataOffset);
+						}
+						else if (el.m_Type == Type::Array)
+						{
+							assert("Array should not be in type template struct" && false);
+						}
+						else
+						{
+							el.m_SizeBytes = GetSize(el.m_Type);
+						}
+
+						size += el.m_SizeBytes;
+					}
+
+					return size;
+				}
+
+				uint32_t SetChildSizes(uint32_t absOffset, std::vector<uint32_t>& offsets)
+				{
+					uint32_t size = 0;
+					for (int i = 0; i < m_Elements.size(); i++)
+					{
+						Element& element = m_Elements[i];
+						uint32_t offset = offsets[i];
+
+						element.m_SizeBytes = offsets[i + 1] - offset;
+						element.m_DataOffset = absOffset + offset;
+
+						if (element.m_Type == Type::Struct)
+						{
+							element.m_ExtraData->as<Struct>().SetConstChildSizes(element.m_DataOffset);
+						}
+
+						size += element.m_SizeBytes;
 					}
 
 					return size;
@@ -79,25 +129,40 @@ namespace Proton
 			struct Array : public Element::ExtraDataBase
 			{
 				Array() = default;
+
+				Array(Element::ExtraDataBase* other)
+				{
+					Array& arrayData = other->as<Array>();
+
+					m_Size = arrayData.m_Size;
+					m_ConstElementSize = arrayData.m_ConstElementSize;
+					m_Stride = arrayData.m_Stride;
+					m_TypeTemplate = Element(arrayData.m_TypeTemplate);
+					if (arrayData.m_ElementOffsets.has_value())
+					{
+						m_ElementOffsets.emplace(arrayData.m_ElementOffsets->begin(), arrayData.m_ElementOffsets->end());
+					}
+				}
+
 				Array(Type type, uint32_t size, bool constElementSize, std::optional<std::vector<uint32_t>> elementOffsets = std::nullopt)
 					:
 					m_Size(size),
 					m_TypeTemplate({ "", type, 0 }),
-					m_constElementSize(constElementSize),
+					m_ConstElementSize(constElementSize),
 					m_ElementOffsets(elementOffsets),
-					m_ChildStride(0)
+					m_Stride(-1)
 				{
 					assert("No element offsets were given!" && constElementSize);
 				}
 
 				uint32_t m_Size;
 				Element m_TypeTemplate;
-				bool m_constElementSize;
+				bool m_ConstElementSize;
 
 				//Only used if the array type is not constant size
 				std::optional<std::vector<uint32_t>> m_ElementOffsets;
-				//The size in bytes of the element of the child array (only used by non-const type arrays with array type templates)
-				uint32_t m_ChildStride;
+				//The size in bytes of the type template
+				int m_Stride;
 			};
 		};
 
@@ -128,6 +193,20 @@ namespace Proton
 				m_ExtraData = new ExtraData::Struct();
 			else if (type == Type::Array)
 				m_ExtraData = new ExtraData::Array(Type::None, 0, true);
+		}
+
+		Element::Element(const Element& element)
+			:
+			m_Type(element.m_Type),
+			m_DataOffset(element.m_DataOffset),
+			m_Name(element.m_Name),
+			m_SizeBytes(element.m_SizeBytes),
+			m_ExtraData(nullptr)
+		{
+			if (m_Type == Type::Struct)
+				m_ExtraData = new ExtraData::Struct(element.m_ExtraData);
+			else if (m_Type == Type::Array)
+				m_ExtraData = new ExtraData::Array(element.m_ExtraData);
 		}
 
 		//For debug only
@@ -204,20 +283,15 @@ namespace Proton
 
 				COPY_DATA_OFFSET(bytes.data(), offset, typeData.data(), typeData.size());
 				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_Size, sizeof(uint32_t));
-				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_constElementSize, sizeof(bool));
+				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_ConstElementSize, sizeof(bool));
+				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_Stride, sizeof(int));
 
 				//If the array template is not of const size the element offsets need to be saved
-				if (!arrayData.m_constElementSize)
+				if (!arrayData.m_ConstElementSize)
 				{
 					uint32_t numOffsets = arrayData.m_ElementOffsets.value().size();
 					COPY_DATA_OFFSET(bytes.data(), offset, &numOffsets, sizeof(uint32_t));
 					COPY_DATA_OFFSET(bytes.data(), offset, arrayData.m_ElementOffsets.value().data(), numOffsets * sizeof(uint32_t));
-					
-					//If the array template is also an array, save the stride of the children of the template array
-					if (arrayData.m_TypeTemplate.m_Type == Type::Array)
-					{
-						COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_ChildStride, sizeof(uint32_t));
-					}
 				}
 			}
 		}
@@ -273,7 +347,7 @@ namespace Proton
 			ExtraData::Array& arrayData = static_cast<ExtraData::Array&>(*m_ExtraData);
 			//If element offsets are given it is assumed that the
 			//array type template is not of const size
-			arrayData.m_constElementSize = false;
+			arrayData.m_ConstElementSize = false;
 			arrayData.m_ElementOffsets = std::move(offsets);
 			return *this;
 		}
@@ -299,8 +373,8 @@ namespace Proton
 			{
 				ExtraData::Array& data = static_cast<ExtraData::Array&>(*m_ExtraData);
 
-				//Type, Elements Type, size
-				return 2 * sizeof(uint32_t) + data.m_TypeTemplate.CalculateSizeInArray();
+				//Type, Elements Type, size, stride
+				return sizeof(uint32_t) + data.m_TypeTemplate.CalculateSizeInArray() + sizeof(uint32_t) + sizeof(int);
 			}
 			else
 			{
@@ -323,8 +397,8 @@ namespace Proton
 			else if (m_Type == Type::Array)
 			{
 				ExtraData::Array& arrayData = static_cast<ExtraData::Array&>(*m_ExtraData);
-				//			Type Data										Size			Constant Size											Num Offsets							{Offsets}                                                               {If not const size and array type template : Child Stride}
-				size += arrayData.m_TypeTemplate.CalculateSizeInArray() + sizeof(uint32_t) + sizeof(boolean) + (arrayData.m_constElementSize ? 0 : sizeof(uint32_t) + sizeof(uint32_t) * arrayData.m_ElementOffsets.value().size()) + (arrayData.m_TypeTemplate.m_Type == Type::Array && !arrayData.m_constElementSize ? sizeof(uint32_t) : 0);
+				//			Type Data										Size			Constant Size		Stride												Num Offsets							{Offsets}
+				size += arrayData.m_TypeTemplate.CalculateSizeInArray() + sizeof(uint32_t) + sizeof(boolean) + sizeof(int) + (arrayData.m_ConstElementSize ? 0 : sizeof(uint32_t) + sizeof(uint32_t) * arrayData.m_ElementOffsets.value().size());
 			}
 
 			return size;
@@ -373,13 +447,13 @@ namespace Proton
 			{
 				ExtraData::Array& arrayData = static_cast<ExtraData::Array&>(*m_ExtraData);
 
-				//Elements Type, Size
-
 				std::vector<byte> typeData = arrayData.m_TypeTemplate.GetDataForArray();
-				bytes.resize(bytes.size() + typeData.size() + sizeof(uint32_t));
+				//Elements Type, Size, Stride
+				bytes.resize(bytes.size() + typeData.size() + sizeof(uint32_t) + sizeof(int));
 
 				COPY_DATA_OFFSET(bytes.data(), offset, typeData.data(), typeData.size());
 				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_Size, sizeof(uint32_t));
+				COPY_DATA_OFFSET(bytes.data(), offset, &arrayData.m_Stride, sizeof(int));
 			}
 
 			return bytes;
@@ -507,20 +581,15 @@ namespace Proton
 				arrayData.m_TypeTemplate = ReadArrayElement(data);
 
 				arrayData.m_Size = *(uint32_t*)data; data += sizeof(uint32_t);
-				arrayData.m_constElementSize = *(bool*)data; data += sizeof(bool);
+				arrayData.m_ConstElementSize = *(bool*)data; data += sizeof(bool);
+				arrayData.m_Stride = *(int*)data; data += sizeof(int);
 
-				if (!arrayData.m_constElementSize)
+				if (!arrayData.m_ConstElementSize)
 				{
 					//Read the element offsets
 					uint32_t numOffsets = *(uint32_t*)data; data += sizeof(uint32_t);
 					arrayData.m_ElementOffsets = std::vector<uint32_t>((uint32_t*)data, (uint32_t*)(data + numOffsets * sizeof(uint32_t)));
 					data += numOffsets * sizeof(uint32_t);
-
-					if (arrayData.m_TypeTemplate.m_Type == Type::Array)
-					{
-						//Reads the stride of the children of the array type template
-						arrayData.m_ChildStride = *(uint32_t*)data; data += sizeof(uint32_t);
-					}
 				}
 			}
 
@@ -561,6 +630,7 @@ namespace Proton
 				//Reads the array type template and size
 				arrayData.m_TypeTemplate = ReadArrayElement(data);
 				arrayData.m_Size = *(uint32_t*)data; data += sizeof(uint32_t);
+				arrayData.m_Stride = *(int*)data; data += sizeof(int);
 			}
 			
 			return element;

@@ -28,187 +28,274 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
+		ModelCreator::ParseModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
+		
 		Asset& desAsset = AssetSerializer::DeserializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset");
 
-		std::string name = desAsset["Name"];
-		int age = desAsset["Age"];
-		float height = desAsset["Height"];
+		std::string desName = desAsset["Name"];
 
-		ElementRef& str = desAsset["Data"];
-		char* id = desAsset["Data"]["ID"];
-		int houseNum = desAsset["Data"]["House Number"];
-		std::string postCode = desAsset["Data"]["Post Code"];
-		byte test = desAsset["Data"]["Test"];
+		int arr1_0 = desAsset["Array1"][0];
+		int arr1_1 = desAsset["Array1"][1];
+		int arr1_2 = desAsset["Array1"][2];
 
-		double a0 = desAsset["Family members ages"][0];
-		double a1 = desAsset["Family members ages"][1];
-		double a2 = desAsset["Family members ages"][2];
+		ElementRef& array9Ref = desAsset["Array9"];
+		ElementRef& el1 = array9Ref[0];
+		ElementRef& el2 = array9Ref[1];
+		float dat = el2["Data3"]["Data2"];
 
-		//TODO: Test arrays of arrays and arrays of structs
-		std::string f0 = desAsset["Family members"][0];
-		char* f1 = desAsset["Family members"][1];
-		std::string f2 = desAsset["Family members"][2];
+		ElementRef& array10Ref = desAsset["Array10"];
+		ElementRef& array2 = array10Ref[1];
 
-		ElementRef& array0 = desAsset["Array Of Array"][0];
-		float val00 = array0[0];
-		float val01 = array0[1];
-		float val02 = array0[2];
+		int second = array2[1];
 
-		float val10 = desAsset["Array Of Array"][1][0];
-		float val11 = desAsset["Array Of Array"][1][1];
-
-		float val20 = desAsset["Array Of Array"][2][0];
-		float val21 = desAsset["Array Of Array"][2][1];
-
-		float val = desAsset["3D Array"][1][1][1];
-
-		ElementRef& str1 = desAsset["Previous houses"][0];
-		std::string road1 = str1["Road"];
-		int16_t num1 = str1["Number"];
-
-		std::string road2 = desAsset["Previous houses"][1]["Road"];
-		int16_t num2 = desAsset["Previous houses"][1]["Number"];
+		ElementRef& arr5Ref = desAsset["Array5"];
+		ElementRef& struct2 = arr5Ref[0];
+		std::string struct2Name = struct2["Name"];
+		ElementRef& struct2Struct = struct2["Struct"];
+		int struct2StructInt = struct2Struct["Int"];
 		
-		ElementRef& models = desAsset["Model"];
-		ElementRef& model1 = models[0];
-		int id1 = model1["id"];
-		ElementRef& pos1 = model1["position"];
-		float x1 = pos1["x"];
-		float y1 = pos1["y"];
-		float z1 = pos1["z"];
-
-		ElementRef& model2 = models[1];
-		int id2 = model2["id"];
-		ElementRef& pos2 = model2["position"];
-		float x2 = pos2["x"];
-		float y2 = pos2["y"];
-		float z2 = pos2["z"];
-		
-		
+		ElementRef& pointer = desAsset["Pointer"];
+		std::string pointerData = *pointer;
 		//*/
 
+		//
+
 		RawAsset rawAsset;
-		rawAsset.Add("Name", std::string("Alan"));
 		rawAsset.Add("Age", 18);
 		rawAsset.Add("Height", 178.12f);
+		rawAsset.Add("Name", std::string("Alan"));
+		rawAsset.Add("Pointer", Type::Pointer);
+		rawAsset["Pointer"].SetPointer(Type::String, rawAsset);
+		rawAsset["Pointer"]->SetData(std::string("Hello my name is Alan!"));
 
-		rawAsset.Add("Model", Type::Array);
-		rawAsset["Model"].SetType(TypeElement({		Element("id", Type::Int32),
-													Element("position", Type::Struct),
-														}));
-		rawAsset["Model"].GetType()["position"].Add({	Element("x", Type::Float),
-														Element("y", Type::Float),
-														Element("z", Type::Float) });
+		//Test 1
+		rawAsset.Add("Struct", Type::Struct);
+		rawAsset["Struct"].Add("Number", 8712);
+		rawAsset["Struct"].Add("Double", 8712.7612);
+		rawAsset["Struct"].Add("String", std::string("Hello world"));
 
-		rawAsset["Model"].Add(TypeElement({ Element::Create("id", 81),
-											Element("position", Type::Struct).Add({ Element::Create("x", 812.32f),
-																					Element::Create("y", 116.2f),
-																					Element::Create("z", -192.5f) }) }));
+		//Test 2
+		rawAsset.Add("Struct2", Type::Struct);
+		rawAsset["Struct2"].Add("Number", 8712);
+		rawAsset["Struct2"].Add("Double", 1654.62);
+		rawAsset["Struct2"].Add("Array", Type::Array);
+		rawAsset["Struct2"]["Array"].SetType(TypeElement(Type::Byte));
+		rawAsset["Struct2"]["Array"].Add((byte)81);
+		rawAsset["Struct2"]["Array"].Add((byte)255);
+		rawAsset["Struct2"]["Array"].Add((byte)1);
 
-		rawAsset["Model"].Add(TypeElement({ Element::Create("id", 17),
-											Element("position", Type::Struct).Add({ Element::Create("x", 8712.7612f),
-																					Element::Create("y", -1.26f),
-																					Element::Create("z", -6512.0f) }) }));
+		//Test 3
+		rawAsset.Add("Struct3", Type::Struct);
+		rawAsset["Struct3"].Add("Number", 8712);
+		rawAsset["Struct3"].Add("Double", 1654.62);
+		rawAsset["Struct3"].Add("Struct1", Type::Struct);
+		rawAsset["Struct3"]["Struct1"].Add("Hello", std::string("Hello"));
+		rawAsset["Struct3"]["Struct1"].Add("Struct2", Type::Struct);
+		rawAsset["Struct3"]["Struct1"]["Struct2"].Add("Struct3", Type::Struct);
+		rawAsset["Struct3"]["Struct1"]["Struct2"]["Struct3"].Add("Array", Type::Array);
+		rawAsset["Struct3"]["Struct1"]["Struct2"]["Struct3"]["Array"].SetType(TypeElement(Type::Float));
+		rawAsset["Struct3"]["Struct1"]["Struct2"]["Struct3"]["Array"].Add(812.3f);
+		rawAsset["Struct3"]["Struct1"]["Struct2"]["Struct3"]["Array"].Add(82.32f);
 
+		//Test 4
+		rawAsset.Add("Array1", Type::Array);
+		rawAsset["Array1"].SetType(TypeElement(Type::Int32));
+		rawAsset["Array1"].Add(8712);
+		rawAsset["Array1"].Add(120);
+		rawAsset["Array1"].Add(9032);
 
-		//13 bytes, 3 elements
+		//Test 5
+		rawAsset.Add("Array2", Type::Array);
+		rawAsset["Array2"].SetType(TypeElement(Type::String));
+		rawAsset["Array2"].Add(std::string("Hello"));
+		rawAsset["Array2"].Add(std::string("My"));
+		rawAsset["Array2"].Add(std::string("name"));
+		rawAsset["Array2"].Add(std::string("is"));
+		rawAsset["Array2"].Add(std::string("Alan"));
 
-		rawAsset.Add("Data", Type::Struct);
-		rawAsset["Data"].Add("ID", std::string("0184804L"));
-		rawAsset["Data"].Add("House Number", 13);
-		rawAsset["Data"].Add("Post Code", std::string("ATD 2253"));
-		rawAsset["Data"].Add("Test", (byte)17);
+		//Test 6
+		rawAsset.Add("Array3", Type::Array);
+		rawAsset["Array3"].SetType(TypeElement(Type::Struct));
+		rawAsset["Array3"].GetType().Add({
+			Element("Data1", Type::Int32),
+			Element("Data2", Type::Byte),
+			});
+		rawAsset["Array3"].Add(TypeElement({
+			Element::Create("Data1", 1256),
+			Element::Create("Data2", (byte)255),
+			}));
+		rawAsset["Array3"].Add(TypeElement({
+			Element::Create("Data1", 461),
+			Element::Create("Data2", (byte)12),
+			}));
 
-		//36 bytes, 8 elements
+		rawAsset.Add("Array9", Type::Array);
+		rawAsset["Array9"].SetType(TypeElement(Type::Struct));
+		rawAsset["Array9"].GetType().Add({
+			Element("Data1", Type::Int32),
+			Element("Data2", Type::Float),
+			Element("Data3", Type::Struct)
+			});
+		rawAsset["Array9"].GetType()["Data3"].Add({
+			Element("Data1", Type::Int32),
+			Element("Data2", Type::Float),
+			});
 
-		rawAsset.Add("Family members ages", Type::Array);
-		rawAsset["Family members ages"].SetType(Type::Double);
-		rawAsset["Family members ages"].Add(52.02);
-		rawAsset["Family members ages"].Add(55.83);
-		rawAsset["Family members ages"].Add(21.24);
+		rawAsset["Array9"].Add(TypeElement({
+			Element::Create("Data1", 1256),
+			Element::Create("Data2", 712.2313f),
+			Element("Data3", {
+				Element::Create("Data1", -71),
+				Element::Create("Data2", 612.3f),
+			})
+			}));
+		rawAsset["Array9"].Add(TypeElement({
+			Element::Create("Data1", 41),
+			Element::Create("Data2", -7612.4f),
+			Element("Data3", {
+				Element::Create("Data1", 142),
+				Element::Create("Data2", -7612.13f),
+			})
+			}));
 
-		//60 bytes, 9 elements
+		//Test 7
+		rawAsset.Add("Array4", Type::Array);
+		rawAsset["Array4"].SetType(TypeElement(Type::Struct));
+		rawAsset["Array4"].GetType().Add({
+			Element("Data1", Type::Int32),
+			Element("Data2", Type::Byte),
+			Element("Data3", Type::String)
+			});
+		rawAsset["Array4"].Add(TypeElement({
+			Element::Create("Data1", 1256),
+			Element::Create("Data2", (byte)255),
+			Element::Create("Data3", std::string("Hello world"))
+			}));
+		rawAsset["Array4"].Add(TypeElement({
+			Element::Create("Data1", 461),
+			Element::Create("Data2", (byte)12),
+			Element::Create("Data3", std::string("Hello world too!"))
+		}));
 
-		rawAsset.Add("Arr of structs", Type::Array);
-		rawAsset["Arr of structs"].SetType(TypeElement({ Element("A", Type::Int32),
-														 Element("B", Type::Float) }));
-		rawAsset["Arr of structs"].Add(TypeElement({ Element::Create("A", 1521),
-													  Element::Create("B", 823.12f) }));
+		//Test 8
+		rawAsset.Add("Array5", Type::Array);
+		rawAsset["Array5"].SetType(TypeElement(Type::Struct));
+		rawAsset["Array5"].GetType().Add({
+			Element("Name", Type::String),
+			Element("Struct", Type::Struct)
+			});
 
-		rawAsset["Arr of structs"].Add(TypeElement({ Element::Create("A", 87612),
-													  Element::Create("B", 1762.87123f) }));
+		rawAsset["Array5"].GetType()["Struct"].Add({
+			Element("Int", Type::Int32),
+		});
 
-		//76 bytes, 10 elements
+		rawAsset["Array5"].Add(TypeElement({
+			Element::Create("Name", std::string("Alan")),
+			Element("Struct", {
+				Element::Create("Int", 123)
+			})
+		}));
 
-		rawAsset.Add("Previous houses", Type::Array);
-		rawAsset["Previous houses"].SetType(TypeElement({Element("Road", Type::String), 
-														 Element("Number", Type::Int16)}));
+		rawAsset["Array5"].Add(TypeElement({
+			Element::Create("Name", std::string("Bob")),
+			Element("Struct", {
+				Element::Create("Int", 62)
+			})
+		}));
 
-		rawAsset["Previous houses"].Add(TypeElement({ Element::Create("Road", std::string("Triq L-Istwiel")),
-													  Element::Create("Number", (int16_t)13) }));
-
-		rawAsset["Previous houses"].Add(TypeElement({ Element::Create("Road", std::string("Triq Lorenzo Gafa")),
-													  Element::Create("Number", (int16_t)68) }));
-
-		//113 bytes, 17 elements
-
-		rawAsset.Add("Family members", Type::Array);
-		rawAsset["Family members"].SetType(Type::String);
-		rawAsset["Family members"].Add(std::string("Cynthia"));
-		rawAsset["Family members"].Add(std::string("Manuel"));
-		rawAsset["Family members"].Add(std::string("Daniel"));
-
-		//135 bytes, 21 elements
-
-		rawAsset.Add("Array Of Array", Type::Array);
-		rawAsset["Array Of Array"].SetType(Type::Array);
-		rawAsset["Array Of Array"].GetType().SetType(Type::Float);
-
-		rawAsset["Array Of Array"].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["Array Of Array"][0].Add(61.61f);
-		rawAsset["Array Of Array"][0].Add(812.1f);
-		rawAsset["Array Of Array"][0].Add(812.1f);
-
-		rawAsset["Array Of Array"].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["Array Of Array"][1].Add(863.71f);
-		rawAsset["Array Of Array"][1].Add(1.72f);
-
-		rawAsset["Array Of Array"].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["Array Of Array"][2].Add(863.71f);
-		rawAsset["Array Of Array"][2].Add(1.72f);
-
-		rawAsset.Add("3D Array", Type::Array);
-		rawAsset["3D Array"].SetType(Type::Array);
-		rawAsset["3D Array"].GetType().SetType(Type::Array);
-		rawAsset["3D Array"].GetType().GetType().SetType(Type::Float).SetSize(2);
-
+		//Test 9
+		rawAsset.Add("Array6", Type::Array);
+		rawAsset["Array6"].SetType(Type::Array);
+		rawAsset["Array6"].GetType().SetType(Type::Int16);
 		TypeElement arr1 = TypeElement(Type::Array);
-		arr1.SetType(Type::Array).GetType().SetType(Type::Float);
+		arr1.SetType(Type::Int16);
+		arr1.Add((int16_t)123);
+		arr1.Add((int16_t)65000);
+		arr1.Add((int16_t)712);
+		arr1.Add((int16_t)591);
+		arr1.Add((int16_t)54);
+		rawAsset["Array6"].Add(arr1);
 
 		TypeElement arr2 = TypeElement(Type::Array);
-		arr2.SetType(Type::Array).GetType().SetType(Type::Float);
+		arr2.SetType(Type::Int16);
+		arr2.Add((int16_t)8172);
+		arr2.Add((int16_t)4651);
+		rawAsset["Array6"].Add(arr2);
 
-		rawAsset["3D Array"].Add(arr1);
-		rawAsset["3D Array"][0].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["3D Array"][0][0].Add(8123.61f);
-		rawAsset["3D Array"][0][0].Add(-81.2f);
+		//Test 9
+		rawAsset.Add("Array10", Type::Array);
+		rawAsset["Array10"].SetType(Type::Array);
+		rawAsset["Array10"].GetType().SetType(Type::Int32);
+		arr1 = TypeElement(Type::Array);
+		arr1.SetType(Type::Int32);
+		arr1.Add(123);
+		arr1.Add(65000);
+		arr1.Add(712);
+		rawAsset["Array10"].Add(arr1);
 
-		rawAsset["3D Array"][0].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["3D Array"][0][1].Add(91.52f);
-		rawAsset["3D Array"][0][1].Add(-61.2f);
+		arr2 = TypeElement(Type::Array);
+		arr2.SetType(Type::Int32);
+		arr2.Add(8172);
+		arr2.Add(4651);
+		arr2.Add(-12123);
+		rawAsset["Array10"].Add(arr2);
 
-		rawAsset["3D Array"].Add(arr2);
-		rawAsset["3D Array"][1].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["3D Array"][1][0].Add(8123.61f);
-		rawAsset["3D Array"][1][0].Add(-81.2f);
+		//Test 10
+		rawAsset.Add("Array7", Type::Array);
+		rawAsset["Array7"].SetType(Type::Array);
+		rawAsset["Array7"].GetType().SetType(Type::Struct);
+		rawAsset["Array7"].GetType().GetType().Add({
+			Element("Data1", Type::Byte),
+			Element("Data2", Type::Float)
+			});
 
-		rawAsset["3D Array"][1].Add(TypeElement(Type::Array).SetType(Type::Float));
-		rawAsset["3D Array"][1][1].Add(91.52f);
-		rawAsset["3D Array"][1][1].Add(-61.2f);
+		TypeElement strArr1 = TypeElement(Type::Array);
+		strArr1.SetType(Type::Struct);
+		strArr1.GetType().Add({
+			Element("Data1", Type::Byte),
+			Element("Data2", Type::Float)
+			});
+		strArr1.Add(TypeElement({
+			Element::Create("Data1", (byte)71),
+			Element::Create("Data2", 712.62f)
+			}));
+		strArr1.Add(TypeElement({
+			Element::Create("Data1", (byte)12),
+			Element::Create("Data2", 876123.658123f)
+			}));
+		rawAsset["Array7"].Add(strArr1);
+
+		TypeElement strArr2 = TypeElement(Type::Array);
+		strArr2.SetType(Type::Struct);
+		strArr2.GetType().Add({
+			Element("Data1", Type::Byte),
+			Element("Data2", Type::Float)
+			});
+		strArr2.Add(TypeElement({
+			Element::Create("Data1", (byte)255),
+			Element::Create("Data2", 712.62f)
+			}));
+		strArr2.Add(TypeElement({
+			Element::Create("Data1", (byte)91),
+			Element::Create("Data2", -812.612f)
+			}));
+		rawAsset["Array7"].Add(strArr2);
+
+		//Test 11
+		/*rawAsset.Add("Array8", Type::Array);
+		rawAsset["Array8"].SetType(Type::Array);
+		rawAsset["Array8"].GetType().SetSize(10).SetType(Type::Array);
+		rawAsset["Array8"].GetType().GetType().SetSize(5).SetType(Type::Struct);
+		rawAsset["Array8"].GetType().GetType().GetType().Add({
+			Element("Data1", Type::Int32),
+			Element("Data2", Type::Float)
+			});*/
+
+		//Continue test
 
 		Asset asset(rawAsset);
 
-		AssetSerializer::SerializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset", asset);
+		AssetSerializer::SerializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset", asset);//*/
 
 		//159 bytes, 25 elements
 
@@ -869,7 +956,7 @@ namespace Proton
 		PT_CORE_TRACE("Writing Image {0}", imagePath.string());
 		File* file = new File(imagePath.string() + std::string(".rawAsset"), scratch.GetPixelsSize() + 18 + imagePath.string().length());
 
-		file->Write((uint32_t)AssetType::Image);
+		//file->Write((uint32_t)AssetType::Image);
 
 		file->Write(width);
 
