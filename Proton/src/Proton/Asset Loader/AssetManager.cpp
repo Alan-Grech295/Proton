@@ -28,8 +28,10 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
-		ModelCreator::ParseModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
+		//ModelCreator::ParseModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
 		
+		ModelCreator::DeserializeModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
+
 		Asset& desAsset = AssetSerializer::DeserializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset");
 
 		std::string desName = desAsset["Name"];

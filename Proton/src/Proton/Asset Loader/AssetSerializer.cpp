@@ -322,7 +322,12 @@ namespace Proton
 		assert("Element is not a struct" && m_Type == Type::Struct);
 
 		Data::Struct& structData = m_Data->as<Data::Struct>();
-		structData.Add(Element(name, type));
+
+		uint32_t nameSize = strlen(name) + 1;
+		char* nameCopy = new char[nameSize];
+		memcpy(nameCopy, name, nameSize);
+
+		structData.Add(Element(nameCopy, type));
 		return structData.m_Elements.back();
 	}
 

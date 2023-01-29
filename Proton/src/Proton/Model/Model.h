@@ -224,15 +224,11 @@ namespace Proton
 	class ModelCreator
 	{
 	public:
-		//static Entity CreateModelEntity(const std::string& path, Scene* activeScene);
-		//static Entity CreatePrefabEntity(const std::string& path, Scene* activeScene);
-		//static Mesh* ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiMaterial* const* pMaterials);
 		static void ParseModel(const std::string& path);
+		static void DeserializeModel(const std::string& path);
+	private:
 		static TypeElement ParseMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const std::vector<MaterialData>& materials);
 		static void ParseMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat);
-		static void ParseNode(aiNode* node, RawAsset& asset);
-	private:
-		//static Entity CreateChild(const Node& node, Entity parent, Entity root, Scene* activeScene);
-		//static Entity CreatePrefabChild(const PrefabNode& node, Entity parent, Entity root, Scene* activeScene);
+		static void ParseNode(aiNode* node, RawAsset& asset, uint32_t& index);
 	};
 }

@@ -543,8 +543,21 @@ namespace Proton
 
 		for (int i = 0; i < pScene->mNumMeshes; i++)
 		{
-			rawAsset["Meshes"].Add(std::move(ParseMesh(model.m_Meshes.data() + i, rawAsset, basePath, path, *pScene->mMeshes[i], pScene, model.m_Materials)));
+			TypeElement meshElement = std::move(ParseMesh(model.m_Meshes.data() + i, rawAsset, basePath, path, *pScene->mMeshes[i], pScene, model.m_Materials));
+			rawAsset["Meshes"].Add(meshElement);
 		}
+
+		rawAsset.Add("Nodes", Type::Struct);
+
+		uint32_t index = 0;
+		ParseNode(pScene->mRootNode, rawAsset, index);
+
+		AssetSerializer::SerializeAsset(path + ".asset", Asset(rawAsset));
+	}
+
+	void ModelCreator::DeserializeModel(const std::string& path)
+	{
+		Asset modelAsset = AssetSerializer::DeserializeAsset(path + ".asset");
 	}
 
 	void ModelCreator::ParseMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat)
@@ -832,5 +845,53 @@ namespace Proton
 		technique.m_Steps.push_back(step);
 
 		matData->m_Techniques.push_back(technique);
+	}
+
+	void ModelCreator::ParseNode(aiNode* node, RawAsset& asset, uint32_t& index)
+	{
+		std::string nodeName = node->mName.C_Str();
+		asset["Nodes"].Add(nodeName.c_str(), Type::Struct);
+		XMMATRIX transformation = DirectX::XMMatrixTranspose(
+			DirectX::XMLoadFloat4x4(
+				reinterpret_cast<const DirectX::XMFLOAT4X4*>(&node->mTransformation)
+			)
+		);
+
+		asset["Nodes"][nodeName].Add({ 
+			Element::Create("Index", index),
+			Element("TransformationMat", Type::Array)
+		});
+
+		Element& transformElement = asset["Nodes"][nodeName]["TransformationMat"].SetSize(16).SetType(TypeElement(Type::Float));
+		float* nextMatFloat = (float*)&transformation;
+		for (int i = 0; i < 16; i++)
+		{
+			transformElement.Add(*nextMatFloat);
+			nextMatFloat++;
+		}
+
+		if (node->mNumMeshes > 0)
+		{
+			Element& meshesElement = asset["Nodes"][nodeName].Add("Meshes", Type::Array);
+			meshesElement.SetSize(node->mNumMeshes).SetType(Type::UInt32);
+
+			for (int i = 0; i < node->mNumMeshes; i++)
+			{
+				meshesElement.Add((uint32_t)node->mMeshes[i]);
+			}
+		}
+
+		if (node->mNumChildren > 0)
+		{
+			asset["Nodes"][nodeName].Add("ChildNodes", Type::Array);
+			asset["Nodes"][nodeName]["ChildNodes"].SetSize(node->mNumChildren).SetType(Type::UInt32);
+
+			for (int i = 0; i < node->mNumChildren; i++)
+			{
+				index++;
+				asset["Nodes"][nodeName]["ChildNodes"].Add(TypeElement::Create(index));
+				ParseNode(node->mChildren[i], asset, index);
+			}
+		}
 	}
 }
