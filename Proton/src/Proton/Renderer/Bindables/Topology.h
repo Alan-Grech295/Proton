@@ -22,6 +22,8 @@ namespace Proton
 
 		virtual void Bind() override;
 
+		TopologyType GetTopology() { return m_Topology; }
+
 		std::string GetUID() const noexcept { return GenerateUID(m_Topology); }
 
 		static std::string GenerateUID(TopologyType type) 

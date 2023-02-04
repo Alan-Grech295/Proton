@@ -84,6 +84,8 @@ namespace Proton
 				return m_SizeBytes;
 			}
 
+			bool Has(const std::string& name) const;
+
 		private:
 			//The data in bytes when stored in an array element
 			uint32_t CalculateSizeInArray();

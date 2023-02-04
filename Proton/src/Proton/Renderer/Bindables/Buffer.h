@@ -216,7 +216,7 @@ namespace Proton
 			return Vertex{ m_Data + index * m_Layout.stride, m_Layout, &m_Changed };
 		}
 
-		void SetRawData(char* rawData, uint32_t size)
+		void SetRawData(void* rawData, uint32_t size)
 		{
 			if (m_MaxSize != size)
 			{

@@ -655,13 +655,28 @@ namespace Proton
 		}		
 	}
 
-	/*ElementRef Asset::operator[](const std::string& name)
+	bool ElementRef::Has(const std::string& name)
 	{
-		Meta::Element& metaElement = m_MetaFile[name];
-		ElementRef& ref = ElementRef(m_Data + metaElement.m_DataOffset, metaElement.m_Type, this, metaElement);
-		//ref.CalcSize();
-		return ref;
-	}*/
+		return m_MetaElement.Has(name);
+	}
+
+	uint32_t ElementRef::Size()
+	{
+		assert("Element must be a struct or array" && (m_Type == Type::Struct || m_Type == Type::Array));
+		if (m_Type == Type::Struct)
+		{
+			return m_MetaElement.m_ExtraData->as<Meta::ExtraData::Struct>().m_Elements.size();
+		}
+		else
+		{
+			return m_MetaElement.m_ExtraData->as<Meta::ExtraData::Array>().m_Size;
+		}
+	}
+
+	StructRef ElementRef::AsStruct()
+	{
+		return StructRef(*this);
+	}
 
 	ElementRef Asset::operator[](const std::string& name)
 	{
@@ -671,7 +686,7 @@ namespace Proton
 		return ref;
 	}
 
-	ElementRef& ElementRef::operator*()
+	ElementRef ElementRef::operator*()
 	{
 		assert("Type is not a pointer" && m_Type == Type::Pointer);
 		if ((*(uint32_t*)m_Data) == 0)
@@ -743,5 +758,62 @@ namespace Proton
 		m_Elements.push_back(Element(it->first.c_str(), type));
 		m_NextPtr++;
 		return m_NextPtr - 1;
+	}
+
+	ElementRef::StructIterator StructRef::begin()
+	{
+		return StructIterator(m_MetaElement.m_ExtraData->as<Meta::ExtraData::Struct>().m_Elements.begin(), m_Asset.m_Data, m_Asset);
+	}
+
+	ElementRef::StructIterator StructRef::end()
+	{
+		return StructIterator(m_MetaElement.m_ExtraData->as<Meta::ExtraData::Struct>().m_Elements.end(), m_Asset.m_Data, m_Asset);
+	}
+
+	ElementRef& ElementRef::StructIterator::operator*() const
+	{
+		Meta::Element& element = *m_ElementIter;
+		return ElementRef(m_BaseData + element.m_DataOffset, element.m_Type, m_Asset, element);
+	}
+
+	ElementRef* ElementRef::StructIterator::operator->()
+	{
+		Meta::Element& element = *m_ElementIter;
+		return new ElementRef(m_BaseData + element.m_DataOffset, element.m_Type, m_Asset, element);
+	}
+
+	ElementRef::StructIterator& ElementRef::StructIterator::operator++()
+	{
+		++m_ElementIter;
+		return *this;
+	}
+
+	ElementRef::StructIterator ElementRef::StructIterator::operator++(int)
+	{
+		StructIterator temp = *this;
+		++(*this);
+		return temp;
+	}
+
+	ElementRef::StructIterator& ElementRef::StructIterator::operator--()
+	{
+		--m_ElementIter;
+		return *this;
+	}
+
+	ElementRef::StructIterator ElementRef::StructIterator::operator--(int)
+	{
+		StructIterator temp = *this;
+		--(*this);
+		return temp;
+	}
+
+	bool ElementRef::StructIterator::operator==(const StructIterator& other) const
+	{
+		return m_ElementIter == other.m_ElementIter;
+	}
+	bool ElementRef::StructIterator::operator!=(const StructIterator& other) const
+	{
+		return m_ElementIter != other.m_ElementIter;
 	}
 }

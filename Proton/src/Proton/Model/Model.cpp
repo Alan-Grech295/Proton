@@ -18,6 +18,7 @@
 
 namespace Proton
 {
+	//std::string ModelCreator::MAT_TAG = "Material_";
 	/*Entity ModelCreator::CreateModelEntity(const std::string& path, Scene* activeScene)
 	{
 		namespace dx = DirectX;
@@ -167,7 +168,7 @@ namespace Proton
 		return childEntity;
 	}
 
-	Mesh* ModelCreator::ParseMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiMaterial* const* pMaterials)
+	Mesh* ModelCreator::SerializeMesh(const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiMaterial* const* pMaterials)
 	{
 		PT_PROFILE_FUNCTION();
 
@@ -293,7 +294,7 @@ namespace Proton
 		pMesh->m_VertBuffer = VertexBuffer::Create(meshTag, layout, vertShader.get());
 
 		{
-			PT_PROFILE_SCOPE("Vertex Loading - Model::ParseMesh");
+			PT_PROFILE_SCOPE("Vertex Loading - Model::SerializeMesh");
 			for (unsigned int i = 0; i < mesh.mNumVertices; i++)
 			{
 				pMesh->m_VertBuffer->EmplaceBack(
@@ -309,7 +310,7 @@ namespace Proton
 		pMesh->m_IndexBuffer = IndexBuffer::Create(meshTag);
 		//indices.reserve((UINT)mesh.mNumFaces * 3);
 		{
-			PT_PROFILE_SCOPE("Index Loading - Model::ParseMesh");
+			PT_PROFILE_SCOPE("Index Loading - Model::SerializeMesh");
 			for (unsigned int i = 0; i < mesh.mNumFaces; i++)
 			{
 				const auto& face = mesh.mFaces[i];
@@ -358,7 +359,7 @@ namespace Proton
 		return pMesh;
 	}*/
 
-	TypeElement ModelCreator::ParseMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const std::vector<MaterialData>& materials)
+	TypeElement ModelCreator::SerializeMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const MaterialData* materials)
 	{
 		using ResType = ConstructableBindable::ResourceType;
 
@@ -371,13 +372,18 @@ namespace Proton
 		auto meshTag = modelPath + "%" + mesh.mName.C_Str();
 
 		meshData->Create(meshTag, mesh.mName.C_Str(), modelPath);
-		meshData->m_MatIndex = mesh.mMaterialIndex;
+		meshData->m_Material = materials + mesh.mMaterialIndex;
 
 		TypeElement meshElement = TypeElement({
-			Element::Create("MaterialIndex", meshData->m_MatIndex),
+			Element::Create("MaterialIndex", const_cast<uint32_t&>(mesh.mMaterialIndex)),
+			Element::Create("Topology", (uint32_t)static_cast<Topology*>(meshData->m_Topology->GetRef().get())->GetTopology()),
+			Element("Name", Type::Pointer),
 			Element("Vertices", Type::Pointer),
 			Element("Indices", Type::Pointer),
 			});
+
+		meshElement["Name"].SetPointer(Type::String, asset);
+		meshElement["Name"]->SetData(meshData->m_Name);
 
 		BufferLayout layout = {
 			{"POSITION", ShaderDataType::Float3},
@@ -422,7 +428,7 @@ namespace Proton
 		}));
 
 		{
-			PT_PROFILE_SCOPE("Vertex Loading - Model::ParseMesh");
+			PT_PROFILE_SCOPE("Vertex Loading - Model::SerializeMesh");
 			for (unsigned int i = 0; i < mesh.mNumVertices; i++)
 			{
 				dx::XMFLOAT3& position	= *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]);
@@ -474,17 +480,17 @@ namespace Proton
 		meshElement["Indices"].SetPointer(Type::Array, asset);
 		TypeElement& indArray = meshElement["Indices"]->SetSize(mesh.mNumFaces * 3).SetType(Type::UInt32);
 
-		IndexBuffer* p_indexBuffer = (IndexBuffer*)meshData->m_IndexBuffer.get()->GetRef().get();
+		IndexBuffer* indexBuffer = (IndexBuffer*)meshData->m_IndexBuffer.get()->GetRef().get();
 
 		{
-			PT_PROFILE_SCOPE("Index Loading - Model::ParseMesh");
+			PT_PROFILE_SCOPE("Index Loading - Model::SerializeMesh");
 			for (unsigned int i = 0; i < mesh.mNumFaces; i++)
 			{
 				const auto& face = mesh.mFaces[i];
 				assert(face.mNumIndices == 3);
-				p_indexBuffer->EmplaceBack(face.mIndices[0]);
-				p_indexBuffer->EmplaceBack(face.mIndices[1]);
-				p_indexBuffer->EmplaceBack(face.mIndices[2]);
+				indexBuffer->EmplaceBack(face.mIndices[0]);
+				indexBuffer->EmplaceBack(face.mIndices[1]);
+				indexBuffer->EmplaceBack(face.mIndices[2]);
 
 				indArray.Add({
 					TypeElement::Create(face.mIndices[0]),
@@ -494,10 +500,12 @@ namespace Proton
 			}
 		}
 
+
+
 		return meshElement;
 	}
 
-	void ModelCreator::ParseModel(const std::string& path)
+	void ModelCreator::SerializeModel(const std::string& path)
 	{
 		Assimp::Importer imp;
 		const auto pScene = imp.ReadFile(path.c_str(),
@@ -529,38 +537,39 @@ namespace Proton
 
 		RawAsset rawAsset = RawAsset();
 
+		rawAsset.Add("Materials", Type::Struct);
+
 		for (int i = 0; i < pScene->mNumMaterials; i++)
 		{
-			ParseMaterial(model.m_Materials.data() + i, rawAsset, basePath, i, *pScene->mMaterials[i]);
+			SerializeMaterial(model.m_Materials.data() + i, rawAsset, basePath, i, *pScene->mMaterials[i]);
 		}
 
 		rawAsset.Add("Meshes", Type::Array);
 		rawAsset["Meshes"].SetSize(pScene->mNumMeshes).SetType(TypeElement({
 			Element("MaterialIndex", Type::UInt32),
+			Element("Topology", Type::UInt32),
+			Element("Name", Type::Pointer),
 			Element("Vertices", Type::Pointer),
 			Element("Indices", Type::Pointer),
 		}));
 
 		for (int i = 0; i < pScene->mNumMeshes; i++)
 		{
-			TypeElement meshElement = std::move(ParseMesh(model.m_Meshes.data() + i, rawAsset, basePath, path, *pScene->mMeshes[i], pScene, model.m_Materials));
+			TypeElement meshElement = std::move(SerializeMesh(model.m_Meshes.data() + i, rawAsset, basePath, path, *pScene->mMeshes[i], pScene, model.m_Materials.data()));
 			rawAsset["Meshes"].Add(meshElement);
 		}
 
+		model.m_Nodes.resize(CountNodes(pScene->mRootNode));
 		rawAsset.Add("Nodes", Type::Struct);
 
 		uint32_t index = 0;
-		ParseNode(pScene->mRootNode, rawAsset, index);
+		NodeData* nodeData = model.m_Nodes.data();
+		SerializeNode(nodeData, pScene->mRootNode, rawAsset, model.m_Meshes.data(), index);
 
 		AssetSerializer::SerializeAsset(path + ".asset", Asset(rawAsset));
 	}
 
-	void ModelCreator::DeserializeModel(const std::string& path)
-	{
-		Asset modelAsset = AssetSerializer::DeserializeAsset(path + ".asset");
-	}
-
-	void ModelCreator::ParseMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat)
+	void ModelCreator::SerializeMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat)
 	{
 		using ResType = ConstructableBindable::ResourceType;
 
@@ -570,12 +579,13 @@ namespace Proton
 
 		using namespace std::string_literals;
 
-		std::string matString = "Material_" + std::to_string(index);
-		asset.Add(matString, Type::Struct);
-		asset[matString].Add("Opaque", Type::Array);
+		std::string matString = std::to_string(index);
+		asset["Materials"].Add(matString.c_str(), Type::Struct);
+		asset["Materials"][matString].Add("Techniques", Type::Struct);
+		asset["Materials"][matString]["Techniques"].Add("Opaque", Type::Array);
 
-		asset[matString]["Opaque"].SetType(Type::Struct);
-		asset[matString]["Opaque"].GetType().Add({
+		asset["Materials"][matString]["Techniques"]["Opaque"].SetType(Type::Struct);
+		asset["Materials"][matString]["Techniques"]["Opaque"].GetType().Add({
 			Element("StepID", Type::UInt16),
 			Element("ResType", Type::Int32),
 			Element("Shared", Type::Bool),
@@ -602,7 +612,7 @@ namespace Proton
 			step.AddBindable(texture);
 
 			//Asset Data
-			Element& el = asset[matString]["Opaque"].Add(TypeElement({
+			Element& el = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 				Element::Create("StepID", (uint16_t)step.m_ID),
 				Element::Create("ResType", (int)ResType::Texture2D),
 				Element::Create("Shared", true),
@@ -630,7 +640,7 @@ namespace Proton
 			hasAlphaGloss = dynamic_cast<Texture2D*>(specular.get()->GetRef().get())->HasAlpha();
 
 			//Asset Data
-			Element& el = asset[matString]["Opaque"].Add(TypeElement({
+			Element& el = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 				Element::Create("StepID", (uint16_t)step.m_ID),
 				Element::Create("ResType", (int)ResType::Texture2D),
 				Element::Create("Shared", true),
@@ -662,7 +672,7 @@ namespace Proton
 			//step.AddBindable(Texture2D::Create(basePath + texFileName.C_Str(), 2));
 
 			//Asset Data
-			Element& el = asset[matString]["Opaque"].Add(TypeElement({
+			Element& el = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 				Element::Create("StepID", (uint16_t)step.m_ID),
 				Element::Create("ResType", (int)ResType::Texture2D),
 				Element::Create("Shared", true),
@@ -684,7 +694,7 @@ namespace Proton
 			//step.AddBindable(Sampler::Create(meshTag));
 
 			//Asset Data
-			Element& el = asset[matString]["Opaque"].Add(TypeElement({
+			Element& el = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 				Element::Create("StepID", (uint16_t)step.m_ID),
 				Element::Create("ResType", (int)ResType::Sampler),
 				Element::Create("Shared", true),
@@ -695,7 +705,7 @@ namespace Proton
 			el["Data"]->SetData(std::string(basePath + "mat_" + std::to_string(index)));
 		}
 
-		asset[matString].Add({
+		asset["Materials"][matString].Add({
 			Element::Create("HasDiffuse", matData->hasDiffuseMap),
 			Element::Create("HasSpecular", matData->hasSpecular),
 			Element::Create("HasNormal", matData->hasNormalMap)
@@ -742,7 +752,7 @@ namespace Proton
 		step.AddBindable(pixShader);
 
 		//Asset Data
-		Element& el = asset[matString]["Opaque"].Add(TypeElement({
+		Element& el = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 			Element::Create("StepID", (uint16_t)step.m_ID),
 			Element::Create("ResType", (int)ResType::PixelShader),
 			Element::Create("Shared", true),
@@ -753,7 +763,7 @@ namespace Proton
 		el["Data"]->SetData(pixShaderPath);
 
 		//Asset Data
-		el = asset[matString]["Opaque"].Add(TypeElement({
+		el = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 			Element::Create("StepID", (uint16_t)step.m_ID),
 			Element::Create("ResType", (int)ResType::VertexShader),
 			Element::Create("Shared", true),
@@ -782,7 +792,7 @@ namespace Proton
 			step.AddBindable(pcb);
 			
 			//Asset Data
-			el = asset[matString]["Opaque"].Add(TypeElement({
+			el = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 				Element::Create("StepID", (uint16_t)step.m_ID),
 				Element::Create("ResType", (int)ResType::PixelConstantBuffer),
 				Element::Create("Shared", false),
@@ -826,7 +836,7 @@ namespace Proton
 			step.AddBindable(pcb);
 
 			//Asset Data
-			el = asset[matString]["Opaque"].Add(TypeElement({
+			el = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 				Element::Create("StepID", (uint16_t)step.m_ID),
 				Element::Create("ResType", (int)ResType::PixelConstantBuffer),
 				Element::Create("Shared", false),
@@ -847,50 +857,390 @@ namespace Proton
 		matData->m_Techniques.push_back(technique);
 	}
 
-	void ModelCreator::ParseNode(aiNode* node, RawAsset& asset, uint32_t& index)
+	void ModelCreator::SerializeNode(NodeData*& nodeData, aiNode* aiNode, RawAsset& asset, MeshData* meshes, uint32_t& index)
 	{
-		std::string nodeName = node->mName.C_Str();
-		asset["Nodes"].Add(nodeName.c_str(), Type::Struct);
-		XMMATRIX transformation = DirectX::XMMatrixTranspose(
+		assert("Node Data at position already initialized" && (nodeData->m_Name == ""));
+		nodeData->m_Name = aiNode->mName.C_Str();
+		asset["Nodes"].Add(nodeData->m_Name.c_str(), Type::Struct);
+		nodeData->m_Transformation = DirectX::XMMatrixTranspose(
 			DirectX::XMLoadFloat4x4(
-				reinterpret_cast<const DirectX::XMFLOAT4X4*>(&node->mTransformation)
+				reinterpret_cast<const DirectX::XMFLOAT4X4*>(&aiNode->mTransformation)
 			)
 		);
 
-		asset["Nodes"][nodeName].Add({ 
+		asset["Nodes"][nodeData->m_Name].Add({ 
 			Element::Create("Index", index),
 			Element("TransformationMat", Type::Array)
 		});
 
-		Element& transformElement = asset["Nodes"][nodeName]["TransformationMat"].SetSize(16).SetType(TypeElement(Type::Float));
-		float* nextMatFloat = (float*)&transformation;
+		Element& transformElement = asset["Nodes"][nodeData->m_Name]["TransformationMat"].SetSize(16).SetType(TypeElement(Type::Float));
+		float* nextMatFloat = (float*)&nodeData->m_Transformation;
 		for (int i = 0; i < 16; i++)
 		{
 			transformElement.Add(*nextMatFloat);
 			nextMatFloat++;
 		}
 
-		if (node->mNumMeshes > 0)
+		if (aiNode->mNumMeshes > 0)
 		{
-			Element& meshesElement = asset["Nodes"][nodeName].Add("Meshes", Type::Array);
-			meshesElement.SetSize(node->mNumMeshes).SetType(Type::UInt32);
+			Element& meshesElement = asset["Nodes"][nodeData->m_Name].Add("Meshes", Type::Array);
+			meshesElement.SetSize(aiNode->mNumMeshes).SetType(Type::UInt32);
 
-			for (int i = 0; i < node->mNumMeshes; i++)
+			nodeData->m_Meshes.reserve(aiNode->mNumMeshes);
+			memcpy(nodeData->m_Meshes.data(), aiNode->mMeshes, aiNode->mNumMeshes * sizeof(unsigned int));
+
+			for (int i = 0; i < aiNode->mNumMeshes; i++)
 			{
-				meshesElement.Add((uint32_t)node->mMeshes[i]);
+				nodeData->m_Meshes.push_back(meshes + aiNode->mMeshes[i]);
+				meshesElement.Add((uint32_t)aiNode->mMeshes[i]);
 			}
 		}
 
-		if (node->mNumChildren > 0)
+		if (aiNode->mNumChildren > 0)
 		{
-			asset["Nodes"][nodeName].Add("ChildNodes", Type::Array);
-			asset["Nodes"][nodeName]["ChildNodes"].SetSize(node->mNumChildren).SetType(Type::UInt32);
+			asset["Nodes"][nodeData->m_Name].Add("ChildNodes", Type::Array);
+			asset["Nodes"][nodeData->m_Name]["ChildNodes"].SetSize(aiNode->mNumChildren).SetType(Type::UInt32);
 
-			for (int i = 0; i < node->mNumChildren; i++)
+			nodeData->m_Children.reserve(aiNode->mNumChildren);
+
+			NodeData* curNode = nodeData;
+
+			for (int i = 0; i < aiNode->mNumChildren; i++)
 			{
 				index++;
-				asset["Nodes"][nodeName]["ChildNodes"].Add(TypeElement::Create(index));
-				ParseNode(node->mChildren[i], asset, index);
+				nodeData++;
+
+				curNode->m_Children.push_back(nodeData);
+
+				asset["Nodes"][curNode->m_Name]["ChildNodes"].Add(TypeElement::Create(index));
+				SerializeNode(nodeData, aiNode->mChildren[i], asset, meshes, index);
+			}
+		}
+	}
+	
+	uint32_t ModelCreator::CountNodes(aiNode* root)
+	{
+		if (root->mNumChildren == 0)
+			return 1;
+
+		uint32_t sum = 1;
+		for (int i = 0; i < root->mNumChildren; i++)
+		{
+			sum += CountNodes(root->mChildren[i]);
+		}
+
+		return sum;
+	}
+
+	void ModelCreator::DeserializeModel(const std::string& path)
+	{
+		Asset modelAsset = AssetSerializer::DeserializeAsset(path + ".asset");
+
+		ModelData modelData = ModelData();
+		modelData.m_Materials.resize(modelAsset["Materials"].Size());
+		modelData.m_Meshes.resize(modelAsset["Meshes"].Size());
+		modelData.m_Nodes.resize(modelAsset["Nodes"].Size());
+
+		DeserializeMaterials(modelAsset, modelData.m_Materials.data());
+
+		DeserializeMeshes(modelAsset, path, modelData.m_Meshes.data(), modelData.m_Materials.data());
+
+		DeserializeNodes(modelAsset, modelData.m_Nodes.data(), modelData.m_Meshes.data());
+	}
+
+	void ModelCreator::DeserializeMeshes(Asset& asset, const std::string& modelPath, MeshData* meshData, const MaterialData* materials)
+	{
+		using ResType = ConstructableBindable::ResourceType;
+		for (int i = 0; i < asset["Meshes"].Size(); i++, meshData++)
+		{
+			ElementRef& mesh = asset["Meshes"][i];
+			std::string meshTag = modelPath + "%" + (std::string)*mesh["Name"];
+			meshData->Create(meshTag, *mesh["Name"], modelPath);
+			meshData->m_Material = materials + (uint32_t)mesh["MaterialIndex"];
+			//Set topology?
+			//meshData->m_Topology
+
+			ElementRef vertices = *(mesh["Vertices"]);
+			ElementRef indices = *(mesh["Indices"]);
+
+			BufferLayout layout = {
+				{"POSITION", ShaderDataType::Float3},
+				{"NORMAL", ShaderDataType::Float3},
+				{"TANGENT", ShaderDataType::Float3},
+				{"BITANGENT", ShaderDataType::Float3},
+				{"TEXCOORD", ShaderDataType::Float2}
+			};
+
+			//Vertices
+			meshData->m_VertBuffer = CreateRef<SharedBindable>(ResType::VertexBuffer, meshTag);
+			VertexShader* vertShader = meshData->m_Material->m_Techniques[0].m_Steps[0].GetResource<VertexShader>(ResType::VertexShader);
+			meshData->m_VertBuffer->Initialize<VertexBuffer>(layout, vertShader, vertices.Size());
+
+			VertexBuffer* vertBuffer = (VertexBuffer*)meshData->m_VertBuffer.get()->GetRef().get();
+
+			vertBuffer->SetRawData(vertices.m_Data, vertices.m_Size);
+
+			//Indices
+			meshData->m_IndexBuffer = CreateRef<SharedBindable>(ResType::IndexBuffer, meshTag);
+			meshData->m_IndexBuffer->Initialize<IndexBuffer>(indices.Size());
+
+			IndexBuffer* indexBuffer = (IndexBuffer*)meshData->m_IndexBuffer.get()->GetRef().get();
+
+			indexBuffer->SetRawData((uint32_t*)indices.m_Data, indices.Size());
+		}
+	}
+
+	void ModelCreator::DeserializeMaterials(Asset& asset, MaterialData* materialData)
+	{
+		using ResType = ConstructableBindable::ResourceType;
+		uint32_t size = asset["Materials"].Size();
+		for (ElementRef mat : asset["Materials"].AsStruct())
+		{
+			materialData->hasDiffuseMap = mat["HasDiffuse"];
+			materialData->hasSpecular = mat["HasSpecular"];
+			materialData->hasNormalMap = mat["HasNormal"];
+
+			materialData->m_Techniques.reserve(mat["Techniques"].Size());
+
+			for (ElementRef technique : mat["Techniques"].AsStruct())
+			{
+				TechniqueData techData = TechniqueData(technique.m_MetaElement.m_Name);
+				StepData curStep = StepData((uint16_t)technique[0]["StepID"]);
+
+				for (int i = 0; i < technique.Size(); i++)
+				{
+					ElementRef& bindable = technique[i];
+					uint16_t stepID = bindable["StepID"];
+					if (stepID != curStep.m_ID) 
+					{
+						techData.m_Steps.push_back(curStep);
+						curStep = StepData(stepID);
+					}
+
+					ResType resType = (ResType)((int)bindable["ResType"]);
+					bool shared = bindable["Shared"];
+					ElementRef data = *bindable["Data"];
+
+					switch(resType)
+					{
+					case ResType::VertexBuffer:
+						assert("Vertex buffer not handled" && false);
+						/*if (shared)
+						{
+							Ref<SharedBindable> vertBuf = CreateRef<SharedBindable>(ResType::VertexBuffer, (char*)data["Path"]);
+							vertBuf->Initialize<VertexBuffer>();
+							curStep.AddBindable(vertBuf);
+						}
+						else
+						{
+							Ref<UniqueBindable> vertBuf = CreateRef<UniqueBindable>(ResType::VertexBuffer);
+							vertBuf->Initialize<VertexBuffer>();
+							curStep.AddBindable(vertBuf);
+						}*/
+						break;
+					case ResType::IndexBuffer:
+						assert("Index buffer not handled" && false);
+						/*if (shared)
+						{
+							Ref<SharedBindable> indexBuf = CreateRef<SharedBindable>(ResType::IndexBuffer, (char*)data["Path"]);
+							indexBuf->Initialize<IndexBuffer>();
+							curStep.AddBindable(indexBuf);
+						}
+						else
+						{
+							Ref<UniqueBindable> indexBuf = CreateRef<UniqueBindable>(ResType::IndexBuffer);
+							indexBuf->Initialize<IndexBuffer>();
+							curStep.AddBindable(indexBuf);
+						}*/
+						break;
+					case ResType::VertexConstantBuffer:
+						assert("Vertex constant buffer not handled" && false);
+						/*if (shared)
+						{
+							Ref<SharedBindable> vertConstBuf = CreateRef<SharedBindable>(ResType::VertexConstantBuffer, (char*)data["Path"]);
+							vertConstBuf->Initialize<VertexConstantBuffer>((int)data["Slot"]);
+							curStep.AddBindable(vertConstBuf);
+						}
+						else
+						{
+							Ref<UniqueBindable> vertConstBuf = CreateRef<UniqueBindable>(ResType::VertexConstantBuffer);
+							vertConstBuf->Initialize<VertexConstantBuffer>();
+							curStep.AddBindable(vertConstBuf);
+						}*/
+						break;
+					case ResType::PixelConstantBuffer:
+						if (shared)
+						{
+							assert("Shared Pixel Constant Buffers not handled");
+						}
+						else
+						{
+							Ref<UniqueBindable> pixConstBuf = CreateRef<UniqueBindable>(ResType::PixelConstantBuffer);
+							void* dataPtr;
+							uint32_t dataSize;
+
+							if (data.Has("SpecIntensity"))
+							{
+								struct PSMaterialConstant
+								{
+									float specularIntensity;
+									float specularPower;
+									BOOL hasAlphaGloss;
+									float padding;
+								};
+
+								dataSize = sizeof(PSMaterialConstant);
+
+								dataPtr = new PSMaterialConstant();
+								PSMaterialConstant& pmc = *static_cast<PSMaterialConstant*>(dataPtr);
+
+								pmc.specularIntensity = data["SpecIntensity"];
+								pmc.specularPower = data["SpecPower"];
+								pmc.hasAlphaGloss = data["HasAlphaGloss"];
+							}
+							else
+							{
+								namespace dx = DirectX;
+
+								struct PSMaterialConstantNoTex
+								{
+									dx::XMFLOAT4 materialColor;
+									dx::XMFLOAT4 specularColor;
+									float specularPower;
+									float padding[3];
+								};
+
+								dataSize = sizeof(PSMaterialConstantNoTex);
+
+								dataPtr = new PSMaterialConstantNoTex();
+								PSMaterialConstantNoTex& pmc = *static_cast<PSMaterialConstantNoTex*>(dataPtr);
+
+								pmc.materialColor = data["MaterialCol"];
+								pmc.specularColor = data["SpecCol"];
+								pmc.specularPower = data["SpecPow"];
+							}
+							
+							pixConstBuf->Initialize<PixelConstantBuffer>((int)data["Slot"], dataSize, dataPtr);
+							curStep.AddBindable(pixConstBuf);
+							delete dataPtr;
+						}
+						break;
+					case ResType::Sampler:
+						if (shared)
+						{
+							Ref<SharedBindable> sampler = CreateRef<SharedBindable>(ResType::Sampler, (char*)data);
+							sampler->Initialize<Sampler>();
+							curStep.AddBindable(sampler);
+						}
+						else
+						{
+							Ref<UniqueBindable> sampler = CreateRef<UniqueBindable>(ResType::Sampler);
+							sampler->Initialize<Sampler>();
+							curStep.AddBindable(sampler);
+						}
+						break;
+					case ResType::PixelShader:
+						if (shared)
+						{
+							Ref<SharedBindable> pixShader = CreateRef<SharedBindable>(ResType::PixelShader, (char*)data);
+							pixShader->Initialize<PixelShader>();
+							curStep.AddBindable(pixShader);
+						}
+						else
+						{
+							Ref<UniqueBindable> pixShader = CreateRef<UniqueBindable>(ResType::PixelShader);
+							pixShader->Initialize<PixelShader>((char*)data);
+							curStep.AddBindable(pixShader);
+						}
+						break;
+					case ResType::VertexShader:
+						if (shared)
+						{
+							Ref<SharedBindable> vertShader = CreateRef<SharedBindable>(ResType::VertexShader, (char*)data);
+							vertShader->Initialize<VertexShader>();
+							curStep.AddBindable(vertShader);
+						}
+						else
+						{
+							Ref<UniqueBindable> vertShader = CreateRef<UniqueBindable>(ResType::VertexShader);
+							vertShader->Initialize<VertexShader>((char*)data);
+							curStep.AddBindable(vertShader);
+						}
+						break;
+					case ResType::Texture2D:
+						if (shared)
+						{
+							Ref<SharedBindable> texture = CreateRef<SharedBindable>(ResType::Texture2D, (char*)data["Path"]);
+							texture->Initialize<Texture2D>((int)data["Slot"]);
+							curStep.AddBindable(texture);
+						}
+						else
+						{
+							Ref<UniqueBindable> texture = CreateRef<UniqueBindable>(ResType::Texture2D);
+							texture->Initialize<Texture2D>((char*)data["Path"], (int)data["Slot"]);
+							curStep.AddBindable(texture);
+						}
+						break;
+					case ResType::Topology:
+						assert("Topology not handled" && false);
+						/*if (shared)
+						{
+							Ref<SharedBindable> topology = CreateRef<SharedBindable>(ResType::Topology, (char*)data["Path"]);
+							topology->Initialize<Topology>();
+							curStep.AddBindable(topology);
+						}
+						else
+						{
+							Ref<UniqueBindable> topology = CreateRef<UniqueBindable>(ResType::Topology);
+							topology->Initialize<Topology>();
+							curStep.AddBindable(topology);
+						}*/
+						break;
+					default:
+						assert("Unhandled resource type");
+					}
+				}
+
+				techData.m_Steps.push_back(curStep);
+				materialData->m_Techniques.push_back(techData);
+			}
+
+			materialData++;
+		}
+	}
+	
+	void ModelCreator::DeserializeNodes(Asset& asset, NodeData* nodeData, MeshData* meshData)
+	{
+		NodeData* nextNode;
+		for (ElementRef element : asset["Nodes"].AsStruct())
+		{
+			nextNode = nodeData + (uint32_t)element["Index"];
+
+			assert("Node Data at position already initialized" && (nextNode->m_Name == ""));
+
+			nextNode->m_Name = element.m_MetaElement.m_Name;
+			nextNode->m_Transformation = DirectX::XMLoadFloat4x4((const DirectX::XMFLOAT4X4*)element["TransformationMat"].m_Data);
+		
+			if (element.Has("Meshes"))
+			{
+				ElementRef meshes = element["Meshes"];
+				nextNode->m_Meshes.reserve(meshes.Size());
+
+				for (int i = 0; i < meshes.Size(); i++)
+				{
+					nextNode->m_Meshes.push_back(meshData + (uint32_t)meshes[i]);
+				}
+			}
+
+			if (element.Has("ChildNodes"))
+			{
+				ElementRef childNodes = element["ChildNodes"];
+				nextNode->m_Children.reserve(childNodes.Size());
+
+				for (int i = 0; i < childNodes.Size(); i++)
+				{
+					nextNode->m_Children.push_back(nodeData + (uint32_t)childNodes[i]);
+				}
 			}
 		}
 	}

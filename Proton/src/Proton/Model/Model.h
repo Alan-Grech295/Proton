@@ -83,9 +83,19 @@ namespace Proton
 	struct StepData
 	{
 	public:
+		StepData()
+			:
+			m_ID(-1)
+		{}
+
 		StepData(const std::string& name)
 			:
 			m_ID(Renderer::GetPassIDFromName(name))
+		{}
+
+		StepData(int id)
+			:
+			m_ID(id)
 		{}
 
 		void AddBindable(Ref<ConstructableBindable> bindable)
@@ -165,16 +175,25 @@ namespace Proton
 		Ref<SharedBindable> m_VertBuffer;
 		Ref<SharedBindable> m_IndexBuffer;
 		Ref<SharedBindable> m_Topology;
-		uint32_t m_MatIndex;
+		const MaterialData* m_Material;
 
 		Ref<UniqueBindable> m_TransformCBuf;
 		Ref<UniqueBindable> m_TransformCBufPix;
+	};
+
+	struct NodeData
+	{
+		std::string m_Name;
+		std::vector<NodeData*> m_Children;
+		DirectX::XMMATRIX m_Transformation;
+		std::vector<MeshData*> m_Meshes;
 	};
 
 	struct ModelData
 	{
 		std::vector<MeshData> m_Meshes;
 		std::vector<MaterialData> m_Materials;
+		std::vector<NodeData> m_Nodes;
 	};
 
 	/*struct Node
@@ -224,11 +243,18 @@ namespace Proton
 	class ModelCreator
 	{
 	public:
-		static void ParseModel(const std::string& path);
+		static void SerializeModel(const std::string& path);
 		static void DeserializeModel(const std::string& path);
 	private:
-		static TypeElement ParseMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const std::vector<MaterialData>& materials);
-		static void ParseMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat);
-		static void ParseNode(aiNode* node, RawAsset& asset, uint32_t& index);
+		static TypeElement SerializeMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const MaterialData* materials);
+		static void SerializeMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat);
+		static void SerializeNode(NodeData*& nodeData, aiNode* aiNode, RawAsset& asset, MeshData* meshes, uint32_t& index);
+		static uint32_t CountNodes(aiNode* root);
+
+		static void DeserializeMeshes(Asset& asset, const std::string& modelPath, MeshData* meshData, const MaterialData* materials);
+		static void DeserializeMaterials(Asset& asset, MaterialData* materialData);
+		static void DeserializeNodes(Asset& asset, NodeData* nodeData, MeshData* meshData);
+	private:
+		//static std::string MAT_TAG;
 	};
 }

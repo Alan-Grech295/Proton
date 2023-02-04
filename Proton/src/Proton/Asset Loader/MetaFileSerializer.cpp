@@ -41,6 +41,10 @@ namespace Proton
 
 				Element& operator[](const std::string& name)
 				{
+					/*auto [cacheName, cacheIndex] = m_CachedElement;
+					if (cacheName == name)
+						return m_Elements[cacheIndex];*/
+
 					for (Element& e : m_Elements)
 					{
 						if (e.m_Name == name)
@@ -49,6 +53,23 @@ namespace Proton
 
 					assert("Element not found" && false);
 					return Element::Empty();
+				}
+
+				bool Has(const std::string& name)
+				{
+					int index = 0;
+					for (Element& e : m_Elements)
+					{
+						if (e.m_Name == name)
+						{
+							//m_CachedElement = std::make_tuple(name, index);
+							return true;
+						}
+
+						index++;
+					}
+
+					return false;
 				}
 
 				//Calculates the size of the struct if it were constant size
@@ -90,6 +111,10 @@ namespace Proton
 						{
 							assert("Array should not be in type template struct" && false);
 						}
+						else if (el.m_Type == Type::Pointer)
+						{
+							el.m_SizeBytes = sizeof(uint32_t);
+						}
 						else
 						{
 							el.m_SizeBytes = GetSize(el.m_Type);
@@ -124,6 +149,8 @@ namespace Proton
 				}
 
 				std::vector<Element> m_Elements;
+
+				//std::tuple<std::string, uint32_t> m_CachedElement;
 			};
 
 			struct Array : public Element::ExtraDataBase
@@ -311,6 +338,14 @@ namespace Proton
 			ExtraData::Struct& structData = static_cast<ExtraData::Struct&>(*m_ExtraData);
 
 			return structData[name];
+		}
+
+		bool Element::Has(const std::string& name) const
+		{
+			assert("Element is not a struct!" && m_Type == Type::Struct);
+			ExtraData::Struct& structData = static_cast<ExtraData::Struct&>(*m_ExtraData);
+
+			return structData.Has(name);
 		}
 
 		//Get the type template of an array element

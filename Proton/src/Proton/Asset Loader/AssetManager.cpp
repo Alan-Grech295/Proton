@@ -28,7 +28,7 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
-		//ModelCreator::ParseModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
+		ModelCreator::SerializeModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
 		
 		ModelCreator::DeserializeModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
 
@@ -58,6 +58,18 @@ namespace Proton
 		
 		ElementRef& pointer = desAsset["Pointer"];
 		std::string pointerData = *pointer;
+		for (ElementRef& element : desAsset["Struct2"].AsStruct())
+		{
+			std::string name = element.m_MetaElement.m_Name;
+		}
+
+		for (ElementRef& element : desAsset["Struct3"].AsStruct())
+		{
+			std::string name = element.m_MetaElement.m_Name;
+		}
+
+		uint32_t structSize = desAsset["Struct2"].Size();
+		uint32_t arraySize = desAsset["Array9"].Size();
 		//*/
 
 		//
@@ -787,7 +799,7 @@ namespace Proton
 
 			bufferSize += sizeof(uint32_t) + mesh.mName.length + 1;
 
-			meshes[i] = ModelCreator::ParseMesh(basePath, modelPath.string(), mesh, pScene->mMaterials);
+			meshes[i] = ModelCreator::SerializeMesh(basePath, modelPath.string(), mesh, pScene->mMaterials);
 
 			allVerts[i].reserve(mesh.mNumVertices);
 			for (uint32_t j = 0; j < mesh.mNumVertices; j++)

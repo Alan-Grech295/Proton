@@ -386,6 +386,41 @@ namespace Proton
 	struct ElementRef
 	{
 	public:
+		struct StructIterator
+		{
+		public:
+			StructIterator(std::vector<Meta::Element>::iterator iterator, byte* baseData, class Asset& asset)
+				:
+				m_BaseData(baseData),
+				m_Asset(asset),
+				m_ElementIter(iterator)
+			{}
+
+			ElementRef& operator*() const;
+
+			//NOTE: UNDELETED ELEMENT REF
+			ElementRef* operator->();
+
+			StructIterator& operator++();
+
+			StructIterator operator++(int);
+
+			StructIterator& operator--();
+
+			StructIterator operator--(int);
+
+			bool operator==(const StructIterator& other) const;
+
+			bool operator!=(const StructIterator& other) const;
+		private:
+			std::vector<Meta::Element>::iterator m_ElementIter;
+			byte* m_BaseData;
+			class Asset& m_Asset;
+		};
+
+	public:
+		using struct_iterator = StructIterator;
+	public:
 		ElementRef(byte* data, Type type, Asset& asset, Meta::Element& metaElement)
 			:
 			m_Data(data),
@@ -396,7 +431,7 @@ namespace Proton
 			m_Size = m_MetaElement.m_SizeBytes;
 		}
 
-		ElementRef& operator*();
+		ElementRef operator*();
 
 		template<typename T>
 		operator T&()
@@ -427,7 +462,18 @@ namespace Proton
 		//Accesses element in an array
 		ElementRef operator[](int index);
 
-	private:
+		bool Has(const std::string& name);
+
+		bool operator==(ElementRef& other) const { return m_Data == other.m_Data; }
+		bool operator!=(ElementRef& other) const { return m_Data != other.m_Data; }
+		//static bool operator==(ElementRef& a, ElementRef& b) { return a.m_Data == b.m_Data; }
+		//static bool operator!=(ElementRef& a, ElementRef& b) { return a.m_Data != b.m_Data; }
+
+		uint32_t Size();
+
+		//Convert to struct
+		class StructRef AsStruct();
+	public:
 		byte* m_Data;
 		Type m_Type;
 		uint32_t m_Size = 0;
@@ -435,12 +481,30 @@ namespace Proton
 		Meta::Element m_MetaElement;
 
 		static ElementRef& NULL_ELEMENT;
+
+		//For struct use
+		//std::tuple<std::string, uint32_t> m_CachedElement;
+	};
+
+	struct StructRef : public ElementRef
+	{
+	public:
+		StructRef(const ElementRef& element)
+			:
+			ElementRef(element)
+		{
+			assert("Element not a struct" && element.m_Type == Type::Struct);
+		}
+
+		StructIterator begin();
+		StructIterator end();
 	};
 
 	//Note: Variables cannot be added to Assets, however, data can be changed
 	class Asset
 	{
 		friend class AssetSerializer;
+		friend class StructRef;
 	public:
 		Asset()
 			:
