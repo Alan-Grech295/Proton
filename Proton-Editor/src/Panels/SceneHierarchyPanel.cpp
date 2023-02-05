@@ -142,9 +142,9 @@ namespace Proton
 					{
 						NodeComponent entityParentNode = targetNode.m_ParentEntity.GetComponent<NodeComponent>();
 						int pos = 0;
-						for (int i = 0; i < entityParentNode.m_ChildNodes.size(); i++)
+						for (int i = 0; i < entityParentNode.m_Children.size(); i++)
 						{
-							if (entityParentNode.m_ChildNodes[i] == entity)
+							if (entityParentNode.m_Children[i] == entity)
 							{
 								pos = i;
 								break;
@@ -165,9 +165,9 @@ namespace Proton
 					{
 						NodeComponent entityParentNode = targetNode.m_ParentEntity.GetComponent<NodeComponent>();
 						int pos = 0;
-						for (int i = 0; i < entityParentNode.m_ChildNodes.size(); i++)
+						for (int i = 0; i < entityParentNode.m_Children.size(); i++)
 						{
-							if (entityParentNode.m_ChildNodes[i] == entity)
+							if (entityParentNode.m_Children[i] == entity)
 							{
 								pos = i;
 								break;
@@ -190,7 +190,7 @@ namespace Proton
 	{
 		auto& tag = entity.GetComponent<TagComponent>().tag;
 		auto& node = entity.GetComponent<NodeComponent>();
-		bool isLeaf = node.m_ChildNodes.size() == 0;
+		bool isLeaf = node.m_Children.size() == 0;
 
 		ImGuiTreeNodeFlags flags = (m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
 			ImGuiTreeNodeFlags_OpenOnArrow |
@@ -265,7 +265,7 @@ namespace Proton
 
 		if (opened)
 		{
-			for (Entity e : node.m_ChildNodes)
+			for (Entity e : node.m_Children)
 			{
 				DrawEntityNode(e);
 			}
@@ -275,7 +275,7 @@ namespace Proton
 
 		if (entityDeleted)
 		{
-			for (Entity e : node.m_ChildNodes)
+			for (Entity e : node.m_Children)
 			{
 				DeleteChildNode(e);
 			}
@@ -284,10 +284,10 @@ namespace Proton
 			{
 				NodeComponent& parentComponent = node.m_ParentEntity.GetComponent<NodeComponent>();
 
-				for (int i = 0; i < parentComponent.m_ChildNodes.size(); i++)
+				for (int i = 0; i < parentComponent.m_Children.size(); i++)
 				{
-					if (parentComponent.m_ChildNodes[i] == entity)
-						parentComponent.m_ChildNodes.erase(parentComponent.m_ChildNodes.begin() + i);
+					if (parentComponent.m_Children[i] == entity)
+						parentComponent.m_Children.erase(parentComponent.m_Children.begin() + i);
 				}
 			}
 
@@ -304,7 +304,7 @@ namespace Proton
 
 		auto& node = entity.GetComponent<NodeComponent>();
 
-		bool isLeaf = node.m_ChildNodes.size() == 0;
+		bool isLeaf = node.m_Children.size() == 0;
 
 		ImGuiTreeNodeFlags flags = (m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
 									ImGuiTreeNodeFlags_OpenOnArrow |
@@ -361,7 +361,7 @@ namespace Proton
 
 		if (opened)
 		{
-			for (Entity& e : node.m_ChildNodes)
+			for (Entity& e : node.m_Children)
 			{
 				DrawChildNode(e);
 			}
@@ -370,7 +370,7 @@ namespace Proton
 
 		if (entityDeleted)
 		{
-			for (Entity& e : node.m_ChildNodes)
+			for (Entity& e : node.m_Children)
 			{
 				DeleteChildNode(e);
 			}
@@ -380,10 +380,10 @@ namespace Proton
 			{
 				NodeComponent& parentComponent = node.m_ParentEntity.GetComponent<NodeComponent>();
 
-				for (int i = 0; i < parentComponent.m_ChildNodes.size(); i++)
+				for (int i = 0; i < parentComponent.m_Children.size(); i++)
 				{
-					if (parentComponent.m_ChildNodes[i] == entity)
-						parentComponent.m_ChildNodes.erase(parentComponent.m_ChildNodes.begin() + i);
+					if (parentComponent.m_Children[i] == entity)
+						parentComponent.m_Children.erase(parentComponent.m_Children.begin() + i);
 				}
 			}
 
@@ -398,7 +398,7 @@ namespace Proton
 	{
 		auto& node = entity.GetComponent<NodeComponent>();
 
-		for (Entity& e : node.m_ChildNodes)
+		for (Entity& e : node.m_Children)
 		{
 			DeleteChildNode(e);
 		}

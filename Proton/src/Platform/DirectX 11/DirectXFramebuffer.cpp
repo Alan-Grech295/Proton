@@ -204,7 +204,7 @@ namespace Proton
 		}
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetRenderTargets(m_ColorAttachmentRenderTargets.size(), m_ColorAttachmentRenderTargets.data(), m_DepthStencilView);
-	
+		
 		Clear();
 	}
 

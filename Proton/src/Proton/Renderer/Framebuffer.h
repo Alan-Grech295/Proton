@@ -46,6 +46,7 @@ namespace Proton
 		uint32_t Samples = 1;
 		float* ClearColor = new float[4]{ 0, 0, 0, 0 };
 
+		//UNUSED
 		bool SwapChainTarget = false;
 	};
 

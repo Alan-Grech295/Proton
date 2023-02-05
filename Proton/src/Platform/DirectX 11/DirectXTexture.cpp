@@ -127,8 +127,8 @@ namespace Proton
 		srd.pSysMem = image->pixels;
 		srd.SysMemPitch = image->width * 4 * sizeof(uint8_t);
 
-		for (int i = 0; i < image->width * image->height * 4; i++)
-			uint8_t pix = image->pixels[i];
+		/*for (int i = 0; i < image->width * image->height * 4; i++)
+			uint8_t pix = image->pixels[i];*/
 
 		HRESULT hr = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&desc, &srd, &pTexture);
 

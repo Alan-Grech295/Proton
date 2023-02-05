@@ -32,9 +32,10 @@ namespace Proton
 			lightData.attConst = lightComponent->attConst;
 			lightData.attLin = lightComponent->attLin;
 			lightData.attQuad = lightComponent->attQuad;
-			lightCBuf->SetData(&lightData);
-			lightCBuf->Bind();
 		}
+
+		lightCBuf->SetData(&lightData);
+		lightCBuf->Bind();
 
 		//End Light Data
 
@@ -45,48 +46,7 @@ namespace Proton
 		{
 			auto& [node, transform] = sceneRegistry.get<NodeComponent, TransformComponent>(entity);
 
-			DirectX::XMMATRIX transformMat = transform.GetTransformMatrix() *
-											 node.m_Origin;
-
-			if (sceneRegistry.has<MeshComponent>(entity))
-			{
-				auto& mesh = m_Scene->m_Registry.get<MeshComponent>(entity);
-
-				for (Mesh* m : mesh.m_MeshPtrs)
-				{
-					//TODO: Change const buffer setting
-					const auto modelView = transformMat * editorCam.GetViewMatrix();
-					struct Transforms
-					{
-						DirectX::XMMATRIX modelViewProj;
-						DirectX::XMMATRIX model;
-					};
-
-					const Transforms tf =
-					{
-						DirectX::XMMatrixTranspose(modelView),
-						DirectX::XMMatrixTranspose(
-							modelView *
-							editorCam.GetProjection()
-						)
-					};
-
-					m->m_TransformCBuf->SetData(&tf);
-					m->m_TransformCBufPix->SetData(&tf);
-
-					Renderer::Submit(m);
-				}
-				/*for (int i = 0; i < mesh.m_NumMeshes; i++)
-				{
-					//mesh.m_MeshPtrs[i]->Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transformMat, editorCam.GetViewMatrix(), editorCam.GetProjection());
-					
-				}*/
-			}
-
-			for (int i = 0; i < node.m_ChildNodes.size(); i++)
-			{
-				SubmitChildren(node.m_ChildNodes[i], transformMat, editorCam.GetViewMatrix(), editorCam.GetProjection());
-			}
+			SubmitNode(Entity(entity, m_Scene.get()), DirectX::XMMatrixIdentity(), editorCam.GetViewMatrix(), editorCam.GetProjection());
 		}
 
 		Renderer::Render();
@@ -105,7 +65,7 @@ namespace Proton
 		RenderCommand::Draw(m_Scene->m_DebugVertBuffer->size());*/
 	}
 
-	void SceneRenderer::SubmitChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection)
+	void SceneRenderer::SubmitNode(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection)
 	{
 		struct Transforms
 		{
@@ -142,9 +102,9 @@ namespace Proton
 			}
 		}
 
-		for (Entity& e : node.m_ChildNodes)
+		for (Entity& e : node.m_Children)
 		{
-			SubmitChildren(e, transformMat, cameraView, cameraProjection);
+			SubmitNode(e, transformMat, cameraView, cameraProjection);
 		}
 	}
 	

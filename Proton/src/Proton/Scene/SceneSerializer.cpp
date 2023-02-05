@@ -4,7 +4,7 @@
 #include "Entity.h"
 #include "Components.h"
 #include "Model.h"
-#include "ModelCollection.h"
+#include "Proton/Asset Loader/AssetCollection.h"
 
 #include <yaml-cpp\yaml.h>
 #include <fstream>
@@ -166,10 +166,10 @@ namespace Proton
 			out << YAML::BeginMap;	//NodeComponent
 
 			auto& nc = entity.GetComponent<NodeComponent>();
-			writeMesh = entity.HasComponent<RootNodeTag>() ? nc.m_PrefabName == "" : nc.m_RootEntity.GetComponent<NodeComponent>().m_PrefabName == "";
+			//writeMesh = entity.HasComponent<RootNodeTag>() ? nc.m_PrefabName == "" : nc.m_RootEntity.GetComponent<NodeComponent>().m_PrefabName == "";
 			out << YAML::Key << "Node Name" << YAML::Value << nc.m_NodeName;
 			out << YAML::Key << "Is Prefab" << YAML::Value << !writeMesh;
-			out << YAML::Key << "Prefab Path" << YAML::Value << nc.m_PrefabName;
+			//out << YAML::Key << "Prefab Path" << YAML::Value << nc.m_PrefabName;
 			out << YAML::Key << "Parent Entity" << YAML::Value << (nc.m_ParentEntity == Entity::Null ? LLONG_MAX : nc.m_ParentEntity.GetUUID());
 			out << YAML::Key << "Root Entity" << YAML::Value << (nc.m_RootEntity == Entity::Null ? LLONG_MAX : nc.m_RootEntity.GetUUID());
 			out << YAML::Key << "Initial Transform" << YAML::Value << nc.m_Origin;
@@ -200,7 +200,7 @@ namespace Proton
 
 			auto& mc = entity.GetComponent<MeshComponent>();
 
-			for (int i = 0; i < mc.m_NumMeshes; i++)
+			for (int i = 0; i < mc.m_MeshPtrs.size(); i++)
 			{
 				Mesh& mesh = *mc.m_MeshPtrs[i];
 				out << YAML::Key << ("Mesh" + std::to_string(i));
@@ -259,7 +259,7 @@ namespace Proton
 
 		SerializeEntity(out, entity);
 
-		for (Entity child : cc.m_ChildNodes)
+		for (Entity child : cc.m_Children)
 		{
 			SerializeChild(out, child);
 		}
@@ -304,7 +304,7 @@ namespace Proton
 
 			NodeComponent& root = entity.GetComponent<NodeComponent>();
 
-			for (Entity child : root.m_ChildNodes)
+			for (Entity child : root.m_Children)
 			{
 				SerializeChild(out, child);
 			}
@@ -390,7 +390,7 @@ namespace Proton
 					childNodeComponent.m_RootEntity = root;
 				}
 
-				childNodeComponent.m_PrefabName = node["Prefab Path"].as<std::string>();
+				//childNodeComponent.m_PrefabName = node["Prefab Path"].as<std::string>();
 				childNodeComponent.m_NodeName = node["Node Name"].as<std::string>();
 
 				if (node["Is Prefab"].as<bool>())

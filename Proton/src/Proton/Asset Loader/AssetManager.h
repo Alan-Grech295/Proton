@@ -4,7 +4,6 @@
 #include <vector>
 #include "Proton\Model\Model.h"
 #include "Proton\Scene\Components.h"
-#include "Proton/Asset Loader/AssetSerializer.h"
 
 namespace Proton
 {
@@ -97,6 +96,12 @@ namespace Proton
 		Image() = default;
 	};
 
+	enum class AssetType { Model, Image };
+#define ASSET_TYPES X(".obj", AssetType::Model, ModelCreator)\
+					X(".gltf", AssetType::Model, ModelCreator)\
+					X(".blend", AssetType::Model, ModelCreator)\
+
+
 	class AssetManager
 	{
 	public:
@@ -144,8 +149,8 @@ namespace Proton
 		//std::unordered_map<std::filesystem::path, Ref<Model>, path_hash> m_ModelAssets;
 		//std::unordered_map<std::filesystem::path, Ref<Prefab>, path_hash> m_Prefabs;
 
-		std::vector<std::filesystem::path> m_PostModelImports;
-		std::vector<std::pair<std::filesystem::path, char*>> m_PostModelReads;
+		std::vector<std::filesystem::path> m_AssetImports;
+		//std::vector<std::pair<std::filesystem::path, char*>> m_PostModelReads;
 
 		std::vector<std::filesystem::path> m_PostImageImports;
 

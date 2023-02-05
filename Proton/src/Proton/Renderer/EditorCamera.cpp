@@ -23,15 +23,35 @@ namespace Proton
 
 	void EditorCamera::OnUpdate(TimeStep ts)
 	{
-		XMFLOAT2 delta = { Input::GetMouseDeltaX() * 0.025f,
+		XMFLOAT2 mouseDelta = { Input::GetMouseDeltaX() * 0.025f,
 							  Input::GetMouseDeltaY() * 0.025f };
 		
 		if (Input::IsMouseButtonPressed(2))
-			MousePan(delta);
+			MousePan(mouseDelta);
 		else if (Input::IsMouseButtonPressed(0))
-			MouseRotate(delta);
+			MouseRotate(mouseDelta);
 		else if (Input::IsMouseButtonPressed(1))
-			MouseOrbit(delta);
+			MouseOrbit(mouseDelta);
+
+		XMFLOAT3 translation = { 0, 0, 0 };
+
+		float moveSpeed = m_MoveSpeed * ts;
+
+		if (Input::IsKeyPressed(Key::W))
+			translation.z += moveSpeed;
+		if (Input::IsKeyPressed(Key::S))
+			translation.z -= moveSpeed;
+		if (Input::IsKeyPressed(Key::D))
+			translation.x += moveSpeed;
+		if (Input::IsKeyPressed(Key::A))
+			translation.x -= moveSpeed;
+
+		if (Input::IsKeyPressed(Key::E))
+			translation.y += moveSpeed;
+		if (Input::IsKeyPressed(Key::Q))
+			translation.y -= moveSpeed;
+
+		m_FocalPoint = CalculateFocalPoint(translation);
 
 		UpdateView();
 	}
@@ -118,6 +138,12 @@ namespace Proton
 	XMVECTOR EditorCamera::CalculatePosition() const
 	{
 		return m_FocalPoint - GetForwardDirection() * m_Distance;
+	}
+
+	XMVECTOR EditorCamera::CalculateFocalPoint(XMFLOAT3& translation) const
+	{
+		return XMVector3Transform(m_FocalPoint, 
+			XMMatrixTranslationFromVector(XMVector3Rotate(XMLoadFloat3(&translation), GetOrientation())));
 	}
 
 	std::pair<float, float> EditorCamera::PanSpeed() const

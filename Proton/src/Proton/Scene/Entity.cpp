@@ -32,31 +32,29 @@ namespace Proton
 			if (nodeComponent.m_ParentEntity != Entity::Null)
 			{
 				NodeComponent& pastParentNodeComponent = nodeComponent.m_ParentEntity.GetComponent<NodeComponent>();
-				for (int i = 0; i < pastParentNodeComponent.m_ChildNodes.size(); i++)
+				for (int i = 0; i < pastParentNodeComponent.m_Children.size(); i++)
 				{
-					if (pastParentNodeComponent.m_ChildNodes[i] == *this)
+					if (pastParentNodeComponent.m_Children[i] == *this)
 					{
 						childPos = i;
-						pastParentNodeComponent.m_ChildNodes.erase(pastParentNodeComponent.m_ChildNodes.begin() + i);
+						pastParentNodeComponent.m_Children.erase(pastParentNodeComponent.m_Children.begin() + i);
 						break;
 					}
 				}
 			}
 
-			if (pos > -1 && pos < parentNodeComponent.m_ChildNodes.size() + 1)
+			if (pos > -1 && pos < parentNodeComponent.m_Children.size() + 1)
 			{
 				int insertPos = pos;
 				if (nodeComponent.m_ParentEntity == *parent && childPos < pos)
 					insertPos -= 1;
 
-				parentNodeComponent.m_ChildNodes.insert(parentNodeComponent.m_ChildNodes.begin() + insertPos, *this);
+				parentNodeComponent.m_Children.insert(parentNodeComponent.m_Children.begin() + insertPos, *this);
 			}
 			else
 			{
-				parentNodeComponent.m_ChildNodes.push_back(*this);
+				parentNodeComponent.m_Children.push_back(*this);
 			}
-
-			PT_CORE_TRACE((uint32_t)&parentNodeComponent);
 
 			nodeComponent.m_ParentEntity = *parent;
 
@@ -75,11 +73,11 @@ namespace Proton
 			if (nodeComponent.m_ParentEntity != Entity::Null)
 			{
 				NodeComponent& parentNodeComponent = nodeComponent.m_ParentEntity.GetComponent<NodeComponent>();
-				for (int i = 0; i < parentNodeComponent.m_ChildNodes.size(); i++)
+				for (int i = 0; i < parentNodeComponent.m_Children.size(); i++)
 				{
-					if (parentNodeComponent.m_ChildNodes[i] == *this)
+					if (parentNodeComponent.m_Children[i] == *this)
 					{
-						parentNodeComponent.m_ChildNodes.erase(parentNodeComponent.m_ChildNodes.begin() + i);
+						parentNodeComponent.m_Children.erase(parentNodeComponent.m_Children.begin() + i);
 						break;
 					}
 				}

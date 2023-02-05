@@ -94,7 +94,14 @@ namespace Proton
 
 		BufferElement& operator[](const std::string& tag)
 		{
-			return *m_ElementByTag[tag];
+			//return *m_ElementByTag[tag];
+			for (BufferElement& e : m_Elements)
+			{
+				if (e.Name == tag)
+					return e;
+			}
+
+			return BufferElement();
 		}
 	private:
 		void CalculateOffsetsAndStride()
@@ -103,7 +110,7 @@ namespace Proton
 
 			for (BufferElement& element : m_Elements)
 			{
-				m_ElementByTag[element.Name] = &element;
+				//m_ElementByTag[element.Name] = &element;
 				element.Offset = offset;
 				offset += element.Size;
 			}
@@ -114,7 +121,7 @@ namespace Proton
 		uint32_t stride = 0;
 	private:
 		std::vector<BufferElement> m_Elements;
-		std::unordered_map<std::string, BufferElement*> m_ElementByTag;
+		//std::unordered_map<std::string, BufferElement*> m_ElementByTag;
 	};
 
 	class Vertex

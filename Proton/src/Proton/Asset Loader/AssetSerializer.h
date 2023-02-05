@@ -35,9 +35,9 @@ namespace Proton
 		TypeElement(Type type, byte* data);
 
 		//Array Add function
-		Element& Add(TypeElement entry);
+		uint32_t Add(TypeElement entry);
 		template<typename T>
-		Element& Add(T&& data);
+		uint32_t Add(T&& data);
 
 		//Array set type function
 		TypeElement& SetType(TypeElement type);
@@ -200,9 +200,12 @@ namespace Proton
 		struct Value : public TypeElement::DataBase
 		{
 			Value() = default;
+			~Value() 
+			{
+				delete m_Data;
+			}
+
 			Value(byte* data, Type type)
-				:
-				m_Data(data)
 			{
 				uint32_t size = 0;
 				//Gets the size of the type depending on a Map
@@ -270,7 +273,11 @@ namespace Proton
 
 		struct Array : public TypeElement::DataBase
 		{
-			void Add(Element& e)
+			Array()
+			{
+			}
+
+			void Add(Element e)
 			{
 				if (m_TypeTemplate->m_Type == Type::Array)
 				{
@@ -565,7 +572,7 @@ namespace Proton
 	}
 
 	template<typename T>
-	inline Element& TypeElement::Add(T&& data)
+	inline uint32_t TypeElement::Add(T&& data)
 	{
 		assert("Element is not an array!" && m_Type == Type::Array);
 		static_assert(ReverseMap<std::remove_const_t<std::remove_reference_t<T>>>::valid, "Unsupported SysType used in pointer conversion");
@@ -573,7 +580,7 @@ namespace Proton
 		TypeElement entry = TypeElement(type, Map<type>::GetData(data));
 
 		((TypeElement*)this)->Add(static_cast<TypeElement>(entry));
-		return m_Data->as<Data::Array&>().m_Elements.back();
+		return m_Data->as<Data::Array&>().m_Elements.size() - 1;
 	}
 
 	template<typename T>

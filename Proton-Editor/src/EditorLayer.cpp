@@ -3,6 +3,7 @@
 #include "Proton\Scene\SceneSerializer.h"
 #include "Proton\Utils\PlatformUtils.h"
 #include <Proton\Math\Math.h>
+#include <Proton\Asset Loader\AssetManager.h>
 
 //TEMP
 #include "CompileTimeTests.h"
@@ -50,7 +51,13 @@ namespace Proton
 		AssetViewerPanel::SetProjectPath(projectPath);
 		AssetViewerPanel::SetScene(m_ActiveScene);
 
-		//m_Nanosuit = ModelCreator::CreateModelEnti++ty("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
+
+		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
+		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
+		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+
+		//m_Nanosuit = ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
 		//
 		//m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
 		//m_PointLight = m_ActiveScene->CreateEntity("Point Light");
@@ -310,7 +317,7 @@ namespace Proton
 
 		static bool texID = false;
 
-		if (Input::IsKeyReleased(Key::Backspace))
+		if (Input::IsKeyReleased(Key::Backspace) && ImGui::IsWindowFocused())
 			texID = !texID;
 
 		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID), viewportPanelSize);

@@ -53,25 +53,35 @@ namespace Proton
 
 	struct MeshComponent
 	{
-		std::vector<Mesh*> m_MeshPtrs;
-		uint32_t m_NumMeshes = 0;
-
 		MeshComponent() = default;
 		MeshComponent(const MeshComponent& other) = default;
 
-		MeshComponent(std::vector<Mesh*> meshPtrs, uint32_t numMeshes)
+		/*MeshComponent(std::vector<Mesh*> meshPtrs)
 			:
-			m_MeshPtrs(meshPtrs),
-			m_NumMeshes(numMeshes){}
+			m_MeshPtrs(meshPtrs)
+		{}*/
+
+	public:
+		std::vector<Mesh*> m_MeshPtrs;
+		Ref<class Model> m_ModelRef;
+	};
+
+	struct RootNodeTag
+	{
+		RootNodeTag() = default;
+		RootNodeTag(const RootNodeTag& other) = default;
+
+	private:
+		bool placeholder;
 	};
 
 	struct NodeComponent
 	{
-		std::vector<Entity> m_ChildNodes;
+		std::vector<Entity> m_Children;
 		Entity m_ParentEntity;
 		Entity m_RootEntity;
 		std::string m_NodeName;
-		std::string m_PrefabName;
+		//std::string m_PrefabName;
 
 		DirectX::XMMATRIX m_Origin;
 
@@ -80,28 +90,38 @@ namespace Proton
 			m_ParentEntity(Entity::Null),
 			m_RootEntity(Entity::Null),
 			m_NodeName(""),
-			m_PrefabName(""),
+			//m_PrefabName(""),
 			m_Origin(DirectX::XMMatrixIdentity())
 		{};
 
 		NodeComponent(const NodeComponent&) = default;
-		NodeComponent(const std::string& nodeName, const std::string& prefabName, Entity parentEntity, Entity rootEntity, DirectX::FXMMATRIX& origin)
-			:
-			m_NodeName(nodeName),
-			m_PrefabName(prefabName),
-			m_ParentEntity(parentEntity),
-			m_RootEntity(rootEntity),
-			m_Origin(origin)
-		{}
+		//NodeComponent(const std::string& nodeName, const std::string& prefabName, Entity parentEntity, Entity rootEntity, DirectX::FXMMATRIX& origin)
+		//	:
+		//	m_NodeName(nodeName),
+		//	//m_PrefabName(prefabName),
+		//	m_ParentEntity(parentEntity),
+		//	m_RootEntity(rootEntity),
+		//	m_Origin(origin)
+		//{}
 	};
 
-	struct RootNodeTag 
+	/*struct ModelComponent
 	{
-		RootNodeTag() = default;
-		RootNodeTag(const RootNodeTag&) = default;
-	private:
-		bool placeholder;
-	};
+		ModelComponent() = default;
+		ModelComponent(const ModelComponent&) = default;
+
+		ModelComponent(std::vector<Mesh> meshes, std::vector<class Material> materials)
+			:
+			m_Meshes(meshes),
+			m_Materials(materials)
+		{
+		}
+	public:
+		std::vector<Mesh> m_Meshes;
+		std::vector<class Material> m_Materials;
+
+		DirectX::XMMATRIX m_Origin;
+	};*/
 
 	struct LightComponent
 	{

@@ -264,7 +264,7 @@ namespace Proton
 		case WM_KEYDOWN:
 			{
 				input->pressedKeyStates[wParam] = true;
-				PT_CORE_WARN("KeyDown " + std::to_string(wParam));
+				//PT_CORE_WARN("KeyDown " + std::to_string(wParam));
 				KeyPressedEvent event(wParam, lParam & 0xffff);
 				data.eventCallback(event);
 				break;
@@ -272,7 +272,7 @@ namespace Proton
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
 			{
-				PT_CORE_WARN("KeyUp " + std::to_string(wParam));
+				//PT_CORE_WARN("KeyUp " + std::to_string(wParam));
 				input->pressedKeyStates[wParam] = false;
 				input->releasedKeyStates[wParam] = true;
 				KeyReleasedEvent event(wParam);

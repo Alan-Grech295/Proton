@@ -24,7 +24,7 @@ namespace Proton
 	{
 		PT_PROFILE_FUNCTION();
 
-		for (Technique& t : mesh.m_Techniques)
+		for (Technique& t : mesh.m_Material)
 		{
 			for (Step& s : t)
 			{
@@ -38,7 +38,7 @@ namespace Proton
 	{
 		PT_PROFILE_FUNCTION();
 
-		for (Technique& t : mesh->m_Techniques)
+		for (Technique& t : mesh->m_Material)
 		{
 			for (Step& s : t)
 			{
@@ -75,7 +75,7 @@ namespace Proton
 					bind->Bind();
 				}
 
-				RenderCommand::DrawIndexed(job.m_Mesh->m_IndexBuffer->size());
+				RenderCommand::DrawIndexed(static_cast<IndexBuffer*>(job.m_Mesh->m_IndexBuffer.get())->size());
 			}
 		}
 	}

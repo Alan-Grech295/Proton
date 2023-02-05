@@ -166,6 +166,183 @@ namespace Proton
 			static Element ReadArrayElement(byte*& data, bool readName = false);
 		};
 
+		//Extra data for elements
+		struct ExtraData
+		{
+			//Struct extra data
+			struct Struct : public Element::ExtraDataBase
+			{
+				Struct() = default;
+
+				Struct(Element::ExtraDataBase* other)
+				{
+					Struct& structData = other->as<Struct>();
+					m_Elements.resize(structData.m_Elements.size());
+					memcpy(m_Elements.data(), structData.m_Elements.data(), sizeof(Element) * structData.m_Elements.size());
+				}
+
+				Element& Add(const std::string& name, Type type, std::optional<uint32_t> dataOffset)
+				{
+					//If data offset has no value then it is assumed that the element is used as an array type template
+					m_Elements.push_back(Element(name, type, dataOffset.value_or(0)));
+
+					return m_Elements.back();
+				}
+
+				Element& operator[](const std::string& name)
+				{
+					/*auto [cacheName, cacheIndex] = m_CachedElement;
+					if (cacheName == name)
+						return m_Elements[cacheIndex];*/
+
+					for (Element& e : m_Elements)
+					{
+						if (e.m_Name == name)
+							return e;
+					}
+
+					assert("Element not found" && false);
+					return Element::Empty();
+				}
+
+				bool Has(const std::string& name)
+				{
+					int index = 0;
+					for (Element& e : m_Elements)
+					{
+						if (e.m_Name == name)
+						{
+							//m_CachedElement = std::make_tuple(name, index);
+							return true;
+						}
+
+						index++;
+					}
+
+					return false;
+				}
+
+				//Calculates the size of the struct if it were constant size
+				int CalcStructSize(int offset)
+				{
+					int size = 0;
+					for (Element& element : m_Elements)
+					{
+						element.m_DataOffset = size + offset;
+						assert("Struct not of constant size" && !(element.m_Type == Type::String || element.m_Type == Type::Array));
+						if (element.m_Type == Type::Struct)
+						{
+							element.m_SizeBytes = element.m_ExtraData->as<Struct&>().CalcStructSize(offset + size);
+							size += element.m_SizeBytes;
+						}
+						else
+						{
+							size += GetSize(element.m_Type);
+						}
+
+					}
+
+					return size;
+				}
+
+				uint32_t SetConstChildSizes(uint32_t dataOffset)
+				{
+					uint32_t size = 0;
+					for (Element& el : m_Elements)
+					{
+						assert("Struct is meant to be const" && el.m_Type != Type::String);
+						el.m_DataOffset = size + dataOffset;
+
+						if (el.m_Type == Type::Struct)
+						{
+							el.m_SizeBytes = el.m_ExtraData->as<Struct>().SetConstChildSizes(el.m_DataOffset);
+						}
+						else if (el.m_Type == Type::Array)
+						{
+							assert("Array should not be in type template struct" && false);
+						}
+						else if (el.m_Type == Type::Pointer)
+						{
+							el.m_SizeBytes = sizeof(uint32_t);
+						}
+						else
+						{
+							el.m_SizeBytes = GetSize(el.m_Type);
+						}
+
+						size += el.m_SizeBytes;
+					}
+
+					return size;
+				}
+
+				uint32_t SetChildSizes(uint32_t absOffset, std::vector<uint32_t>& offsets)
+				{
+					uint32_t size = 0;
+					for (int i = 0; i < m_Elements.size(); i++)
+					{
+						Element& element = m_Elements[i];
+						uint32_t offset = offsets[i];
+
+						element.m_SizeBytes = offsets[i + 1] - offset;
+						element.m_DataOffset = absOffset + offset;
+
+						if (element.m_Type == Type::Struct)
+						{
+							element.m_ExtraData->as<Struct>().SetConstChildSizes(element.m_DataOffset);
+						}
+
+						size += element.m_SizeBytes;
+					}
+
+					return size;
+				}
+
+				std::vector<Element> m_Elements;
+
+				//std::tuple<std::string, uint32_t> m_CachedElement;
+			};
+
+			struct Array : public Element::ExtraDataBase
+			{
+				Array() = default;
+
+				Array(Element::ExtraDataBase* other)
+				{
+					Array& arrayData = other->as<Array>();
+
+					m_Size = arrayData.m_Size;
+					m_ConstElementSize = arrayData.m_ConstElementSize;
+					m_Stride = arrayData.m_Stride;
+					m_TypeTemplate = Element(arrayData.m_TypeTemplate);
+					if (arrayData.m_ElementOffsets.has_value())
+					{
+						m_ElementOffsets.emplace(arrayData.m_ElementOffsets->begin(), arrayData.m_ElementOffsets->end());
+					}
+				}
+
+				Array(Type type, uint32_t size, bool constElementSize, std::optional<std::vector<uint32_t>> elementOffsets = std::nullopt)
+					:
+					m_Size(size),
+					m_TypeTemplate({ "", type, 0 }),
+					m_ConstElementSize(constElementSize),
+					m_ElementOffsets(elementOffsets),
+					m_Stride(-1)
+				{
+					assert("No element offsets were given!" && constElementSize);
+				}
+
+				uint32_t m_Size;
+				Element m_TypeTemplate;
+				bool m_ConstElementSize;
+
+				//Only used if the array type is not constant size
+				std::optional<std::vector<uint32_t>> m_ElementOffsets;
+				//The size in bytes of the type template
+				int m_Stride;
+			};
+		};
+
 		template<typename T>
 		inline T& Element::ExtraDataBase::as()
 		{

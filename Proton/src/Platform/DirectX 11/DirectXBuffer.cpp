@@ -84,7 +84,7 @@ namespace Proton
 				&msr
 			));
 
-			memcpy(msr.pData, m_Data, size());
+			memcpy(msr.pData, m_Data, sizeBytes());
 
 			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(m_VertexBuffer.Get(), 0);
 		}
@@ -97,7 +97,7 @@ namespace Proton
 			bd.Usage = D3D11_USAGE_DYNAMIC;
 			bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 			bd.MiscFlags = 0u;
-			bd.ByteWidth = size();
+			bd.ByteWidth = sizeBytes();
 			//bd.StructureByteStride = m_Stride;
 			D3D11_SUBRESOURCE_DATA sd = {};
 			sd.pSysMem = m_Data;

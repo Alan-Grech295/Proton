@@ -46,6 +46,8 @@ namespace Proton
 		void MouseZoom(float delta);
 
 		XMVECTOR CalculatePosition() const;
+		
+		XMVECTOR CalculateFocalPoint(XMFLOAT3& translation) const;
 
 		std::pair<float, float> PanSpeed() const;
 		float RotationSpeed() const;
@@ -64,6 +66,8 @@ namespace Proton
 
 		float m_Distance = 10.0f;
 		float m_Pitch = 0.0f, m_Yaw = 0.0f;
+
+		float m_MoveSpeed = 10.0f;
 
 		float m_ViewportWidth = 1280, m_ViewportHeight = 720;
 	};

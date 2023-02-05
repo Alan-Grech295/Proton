@@ -6,8 +6,6 @@
 #include "Panels\AssetViewerPanel.h"
 #include "Panels\ConsolePanel.h"
 #include <Proton\Renderer\SceneRenderer.h>
-#include <Proton\Renderer\EditorCamera.h>
-#include <Proton\Asset Loader\AssetManager.h>
 #include "Proton\Renderer\EditorCamera.h"
 
 namespace Proton

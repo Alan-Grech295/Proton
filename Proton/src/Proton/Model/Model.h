@@ -9,9 +9,10 @@
 #include <vector>
 #include <optional>
 #include <cassert>
-#include "Proton/Asset Loader/AssetSerializer.h"
 #include <assimp/scene.h>
 #include "Bindables/ConstructableBindable.h"
+#include "Proton/Asset Loader/AssetCollection.h"
+#include "Proton/Asset Loader/AssetSerializer.h"
 
 struct aiNode;
 struct aiMesh;
@@ -19,9 +20,32 @@ struct aiMaterial;
 
 namespace Proton
 {
-	using RenderCallback = std::function<void(const UINT)>;
+	//using RenderCallback = std::function<void(const UINT)>;
 	class Entity;
 	class Scene;
+
+	class Material
+	{
+	public:
+		Material()
+		{
+			m_Techniques = std::vector<Technique>();
+		}
+
+		void AddTechnique(Technique& technique)
+		{
+			m_Techniques.push_back(technique);
+		}
+
+		std::vector<Technique>::iterator begin() { return m_Techniques.begin(); }
+		std::vector<Technique>::iterator end() { return m_Techniques.end(); }
+	public:
+		std::vector<Technique> m_Techniques;
+
+		bool hasSpecular = false;
+		bool hasNormalMap = false;
+		bool hasDiffuseMap = false;
+	};
 
 	class Mesh
 	{
@@ -29,6 +53,7 @@ namespace Proton
 		friend class Renderer;
 		friend class SceneRenderer;
 		friend class AssetManager;
+		friend class MeshData;
 	public:
 		struct Transforms
 		{
@@ -36,13 +61,15 @@ namespace Proton
 			DirectX::XMMATRIX model;
 		};
 	public:
-		Mesh(const std::string& meshTag, const std::string& name, const std::string& modelPath)
+		Mesh(const std::string& name, const std::string& modelPath, Material& material)
 			:
 			m_Name(name),
-			m_ModelPath(modelPath)
+			m_ModelPath(modelPath),
+			m_Material(material)
 		{
 			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
 			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Transforms), new Transforms());
+			m_Topology = Topology::Create(TopologyType::TriangleList);
 		}
 
 		Mesh() = default;
@@ -54,30 +81,29 @@ namespace Proton
 		std::string m_ModelPath;
 		std::string m_Name;
 	private:
-		Ref<VertexBuffer> m_VertBuffer;
-		Ref<IndexBuffer> m_IndexBuffer;
-		Ref<Topology> m_Topology = Topology::Create(TopologyType::TriangleList);
-		std::vector<Technique> m_Techniques;
+		Ref<Bindable> m_VertBuffer;
+		Ref<Bindable> m_IndexBuffer;
+		Ref<Bindable> m_Topology;
+		Material& m_Material;
 
 		//TODO: Change pointer to proxy
 		Ref<VertexConstantBuffer> m_TransformCBuf;
 		Ref<PixelConstantBuffer> m_TransformCBufPix;
+	};
 
-		//TEMP
-		/*Ref<VertexShader> m_VertShader;
-		Ref<PixelShader> m_PixelShader;
-		Ref<class Texture2D> m_Diffuse;
-		Ref<class Texture2D> m_Specular;
-		Ref<class Texture2D> m_Normal;
-		Ref<class Sampler> m_Sampler;
+	class Node
+	{
+		std::string m_Name;
+		std::vector<Node*> m_Children;
+		DirectX::XMMATRIX m_Transformation;
+		std::vector<Mesh*> m_Meshes;
+	};
 
-		Scope<PixelConstantBuffer> m_MaterialCBuf;
-		Scope<VertexConstantBuffer> m_TransformCBuf;
-		Scope<PixelConstantBuffer> m_TransformCBufPix;*/
-
-		bool hasSpecular = false;
-		bool hasNormalMap = false;
-		bool hasDiffuseMap = false;
+	class Model
+	{
+	public:
+		std::vector<Mesh> m_Meshes;
+		std::vector<Material> m_Materials;
 	};
 
 	struct StepData
@@ -114,6 +140,18 @@ namespace Proton
 
 			return nullptr;
 		}
+
+		Step CreateStep()
+		{
+			Step step = Step(m_ID);
+
+			for (auto bind : m_Bindables)
+			{
+				step.AddBindable(bind->GetRef());
+			}
+
+			return step;
+		}
 	public:
 		std::vector<Ref<ConstructableBindable>> m_Bindables;
 		int m_ID;
@@ -130,6 +168,18 @@ namespace Proton
 			:
 			m_Name(name)
 		{}
+
+		Technique CreateTechnique()
+		{
+			Technique tech = Technique(m_Name);
+
+			for (StepData& step : m_Steps)
+			{
+				tech.AddStep(step.CreateStep());
+			}
+
+			return tech;
+		}
 	public:
 		std::vector<StepData> m_Steps = std::vector<StepData>();
 		std::string m_Name;
@@ -141,6 +191,18 @@ namespace Proton
 		MaterialData()
 		{
 			m_Techniques = std::vector<TechniqueData>();
+		}
+		
+		Material CreateMaterial()
+		{
+			Material mat = Material();
+
+			for (TechniqueData& tech : m_Techniques)
+			{
+				mat.AddTechnique(tech.CreateTechnique());
+			}
+
+			return mat;
 		}
 
 	public:
@@ -155,7 +217,7 @@ namespace Proton
 	{
 	public:
 		MeshData() {}
-		void Create(const std::string& meshTag, const std::string& name, const std::string& modelPath)
+		void Create(const std::string& name, const std::string& modelPath)
 		{
 			m_Name = name;
 			m_ModelPath = modelPath;
@@ -168,6 +230,18 @@ namespace Proton
 			m_Topology = CreateRef<SharedBindable>(ConstructableBindable::ResourceType::Topology, "TriangleList");
 			m_Topology->m_Bindable = Topology::Create(TopologyType::TriangleList);
 		}
+
+		Mesh CreateMesh(std::vector<Material>& materials)
+		{
+			Mesh mesh = Mesh(m_Name, m_ModelPath, materials[m_Material]);
+
+			mesh.m_VertBuffer = m_VertBuffer->GetRef();
+			mesh.m_IndexBuffer = m_IndexBuffer->GetRef();
+			mesh.m_Topology = m_Topology->GetRef();
+
+			//Transform buffers?
+			return mesh;
+		}
 	public:
 		std::string m_ModelPath;
 		std::string m_Name;
@@ -175,7 +249,7 @@ namespace Proton
 		Ref<SharedBindable> m_VertBuffer;
 		Ref<SharedBindable> m_IndexBuffer;
 		Ref<SharedBindable> m_Topology;
-		const MaterialData* m_Material;
+		uint32_t m_Material;
 
 		Ref<UniqueBindable> m_TransformCBuf;
 		Ref<UniqueBindable> m_TransformCBufPix;
@@ -184,13 +258,23 @@ namespace Proton
 	struct NodeData
 	{
 		std::string m_Name;
-		std::vector<NodeData*> m_Children;
+		std::vector<uint32_t> m_Children;
 		DirectX::XMMATRIX m_Transformation;
-		std::vector<MeshData*> m_Meshes;
+		std::vector<uint32_t> m_Meshes;
 	};
 
 	struct ModelData
 	{
+	public:
+		ModelData() = default;
+		ModelData(const ModelData& copy)
+			:
+			m_Meshes(copy.m_Meshes),
+			m_Materials(copy.m_Materials),
+			m_Nodes(copy.m_Nodes)
+		{
+		}
+
 		std::vector<MeshData> m_Meshes;
 		std::vector<MaterialData> m_Materials;
 		std::vector<NodeData> m_Nodes;
@@ -238,13 +322,12 @@ namespace Proton
 		Prefab() = default;
 	};*/
 
-
-
 	class ModelCreator
 	{
 	public:
-		static void SerializeModel(const std::string& path);
-		static void DeserializeModel(const std::string& path);
+		static ModelData Serialize(const std::string& path);
+		static ModelData Deserialize(Asset& modelAsset, const std::string& path);
+		static Entity CreateModelEntity(const std::string& path, Scene& activeScene);
 	private:
 		static TypeElement SerializeMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const MaterialData* materials);
 		static void SerializeMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat);
@@ -254,7 +337,7 @@ namespace Proton
 		static void DeserializeMeshes(Asset& asset, const std::string& modelPath, MeshData* meshData, const MaterialData* materials);
 		static void DeserializeMaterials(Asset& asset, MaterialData* materialData);
 		static void DeserializeNodes(Asset& asset, NodeData* nodeData, MeshData* meshData);
-	private:
-		//static std::string MAT_TAG;
+
+		static Entity CreateNode(NodeData& nodeData, NodeData* nodes, Mesh* meshes, Ref<Model> modelRef, Scene& activeScene);
 	};
 }

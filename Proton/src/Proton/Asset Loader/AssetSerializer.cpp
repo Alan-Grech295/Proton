@@ -1,6 +1,6 @@
 #include "ptpch.h"
 #include "AssetSerializer.h"
-#include "MetaFileSerializer.cpp"
+//#include "MetaFileSerializer.cpp"
 
 namespace Proton
 {
@@ -42,7 +42,7 @@ namespace Proton
 	}
 
 	//Adds an element to an array
-	Element& TypeElement::Add(TypeElement entry)
+	uint32_t TypeElement::Add(TypeElement entry)
 	{
 		assert("Element is not an array!" && m_Type == Type::Array);
 		Data::Array& arrayData = static_cast<Data::Array&>(*m_Data);
@@ -54,7 +54,7 @@ namespace Proton
 
 		Element e = entry;
 		arrayData.Add(std::move(e));
-		return arrayData.m_Elements.back();
+		return arrayData.m_Elements.size() - 1;
 	}
 
 	//Sets the type template of an array
@@ -365,7 +365,8 @@ namespace Proton
 		//TODO: Change to copy
 		for (TypeElement el : elements)
 		{
-			arrayData.Add(std::move(el));
+			Element e = el;
+			arrayData.Add(std::move(e));
 		}
 
 		return *this;

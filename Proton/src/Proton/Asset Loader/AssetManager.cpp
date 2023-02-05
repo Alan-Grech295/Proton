@@ -7,7 +7,7 @@
 #include "AssetManager.h"
 #include <Platform\DirectX 11\DirectXTexture.h>
 #include "Proton\Model\Model.h"
-#include "Proton\Scene\ModelCollection.h"
+#include "Proton/Asset Loader/AssetCollection.h"
 #include "Proton/Asset Loader/AssetSerializer.h"
 
 namespace fs = std::filesystem;
@@ -28,11 +28,11 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
-		ModelCreator::SerializeModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
+		//ModelCreator::Serialize(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
 		
-		ModelCreator::DeserializeModel(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
+		//ModelCreator::Deserialize(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
 
-		Asset& desAsset = AssetSerializer::DeserializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset");
+		/*Asset& desAsset = AssetSerializer::DeserializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset");
 
 		std::string desName = desAsset["Name"];
 
@@ -74,7 +74,7 @@ namespace Proton
 
 		//
 
-		RawAsset rawAsset;
+		/*RawAsset rawAsset;
 		rawAsset.Add("Age", 18);
 		rawAsset.Add("Height", 178.12f);
 		rawAsset.Add("Name", std::string("Alan"));
@@ -307,57 +307,31 @@ namespace Proton
 
 		//Continue test
 
-		Asset asset(rawAsset);
+		//Asset asset(rawAsset);
 
-		AssetSerializer::SerializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset", asset);//*/
+		//AssetSerializer::SerializeAsset(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Prefabs/asset.asset", asset);//*/
 
 		//159 bytes, 25 elements
 
-		manager.m_PostModelImports.clear();
+		manager.m_AssetImports.clear();
 
-		manager.ScanDirectory(manager.m_ProjectPath);
+		manager.ScanDirectory(manager.m_ProjectPath.string() + "\\Proton-Editor\\assets");
 
-		for (auto& path : manager.m_PostImageImports)
+		/*for (auto& path : manager.m_PostImageImports)
 		{
 			File* file = manager.WriteImageData(path);
 
 			file->WriteFile();
 
 			delete file;
-		}
-
-		/*for (auto& pair : manager.m_PostModelReads)
-		{
-			std::string modelPath = fs::path(pair.first).replace_extension().string();
-
-			File& file = *new File(pair.first, 0);
-			file.ReadFile();
-
-			file.Read<uint32_t>();
-
-			manager.m_ModelAssets[modelPath] = manager.ImportModelAsset(file, fs::path(pair.first).remove_filename().string());
-
-			//delete& file;
-		}
-
-		for (auto& path : manager.m_PostModelImports)
-		{
-			File* file = manager.WriteModelData(path);
-
-			file->WriteFile();
-
-			delete file;
-		}
-
-		for (auto& path : manager.m_PostPrefabReads)
-		{
-			File& file = *new File(path, 0);
-			file.ReadFile();
-
-			manager.m_Prefabs[path] = manager.ImportPrefab(file);
-
-			delete &file;
 		}*/
+
+		for (auto& path : manager.m_AssetImports)
+		{
+#define X(ext, type, cls) if(path.extension() == ext) { AssetCollection::Add(path.string(), cls::Serialize(path.string())); continue; }
+			ASSET_TYPES
+#undef X
+		}
 	}
 
 	void AssetManager::SetProjectPath(const std::filesystem::path path)
@@ -671,7 +645,8 @@ namespace Proton
 	void AssetManager::ScanDirectory(const std::filesystem::path& path)
 	{
 		for (const auto& entry : fs::directory_iterator(path)) {
-			if (entry.is_directory()) {
+			if (entry.is_directory()) 
+			{
 				ScanDirectory(entry);
 			}
 			else if (entry.path().has_extension())
@@ -683,72 +658,23 @@ namespace Proton
 
 	void AssetManager::HandleFile(const std::filesystem::path& path)
 	{
-		/*if (path.extension() == ".rawAsset")
+		if (path.extension() == ".asset")
 		{
-			fs::path pathCopy = fs::path(path);
-			if (!fs::exists(pathCopy.replace_extension()))
-			{
-				remove(path);
-			}
-
-			char* data = AssetLoader::ReadData(path);
-
-			uint64_t ptr = 0;
-			AssetType type = *(AssetType*)&data[ptr];
-			ptr += sizeof(type);
-
-			switch (type)
-			{
-			case AssetType::Image:
-				{
-					File& file = *new File(path, 0);
-					file.ReadFile();
-
-					file.Read<uint32_t>();
-
-					m_ImageAssets[pathCopy] = ImportImageAsset(file);
-				}
-				break;
-			case AssetType::Model:
-				m_PostModelReads.push_back({ path, &data[ptr] });
-				break;
-			}
+			Asset asset = AssetSerializer::DeserializeAsset(path.string());
+			AssetType assetType = (AssetType)((uint32_t)asset["AssetType"]);
+			std::filesystem::path copy = path;
+#define X(ext, type, cls) if(type == assetType) { AssetCollection::Add(copy.replace_extension().string(), cls::Deserialize(asset, path.string())); return; }
+			ASSET_TYPES
+#undef X
+			return;
 		}
 
-		if (path.extension() == ".prefab")
-		{
-			m_PostPrefabReads.push_back(path);
-		}
+		if (std::filesystem::exists(path.string() + ".asset"))
+			return;
 
-		if (path.extension() == ".obj")
-		{
-			std::string outFileName(path.string() + std::string(".rawAsset"));
-
-			if (fs::exists(fs::path(outFileName)))
-				return;
-
-			m_PostModelImports.push_back(path);
-		}
-
-		if (path.extension() == ".gltf")
-		{
-			std::string outFileName(path.string() + std::string(".rawAsset"));
-
-			if (fs::exists(fs::path(outFileName)))
-				return;
-
-			m_PostModelImports.push_back(path);
-		}
-
-		if (path.extension() == ".png")
-		{
-			std::string outFileName(path.string() + std::string(".rawAsset"));
-
-			if (fs::exists(fs::path(outFileName)))
-				return;
-
-			m_PostImageImports.push_back(path);
-		}*/
+#define X(ext, type, cls) if(path.extension() == ext) { manager.m_AssetImports.push_back(path); return; }
+		ASSET_TYPES
+#undef X
 	}
 
 	/*File* AssetManager::WriteModelData(std::filesystem::path& modelPath)

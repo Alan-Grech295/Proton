@@ -31,7 +31,7 @@ namespace Proton
 		void* GetRenderTextureID(int index) { return m_FrameBuffer->GetRenderTextureID(index); }
 
 	private:
-		void SubmitChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
+		void SubmitNode(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
 		//void DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
 	private:
 		Ref<Framebuffer> m_FrameBuffer;
@@ -47,13 +47,13 @@ namespace Proton
 		//TEMP
 		struct PointLightData
 		{
-			alignas(16) DirectX::XMFLOAT3 pos;
-			alignas(16) DirectX::XMFLOAT3 ambient;
-			alignas(16) DirectX::XMFLOAT3 diffuseColor;
-			float diffuseIntensity;
-			float attConst;
-			float attLin;
-			float attQuad;
+			alignas(16) DirectX::XMFLOAT3 pos = {0, 0, 0};
+			alignas(16) DirectX::XMFLOAT3 ambient = { 0, 0, 0 };
+			alignas(16) DirectX::XMFLOAT3 diffuseColor = { 0, 0, 0 };
+			float diffuseIntensity = 0;
+			float attConst = 0;
+			float attLin = 0;
+			float attQuad = 0;
 		};
 
 		//TEMP
