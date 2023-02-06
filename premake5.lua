@@ -14,7 +14,7 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 --Include Directories relative to root folder
 IncludeDir = {}
 IncludeDir["ImGui"] = "%{wks.location}/Proton/vendor/imgui"
-IncludeDir["Assimp"] = "%{wks.location}/Proton/vendor/Assimp/include"
+IncludeDir["Assimp"] = "%{wks.location}/Proton/vendor/assimp/include"
 IncludeDir["entt"] = "%{wks.location}/Proton/vendor/EnTT/include"
 IncludeDir["DirectXTK"] = "%{wks.location}/Proton/vendor/DirectXTK/include"
 IncludeDir["DirectXTex"] = 	"%{wks.location}/Proton/vendor/DirectXTex/include"
@@ -22,6 +22,7 @@ IncludeDir["yaml_cpp"] = 	"%{wks.location}/Proton/vendor/yaml-cpp/include"
 
 include "Proton/vendor/imgui"
 include "Proton/vendor/yaml-cpp"
+include "Proton/vendor/assimp"
 
 project "Proton"
 	location "Proton"
@@ -58,7 +59,8 @@ project "Proton"
 	links
 	{
 		"ImGui",
-		"yaml-cpp"
+		"yaml-cpp",
+		"assimp"
 	}
 
 	filter "system:windows"
@@ -74,7 +76,7 @@ project "Proton"
 		{
 			("%{wks.location}/%{prj.name}/vendor/DirectXTK/" .. outputdir .. "/DirectXTK.lib"),
 			("%{wks.location}/%{prj.name}/vendor/DirectXTex/" .. outputdir .. "/DirectXTex.lib"),
-			("%{wks.location}/%{prj.name}/vendor/Assimp/" .. outputdir .. "/assimp-vc142-mtd.lib")
+			--("%{wks.location}/%{prj.name}/vendor/assimp/" .. outputdir .. "/assimp-vc142-mtd.lib")
 		}
 
 	filter "configurations:Debug"

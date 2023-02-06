@@ -4,3 +4,6 @@
 [submodule "Proton/vendor/yaml-cpp"]
 	path = Proton/vendor/yaml-cpp
 	url = https://github.com/thecherno/yaml-cpp
+[submodule "Proton/vendor/assimp"]
+	path = Proton/vendor/assimp
+	url = https://github.com/assimp/assimp.git
