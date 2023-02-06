@@ -42,7 +42,13 @@ namespace Proton
 			friend struct ExtraData;
 
 		public:
-			Element() = default;
+			Element()
+				:
+				m_DataOffset(0),
+				m_ExtraData(nullptr),
+				m_Name(""),
+				m_Type(Type::None)
+			{}
 
 			Element(const char* name, Type type, uint32_t dataOffset);
 			

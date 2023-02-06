@@ -255,7 +255,7 @@ namespace Proton
 
 		rawAsset.Add("Materials", Type::Struct);
 
-		for (int i = 0; i < pScene->mNumMaterials; i++)
+		for (uint32_t i = 0; i < pScene->mNumMaterials; i++)
 		{
 			SerializeMaterial(modelData.m_Materials.data() + i, rawAsset, basePath, i, *pScene->mMaterials[i]);
 		}
@@ -269,7 +269,7 @@ namespace Proton
 			Element("Indices", Type::Pointer),
 		}));
 
-		for (int i = 0; i < pScene->mNumMeshes; i++)
+		for (uint32_t i = 0; i < pScene->mNumMeshes; i++)
 		{
 			TypeElement meshElement = std::move(SerializeMesh(modelData.m_Meshes.data() + i, rawAsset, basePath, path, *pScene->mMeshes[i], pScene, modelData.m_Materials.data()));
 			rawAsset["Meshes"].Add(meshElement);
@@ -608,7 +608,7 @@ namespace Proton
 			nodeData->m_Meshes.reserve(aiNode->mNumMeshes);
 			memcpy(nodeData->m_Meshes.data(), aiNode->mMeshes, aiNode->mNumMeshes * sizeof(unsigned int));
 
-			for (int i = 0; i < aiNode->mNumMeshes; i++)
+			for (uint32_t i = 0; i < aiNode->mNumMeshes; i++)
 			{
 				nodeData->m_Meshes.push_back(aiNode->mMeshes[i]);
 				meshesElement.Add((uint32_t)aiNode->mMeshes[i]);
@@ -624,7 +624,7 @@ namespace Proton
 
 			NodeData* curNode = nodeData;
 
-			for (int i = 0; i < aiNode->mNumChildren; i++)
+			for (uint32_t i = 0; i < aiNode->mNumChildren; i++)
 			{
 				index++;
 				nodeData++;
@@ -643,7 +643,7 @@ namespace Proton
 			return 1;
 
 		uint32_t sum = 1;
-		for (int i = 0; i < root->mNumChildren; i++)
+		for (uint32_t i = 0; i < root->mNumChildren; i++)
 		{
 			sum += CountNodes(root->mChildren[i]);
 		}
@@ -670,7 +670,7 @@ namespace Proton
 	void ModelCreator::DeserializeMeshes(Asset& asset, const std::string& modelPath, MeshData* meshData, const MaterialData* materials)
 	{
 		using ResType = ConstructableBindable::ResourceType;
-		for (int i = 0; i < asset["Meshes"].Size(); i++, meshData++)
+		for (uint32_t i = 0; i < asset["Meshes"].Size(); i++, meshData++)
 		{
 			ElementRef& mesh = asset["Meshes"][i];
 			std::string meshTag = modelPath + "%" + (std::string)*mesh["Name"];
@@ -726,7 +726,7 @@ namespace Proton
 				TechniqueData techData = TechniqueData(technique.m_MetaElement.m_Name);
 				StepData curStep = StepData((uint16_t)technique[0]["StepID"]);
 
-				for (int i = 0; i < technique.Size(); i++)
+				for (uint32_t i = 0; i < technique.Size(); i++)
 				{
 					ElementRef& bindable = technique[i];
 					uint16_t stepID = bindable["StepID"];
@@ -945,7 +945,7 @@ namespace Proton
 				ElementRef meshes = element["Meshes"];
 				nextNode->m_Meshes.reserve(meshes.Size());
 
-				for (int i = 0; i < meshes.Size(); i++)
+				for (uint32_t i = 0; i < meshes.Size(); i++)
 				{
 					nextNode->m_Meshes.push_back((uint32_t)meshes[i]);
 				}
@@ -956,7 +956,7 @@ namespace Proton
 				ElementRef childNodes = element["ChildNodes"];
 				nextNode->m_Children.reserve(childNodes.Size());
 
-				for (int i = 0; i < childNodes.Size(); i++)
+				for (uint32_t i = 0; i < childNodes.Size(); i++)
 				{
 					nextNode->m_Children.push_back((uint32_t)childNodes[i]);
 				}

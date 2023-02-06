@@ -105,8 +105,8 @@ namespace Proton
 				scratch = std::move(converted);
 			}
 
-			image->width = scratch.GetMetadata().width;
-			image->height = scratch.GetMetadata().height;
+			image->width = (uint32_t)scratch.GetMetadata().width;
+			image->height = (uint32_t)scratch.GetMetadata().height;
 			image->isOpaque = scratch.IsAlphaAllOpaque();
 			image->pixels = new uint8_t[scratch.GetPixelsSize()];
 			image->pixels = scratch.GetPixels();

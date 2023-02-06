@@ -1162,7 +1162,7 @@ namespace Proton
 			}
 
 			if (definingTokens.size() > maxDefiningTokens)
-				maxDefiningTokens = definingTokens.size();
+				maxDefiningTokens = (uint32_t)definingTokens.size();
 
 			nodeFunctions[key] = func;
 		}

@@ -98,12 +98,12 @@ namespace Proton
 			uint32_t size = CalculateSizeBytes();
 			//Gets the offset of the starting point of the data
 			//(not using pointer as vector can be reallocated)
-			uint32_t offset = bytes.size();
+			uint32_t offset = (uint32_t)bytes.size();
 
 			bytes.resize(bytes.size() + size);
 
 			//Data required
-			uint32_t nameLength = strlen(m_Name);
+			uint32_t nameLength = (uint32_t)strlen(m_Name);
 			uint32_t type = (uint32_t)m_Type;
 
 			COPY_DATA_OFFSET(bytes.data(), offset, &nameLength, sizeof(uint32_t));
@@ -117,7 +117,7 @@ namespace Proton
 				ExtraData::Struct& structData = static_cast<ExtraData::Struct&>(*m_ExtraData);
 
 				//Data required
-				uint32_t numElements = structData.m_Elements.size();
+				uint32_t numElements = (uint32_t)structData.m_Elements.size();
 
 				COPY_DATA_OFFSET(bytes.data(), offset, &numElements, sizeof(uint32_t));
 
@@ -139,7 +139,7 @@ namespace Proton
 				//If the array template is not of const size the element offsets need to be saved
 				if (!arrayData.m_ConstElementSize)
 				{
-					uint32_t numOffsets = arrayData.m_ElementOffsets.value().size();
+					uint32_t numOffsets = (uint32_t)arrayData.m_ElementOffsets.value().size();
 					COPY_DATA_OFFSET(bytes.data(), offset, &numOffsets, sizeof(uint32_t));
 					COPY_DATA_OFFSET(bytes.data(), offset, arrayData.m_ElementOffsets.value().data(), numOffsets * sizeof(uint32_t));
 				}
@@ -245,7 +245,7 @@ namespace Proton
 		uint32_t Element::CalculateSizeBytes()
 		{
 			//				Name Length			Name					Type			Data Offset         Size Bytes
-			uint32_t size = sizeof(uint32_t) + strlen(m_Name) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
+			uint32_t size = sizeof(uint32_t) + (uint32_t)strlen(m_Name) + sizeof(uint32_t) + sizeof(uint32_t) + sizeof(uint32_t);
 			
 			if (m_Type == Type::Struct)
 			{
@@ -284,7 +284,7 @@ namespace Proton
 
 				bytes.resize(bytes.size() + sizeof(uint32_t));
 
-				uint32_t numElements = structData.m_Elements.size();
+				uint32_t numElements = (uint32_t)structData.m_Elements.size();
 
 				COPY_DATA_OFFSET(bytes.data(), offset, &numElements, sizeof(uint32_t));
 
@@ -292,7 +292,7 @@ namespace Proton
 				{
 					//Saves the name and data for the array
 					std::vector<byte> elData = e.GetDataForArray();
-					uint32_t nameLength = strlen(e.m_Name);
+					uint32_t nameLength = (uint32_t)strlen(e.m_Name);
 
 					bytes.resize(bytes.size() + sizeof(uint32_t) + nameLength + elData.size());
 
@@ -372,7 +372,7 @@ namespace Proton
 			std::vector<byte> bytes;
 
 			//Adds the number of elements in the meta file
-			uint32_t numElements = file.m_Elements.size();
+			uint32_t numElements = (uint32_t)file.m_Elements.size();
 			
 			bytes.resize(sizeof(uint32_t));
 			memcpy(bytes.data(), &numElements, sizeof(uint32_t));

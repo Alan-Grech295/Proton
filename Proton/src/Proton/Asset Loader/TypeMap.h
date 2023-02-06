@@ -196,7 +196,7 @@ namespace Proton
 
 		static uint32_t SizeBytes(const byte* data)
 		{
-			return strlen((const char*)data) + 1;
+			return (uint32_t)strlen((const char*)data) + 1;
 		}
 	};
 

@@ -452,7 +452,7 @@ namespace Proton
 		operator std::string&()
 		{
 			char* data = (char*)m_Data;
-			uint32_t len = strlen(data);
+			uint32_t len = (uint32_t)strlen(data);
 			return *(new std::string(data, len));
 		}
 
@@ -479,7 +479,7 @@ namespace Proton
 		uint32_t Size();
 
 		//Convert to struct
-		class StructRef AsStruct();
+		struct StructRef AsStruct();
 	public:
 		byte* m_Data;
 		Type m_Type;
@@ -511,7 +511,7 @@ namespace Proton
 	class Asset
 	{
 		friend class AssetSerializer;
-		friend class StructRef;
+		friend struct StructRef;
 	public:
 		Asset()
 			:
@@ -580,7 +580,7 @@ namespace Proton
 		TypeElement entry = TypeElement(type, Map<type>::GetData(data));
 
 		((TypeElement*)this)->Add(static_cast<TypeElement>(entry));
-		return m_Data->as<Data::Array&>().m_Elements.size() - 1;
+		return (uint32_t)m_Data->as<Data::Array&>().m_Elements.size() - 1;
 	}
 
 	template<typename T>

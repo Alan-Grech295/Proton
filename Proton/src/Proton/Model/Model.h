@@ -53,7 +53,7 @@ namespace Proton
 		friend class Renderer;
 		friend class SceneRenderer;
 		friend class AssetManager;
-		friend class MeshData;
+		friend struct MeshData;
 	public:
 		struct Transforms
 		{
@@ -279,48 +279,6 @@ namespace Proton
 		std::vector<MaterialData> m_Materials;
 		std::vector<NodeData> m_Nodes;
 	};
-
-	/*struct Node
-	{
-		Node** childNodes;
-		uint32_t numChildren;
-		DirectX::XMMATRIX transformation;
-		Mesh** meshes;
-		uint32_t numMeshes;
-		std::string name;
-
-		Node() = default;
-	};
-
-	struct PrefabNode
-	{
-		PrefabNode** childNodes;
-		uint32_t numChildren;
-		DirectX::XMMATRIX transformation;
-		Mesh** meshes;
-		uint32_t numMeshes;
-		std::string name;
-
-		DirectX::XMFLOAT3 position;
-		DirectX::XMFLOAT3 rotation;
-		DirectX::XMFLOAT3 scale;
-
-		PrefabNode() = default;
-	};
-
-	struct Model
-	{
-		Node* rootNode;
-
-		Model() = default;
-	};
-
-	struct Prefab
-	{
-		PrefabNode* rootNode;
-
-		Prefab() = default;
-	};*/
 
 	class ModelCreator
 	{

@@ -79,8 +79,8 @@ namespace Proton
 		std::vector<BufferElement>::const_iterator begin() const { return m_Elements.begin(); }
 		std::vector<BufferElement>::const_iterator end() const { return m_Elements.end(); }
 
-		int size() { return m_Elements.size(); }
-		int size() const { return m_Elements.size(); } const
+		uint32_t size() { return (uint32_t)m_Elements.size(); }
+		uint32_t size() const { return (uint32_t)m_Elements.size(); } const
 
 		BufferElement& operator[](int index) 
 		{
@@ -243,11 +243,11 @@ namespace Proton
 			m_Changed = true;
 		}
 
-		uint32_t size() { return (m_End - m_Data) / m_Layout.stride; }
+		uint32_t size() { return (uint32_t)(m_End - m_Data) / m_Layout.stride; }
 
 		uint32_t capacity() { return m_MaxSize; }
 
-		uint32_t sizeBytes() { return m_End - m_Data; }
+		uint32_t sizeBytes() { return (uint32_t)(m_End - m_Data); }
 
 		//IMP: Go back to protected (public for testing)
 	//protected:
@@ -282,7 +282,7 @@ namespace Proton
 
 		virtual void Bind() = 0;
 
-		uint32_t size() { return m_Indices.size(); }
+		uint32_t size() { return (uint32_t)m_Indices.size(); }
 
 		void EmplaceBack(uint32_t index)
 		{

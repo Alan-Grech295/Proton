@@ -26,7 +26,7 @@ namespace Proton
 
 		void SetScene(const Ref<Scene> scene) { m_Scene = scene; }
 
-		void Resize(float width, float height) { m_FrameBuffer->Resize(width, height); }
+		void Resize(uint32_t width, uint32_t height) { m_FrameBuffer->Resize(width, height); }
 
 		void* GetRenderTextureID(int index) { return m_FrameBuffer->GetRenderTextureID(index); }
 

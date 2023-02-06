@@ -87,10 +87,10 @@ namespace Proton
 		while (m_Running)
 		{
 			QueryPerformanceFrequency(&li);
-			double pcFreq = li.QuadPart;
+			double pcFreq = (double)li.QuadPart;
 			QueryPerformanceCounter(&li);
 
-			float time = (li.QuadPart - m_AppStartTime) / pcFreq;		//Platform::GetTime()
+			float time = (float)((double)(li.QuadPart - m_AppStartTime) / pcFreq);		//Platform::GetTime()
 
 			TimeStep timeStep = time - m_LastFrameTime;
 

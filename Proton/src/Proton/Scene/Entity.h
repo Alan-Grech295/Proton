@@ -67,7 +67,7 @@ namespace Proton
 		// as hash function. 
 		size_t operator()(const Entity& e) const
 		{
-			return (size_t)((uint32_t)e + (uint32_t)e.m_Scene);
+			return (size_t)(uint32_t)e + (size_t)e.m_Scene;
 		}
 	};
 }

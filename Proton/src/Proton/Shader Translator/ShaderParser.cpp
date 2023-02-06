@@ -643,7 +643,7 @@ namespace Proton
 		//This loop goes over the tokens at a certain point, converts them to characters,
 		//appends them to "key" and checks if that key exists. If the key exists it is stored
 		//in "lastWorkingKey"
-		for (int j = 0; j < maxDefiningTokens && i < tokens.size(); j++)
+		for (uint32_t j = 0; j < maxDefiningTokens && i < (uint32_t)tokens.size(); j++)
 		{
 			//Converts the type to an int in order to then convert it to a char
 			uint32_t typeVal = (uint32_t)tokens[i].type;
@@ -1034,7 +1034,7 @@ namespace Proton
 		std::string pastAccessedType = accessedType;
 
 		//The access value chain is accessed in reverse as the values are in reverse
-		for (int i = accessValChain.size() - 1; i >= 0; i--)
+		for (uint32_t i = (uint32_t)accessValChain.size() - 1; i >= 0; i--)
 		{
 			Variable* currentAccessVal = accessValChain[i];
 

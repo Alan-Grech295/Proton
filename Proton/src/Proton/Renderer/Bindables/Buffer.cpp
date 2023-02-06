@@ -111,7 +111,7 @@ namespace Proton
 	Scope<IndexBuffer> IndexBuffer::CreateUnique(Ref<Bindable> other)
 	{
 		assert("Test first before using!" && false);
-		return IndexBuffer::CreateUnique(dynamic_cast<IndexBuffer*>(other.get())->m_Indices.size());
+		return IndexBuffer::CreateUnique((uint32_t)dynamic_cast<IndexBuffer*>(other.get())->m_Indices.size());
 	}
 	
 	Ref<VertexConstantBuffer> VertexConstantBuffer::Create(const std::string& tag, int slot, int size, const void* data)

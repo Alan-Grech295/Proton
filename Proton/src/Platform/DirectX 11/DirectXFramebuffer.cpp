@@ -18,7 +18,6 @@ namespace Proton
 
 		static void CreateRenderTarget(ID3D11Texture2D*& texture, ID3D11RenderTargetView*& renderTarget, ID3D11ShaderResourceView*& srv, DXGI_FORMAT format, uint32_t samples, uint32_t width, uint32_t height)
 		{
-			HRESULT hr;
 			D3D11_TEXTURE2D_DESC textureDesc = {};
 			D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc = {};
 			D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc = {};
@@ -59,8 +58,6 @@ namespace Proton
 	
 		static void CreateDepthTexture(ID3D11DepthStencilView*& depthStencilView, ID3D11DepthStencilState*& depthStencilState, DXGI_FORMAT format, uint32_t width, uint32_t height)
 		{
-			HRESULT hr;
-
 			//Create depth stencil state
 			D3D11_DEPTH_STENCIL_DESC dsDesc = {};
 			dsDesc.DepthEnable = TRUE;
@@ -203,7 +200,7 @@ namespace Proton
 			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetDepthStencilState(m_DSState, 1);
 		}
 
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetRenderTargets(m_ColorAttachmentRenderTargets.size(), m_ColorAttachmentRenderTargets.data(), m_DepthStencilView);
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetRenderTargets((UINT)m_ColorAttachmentRenderTargets.size(), m_ColorAttachmentRenderTargets.data(), m_DepthStencilView);
 		
 		Clear();
 	}

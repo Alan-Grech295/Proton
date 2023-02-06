@@ -37,7 +37,7 @@ namespace Proton
 		m_Uid = tag;
 		m_Layout = layout;
 
-		for (int i = 0; i < m_Layout.size(); i++)
+		for (uint32_t i = 0; i < m_Layout.size(); i++)
 		{
 			m_InputLayoutDesc[i] = { m_Layout[i].Name.c_str(), 0, ShaderDataTypeToDXGIFormat(m_Layout[i].Type), 0, m_Layout[i].Offset, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 		}
@@ -139,13 +139,13 @@ namespace Proton
 		}
 		else
 		{
-			m_PastBufferSize = m_Indices.size();
+			m_PastBufferSize = (int)m_Indices.size();
 			D3D11_BUFFER_DESC ibd = {};
 			ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
 			ibd.Usage = D3D11_USAGE_DEFAULT;
 			ibd.CPUAccessFlags = 0u;
 			ibd.MiscFlags = 0u;
-			ibd.ByteWidth = m_Indices.size() * sizeof(uint32_t);
+			ibd.ByteWidth = (UINT)m_Indices.size() * (UINT)sizeof(uint32_t);
 			//ibd.StructureByteStride = sizeof(unsigned short);
 			D3D11_SUBRESOURCE_DATA isd = {};
 			isd.pSysMem = m_Indices.data();

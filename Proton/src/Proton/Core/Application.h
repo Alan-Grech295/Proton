@@ -45,7 +45,7 @@ namespace Proton
 		ImGuiLayer* m_ImGuiLayer;
 		LayerStack m_LayerStack;
 		float m_LastFrameTime = 0.0f;
-		__int64 m_AppStartTime = 0.0f;
+		__int64 m_AppStartTime = 0;
 	private:
 		static Application* s_Instance;
 	};

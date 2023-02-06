@@ -263,9 +263,9 @@ namespace Proton
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			{
-				input->pressedKeyStates[wParam] = true;
+				input->pressedKeyStates[(int)wParam] = true;
 				//PT_CORE_WARN("KeyDown " + std::to_string(wParam));
-				KeyPressedEvent event(wParam, lParam & 0xffff);
+				KeyPressedEvent event((int)wParam, (int)lParam & 0xffff);
 				data.eventCallback(event);
 				break;
 			}
@@ -445,7 +445,7 @@ namespace Proton
 
 				uint32_t numFiles = DragQueryFileA(hDrop, 0xFFFFFFFF, nullptr, 0);
 
-				for (int i = 0; i < numFiles; i++)
+				for (uint32_t i = 0; i < numFiles; i++)
 				{
 					LPSTR filePtr = nullptr;
 					UINT fileSize = 0;
