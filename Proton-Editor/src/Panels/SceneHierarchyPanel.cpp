@@ -550,22 +550,32 @@ namespace Proton
 
 		DrawComponent<TransformComponent>("Transform", entity, [](auto& transform)
 		{
-				static const float degreeToRad = 0.01745329f;
-				static const float radToDegree = 57.2957795f;
+			static const float degreeToRad = 0.01745329f;
+			static const float radToDegree = 57.2957795f;
 
-				DrawFloat3Control("Position", transform.position);
+			DrawFloat3Control("Position", transform.position);
 
-				DirectX::XMFLOAT3 eulerRotation = { transform.rotation.x * radToDegree,
-													transform.rotation.y * radToDegree,
-													transform.rotation.z * radToDegree };
+			DirectX::XMFLOAT3 eulerRotation = { transform.rotation.x * radToDegree,
+												transform.rotation.y * radToDegree,
+												transform.rotation.z * radToDegree };
 
-				DrawFloat3Control("Rotation", eulerRotation);
+			DrawFloat3Control("Rotation", eulerRotation);
 
-				transform.rotation = { eulerRotation.x * degreeToRad,
-									   eulerRotation.y * degreeToRad,
-									   eulerRotation.z * degreeToRad };
+			transform.rotation = { eulerRotation.x * degreeToRad,
+								   eulerRotation.y * degreeToRad,
+								   eulerRotation.z * degreeToRad };
 
-				DrawFloat3Control("Scale", transform.scale, 1.0f);
+			DrawFloat3Control("Scale", transform.scale, 1.0f);
+		});
+
+		DrawComponent<LightComponent>("Light", entity, [](auto& light)
+		{
+			ImGui::ColorPicker3("Ambient", &light.ambient.x);
+			ImGui::ColorPicker3("Diffuse", &light.diffuseColour.x);
+			ImGui::DragFloat("Diffuse Intensity", &light.diffuseIntensity, 1.0f, 0.0f, 100.0f);
+			ImGui::DragFloat("Attenuation Const", &light.attConst, 0.5f, 0.0f, 100.0f);
+			ImGui::DragFloat("Attenuation Linear", &light.attLin, 0.5f, 0.0f, 100.0f);
+			ImGui::DragFloat("Attenuation Quad", &light.attQuad, 0.5f, 0.0f, 100.0f);
 		});
 
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& cameraComponent)
@@ -607,8 +617,7 @@ namespace Proton
 				if (ImGui::DragFloat("Far Clip", &persFar, 1.0f, 0.01f, 50000.0f))
 					camera.SetPerspectiveFarClip(persFar);
 			}
-
-			if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
+			else if (camera.GetProjectionType() == SceneCamera::ProjectionType::Orthographic)
 			{
 				float orthoSize = camera.GetOrthographicSize();
 				if (ImGui::DragFloat("Size", &orthoSize, 1.0f, 0.01f))

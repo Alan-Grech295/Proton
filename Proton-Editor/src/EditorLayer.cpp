@@ -44,7 +44,7 @@ namespace Proton
 		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };
 
 		m_ActiveScene = CreateRef<Scene>();
-		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 1000.0f);
+		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f);
 		m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
 
 		SceneHierarchyPanel::SetScene(m_ActiveScene);
@@ -54,59 +54,21 @@ namespace Proton
 
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
-		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
-		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+		//ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+		//ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+
+		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
 
 		//m_Nanosuit = ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
 		//
 		//m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
-		//m_PointLight = m_ActiveScene->CreateEntity("Point Light");
+		m_PointLight = m_ActiveScene->CreateEntity("Point Light");
+		m_PointLight.AddComponent<LightComponent>();
+
 		//
 		//m_CameraEntity.AddComponent<CameraComponent>();
-		//m_PointLight.AddComponent<LightComponent>();
 		//
 		//m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
-
-		//Shader Parsing (To Be continued later)
-		/*std::string shaderPath = "C:\\Dev\\Proton\\Proton-Editor\\assets\\Shaders\\VertexShader.shader";
-
-		std::vector<Token> tokens = ShaderParser::LexShader(shaderPath);
-
-		std::string outputString = "";
-		uint32_t currentLine = 1;
-		for (auto token : tokens)
-		{
-			if (currentLine == token.GetLine())
-			{
-				outputString += token.ToString() + "|";
-			}
-			else if (token.GetLine() > currentLine)
-			{
-				while (currentLine < token.GetLine())
-				{
-					outputString += "\n";
-					currentLine++;
-				}
-				outputString += token.ToString() + "|";
-			}
-		}
-
-		std::ofstream stream("C:\\Dev\\Proton\\Proton-Editor\\assets\\Shaders\\shader.txt");
-		stream << outputString;
-		stream.close();
-
-		ShaderProfile* profile = ShaderParser::ParseShader(shaderPath);
-		if (profile)
-		{
-			DrawScope(profile->scope, 0);
-		}
-		else
-		{
-			for (auto error : ShaderParser::GetErrors())
-			{
-				LOG_ERROR(error.first->ToString() + " at line " + std::to_string(error.second));
-			}
-		}*/
 	}
 
 	EditorLayer::~EditorLayer()

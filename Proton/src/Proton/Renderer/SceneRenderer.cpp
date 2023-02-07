@@ -27,7 +27,7 @@ namespace Proton
 		{
 			DirectX::XMStoreFloat3(&lightData.pos, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&lightTransform->position), editorCam.GetViewMatrix()));
 			lightData.ambient = lightComponent->ambient;
-			lightData.diffuseColor = lightComponent->diffuseColor;
+			lightData.diffuseColor = lightComponent->diffuseColour;
 			lightData.diffuseIntensity = lightComponent->diffuseIntensity;
 			lightData.attConst = lightComponent->attConst;
 			lightData.attLin = lightComponent->attLin;

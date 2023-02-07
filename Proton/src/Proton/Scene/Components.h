@@ -126,7 +126,7 @@ namespace Proton
 	struct LightComponent
 	{
 		DirectX::XMFLOAT3 ambient;
-		DirectX::XMFLOAT3 diffuseColor;
+		DirectX::XMFLOAT3 diffuseColour;
 		float diffuseIntensity;
 		float attConst;
 		float attLin;
@@ -138,7 +138,7 @@ namespace Proton
 		LightComponent()
 		{
 			ambient = { 0.05f, 0.05f, 0.05f };
-			diffuseColor = { 1.0f, 1.0f, 1.0f };
+			diffuseColour = { 1.0f, 1.0f, 1.0f };
 			diffuseIntensity = 2.0f;
 			attConst = 1.0f;
 			attLin = 0.045f;

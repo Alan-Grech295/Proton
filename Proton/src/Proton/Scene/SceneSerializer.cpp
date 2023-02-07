@@ -184,7 +184,7 @@ namespace Proton
 
 			auto& lc = entity.GetComponent<LightComponent>();
 			out << YAML::Key << "Ambient" << YAML::Value << lc.ambient;
-			out << YAML::Key << "Diffuse Color" << YAML::Value << lc.diffuseColor;
+			out << YAML::Key << "Diffuse Color" << YAML::Value << lc.diffuseColour;
 			out << YAML::Key << "Diffuse Intensity" << YAML::Value << lc.diffuseIntensity;
 			out << YAML::Key << "Attenuation Constant" << YAML::Value << lc.attConst;
 			out << YAML::Key << "Attenuation Linear" << YAML::Value << lc.attLin;
@@ -458,7 +458,7 @@ namespace Proton
 					LightComponent& lightComponent = deserializedEntity.AddComponent<LightComponent>();
 
 					lightComponent.ambient = lightNode["Ambient"].as<DirectX::XMFLOAT3>();
-					lightComponent.diffuseColor = lightNode["Diffuse Color"].as<DirectX::XMFLOAT3>();
+					lightComponent.diffuseColour = lightNode["Diffuse Color"].as<DirectX::XMFLOAT3>();
 					lightComponent.diffuseIntensity = lightNode["Diffuse Intensity"].as<float>();
 					lightComponent.attConst = lightNode["Attenuation Constant"].as<float>();
 					lightComponent.attLin = lightNode["Attenuation Linear"].as<float>();
