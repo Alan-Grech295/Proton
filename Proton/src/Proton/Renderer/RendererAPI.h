@@ -30,6 +30,9 @@ namespace Proton
 
 		virtual void Initialise(const class Window& window) = 0;
 
+		virtual void EnableBlending() = 0;
+		virtual void DisableBlending() = 0;
+
 		inline static API GetAPI() { return s_API; }
 	private:
 		static API s_API;

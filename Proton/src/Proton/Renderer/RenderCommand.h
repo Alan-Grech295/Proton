@@ -52,6 +52,16 @@ namespace Proton
 			s_RendererAPI->Resize(width, height);
 		}
 
+		inline static void EnableBlending()
+		{
+			s_RendererAPI->EnableBlending();
+		}
+
+		inline static void DisableBlending()
+		{
+			s_RendererAPI->DisableBlending();
+		}
+
 		inline static RendererAPI* GetRendererAPI() { return s_RendererAPI; }
 	private:
 		static RendererAPI* s_RendererAPI;

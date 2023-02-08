@@ -3,6 +3,7 @@
 #include <wrl.h>
 #include <d3d11.h>
 #include "Proton\Core\Log.h"
+#include "Proton/Renderer/Bindables/Blender.h"
 
 namespace Proton
 {
@@ -31,6 +32,9 @@ namespace Proton
 		virtual void Present() override;
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
+
+		virtual void EnableBlending() override;
+		virtual void DisableBlending() override;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Device> pDevice;
 		Microsoft::WRL::ComPtr<IDXGISwapChain> pSwap;
@@ -39,6 +43,9 @@ namespace Proton
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDSV;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
 		D3D11_VIEWPORT vp;
+
+		Scope<Blender> m_BlendingBlender;
+		Scope<Blender> m_NonBlendingBlender;
 
 		UINT m_Width, m_Height;
 

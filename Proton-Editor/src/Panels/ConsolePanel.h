@@ -35,9 +35,9 @@ namespace Proton
 	public:
 		ConsolePanel()
 			:
-			traceIcon(Texture2D::CreateUnique("D:\\Dev\\Proton\\Proton-Editor\\icons\\trace.png")),
-			warningIcon(Texture2D::CreateUnique("D:\\Dev\\Proton\\Proton-Editor\\icons\\warning.png")),
-			errorIcon(Texture2D::CreateUnique("D:\\Dev\\Proton\\Proton-Editor\\icons\\error.png"))
+			traceIcon(Texture2D::Create("D:\\Dev\\Proton\\Proton-Editor\\Resources\\icons\\trace.png")),
+			warningIcon(Texture2D::Create("D:\\Dev\\Proton\\Proton-Editor\\Resources\\icons\\warning.png")),
+			errorIcon(Texture2D::Create("D:\\Dev\\Proton\\Proton-Editor\\Resources\\icons\\error.png"))
 		{}
 	public:
 		static void LogError(const std::string& msg);
@@ -88,9 +88,9 @@ namespace Proton
 		std::vector<const char*> messageOrder;
 		std::vector<const char*> collapsedOrder;
 		bool collapsed = true;
-		Scope<Texture2D> traceIcon;
-		Scope<Texture2D> warningIcon;
-		Scope<Texture2D> errorIcon;
+		Ref<Texture2D> traceIcon;
+		Ref<Texture2D> warningIcon;
+		Ref<Texture2D> errorIcon;
 		int selectedIndex = -1;
 
 		uint32_t errors;

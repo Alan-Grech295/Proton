@@ -103,8 +103,8 @@ namespace Proton
 
 		//Buttons
 		colors[ImGuiCol_Button] = ImVec4{ 0.0706f, 0.1059f, 0.1333f, 1.0f };
-		colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.1106f, 0.1459f, 0.1733f, 1.0f };
-		colors[ImGuiCol_ButtonActive] = ImVec4{ 0.0306f, 0.0659f, 0.0933f, 1.0f };
+		colors[ImGuiCol_ButtonHovered] = ImVec4{ 0.3106f, 0.3459f, 0.3733f, 1.0f };
+		colors[ImGuiCol_ButtonActive] = ImVec4{ 0.2306f, 0.2359f, 0.2333f, 1.0f };
 
 		//Frame BG
 		colors[ImGuiCol_FrameBg] = ImVec4{ 0.0667f, 0.1059f, 0.1373f, 1.0f };

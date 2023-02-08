@@ -16,7 +16,9 @@ namespace Proton
 		X(PixelShader)\
 		X(VertexShader)\
 		X(Texture2D)\
-		X(Topology)
+		X(Topology)\
+		X(Blender)\
+		X(Rasterizer)
 
 	class ConstructableBindable
 	{

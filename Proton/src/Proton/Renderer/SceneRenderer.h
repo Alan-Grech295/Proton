@@ -22,7 +22,7 @@ namespace Proton
 		}
 
 		//TODO: Replace with camera object 
-		void Render(const EditorCamera& editorCam);
+		void Render(const DirectX::XMMATRIX& viewMatrix, const DirectX::XMMATRIX& projMatrix);
 
 		void SetScene(const Ref<Scene> scene) { m_Scene = scene; }
 

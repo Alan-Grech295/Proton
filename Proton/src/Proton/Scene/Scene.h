@@ -31,7 +31,7 @@ namespace Proton
 		void DestroyEntity(Entity entity);
 
 		void OnRuntimeUpdate(TimeStep ts);
-		void OnEditorUpdate(TimeStep ts, EditorCamera& camera);
+		void OnEditorUpdate(TimeStep ts);
 		void OnViewportResize(uint32_t width, uint32_t height);
 		uint32_t GetViewportWidth() { return m_ViewportWidth; }
 		uint32_t GetViewportHeight() { return m_ViewportHeight; }

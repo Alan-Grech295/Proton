@@ -10,8 +10,8 @@ namespace Proton
 		:
 		startPath(""),
 		m_SelectedPath(""),
-		folderIcon(Texture2D::CreateUnique("icons\\Folder-icon.png")),
-		fileIcon(Texture2D::CreateUnique("icons\\Document-Blank-icon.png"))
+		folderIcon(Texture2D::Create("Resources\\icons\\Folder-icon.png")),
+		fileIcon(Texture2D::Create("Resources\\icons\\Document-Blank-icon.png"))
 	{}
 
 	AssetViewerPanel::~AssetViewerPanel()

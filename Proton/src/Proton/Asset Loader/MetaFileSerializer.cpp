@@ -157,6 +157,8 @@ namespace Proton
 		//Find element in struct element
 		Element& Element::operator[](const std::string& name)
 		{
+			if (m_Type != Type::Struct)
+				PT_CORE_ERROR(m_Type);
 			assert("Element is not a struct!" && m_Type == Type::Struct);
 			ExtraData::Struct& structData = static_cast<ExtraData::Struct&>(*m_ExtraData);
 

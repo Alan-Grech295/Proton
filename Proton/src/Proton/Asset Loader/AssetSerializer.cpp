@@ -763,29 +763,53 @@ namespace Proton
 
 	ElementRef::StructIterator StructRef::begin()
 	{
-		return StructIterator(m_MetaElement.m_ExtraData->as<Meta::ExtraData::Struct>().m_Elements.begin(), m_Asset.m_Data, m_Asset);
+		Meta::ExtraData::Struct& structData = m_MetaElement.m_ExtraData->as<Meta::ExtraData::Struct>();
+		return StructIterator(structData.m_Elements.begin(), (uint32_t)structData.m_Elements.size(), m_Asset.m_Data, m_Asset);
 	}
 
 	ElementRef::StructIterator StructRef::end()
 	{
-		return StructIterator(m_MetaElement.m_ExtraData->as<Meta::ExtraData::Struct>().m_Elements.end(), m_Asset.m_Data, m_Asset);
+		Meta::ExtraData::Struct& structData = m_MetaElement.m_ExtraData->as<Meta::ExtraData::Struct>();
+		return StructIterator(structData.m_Elements.end(), (uint32_t)structData.m_Elements.size(), m_Asset.m_Data, m_Asset);
 	}
 
-	ElementRef& ElementRef::StructIterator::operator*() const
+	ElementRef& ElementRef::StructIterator::operator*() 
 	{
 		Meta::Element& element = *m_ElementIter;
-		return ElementRef(m_BaseData + element.m_DataOffset, element.m_Type, m_Asset, element);
+		if (!m_ElementRefs.get())
+		{
+			m_ElementRefs = CreateRef<std::vector<ElementRef>>();
+			m_ElementRefs->reserve(m_Size);
+		}
+
+		if (m_ElementRefs->size() <= m_Index)
+			return m_ElementRefs->emplace_back(m_BaseData + element.m_DataOffset, element.m_Type, m_Asset, element);
+		else
+			return (*m_ElementRefs)[m_Index];
 	}
 
 	ElementRef* ElementRef::StructIterator::operator->()
 	{
 		Meta::Element& element = *m_ElementIter;
-		return new ElementRef(m_BaseData + element.m_DataOffset, element.m_Type, m_Asset, element);
+		if (!m_ElementRefs.get())
+		{
+			m_ElementRefs = CreateRef<std::vector<ElementRef>>();
+			m_ElementRefs->reserve(m_Size);
+		}
+
+		ElementRef* ref;
+		if (m_ElementRefs->size() <= m_Index)
+			ref = &m_ElementRefs->emplace_back(m_BaseData + element.m_DataOffset, element.m_Type, m_Asset, element);
+		else
+			ref = &(*m_ElementRefs)[m_Index];
+
+		return ref;
 	}
 
 	ElementRef::StructIterator& ElementRef::StructIterator::operator++()
 	{
 		++m_ElementIter;
+		++m_Index;
 		return *this;
 	}
 

@@ -396,16 +396,17 @@ namespace Proton
 		struct StructIterator
 		{
 		public:
-			StructIterator(std::vector<Meta::Element>::iterator iterator, byte* baseData, class Asset& asset)
+			StructIterator(std::vector<Meta::Element>::iterator iterator, uint32_t size, byte* baseData, class Asset& asset)
 				:
 				m_BaseData(baseData),
 				m_Asset(asset),
-				m_ElementIter(iterator)
+				m_ElementIter(iterator),
+				m_Index(0),
+				m_Size(size)
 			{}
 
-			ElementRef& operator*() const;
+			ElementRef& operator*();
 
-			//NOTE: UNDELETED ELEMENT REF
 			ElementRef* operator->();
 
 			StructIterator& operator++();
@@ -421,8 +422,12 @@ namespace Proton
 			bool operator!=(const StructIterator& other) const;
 		private:
 			std::vector<Meta::Element>::iterator m_ElementIter;
+			uint32_t m_Index;
 			byte* m_BaseData;
 			class Asset& m_Asset;
+			Ref<std::vector<ElementRef>> m_ElementRefs;
+			
+			uint32_t m_Size;
 		};
 
 	public:

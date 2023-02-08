@@ -36,8 +36,8 @@ namespace Proton
 		std::string startPath;
 		std::filesystem::path m_SelectedPath;
 		std::string m_SelectedPathString;
-		Scope<Texture2D> folderIcon;
-		Scope<Texture2D> fileIcon;
+		Ref<Texture2D> folderIcon;
+		Ref<Texture2D> fileIcon;
 		Ref<Scene> m_ActiveScene;
 
 		std::string m_SelectedItem;

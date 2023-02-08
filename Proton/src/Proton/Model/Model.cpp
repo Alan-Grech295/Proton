@@ -27,8 +27,6 @@ namespace Proton
 
 		NodeData& rootNode = modelData.m_Nodes[0];
 
-		Entity modelEntity = activeScene.CreateEntity(rootNode.m_Name);
-
 		Ref<Model> model = CreateRef<Model>();
 
 		model->m_Materials.reserve(modelData.m_Materials.size());
@@ -44,9 +42,7 @@ namespace Proton
 			model->m_Meshes.push_back(meshData.CreateMesh(model->m_Materials));
 		}
 
-		CreateNode(rootNode, modelData.m_Nodes.data(), model->m_Meshes.data(), model, activeScene);
-
-		return modelEntity;
+		return CreateNode(rootNode, modelData.m_Nodes.data(), model->m_Meshes.data(), model, activeScene);
 	}
 
 	Entity ModelCreator::CreateNode(NodeData& nodeData, NodeData* nodes, Mesh* meshes, Ref<Model> modelRef, Scene& activeScene)
@@ -317,6 +313,7 @@ namespace Proton
 
 		float shininess = 40.0f;
 		bool hasAlphaGloss = false;
+		bool hasAlphaDiffuse = false;
 		dx::XMFLOAT4 diffuseColor = { 1.0f,0.0f,1.0f,1.0f };
 		dx::XMFLOAT4 specularColor = { 0.18f,0.18f,0.18f,1.0f };
 
@@ -329,6 +326,7 @@ namespace Proton
 			Ref<SharedBindable> texture = CreateRef<SharedBindable>(ResType::Texture2D, basePath + texFileName.C_Str());
 			texture->Initialize<Texture2D>(0);
 			step.AddBindable(texture);
+			hasAlphaDiffuse = static_cast<Texture2D*>(texture.get()->GetRef().get())->HasAlpha();
 
 			//Asset Data
 			uint32_t itemIndex = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
@@ -424,6 +422,46 @@ namespace Proton
 			asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"]->SetData(std::string(basePath + "mat_" + std::to_string(index)));
 		}
 
+		//Blender
+		/*Ref<SharedBindable> blender = CreateRef<SharedBindable>(ResType::Blender, basePath + "mat_" + std::to_string(index));
+		blender->Initialize<Blender>(blending);
+		step.AddBindable(blender);
+
+		//Asset Data
+		uint32_t itemIndex = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
+			Element::Create("StepID", (uint16_t)step.m_ID),
+			Element::Create("ResType", (int)ResType::Blender),
+			Element::Create("Shared", true),
+			Element("Data", Type::Pointer)
+			}));
+
+		asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"].SetPointer(Type::Struct, asset);
+		asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"]->Add({
+			Element::Create("Tag", std::string(basePath + "mat_" + std::to_string(index))),
+			Element::Create("Blending", blending)
+		});*/
+
+		//
+		//Rasterizer
+		Ref<SharedBindable> rasterizer = CreateRef<SharedBindable>(ResType::Rasterizer, basePath + "mat_" + std::to_string(index));
+		rasterizer->Initialize<Rasterizer>(hasAlphaDiffuse);
+		step.AddBindable(rasterizer);
+
+		//Asset Data
+		uint32_t itemIndex = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
+			Element::Create("StepID", (uint16_t)step.m_ID),
+			Element::Create("ResType", (int)ResType::Rasterizer),
+			Element::Create("Shared", true),
+			Element("Data", Type::Pointer)
+			}));
+
+		asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"].SetPointer(Type::Struct, asset);
+		asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"]->Add({
+			Element::Create("Tag", std::string(basePath + "mat_" + std::to_string(index))),
+			Element::Create("TwoSided", hasAlphaDiffuse)
+		});
+		//
+
 		asset["Materials"][matString].Add({
 			Element::Create("HasDiffuse", matData->hasDiffuseMap),
 			Element::Create("HasSpecular", matData->hasSpecular),
@@ -471,7 +509,7 @@ namespace Proton
 		step.AddBindable(pixShader);
 
 		//Asset Data
-		uint32_t itemIndex = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
+		itemIndex = asset["Materials"][matString]["Techniques"]["Opaque"].Add(TypeElement({
 			Element::Create("StepID", (uint16_t)step.m_ID),
 			Element::Create("ResType", (int)ResType::PixelShader),
 			Element::Create("Shared", true),
@@ -713,7 +751,7 @@ namespace Proton
 	{
 		using ResType = ConstructableBindable::ResourceType;
 		uint32_t size = asset["Materials"].Size();
-		for (ElementRef mat : asset["Materials"].AsStruct())
+		for (ElementRef& mat : asset["Materials"].AsStruct())
 		{
 			materialData->hasDiffuseMap = mat["HasDiffuse"];
 			materialData->hasSpecular = mat["HasSpecular"];
@@ -721,7 +759,7 @@ namespace Proton
 
 			materialData->m_Techniques.reserve(mat["Techniques"].Size());
 
-			for (ElementRef technique : mat["Techniques"].AsStruct())
+			for (ElementRef& technique : mat["Techniques"].AsStruct())
 			{
 				TechniqueData techData = TechniqueData(technique.m_MetaElement.m_Name);
 				StepData curStep = StepData((uint16_t)technique[0]["StepID"]);
@@ -915,6 +953,34 @@ namespace Proton
 							curStep.AddBindable(topology);
 						}*/
 						break;
+					case ResType::Blender:
+						if (shared)
+						{
+							Ref<SharedBindable> blender = CreateRef<SharedBindable>(ResType::Blender, (char*)data["Tag"]);
+							blender->Initialize<Blender>((bool)data["Blending"]);
+							curStep.AddBindable(blender);
+						}
+						else
+						{
+							assert("Not handled" && false);
+							Ref<UniqueBindable> blender = CreateRef<UniqueBindable>(ResType::Blender);
+							blender->Initialize<Blender>((bool)data["Blending"]);
+							curStep.AddBindable(blender);
+						}
+					case ResType::Rasterizer:
+						if (shared)
+						{
+							Ref<SharedBindable> rasterizer = CreateRef<SharedBindable>(ResType::Rasterizer, (char*)data["Tag"]);
+							rasterizer->Initialize<Rasterizer>((bool)data["TwoSided"]);
+							curStep.AddBindable(rasterizer);
+						}
+						else
+						{
+							assert("Not handled" && false);
+							Ref<UniqueBindable> rasterizer = CreateRef<UniqueBindable>(ResType::Rasterizer);
+							rasterizer->Initialize<Rasterizer>((bool)data["TwoSided"]);
+							curStep.AddBindable(rasterizer);
+						}
 					default:
 						assert("Unhandled resource type");
 					}
@@ -931,7 +997,7 @@ namespace Proton
 	void ModelCreator::DeserializeNodes(Asset& asset, NodeData* nodeData, MeshData* meshData)
 	{
 		NodeData* nextNode;
-		for (ElementRef element : asset["Nodes"].AsStruct())
+		for (ElementRef& element : asset["Nodes"].AsStruct())
 		{
 			nextNode = nodeData + (uint32_t)element["Index"];
 

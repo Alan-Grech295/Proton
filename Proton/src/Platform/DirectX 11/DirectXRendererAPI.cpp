@@ -63,9 +63,10 @@ namespace Proton
 
 	void DirectXRendererAPI::Initialise(const Window& window)
 	{
-		PT_CORE_INFO("Created DirectX RendererAPI");
 		m_Width = window.GetWidth();
 		m_Height = window.GetHeight();
+
+		PT_CORE_INFO("Created DirectX RendererAPI of size (" + std::to_string(m_Width) + " x " + std::to_string(m_Height) + ")");
 
 		//Swap chain description structure
 		DXGI_SWAP_CHAIN_DESC sd = {};
@@ -148,6 +149,10 @@ namespace Proton
 		vp.MaxDepth = 1;
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
+
+		//Blenders
+		m_BlendingBlender = Blender::CreateUnique(true);
+		m_NonBlendingBlender = Blender::CreateUnique(false);
 	}
 
 	void DirectXRendererAPI::Present()
@@ -205,5 +210,15 @@ namespace Proton
 		vp.MaxDepth = 1;
 		vp.TopLeftX = 0;
 		vp.TopLeftY = 0;
+	}
+
+	void DirectXRendererAPI::EnableBlending()
+	{
+		m_BlendingBlender->Bind();
+	}
+
+	void DirectXRendererAPI::DisableBlending()
+	{
+		m_NonBlendingBlender->Bind();
 	}
 }

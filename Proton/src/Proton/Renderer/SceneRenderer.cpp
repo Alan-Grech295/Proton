@@ -5,9 +5,13 @@
 namespace Proton
 {
 #define sceneRegistry m_Scene->m_Registry
-	void SceneRenderer::Render(const EditorCamera& editorCam)
+	void SceneRenderer::Render(const DirectX::XMMATRIX& viewMatrix, const DirectX::XMMATRIX& projMatrix)
 	{
+		//RenderCommand::BindSwapChain();
+		//RenderCommand::Clear();
+
 		m_FrameBuffer->Bind();
+
 		Renderer::BeginScene();
 
 		//TODO: Replace with better light code
@@ -25,7 +29,7 @@ namespace Proton
 
 		if (lightComponent)
 		{
-			DirectX::XMStoreFloat3(&lightData.pos, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&lightTransform->position), editorCam.GetViewMatrix()));
+			DirectX::XMStoreFloat3(&lightData.pos, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&lightTransform->position), viewMatrix));
 			lightData.ambient = lightComponent->ambient;
 			lightData.diffuseColor = lightComponent->diffuseColour;
 			lightData.diffuseIntensity = lightComponent->diffuseIntensity;
@@ -46,7 +50,7 @@ namespace Proton
 		{
 			auto& [node, transform] = sceneRegistry.get<NodeComponent, TransformComponent>(entity);
 
-			SubmitNode(Entity(entity, m_Scene.get()), DirectX::XMMatrixIdentity(), editorCam.GetViewMatrix(), editorCam.GetProjection());
+			SubmitNode(Entity(entity, m_Scene.get()), DirectX::XMMatrixIdentity(), viewMatrix, projMatrix);
 		}
 
 		Renderer::Render();

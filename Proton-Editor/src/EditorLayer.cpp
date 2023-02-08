@@ -9,9 +9,6 @@
 #include "CompileTimeTests.h"
 #include <DirectXMath.h>
 
-#include "imgui\imgui.h"
-#include "imgui\imgui_internal.h"
-
 namespace Proton
 {
 	EditorLayer::EditorLayer()
@@ -22,6 +19,9 @@ namespace Proton
 
 	void EditorLayer::OnAttach()
 	{
+		m_IconPlay = Texture2D::Create("Resources/icons/PlayButton.png");
+		m_IconStop = Texture2D::Create("Resources/icons/StopButton.png");
+
 		std::string projectPath = __FILE__;
 		int directoryCounter = 0;
 		while (directoryCounter < 3)
@@ -42,6 +42,7 @@ namespace Proton
 		desc.Height = 720;
 		desc.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH };
 		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };
+		//desc.ClearColor = new float[4] { 1.0f, 0.07f, 0.2f, 1 };
 
 		m_ActiveScene = CreateRef<Scene>();
 		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f);
@@ -55,7 +56,7 @@ namespace Proton
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
 		//ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
-		//ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
 
 		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
 
@@ -118,9 +119,29 @@ namespace Proton
 		if (m_UpdateEditorCam)
 			m_EditorCam.OnUpdate(ts);
 
-		m_ActiveScene->OnEditorUpdate(ts, m_EditorCam);
-
-		m_SceneRenderer->Render(m_EditorCam);
+		switch (m_SceneState)
+		{
+			case SceneState::Edit:
+			{
+				m_ActiveScene->OnEditorUpdate(ts);
+				m_SceneRenderer->Render(m_EditorCam.GetViewMatrix(), m_EditorCam.GetProjection());
+				break;
+			}
+			case SceneState::Play:
+			{
+				m_ActiveScene->OnRuntimeUpdate(ts);
+				Entity cameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
+				if (cameraEntity != Entity::Null)
+				{
+					CameraComponent& camera = cameraEntity.GetComponent<CameraComponent>();
+					TransformComponent& transform = cameraEntity.GetComponent<TransformComponent>();
+					DirectX::XMMATRIX viewMatrix = XMMatrixInverse(nullptr, DirectX::XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z) *
+						XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&transform.position)));
+					m_SceneRenderer->Render(viewMatrix, camera.camera.GetProjection());
+				}
+				break;
+			}
+		}
 	}
 
 	//TEMP
@@ -261,7 +282,7 @@ namespace Proton
 
 		//Custom Windows
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2{ 0, 0 });
-		ImGui::Begin("Scene");
+		ImGui::Begin("Scene", 0, ImGuiDockNodeFlags_AutoHideTabBar);
 		ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
 
 		if (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)
@@ -282,12 +303,20 @@ namespace Proton
 		if (Input::IsKeyReleased(Key::Backspace) && ImGui::IsWindowFocused())
 			texID = !texID;
 
+		//Disable blending when drawing the image in order to avoid blending with the Window background if the texture has alpha
+		ImDrawCallback disableBlend = [](const ImDrawList* parent_list, const ImDrawCmd* cmd) { RenderCommand::DisableBlending(); };
+		ImDrawCallback enableBlend = [](const ImDrawList* parent_list, const ImDrawCmd* cmd) { RenderCommand::EnableBlending(); };
+		
+		ImGui::GetCurrentWindow()->DrawList->AddCallback(disableBlend, nullptr);
 		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID), viewportPanelSize);
+		ImGui::GetCurrentWindow()->DrawList->AddCallback(enableBlend, nullptr);
 		ImGui::End();
 
 		SceneHierarchyPanel::OnImGuiRender();
 		AssetViewerPanel::OnImGuiRender();
 		ConsolePanel::OnImGuiRender();
+
+		UI_Toolbar();
 		//
 
 		if (ImGui::BeginMenuBar())
@@ -321,6 +350,37 @@ namespace Proton
 
 			ImGui::EndMenuBar();
 		}
+
+		ImGui::End();
+	}
+
+	void EditorLayer::UI_Toolbar()
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 2));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(0, 2));
+
+		auto& colors = ImGui::GetStyle().Colors;
+		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0, 0, 0, 0));
+		auto& buttonHovered = colors[ImGuiCol_ButtonHovered];
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4(buttonHovered.x, buttonHovered.y, buttonHovered.z, 0.5f));
+		auto& buttonActive = colors[ImGuiCol_ButtonActive];
+		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4(buttonActive.x, buttonActive.y, buttonActive.z, 0.5f));
+
+		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
+		float size = ImGui::GetWindowHeight() - 4.0f;
+
+		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+		if (ImGui::ImageButton(icon->GetTexturePointer(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+		{
+			if (m_SceneState == SceneState::Edit)
+				OnScenePlay();
+			else if(m_SceneState == SceneState::Play)
+				OnSceneStop();
+		}
+
+		ImGui::PopStyleVar(2);
+		ImGui::PopStyleColor(3);
 
 		ImGui::End();
 	}
@@ -450,5 +510,15 @@ namespace Proton
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(filepath, m_EditorCam);
 		}
+	}
+
+	void EditorLayer::OnScenePlay()
+	{
+		m_SceneState = SceneState::Play;
+	}
+
+	void EditorLayer::OnSceneStop()
+	{
+		m_SceneState = SceneState::Edit;
 	}
 }

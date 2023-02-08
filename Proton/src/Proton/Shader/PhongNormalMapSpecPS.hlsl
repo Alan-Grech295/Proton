@@ -31,6 +31,13 @@ SamplerState smplr;
 PS_OUTPUT main(float3 viewFragPos : POSITION, float3 viewNormal : NORMAL, float3 viewTan : TANGENT, float3 viewBitan : BITANGENT, float2 tc : TEXCOORD)
 {
     PS_OUTPUT output;
+    float4 texCol = tex.Sample(smplr, tc);
+    //Discard if alpha too low
+    clip(texCol.a < 0.1f ? -1 : 1);
+    
+    //Flip normal when backface
+    if (dot(viewNormal, viewFragPos) >= 0.0f)
+        viewNormal = -viewNormal;
     
     //renormalize interpolated normal
     viewNormal = normalize(viewNormal);
@@ -58,7 +65,7 @@ PS_OUTPUT main(float3 viewFragPos : POSITION, float3 viewNormal : NORMAL, float3
     
     const float3 specular = Specular(specularReflectionColour, specularIntensity, viewNormal, lv.vToL, viewFragPos, att, specPower);
 	
-    output.Color = float4(saturate((diffuse + ambient) * tex.Sample(smplr, tc).rgb + specular * diffuseIntensity), 1.0f);
+    output.Color = float4(saturate((diffuse + ambient) * texCol.rgb + specular * diffuseIntensity), texCol.a);
     output.PickID = 1;
     
     return output;

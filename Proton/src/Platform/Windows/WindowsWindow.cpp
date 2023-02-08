@@ -134,6 +134,7 @@ namespace Proton
 		m_HInstance = hInstance;
 		m_Data.title = props.title;
 		m_Data.width = props.width;
+		m_Data.height = props.height;
 
 		//Logs window creation
 		PT_CORE_INFO("Creating window {0} ({1}, {2})", props.title, props.width, props.height);

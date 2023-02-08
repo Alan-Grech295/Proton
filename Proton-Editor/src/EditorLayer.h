@@ -2,6 +2,7 @@
 #define NOMINMAX
 #include <Proton.h>
 #include "imgui\imgui.h"
+#include "imgui\imgui_internal.h"
 #include "Panels\SceneHierarchyPanel.h"
 #include "Panels\AssetViewerPanel.h"
 #include "Panels\ConsolePanel.h"
@@ -29,6 +30,11 @@ namespace Proton
 		void OpenScene();
 		void SaveScene();
 		void SaveSceneAs();
+
+		void UI_Toolbar();
+
+		void OnScenePlay();
+		void OnSceneStop();
 	private:
 		Entity m_CameraEntity;
 		Entity m_GoblinEntity;
@@ -37,6 +43,9 @@ namespace Proton
 
 		Ref<Scene> m_ActiveScene;
 		Scope<SceneRenderer> m_SceneRenderer;
+
+		Ref<Texture2D> m_IconPlay;
+		Ref<Texture2D> m_IconStop;
 
 		EditorCamera m_EditorCam;
 
@@ -57,6 +66,10 @@ namespace Proton
 			float y = 0.0f;
 			float z = 0.0f;
 		} m_Transform;
+
+		enum class SceneState { Edit = 0, Play = 1};
+
+		SceneState m_SceneState = SceneState::Edit;
 	};
 }
 

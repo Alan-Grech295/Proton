@@ -22,6 +22,14 @@ SamplerState smplr;
 
 float4 main(float3 viewFragPos : POSITION, float3 viewNormal : NORMAL, float3 viewTan : TANGENT, float3 viewBitan : BITANGENT, float2 tc : TEXCOORD) : SV_TARGET
 {
+    float4 texCol = tex.Sample(smplr, tc);
+    //Discard if alpha too low
+    clip(texCol.a < 0.1f ? -1 : 1);
+    
+    //Flip normal when backface
+    if(dot(viewNormal, viewFragPos) >= 0.0f)
+        viewNormal = -viewNormal;
+
     //renormalize interpolated normal
     viewNormal = normalize(viewNormal);
     
@@ -39,6 +47,6 @@ float4 main(float3 viewFragPos : POSITION, float3 viewNormal : NORMAL, float3 vi
     // calculate specular intensity based on angle between viewing vector and reflection vector, narrow with power function
     const float3 specular = Specular(diffuseColor, diffuseIntensity, viewNormal, lv.vToL, viewFragPos, att, specularPower);
 	
-    return float4(saturate((diffuse + ambient) * tex.Sample(smplr, tc).rgb + specular), 1.0f);
+    return float4(saturate((diffuse + ambient) * texCol.rgb + specular), texCol.a);
 
 }
