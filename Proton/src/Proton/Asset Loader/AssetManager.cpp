@@ -471,62 +471,6 @@ namespace Proton
 #undef X
 	}
 
-	File* AssetManager::WriteImageData(const std::filesystem::path& imagePath)
-	{
-		DirectX::ScratchImage scratch;
-		HRESULT hr = DirectX::LoadFromWICFile(imagePath.wstring().c_str(), DirectX::WIC_FLAGS_NONE,
-			nullptr, scratch);
-
-		if (FAILED(hr))
-		{
-			PT_CORE_ERROR("[TEXTURE PATH] {0}", imagePath.string());
-			GET_ERROR(hr);
-		}
-
-		if (scratch.GetImage(0, 0, 0)->format != DirectXTexture2D::format)
-		{
-			DirectX::ScratchImage converted;
-			hr = DirectX::Convert(
-				*scratch.GetImage(0, 0, 0),
-				DirectXTexture2D::format,
-				DirectX::TEX_FILTER_DEFAULT,
-				DirectX::TEX_THRESHOLD_DEFAULT,
-				converted
-			);
-
-			scratch = std::move(converted);
-		}
-
-		uint32_t width = (uint32_t)scratch.GetMetadata().width;
-		uint32_t height = (uint32_t)scratch.GetMetadata().height;
-		bool isOpaque = scratch.IsAlphaAllOpaque();
-
-		PT_CORE_TRACE("Writing Image {0}", imagePath.string());
-		File* file = new File(imagePath.string() + std::string(".rawAsset"), scratch.GetPixelsSize() + 18 + imagePath.string().length());
-
-		//file->Write((uint32_t)AssetType::Image);
-
-		file->Write(width);
-
-		file->Write(height);
-
-		file->Write(isOpaque);
-
-		uint32_t pixels = (uint32_t)scratch.GetPixelsSize();
-		file->Write(scratch.GetPixels(), pixels);
-
-		Ref<Image> img = CreateRef<Image>();
-		img->width = width;
-		img->height = height;
-		img->isOpaque = isOpaque;
-		img->pixels = new uint8_t[pixels];
-		memcpy(img->pixels, scratch.GetPixels(), pixels);
-
-		m_ImageAssets[imagePath] = img; 
-
-		return file;
-	}
-
 	Ref<Image> AssetManager::ImportImageAsset(File& file)
 	{
 		Ref<Image> imageAsset = CreateRef<Image>();

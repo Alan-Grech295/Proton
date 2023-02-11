@@ -1,4 +1,6 @@
 #include "ptpch.h"
+#include <stdlib.h>
+#include <crtdbg.h>
 
 #include "Application.h"
 
@@ -16,6 +18,7 @@
 #include "Proton\Renderer\Renderer.h"
 
 #include "Proton\Debug\ProfileLayer.h"
+#include "Proton/Scripting/ScriptEngine.h"
 
 namespace Proton
 {
@@ -24,6 +27,8 @@ namespace Proton
 
 	Application::Application()
 	{
+		//TODO: Investigate memory leaks
+		_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF);
 		s_Instance = this;
 		m_Window = Scope<Window>(Window::Create({"Proton Game Engine", 1280, 720}));
 
@@ -36,10 +41,14 @@ namespace Proton
 		#if PT_PROFILE
 		PushOverlay(new ProfileLayer());
 		#endif
+
+		ScriptEngine::Init();
 	}
 
 	Application::~Application()
 	{
+		m_Window->Close();
+		ScriptEngine::Shutdown();
 	}
 
 	void Application::OnEvent(Event& e)
@@ -73,7 +82,7 @@ namespace Proton
 
 	void Application::Close()
 	{
-		m_Window->Close();
+		
 	}
 
 	void Application::Run()

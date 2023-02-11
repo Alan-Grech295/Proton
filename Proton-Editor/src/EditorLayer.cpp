@@ -69,7 +69,7 @@ namespace Proton
 		//
 		//m_CameraEntity.AddComponent<CameraComponent>();
 		//
-		//m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
+		//m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();*/
 	}
 
 	EditorLayer::~EditorLayer()

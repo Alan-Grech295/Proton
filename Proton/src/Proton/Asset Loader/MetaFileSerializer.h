@@ -11,16 +11,6 @@ namespace Proton
 {
 	namespace Meta
 	{
-		//For debug only
-		static std::unordered_map<Type, std::string> typeToString = {
-			#define X(el) {Type::el, #el},
-			ELEMENT_TYPES
-			#undef X
-			{Type::Struct, "Struct"},
-			{Type::Array, "Array"},
-			{Type::Pointer, "Pointer"}
-		};
-
 		//Virtual class for Element and MetaFile so that elements can be added to them
 		class Addable
 		{

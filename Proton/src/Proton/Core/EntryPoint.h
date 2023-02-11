@@ -44,6 +44,9 @@ int CALLBACK WinMain(
 	delete app;
 	PT_PROFILE_END_SESSION();
 
+	//_CrtDumpMemoryLeaks();
+	std::cin.get();
+
 	return 0;
 }
 

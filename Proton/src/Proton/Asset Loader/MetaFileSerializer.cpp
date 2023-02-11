@@ -16,6 +16,16 @@ namespace Proton
 {
 	namespace Meta
 	{
+		//For debug only
+		static std::unordered_map<Type, std::string> typeToString = {
+			#define X(el) {Type::el, #el},
+			ELEMENT_TYPES
+			#undef X
+			{Type::Struct, "Struct"},
+			{Type::Array, "Array"},
+			{Type::Pointer, "Pointer"}
+		};
+
 		Element::Element(const char* name, Type type, uint32_t dataOffset)
 			:
 			m_Name(name),
@@ -82,7 +92,7 @@ namespace Proton
 				return std::string(m_Name) + ", (Array) Type: " + data.m_TypeTemplate.ToString() + ", Size: " + std::to_string(data.m_Size);
 			}
 
-			return std::string(m_Name) + ", " + typeToString[m_Type];
+			return std::string(m_Name) +", " + typeToString[m_Type];
 		}
 
 		//Converts the element to bytes
@@ -258,7 +268,7 @@ namespace Proton
 			{
 				ExtraData::Array& arrayData = static_cast<ExtraData::Array&>(*m_ExtraData);
 				//			Type Data										Size			Constant Size		Stride												Num Offsets							{Offsets}
-				size += arrayData.m_TypeTemplate.CalculateSizeInArray() + sizeof(uint32_t) + sizeof(boolean) + sizeof(int) + (arrayData.m_ConstElementSize ? 0 : sizeof(uint32_t) + sizeof(uint32_t) * arrayData.m_ElementOffsets.value().size());
+				size += arrayData.m_TypeTemplate.CalculateSizeInArray() + sizeof(uint32_t) + sizeof(bool) + sizeof(int) + (arrayData.m_ConstElementSize ? 0 : sizeof(uint32_t) + sizeof(uint32_t) * arrayData.m_ElementOffsets.value().size());
 			}
 
 			return size;

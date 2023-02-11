@@ -1,5 +1,4 @@
 #define NOMINMAX
-
 #include "ptpch.h"
 #include "WindowsWindow.h"
 #include "Proton\Core\Application.h"
@@ -221,8 +220,9 @@ namespace Proton
 	void WindowsWindow::Close()
 	{
 		WindowCloseEvent event;
-		WindowData& data = *(WindowData*)GetClassLongPtr(m_HWnd, 0);
-		data.eventCallback(event);
+		WindowData* data = (WindowData*)GetClassLongPtr(m_HWnd, 0);
+		if(data)
+			data->eventCallback(event);
 		Shutdown();
 	}
 

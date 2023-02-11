@@ -20,3 +20,5 @@
 	#include <Windows.h>
 #endif // PT_PLATFORM_WINDOWS
 
+#define PT_PROFILE 1
+

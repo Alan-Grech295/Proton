@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Proton\Core\Window.h"
 #include "Proton\Core\Log.h"
 #include <memory>

@@ -1,0 +1,6 @@
+D:\Dev\Proton\Proton-Editor\Resources\Scripts\Intermediates\Debug\Proton-ScriptCore.csproj.AssemblyReference.cache
+D:\Dev\Proton\Proton-Editor\Resources\Scripts\Intermediates\Debug\Proton-ScriptCore.csproj.CoreCompileInputs.cache
+D:\Dev\Proton\Proton-Editor\Resources\Scripts\Intermediates\Debug\Proton-ScriptCore.dll
+D:\Dev\Proton\Proton-Editor\Resources\Scripts\Intermediates\Debug\Proton-ScriptCore.pdb
+D:\Dev\Proton\Proton-Editor\Resources\Scripts\Proton-ScriptCore.dll
+D:\Dev\Proton\Proton-Editor\Resources\Scripts\Proton-ScriptCore.pdb

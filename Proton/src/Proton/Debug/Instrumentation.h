@@ -147,8 +147,6 @@ namespace Proton
     };
 }
 
-#define PT_PROFILE 1
-
 #if PT_PROFILE
     #define PT_PROFILE_BEGIN_SESSION(name, filepath) ::Proton::Instrumentor::Get().BeginSession(name, filepath)
     #define PT_PROFILE_END_SESSION()  ::Proton::Instrumentor::Get().EndSession()
