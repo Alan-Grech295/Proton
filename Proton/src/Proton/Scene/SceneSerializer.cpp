@@ -496,7 +496,7 @@ namespace Proton
 				{
 					ScriptComponent& sc = deserializedEntity.AddComponent<ScriptComponent>();
 
-					sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+					sc.ClassName = scriptComponent["Class"].as<std::string>();
 				}
 			}
 		}

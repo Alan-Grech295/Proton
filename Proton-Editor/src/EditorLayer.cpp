@@ -9,6 +9,8 @@
 #include "CompileTimeTests.h"
 #include <DirectXMath.h>
 
+#include <filesystem>
+
 namespace Proton
 {
 	EditorLayer::EditorLayer()
@@ -496,6 +498,12 @@ namespace Proton
 
 		if (!filepath.empty())
 		{
+			std::filesystem::path path = filepath;
+			if (path.extension() != ".proton")
+				path += ".proton";
+
+			filepath = path.string();
+
 			saveFilePath = filepath;
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(filepath, m_EditorCam);
