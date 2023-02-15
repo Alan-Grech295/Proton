@@ -16,8 +16,8 @@ namespace Proton
 			m_FrameBuffer = Framebuffer::Create(framebufferDesc);
 
 			//TEMP (debug lines)
-			m_DebugPixShader = PixelShader::CreateUnique("C:\\Dev\\Proton\\Proton\\DebugPS.cso");
-			m_DebugVertShader = VertexShader::CreateUnique("C:\\Dev\\Proton\\Proton\\DebugVS.cso");
+			m_DebugPixShader = PixelShader::CreateUnique(CoreUtils::CORE_PATH_STR + "Proton\\DebugPS.cso");
+			m_DebugVertShader = VertexShader::CreateUnique(CoreUtils::CORE_PATH_STR + "Proton\\DebugVS.cso");
 			m_ViewProjBuffer = VertexConstantBuffer::CreateUnique(0, sizeof(DirectX::XMMATRIX), nullptr);
 		}
 

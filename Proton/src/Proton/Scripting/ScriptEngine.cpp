@@ -121,6 +121,7 @@ namespace Proton
 		Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 
 		ScriptGlue::RegisterFunctions();
+		ScriptGlue::RegisterComponents();
 
 		//Retrieve and instantiate class with constructor
 		s_Data->EntityClass = ScriptClass("Proton", "Entity");
@@ -261,6 +262,11 @@ namespace Proton
 			if (isEntity)
 				s_Data->EntityClasses[fullName] = CreateRef<ScriptClass>(nameSpace, name);
 		}
+	}
+
+	MonoImage* ScriptEngine::GetCoreAssemblyImage()
+	{
+		return s_Data->CoreAssemblyImage;
 	}
 
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)

@@ -38,9 +38,9 @@ namespace Sandbox
             else if (Input.IsKeyDown(KeyCode.S))
                 velocity.z -= speed;
 
-            Vector3 translation = Translation;
-            translation += velocity * ts;
-            Translation = translation;
+            Vector3 position = Position;
+            position += velocity * ts;
+            Position = position;
         }
     }
 }

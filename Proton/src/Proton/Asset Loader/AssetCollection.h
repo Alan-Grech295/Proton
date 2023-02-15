@@ -19,14 +19,8 @@ namespace Proton
 		template<typename T>
 		static T& Get(std::string path)
 		{
-			if (m_Collection.find(path) != m_Collection.end())
-			{
-				return *static_cast<T*>(m_Collection[path]);
-			}
-			else
-			{
-				assert("Key not found" && false);
-			}
+			PT_CORE_ASSERT(m_Collection.find(path) != m_Collection.end(), "Key not found");
+			return *static_cast<T*>(m_Collection[path]);
 		}
 	private:
 		static std::unordered_map<std::string, void*> m_Collection;

@@ -41,7 +41,7 @@ namespace Proton
 		Entity m_Nanosuit;
 		Entity m_PointLight;
 
-		std::string projectPath = CORE_PATH_STR + "\\Proton-Editor\\assets";
+		std::string projectPath;
 
 		Ref<Scene> m_ActiveScene;
 		Scope<SceneRenderer> m_SceneRenderer;

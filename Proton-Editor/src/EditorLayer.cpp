@@ -17,6 +17,12 @@ namespace Proton
 		:
 		Layer("EditorLayer")
 	{
+		//Setting working directory
+		std::string_view fileLoc = __FILE__;
+		size_t pos = fileLoc.find("Proton");
+		PT_CORE_ASSERT(pos != -1);
+		CoreUtils::CORE_PATH_STR = fileLoc.substr(0, pos + 7);
+		projectPath = CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets";
 	}
 
 	void EditorLayer::OnAttach()
@@ -48,9 +54,9 @@ namespace Proton
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
 		//ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
-		ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+		ModelCreator::CreateModelEntity(CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
 
-		ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
+		ModelCreator::CreateModelEntity(CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
 
 		//m_Nanosuit = ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
 		//

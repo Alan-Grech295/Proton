@@ -1,5 +1,6 @@
 #pragma once
 #include <memory>
+#include <string>
 
 #ifdef PT_PLATFORM_WINDOWS
 #define DX_CHECK_ERROR(x)   { \
@@ -15,11 +16,15 @@
 
 #define BIT(x) (1 << x)
 
-#define CORE_PATH "C:\\Dev\\Proton"
-#define CORE_PATH_STR std::string(CORE_PATH)
-
 namespace Proton
 {
+	//Need to be set
+	class CoreUtils
+	{
+	public:
+		static std::string CORE_PATH_STR;
+	};
+
 	template<typename T>
 	using Scope = std::unique_ptr<T>;
 	template<typename T, typename... Args>

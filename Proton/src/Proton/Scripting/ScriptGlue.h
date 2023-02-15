@@ -5,5 +5,6 @@ namespace Proton
 	{
 	public:
 		static void RegisterFunctions();
+		static void RegisterComponents();
 	};
 }

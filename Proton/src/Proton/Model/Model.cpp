@@ -485,28 +485,28 @@ namespace Proton
 
 		if (matData->hasSpecular && !matData->hasNormalMap)
 		{
-			pixShaderPath = CORE_PATH_STR + "Proton\\PhongSpecularPS.cso";
-			vertShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
+			pixShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongSpecularPS.cso";
+			vertShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
 		}
 		else if (matData->hasNormalMap && !matData->hasSpecular)
 		{
-			pixShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapPS.cso";
-			vertShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
+			pixShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongNormalMapPS.cso";
+			vertShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
 		}
 		else if (matData->hasNormalMap && matData->hasSpecular)
 		{
-			pixShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapSpecPS.cso";
-			vertShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
+			pixShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongNormalMapSpecPS.cso";
+			vertShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
 		}
 		else if (!matData->hasNormalMap && !matData->hasSpecular && matData->hasDiffuseMap)
 		{
-			pixShaderPath = CORE_PATH_STR + "Proton\\PhongPS.cso";
-			vertShaderPath = CORE_PATH_STR + "Proton\\PhongVS.cso";
+			pixShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongPS.cso";
+			vertShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongVS.cso";
 		}
 		else
 		{
-			pixShaderPath = CORE_PATH_STR + "Proton\\PhongNoTexPS.cso";
-			vertShaderPath = CORE_PATH_STR + "Proton\\PhongVS.cso";
+			pixShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongNoTexPS.cso";
+			vertShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongVS.cso";
 		}
 
 		pixShader = CreateRef<SharedBindable>(ResType::PixelShader, pixShaderPath);
