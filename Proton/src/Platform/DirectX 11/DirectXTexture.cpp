@@ -1,6 +1,5 @@
 #include "ptpch.h"
 #include "DirectXTexture.h"
-#include "Proton\Renderer\RenderCommand.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
 #include <cassert>
 #include "Proton\Asset Loader\AssetManager.h"

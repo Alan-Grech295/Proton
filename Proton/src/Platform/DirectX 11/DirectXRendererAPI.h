@@ -2,7 +2,6 @@
 #include "Proton\Renderer\RendererAPI.h"
 #include <wrl.h>
 #include <d3d11.h>
-#include "Proton\Core\Log.h"
 #include "Proton/Renderer/Bindables/Blender.h"
 
 namespace Proton

@@ -1,6 +1,5 @@
 #pragma once
 #include "Proton\Core\Input.h"
-#include "Proton\Core\Core.h"
 #include <bitset>
 
 
@@ -11,8 +10,8 @@ namespace Proton
 		friend class WindowsWindow;
 		friend Input;
 	protected:
-		virtual bool IsKeyPressedImpl(int keycode) override;
-		virtual bool IsKeyReleasedImpl(int keycode) override;
+		virtual bool IsKeyPressedImpl(KeyCode keycode) override;
+		virtual bool IsKeyReleasedImpl(KeyCode keycode) override;
 		virtual bool IsMouseButtonPressedImpl(int button) override;
 		virtual float GetMouseXImpl() override;
 		virtual float GetMouseYImpl() override;

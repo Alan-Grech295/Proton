@@ -2,8 +2,7 @@
 #include "SceneSerializer.h"
 #include <cassert>
 #include "Entity.h"
-#include "Components.h"
-#include "Model.h"
+#include "Proton/Model/Model.h"
 #include "Proton/Asset Loader/AssetCollection.h"
 
 #include <yaml-cpp\yaml.h>
@@ -131,6 +130,8 @@ namespace Proton
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
+		assert(entity.HasComponent<IDComponent>());
+
 		out << YAML::BeginMap;	//Entity
 		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
 
@@ -139,7 +140,7 @@ namespace Proton
 			out << YAML::Key << "TagComponent";
 			out << YAML::BeginMap;	//TagComponent
 
-			auto& tag = entity.GetComponent<TagComponent>().tag;
+			auto& tag = entity.GetComponent<TagComponent>().Tag;
 			out << YAML::Key << "Tag" << YAML::Value << tag;
 
 			out << YAML::EndMap;	//TagComponent
@@ -167,12 +168,12 @@ namespace Proton
 
 			auto& nc = entity.GetComponent<NodeComponent>();
 			//writeMesh = entity.HasComponent<RootNodeTag>() ? nc.m_PrefabName == "" : nc.m_RootEntity.GetComponent<NodeComponent>().m_PrefabName == "";
-			out << YAML::Key << "Node Name" << YAML::Value << nc.m_NodeName;
+			out << YAML::Key << "Node Name" << YAML::Value << nc.NodeName;
 			out << YAML::Key << "Is Prefab" << YAML::Value << !writeMesh;
 			//out << YAML::Key << "Prefab Path" << YAML::Value << nc.m_PrefabName;
-			out << YAML::Key << "Parent Entity" << YAML::Value << (nc.m_ParentEntity == Entity::Null ? LLONG_MAX : nc.m_ParentEntity.GetUUID());
-			out << YAML::Key << "Root Entity" << YAML::Value << (nc.m_RootEntity == Entity::Null ? LLONG_MAX : nc.m_RootEntity.GetUUID());
-			out << YAML::Key << "Initial Transform" << YAML::Value << nc.m_Origin;
+			out << YAML::Key << "Parent Entity" << YAML::Value << (nc.ParentEntity == Entity::Null ? LLONG_MAX : nc.ParentEntity.GetUUID());
+			out << YAML::Key << "Root Entity" << YAML::Value << (nc.RootEntity == Entity::Null ? LLONG_MAX : nc.RootEntity.GetUUID());
+			out << YAML::Key << "Initial Transform" << YAML::Value << nc.Origin;
 
 			out << YAML::EndMap;	//NodeComponent
 		}
@@ -183,12 +184,12 @@ namespace Proton
 			out << YAML::BeginMap;	//LightComponent
 
 			auto& lc = entity.GetComponent<LightComponent>();
-			out << YAML::Key << "Ambient" << YAML::Value << lc.ambient;
-			out << YAML::Key << "Diffuse Color" << YAML::Value << lc.diffuseColour;
-			out << YAML::Key << "Diffuse Intensity" << YAML::Value << lc.diffuseIntensity;
-			out << YAML::Key << "Attenuation Constant" << YAML::Value << lc.attConst;
-			out << YAML::Key << "Attenuation Linear" << YAML::Value << lc.attLin;
-			out << YAML::Key << "Attenuation Quadratic" << YAML::Value << lc.attQuad;
+			out << YAML::Key << "Ambient" << YAML::Value << lc.Ambient;
+			out << YAML::Key << "Diffuse Color" << YAML::Value << lc.DiffuseColour;
+			out << YAML::Key << "Diffuse Intensity" << YAML::Value << lc.DiffuseIntensity;
+			out << YAML::Key << "Attenuation Constant" << YAML::Value << lc.AttConst;
+			out << YAML::Key << "Attenuation Linear" << YAML::Value << lc.AttLin;
+			out << YAML::Key << "Attenuation Quadratic" << YAML::Value << lc.AttQuad;
 
 			out << YAML::EndMap;	//LightComponent
 		}
@@ -200,9 +201,9 @@ namespace Proton
 
 			auto& mc = entity.GetComponent<MeshComponent>();
 
-			for (int i = 0; i < mc.m_MeshPtrs.size(); i++)
+			for (int i = 0; i < mc.MeshPtrs.size(); i++)
 			{
-				Mesh& mesh = *mc.m_MeshPtrs[i];
+				Mesh& mesh = *mc.MeshPtrs[i];
 				out << YAML::Key << ("Mesh" + std::to_string(i));
 
 				out << YAML::BeginMap;	//Mesh
@@ -220,7 +221,7 @@ namespace Proton
 			out << YAML::BeginMap;	//CameraComponent
 
 			auto& cc = entity.GetComponent<CameraComponent>();
-			auto& camera = cc.camera;
+			auto& camera = cc.Camera;
 
 			out << YAML::Key << "Camera" << YAML::Value;
 			out << YAML::BeginMap;	//Camera
@@ -250,6 +251,17 @@ namespace Proton
 			out << YAML::EndMap;	//NativeScriptComponent
 		}
 
+		if (entity.HasComponent<ScriptComponent>())
+		{
+			out << YAML::Key << "ScriptComponent";
+			out << YAML::BeginMap;	//ScriptComponent
+
+			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
+			out << YAML::Key << "Class" << YAML::Value << scriptComponent.ClassName;
+
+			out << YAML::EndMap;	//ScriptComponent
+		}
+
 		out << YAML::EndMap;	//Entity
 	}
 
@@ -259,7 +271,7 @@ namespace Proton
 
 		SerializeEntity(out, entity);
 
-		for (Entity child : cc.m_Children)
+		for (Entity child : cc.Children)
 		{
 			SerializeChild(out, child);
 		}
@@ -296,7 +308,7 @@ namespace Proton
 		{
 			entt::entity entityID = *it;
 
-			Entity entity{ entityID, m_Scene.get() };
+			Entity entity(entityID, m_Scene.get());
 			if (!entity)
 				return;
 
@@ -304,7 +316,7 @@ namespace Proton
 
 			NodeComponent& root = entity.GetComponent<NodeComponent>();
 
-			for (Entity child : root.m_Children)
+			for (Entity child : root.Children)
 			{
 				SerializeChild(out, child);
 			}
@@ -379,19 +391,19 @@ namespace Proton
 				auto node = entity["NodeComponent"];
 				NodeComponent& childNodeComponent = deserializedEntity.GetComponent<NodeComponent>();
 
-				childNodeComponent.m_Origin = node["Initial Transform"].as<DirectX::XMMATRIX>();
+				childNodeComponent.Origin = node["Initial Transform"].as<DirectX::XMMATRIX>();
 
 				if (node["Parent Entity"].as<uint64_t>() != LLONG_MAX)
 				{
-					Entity& parent = m_Scene->GetEntityFromUUID(node["Parent Entity"].as<uint64_t>());
+					Entity& parent = m_Scene->GetEntityByUUID(node["Parent Entity"].as<uint64_t>());
 					deserializedEntity.SetParent(&parent);
 
-					Entity& root = m_Scene->GetEntityFromUUID(node["Root Entity"].as<uint64_t>());
-					childNodeComponent.m_RootEntity = root;
+					Entity& root = m_Scene->GetEntityByUUID(node["Root Entity"].as<uint64_t>());
+					childNodeComponent.RootEntity = root;
 				}
 
 				//childNodeComponent.m_PrefabName = node["Prefab Path"].as<std::string>();
-				childNodeComponent.m_NodeName = node["Node Name"].as<std::string>();
+				childNodeComponent.NodeName = node["Node Name"].as<std::string>();
 
 				if (node["Is Prefab"].as<bool>())
 				{
@@ -457,12 +469,12 @@ namespace Proton
 				{
 					LightComponent& lightComponent = deserializedEntity.AddComponent<LightComponent>();
 
-					lightComponent.ambient = lightNode["Ambient"].as<DirectX::XMFLOAT3>();
-					lightComponent.diffuseColour = lightNode["Diffuse Color"].as<DirectX::XMFLOAT3>();
-					lightComponent.diffuseIntensity = lightNode["Diffuse Intensity"].as<float>();
-					lightComponent.attConst = lightNode["Attenuation Constant"].as<float>();
-					lightComponent.attLin = lightNode["Attenuation Linear"].as<float>();
-					lightComponent.attQuad = lightNode["Attenuation Quadratic"].as<float>();
+					lightComponent.Ambient = lightNode["Ambient"].as<DirectX::XMFLOAT3>();
+					lightComponent.DiffuseColour = lightNode["Diffuse Color"].as<DirectX::XMFLOAT3>();
+					lightComponent.DiffuseIntensity = lightNode["Diffuse Intensity"].as<float>();
+					lightComponent.AttConst = lightNode["Attenuation Constant"].as<float>();
+					lightComponent.AttLin = lightNode["Attenuation Linear"].as<float>();
+					lightComponent.AttQuad = lightNode["Attenuation Quadratic"].as<float>();
 				}
 				
 				//CameraComponent
@@ -473,17 +485,27 @@ namespace Proton
 					CameraComponent& cameraComponent = deserializedEntity.AddComponent<CameraComponent>();
 
 					auto cameraSettingsNode = cameraNode["Camera"];
-					cameraComponent.camera.SetProjectionType((SceneCamera::ProjectionType)cameraSettingsNode["ProjectionType"].as<int>());
-					cameraComponent.camera.SetPerspectiveVerticalFOV(cameraSettingsNode["PerspectiveFOV"].as<float>());
-					cameraComponent.camera.SetPerspectiveNearClip(cameraSettingsNode["PerspectiveNear"].as<float>());
-					cameraComponent.camera.SetPerspectiveFarClip(cameraSettingsNode["PerspectiveFar"].as<float>());
+					cameraComponent.Camera.SetProjectionType((SceneCamera::ProjectionType)cameraSettingsNode["ProjectionType"].as<int>());
+					cameraComponent.Camera.SetPerspectiveVerticalFOV(cameraSettingsNode["PerspectiveFOV"].as<float>());
+					cameraComponent.Camera.SetPerspectiveNearClip(cameraSettingsNode["PerspectiveNear"].as<float>());
+					cameraComponent.Camera.SetPerspectiveFarClip(cameraSettingsNode["PerspectiveFar"].as<float>());
 
-					cameraComponent.camera.SetOrthographicSize(cameraSettingsNode["OrthographicSize"].as<float>());
-					cameraComponent.camera.SetOrthographicNearClip(cameraSettingsNode["OrthographicNear"].as<float>());
-					cameraComponent.camera.SetOrthographicFarClip(cameraSettingsNode["OrthographicFar"].as<float>());
+					cameraComponent.Camera.SetOrthographicSize(cameraSettingsNode["OrthographicSize"].as<float>());
+					cameraComponent.Camera.SetOrthographicNearClip(cameraSettingsNode["OrthographicNear"].as<float>());
+					cameraComponent.Camera.SetOrthographicFarClip(cameraSettingsNode["OrthographicFar"].as<float>());
 
 					cameraComponent.Primary = cameraNode["Primary"].as<bool>();
 					cameraComponent.FixedAspectRatio = cameraNode["FixedAspectRatio"].as<bool>();
+				}
+
+				//Script Component
+				auto scriptComponent = entity["ScriptComponent"];
+
+				if (scriptComponent)
+				{
+					ScriptComponent& sc = deserializedEntity.AddComponent<ScriptComponent>();
+
+					sc.ClassName = scriptComponent["ClassName"].as<std::string>();
 				}
 			}
 		}

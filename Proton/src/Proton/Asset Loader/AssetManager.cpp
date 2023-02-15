@@ -1,10 +1,10 @@
 #include "ptpch.h"
+#include "AssetManager.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
 
-#include "AssetManager.h"
 #include <Platform\DirectX 11\DirectXTexture.h>
 #include "Proton\Model\Model.h"
 #include "Proton/Asset Loader/AssetCollection.h"

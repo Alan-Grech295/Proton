@@ -1,8 +1,4 @@
 #pragma once
-#include "Proton\Renderer\Bindables\Buffer.h"
-#include "Proton\Renderer\Bindables\Texture.h"
-#include "Proton\Renderer\Bindables\Sampler.h"
-#include "Proton\Renderer\Bindables\Topology.h"
 #include "Proton\Renderer\Render Queue\Technique.h"
 #include <DirectXMath.h>
 #include <memory>
@@ -10,6 +6,7 @@
 #include <optional>
 #include <cassert>
 #include <assimp/scene.h>
+
 #include "Bindables/ConstructableBindable.h"
 #include "Proton/Asset Loader/AssetCollection.h"
 #include "Proton/Asset Loader/AssetSerializer.h"

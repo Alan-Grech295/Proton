@@ -1,15 +1,32 @@
 #pragma once
-#include <DirectXMath.h>
-#include "Proton\Renderer\Camera.h"
-#include "Proton\Model\Model.h"
-#include "ScriptableEntity.h"
-#include "Proton\Scene\SceneCamera.h"
+
+//#include "ScriptableEntity.h"
+#include "SceneCamera.h"
 #include "Scene.h"
+#include "Proton/Core/UUID.h"
+
 #include <vector>
+#include <DirectXMath.h>
+#include <string.h>
 
 namespace Proton
 {
+	//Forward declaration
 	class Entity;
+
+	struct IDComponent
+	{
+		UUID ID;
+
+		IDComponent() = default;
+		IDComponent(UUID uuid)
+			:
+			ID(uuid)
+		{}
+
+		IDComponent(const IDComponent&) = default;
+	};
+
 	struct TransformComponent
 	{
 		DirectX::XMFLOAT3 position = { 0, 0, 0 };
@@ -33,17 +50,17 @@ namespace Proton
 
 	struct TagComponent
 	{
-		std::string tag;
+		std::string Tag;
 
 		TagComponent() = default;
 		TagComponent(const TagComponent&) = default;
 		TagComponent(const std::string& tag)
-			: tag(tag) {}
+			: Tag(tag) {}
 	};
 
 	struct CameraComponent
 	{
-		SceneCamera camera;
+		SceneCamera Camera;
 		bool Primary = true;
 		bool FixedAspectRatio = false;
 
@@ -62,8 +79,8 @@ namespace Proton
 		{}*/
 
 	public:
-		std::vector<Mesh*> m_MeshPtrs;
-		Ref<class Model> m_ModelRef;
+		std::vector<class Mesh*> MeshPtrs;
+		Ref<class Model> ModelRef;
 	};
 
 	struct RootNodeTag
@@ -77,21 +94,21 @@ namespace Proton
 
 	struct NodeComponent
 	{
-		std::vector<Entity> m_Children;
-		Entity m_ParentEntity;
-		Entity m_RootEntity;
-		std::string m_NodeName;
+		std::vector<Entity> Children;
+		Entity ParentEntity;
+		Entity RootEntity;
+		std::string NodeName;
 		//std::string m_PrefabName;
 
-		DirectX::XMMATRIX m_Origin;
+		DirectX::XMMATRIX Origin;
 
 		NodeComponent()
 			:
-			m_ParentEntity(Entity::Null),
-			m_RootEntity(Entity::Null),
-			m_NodeName(""),
+			ParentEntity(Entity::Null),
+			RootEntity(Entity::Null),
+			NodeName(""),
 			//m_PrefabName(""),
-			m_Origin(DirectX::XMMatrixIdentity())
+			Origin(DirectX::XMMatrixIdentity())
 		{};
 
 		NodeComponent(const NodeComponent&) = default;
@@ -125,28 +142,37 @@ namespace Proton
 
 	struct LightComponent
 	{
-		DirectX::XMFLOAT3 ambient;
-		DirectX::XMFLOAT3 diffuseColour;
-		float diffuseIntensity;
-		float attConst;
-		float attLin;
-		float attQuad;
-
-		//PixelConstantBuffer* cbuf;
+		DirectX::XMFLOAT3 Ambient;
+		DirectX::XMFLOAT3 DiffuseColour;
+		float DiffuseIntensity;
+		float AttConst;
+		float AttLin;
+		float AttQuad;
 
 		LightComponent(const LightComponent&) = default;
 		LightComponent()
 		{
-			ambient = { 0.05f, 0.05f, 0.05f };
-			diffuseColour = { 1.0f, 1.0f, 1.0f };
-			diffuseIntensity = 2.0f;
-			attConst = 1.0f;
-			attLin = 0.045f;
-			attQuad = 0.0075f;
+			Ambient = { 0.05f, 0.05f, 0.05f };
+			DiffuseColour = { 1.0f, 1.0f, 1.0f };
+			DiffuseIntensity = 2.0f;
+			AttConst = 1.0f;
+			AttLin = 0.045f;
+			AttQuad = 0.0075f;
 
 			//cbuf = PixelConstantBuffer::CreateUniquePtr(0, sizeof(Scene::PointLightData), new Scene::PointLightData());
 		}
 	};
+
+	struct ScriptComponent
+	{
+		std::string ClassName;
+
+		ScriptComponent() = default;
+		ScriptComponent(const ScriptComponent&) = default;
+	};
+
+	//Forward declaration
+	class ScriptableEntity;
 
 	struct NativeScriptComponent
 	{

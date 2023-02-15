@@ -1,6 +1,8 @@
 #include "ptpch.h"
 #include "SceneRenderer.h"
-#include "Proton\Scene\Components.h"
+#include "Renderer.h"
+#include "Proton\Scene\Entity.h"
+#include "Proton/Model/Model.h"
 
 namespace Proton
 {
@@ -30,12 +32,12 @@ namespace Proton
 		if (lightComponent)
 		{
 			DirectX::XMStoreFloat3(&lightData.pos, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&lightTransform->position), viewMatrix));
-			lightData.ambient = lightComponent->ambient;
-			lightData.diffuseColor = lightComponent->diffuseColour;
-			lightData.diffuseIntensity = lightComponent->diffuseIntensity;
-			lightData.attConst = lightComponent->attConst;
-			lightData.attLin = lightComponent->attLin;
-			lightData.attQuad = lightComponent->attQuad;
+			lightData.ambient = lightComponent->Ambient;
+			lightData.diffuseColor = lightComponent->DiffuseColour;
+			lightData.diffuseIntensity = lightComponent->DiffuseIntensity;
+			lightData.attConst = lightComponent->AttConst;
+			lightData.attLin = lightComponent->AttLin;
+			lightData.attQuad = lightComponent->AttQuad;
 		}
 
 		lightCBuf->SetData(&lightData);
@@ -80,14 +82,14 @@ namespace Proton
 		auto [transform, node] = sceneRegistry.get<TransformComponent, NodeComponent>(entity);
 
 		DirectX::XMMATRIX transformMat = transform.GetTransformMatrix() *
-										 node.m_Origin *
+										 node.Origin *
 										 accumulatedTransform;
 
 		if (entity.HasComponent<MeshComponent>())
 		{
 			MeshComponent& mesh = entity.GetComponent<MeshComponent>();
 
-			for (Mesh* m : mesh.m_MeshPtrs)
+			for (Mesh* m : mesh.MeshPtrs)
 			{
 				const auto modelView = transformMat * cameraView;
 				const Transforms tf =
@@ -106,7 +108,7 @@ namespace Proton
 			}
 		}
 
-		for (Entity& e : node.m_Children)
+		for (Entity& e : node.Children)
 		{
 			SubmitNode(e, transformMat, cameraView, cameraProjection);
 		}

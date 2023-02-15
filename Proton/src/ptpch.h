@@ -20,5 +20,7 @@
 	#include <Windows.h>
 #endif // PT_PLATFORM_WINDOWS
 
+#include "Proton\Core\Base.h"
+
 #define PT_PROFILE 1
 

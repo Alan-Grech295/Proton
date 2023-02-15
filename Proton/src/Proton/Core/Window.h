@@ -1,6 +1,4 @@
 #pragma once
-
-#include "ptpch.h"
 #include "Proton\Core\Core.h"
 #include "Proton/Events/Event.h"
 #include <random>

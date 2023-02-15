@@ -1,9 +1,11 @@
 #pragma once
 #include "entt.hpp"
 #include "Scene.h"
+#include "Proton/Core/UUID.h"
 
 namespace Proton
 {
+	//Forward declaration
 	struct NativeScriptComponent;
 
 	class Entity
@@ -46,7 +48,7 @@ namespace Proton
 
 		void SetParent(Entity* parent = nullptr, int pos = -1);
 
-		const uint64_t GetUUID() const { return m_Scene->GetUUIDFromEntity(*this); }
+		const UUID GetUUID();
 
 		operator bool() const { return (std::uint32_t)m_EntityHandle != entt::null; }
 		operator entt::entity() const { return m_EntityHandle; }
@@ -71,3 +73,5 @@ namespace Proton
 		}
 	};
 }
+
+#include "Components.h"

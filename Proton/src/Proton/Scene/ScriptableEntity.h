@@ -19,6 +19,6 @@ namespace Proton
 		virtual void OnDestroy() {}
 		virtual void OnUpdate(TimeStep ts) {}
 	private:
-		Entity m_Entity;
+		class Entity m_Entity;
 	};
 }

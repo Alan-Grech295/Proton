@@ -8,12 +8,12 @@ namespace Proton
 	WindowsInput* WindowsInput::s_Instance = new WindowsInput();
 	Input* Input::s_Instance = WindowsInput::s_Instance;
 
-	bool WindowsInput::IsKeyPressedImpl(int keycode)
+	bool WindowsInput::IsKeyPressedImpl(KeyCode keycode)
 	{
 		return pressedKeyStates[keycode];
 	}
 
-	bool WindowsInput::IsKeyReleasedImpl(int keycode)
+	bool WindowsInput::IsKeyReleasedImpl(KeyCode keycode)
 	{
 		return releasedKeyStates[keycode];
 	}

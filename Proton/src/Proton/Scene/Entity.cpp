@@ -1,7 +1,7 @@
 #include "ptpch.h"
 #include "Entity.h"
 #include "Scene.h"
-#include "Components.h"
+//#include "Components.h"
 
 namespace Proton
 {
@@ -15,11 +15,11 @@ namespace Proton
 
 	void Entity::SetParent(Entity* parent, int pos)
 	{
-		std::string name = GetComponent<TagComponent>().tag;
+		std::string name = GetComponent<TagComponent>().Tag;
 		if (parent != nullptr)
 		{
 			NodeComponent& nodeComponent = GetComponent<NodeComponent>();
-			if (nodeComponent.m_ParentEntity != Entity::Null && nodeComponent.m_ParentEntity == *parent && pos == -1)
+			if (nodeComponent.ParentEntity != Entity::Null && nodeComponent.ParentEntity == *parent && pos == -1)
 				return;
 
 			NodeComponent& parentNodeComponent = parent->GetComponent<NodeComponent>();
@@ -29,39 +29,39 @@ namespace Proton
 
 			int childPos = INT32_MAX;
 
-			if (nodeComponent.m_ParentEntity != Entity::Null)
+			if (nodeComponent.ParentEntity != Entity::Null)
 			{
-				NodeComponent& pastParentNodeComponent = nodeComponent.m_ParentEntity.GetComponent<NodeComponent>();
-				for (int i = 0; i < pastParentNodeComponent.m_Children.size(); i++)
+				NodeComponent& pastParentNodeComponent = nodeComponent.ParentEntity.GetComponent<NodeComponent>();
+				for (int i = 0; i < pastParentNodeComponent.Children.size(); i++)
 				{
-					if (pastParentNodeComponent.m_Children[i] == *this)
+					if (pastParentNodeComponent.Children[i] == *this)
 					{
 						childPos = i;
-						pastParentNodeComponent.m_Children.erase(pastParentNodeComponent.m_Children.begin() + i);
+						pastParentNodeComponent.Children.erase(pastParentNodeComponent.Children.begin() + i);
 						break;
 					}
 				}
 			}
 
-			if (pos > -1 && pos < parentNodeComponent.m_Children.size() + 1)
+			if (pos > -1 && pos < parentNodeComponent.Children.size() + 1)
 			{
 				int insertPos = pos;
-				if (nodeComponent.m_ParentEntity == *parent && childPos < pos)
+				if (nodeComponent.ParentEntity == *parent && childPos < pos)
 					insertPos -= 1;
 
-				parentNodeComponent.m_Children.insert(parentNodeComponent.m_Children.begin() + insertPos, *this);
+				parentNodeComponent.Children.insert(parentNodeComponent.Children.begin() + insertPos, *this);
 			}
 			else
 			{
-				parentNodeComponent.m_Children.push_back(*this);
+				parentNodeComponent.Children.push_back(*this);
 			}
 
-			nodeComponent.m_ParentEntity = *parent;
+			nodeComponent.ParentEntity = *parent;
 
 			if (parent->HasComponent<RootNodeTag>())
-				nodeComponent.m_RootEntity = *parent;
+				nodeComponent.RootEntity = *parent;
 			else
-				nodeComponent.m_RootEntity = parentNodeComponent.m_RootEntity;
+				nodeComponent.RootEntity = parentNodeComponent.RootEntity;
 		}
 		else
 		{
@@ -70,21 +70,26 @@ namespace Proton
 
 			NodeComponent& nodeComponent = GetComponent<NodeComponent>();
 
-			if (nodeComponent.m_ParentEntity != Entity::Null)
+			if (nodeComponent.ParentEntity != Entity::Null)
 			{
-				NodeComponent& parentNodeComponent = nodeComponent.m_ParentEntity.GetComponent<NodeComponent>();
-				for (int i = 0; i < parentNodeComponent.m_Children.size(); i++)
+				NodeComponent& parentNodeComponent = nodeComponent.ParentEntity.GetComponent<NodeComponent>();
+				for (int i = 0; i < parentNodeComponent.Children.size(); i++)
 				{
-					if (parentNodeComponent.m_Children[i] == *this)
+					if (parentNodeComponent.Children[i] == *this)
 					{
-						parentNodeComponent.m_Children.erase(parentNodeComponent.m_Children.begin() + i);
+						parentNodeComponent.Children.erase(parentNodeComponent.Children.begin() + i);
 						break;
 					}
 				}
 			}
 
-			nodeComponent.m_ParentEntity = Entity::Null;
-			nodeComponent.m_RootEntity = *this;
+			nodeComponent.ParentEntity = Entity::Null;
+			nodeComponent.RootEntity = *this;
 		}
+	}
+
+	const UUID Entity::GetUUID()
+	{
+		return GetComponent<IDComponent>().ID;
 	}
 }

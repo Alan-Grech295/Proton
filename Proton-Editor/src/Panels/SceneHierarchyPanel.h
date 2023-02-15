@@ -2,7 +2,6 @@
 #include "Proton\Scene\Scene.h"
 #include "Proton\Scene\Entity.h"
 #include "Proton\Core\Core.h"
-#include "Proton\Scene\Components.h"
 
 namespace Proton
 {

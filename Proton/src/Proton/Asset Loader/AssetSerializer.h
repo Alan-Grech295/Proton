@@ -1,11 +1,5 @@
 #pragma once
-#include <string>
-#include <vector>
-#include "Proton\Core\Log.h"
-#include <unordered_map>
-#include <assert.h>
 #include "MetaFileSerializer.h"
-#include <optional>
 
 namespace Proton
 {

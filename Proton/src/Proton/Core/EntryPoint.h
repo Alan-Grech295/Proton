@@ -15,6 +15,9 @@ int CALLBACK WinMain(
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
+	//TODO: Investigate memory leaks
+	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF);
+
 	//Initializing console as a Win32 app does not open a console
 	AllocConsole();
 
@@ -45,7 +48,6 @@ int CALLBACK WinMain(
 	PT_PROFILE_END_SESSION();
 
 	//_CrtDumpMemoryLeaks();
-	std::cin.get();
 
 	return 0;
 }

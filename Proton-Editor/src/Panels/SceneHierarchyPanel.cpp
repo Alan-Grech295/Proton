@@ -5,6 +5,7 @@
 #include "Proton\Core\KeyCodes.h"
 #include "Proton\Asset Loader\AssetManager.h"
 #include "AssetViewerPanel.h"
+#include "Proton/Scripting/ScriptEngine.h"
 
 namespace Proton
 {
@@ -74,16 +75,23 @@ namespace Proton
 
 			if (ImGui::BeginPopup("AddComponent"))
 			{
+				//TODO: Change menu items
 				if (ImGui::MenuItem("Camera"))
 				{
 					CameraComponent& camera = Get().m_Selected.AddComponent<CameraComponent>();
-					camera.camera.SetViewportSize(Get().m_Scene->GetViewportWidth(), Get().m_Scene->GetViewportHeight());
+					camera.Camera.SetViewportSize(Get().m_Scene->GetViewportWidth(), Get().m_Scene->GetViewportHeight());
 					ImGui::CloseCurrentPopup();
 				}
 
 				if (ImGui::MenuItem("Light"))
 				{
 					Get().m_Selected.AddComponent<LightComponent>();
+					ImGui::CloseCurrentPopup();
+				}
+
+				if (ImGui::MenuItem("Script Component"))
+				{
+					Get().m_Selected.AddComponent<ScriptComponent>();
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -140,18 +148,18 @@ namespace Proton
 					}
 					else
 					{
-						NodeComponent entityParentNode = targetNode.m_ParentEntity.GetComponent<NodeComponent>();
+						NodeComponent entityParentNode = targetNode.ParentEntity.GetComponent<NodeComponent>();
 						int pos = 0;
-						for (int i = 0; i < entityParentNode.m_Children.size(); i++)
+						for (int i = 0; i < entityParentNode.Children.size(); i++)
 						{
-							if (entityParentNode.m_Children[i] == entity)
+							if (entityParentNode.Children[i] == entity)
 							{
 								pos = i;
 								break;
 							}
 						}
 
-						draggedEntity.SetParent(&targetNode.m_ParentEntity, pos);
+						draggedEntity.SetParent(&targetNode.ParentEntity, pos);
 					}
 				}
 				else if (percent > 0.75f)
@@ -163,18 +171,18 @@ namespace Proton
 					}
 					else
 					{
-						NodeComponent entityParentNode = targetNode.m_ParentEntity.GetComponent<NodeComponent>();
+						NodeComponent entityParentNode = targetNode.ParentEntity.GetComponent<NodeComponent>();
 						int pos = 0;
-						for (int i = 0; i < entityParentNode.m_Children.size(); i++)
+						for (int i = 0; i < entityParentNode.Children.size(); i++)
 						{
-							if (entityParentNode.m_Children[i] == entity)
+							if (entityParentNode.Children[i] == entity)
 							{
 								pos = i;
 								break;
 							}
 						}
 
-						draggedEntity.SetParent(&targetNode.m_ParentEntity, pos + 1);
+						draggedEntity.SetParent(&targetNode.ParentEntity, pos + 1);
 					}
 				}
 				else
@@ -188,9 +196,9 @@ namespace Proton
 
 	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
 	{
-		auto& tag = entity.GetComponent<TagComponent>().tag;
+		auto& tag = entity.GetComponent<TagComponent>().Tag;
 		auto& node = entity.GetComponent<NodeComponent>();
-		bool isLeaf = node.m_Children.size() == 0;
+		bool isLeaf = node.Children.size() == 0;
 
 		ImGuiTreeNodeFlags flags = (m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
 			ImGuiTreeNodeFlags_OpenOnArrow |
@@ -239,7 +247,7 @@ namespace Proton
 
 			if (entity.HasComponent<RootNodeTag>() && ImGui::MenuItem("Create Prefab"))
 			{
-				std::string tag = entity.GetComponent<TagComponent>().tag;
+				std::string tag = entity.GetComponent<TagComponent>().Tag;
 
 				uint32_t stringLen = 0;
 
@@ -265,7 +273,7 @@ namespace Proton
 
 		if (opened)
 		{
-			for (Entity e : node.m_Children)
+			for (Entity e : node.Children)
 			{
 				DrawEntityNode(e);
 			}
@@ -275,19 +283,19 @@ namespace Proton
 
 		if (entityDeleted)
 		{
-			for (Entity e : node.m_Children)
+			for (Entity e : node.Children)
 			{
 				DeleteChildNode(e);
 			}
 
 			if (!entity.HasComponent<RootNodeTag>())
 			{
-				NodeComponent& parentComponent = node.m_ParentEntity.GetComponent<NodeComponent>();
+				NodeComponent& parentComponent = node.ParentEntity.GetComponent<NodeComponent>();
 
-				for (int i = 0; i < parentComponent.m_Children.size(); i++)
+				for (int i = 0; i < parentComponent.Children.size(); i++)
 				{
-					if (parentComponent.m_Children[i] == entity)
-						parentComponent.m_Children.erase(parentComponent.m_Children.begin() + i);
+					if (parentComponent.Children[i] == entity)
+						parentComponent.Children.erase(parentComponent.Children.begin() + i);
 				}
 			}
 
@@ -300,11 +308,11 @@ namespace Proton
 
 	void SceneHierarchyPanel::DrawChildNode(Entity entity)
 	{
-		auto& tag = entity.GetComponent<TagComponent>().tag;
+		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
 		auto& node = entity.GetComponent<NodeComponent>();
 
-		bool isLeaf = node.m_Children.size() == 0;
+		bool isLeaf = node.Children.size() == 0;
 
 		ImGuiTreeNodeFlags flags = (m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
 									ImGuiTreeNodeFlags_OpenOnArrow |
@@ -361,7 +369,7 @@ namespace Proton
 
 		if (opened)
 		{
-			for (Entity& e : node.m_Children)
+			for (Entity& e : node.Children)
 			{
 				DrawChildNode(e);
 			}
@@ -370,7 +378,7 @@ namespace Proton
 
 		if (entityDeleted)
 		{
-			for (Entity& e : node.m_Children)
+			for (Entity& e : node.Children)
 			{
 				DeleteChildNode(e);
 			}
@@ -378,12 +386,12 @@ namespace Proton
 			//TODO: Create better entity destruction
 			if (!entity.HasComponent<RootNodeTag>())
 			{
-				NodeComponent& parentComponent = node.m_ParentEntity.GetComponent<NodeComponent>();
+				NodeComponent& parentComponent = node.ParentEntity.GetComponent<NodeComponent>();
 
-				for (int i = 0; i < parentComponent.m_Children.size(); i++)
+				for (int i = 0; i < parentComponent.Children.size(); i++)
 				{
-					if (parentComponent.m_Children[i] == entity)
-						parentComponent.m_Children.erase(parentComponent.m_Children.begin() + i);
+					if (parentComponent.Children[i] == entity)
+						parentComponent.Children.erase(parentComponent.Children.begin() + i);
 				}
 			}
 
@@ -398,7 +406,7 @@ namespace Proton
 	{
 		auto& node = entity.GetComponent<NodeComponent>();
 
-		for (Entity& e : node.m_Children)
+		for (Entity& e : node.Children)
 		{
 			DeleteChildNode(e);
 		}
@@ -531,7 +539,9 @@ namespace Proton
 	{
 		if (entity.HasComponent<TagComponent>())
 		{
-			auto& tag = entity.GetComponent<TagComponent>().tag;
+			//float startCursorPosX = ImGui::GetCurrentWindow()->DC.CursorPos.x;
+
+			auto& tag = entity.GetComponent<TagComponent>().Tag;
 
 			char buffer[256];
 			memset(buffer, 0, sizeof(buffer));
@@ -542,9 +552,12 @@ namespace Proton
 				tag = std::string(buffer);
 			}
 
-			std::string entityIDText = "Entity ID: " + std::to_string(m_Scene->GetUUIDFromEntity(entity));
+			std::string entityIDText = "Entity ID: " + fmt::format("{:x}", entity.GetUUID());
+			float contentAvailX = ImGui::GetContentRegionAvail().x;
+			ImGui::SameLine();
+			float remaining = ImGui::GetWindowSize().x - ImGui::GetCursorPosX();
 
-			ImGui::SameLine(ImGui::GetContentRegionAvail().x - ImGui::CalcTextSize(entityIDText.c_str()).x);
+			ImGui::SetCursorPosX(contentAvailX - ImGui::CalcTextSize(entityIDText.c_str()).x);
 			ImGui::Text(entityIDText.c_str());
 		}
 
@@ -570,17 +583,17 @@ namespace Proton
 
 		DrawComponent<LightComponent>("Light", entity, [](auto& light)
 		{
-			ImGui::ColorPicker3("Ambient", &light.ambient.x);
-			ImGui::ColorPicker3("Diffuse", &light.diffuseColour.x);
-			ImGui::DragFloat("Diffuse Intensity", &light.diffuseIntensity, 1.0f, 0.0f, 100.0f);
-			ImGui::DragFloat("Attenuation Const", &light.attConst, 0.5f, 0.0f, 100.0f);
-			ImGui::DragFloat("Attenuation Linear", &light.attLin, 0.5f, 0.0f, 100.0f);
-			ImGui::DragFloat("Attenuation Quad", &light.attQuad, 0.5f, 0.0f, 100.0f);
+			ImGui::ColorPicker3("Ambient", &light.Ambient.x);
+			ImGui::ColorPicker3("Diffuse", &light.DiffuseColour.x);
+			ImGui::DragFloat("Diffuse Intensity", &light.DiffuseIntensity, 1.0f, 0.0f, 100.0f);
+			ImGui::DragFloat("Attenuation Const", &light.AttConst, 0.5f, 0.0f, 100.0f);
+			ImGui::DragFloat("Attenuation Linear", &light.AttLin, 0.5f, 0.0f, 100.0f);
+			ImGui::DragFloat("Attenuation Quad", &light.AttQuad, 0.5f, 0.0f, 100.0f);
 		});
 
 		DrawComponent<CameraComponent>("Camera", entity, [](auto& cameraComponent)
 		{
-			auto& camera = cameraComponent.camera;
+			auto& camera = cameraComponent.Camera;
 
 			const char* projectionTypeStrings[] = { "Perspective", "Orthographic" };
 			const char* currentProjectionTypeString = projectionTypeStrings[(int)camera.GetProjectionType()];
@@ -631,6 +644,23 @@ namespace Proton
 				if (ImGui::DragFloat("Far Clip", &orthoFar, 1.0f, 0.01f, 50000.0f))
 					camera.SetOrthographicFarClip(orthoFar);
 			}
+		});
+
+		DrawComponent<ScriptComponent>("Script", entity, [](auto& component)
+		{
+			bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
+
+			static char buffer[64];
+			strcpy(buffer, component.ClassName.c_str());
+
+			if (!scriptClassExists)
+				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
+
+			if (ImGui::InputText("Class", buffer, sizeof(buffer)))
+				component.ClassName = buffer;
+
+			if (!scriptClassExists)
+				ImGui::PopStyleColor();
 		});
 	}
 }

@@ -7,11 +7,23 @@ namespace Proton
     {
         public float x, y, z;
 
+        public static Vector3 Zero = new Vector3(0f, 0f, 0f);
+
         public Vector3(float x, float y, float z)
         {
             this.x = x;
             this.y = y;
             this.z = z;
+        }
+
+        public static Vector3 operator*(Vector3 vector, float scalar)
+        {
+            return new Vector3(vector.x * scalar, vector.y * scalar, vector.z * scalar);
+        }
+
+        public static Vector3 operator+(Vector3 v1, Vector3 v2)
+        {
+            return new Vector3(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
         }
     }
 
@@ -22,38 +34,37 @@ namespace Proton
 
         [MethodImplAttribute(MethodImplOptions.InternalCall)]
         internal extern static void NativeLog_Vec(ref Vector3 param, out Vector3 result);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_GetTranslation(ulong entityID, out Vector3 translation);
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static void Entity_SetTranslation(ulong entityID, ref Vector3 translation);
+
+        [MethodImplAttribute(MethodImplOptions.InternalCall)]
+        internal extern static bool Input_IsKeyDown(KeyCode keyCode);
     }
 
     public class Entity
     {
-        public float FloatVar { get; set; }
-
-
-
-        public Entity()
+        protected Entity() { ID = 0; }
+        internal Entity(ulong id)
         {
-            Console.WriteLine("Main constructor!");
-            InternalCalls.NativeLog("Hello world", 16);
-
-            Vector3 pos = new Vector3(5, 2.5f, 1);
-            Vector3 result;
-            InternalCalls.NativeLog_Vec(ref pos, out result);
-            Console.WriteLine(result.x + ", " + result.y + ", " + result.z);
+            ID = id;
         }
 
-        public void PrintMessage()
-        {
-            Console.WriteLine("Hello world from C#!");
-        }
+        public readonly ulong ID;
 
-        public void PrintInt(int value)
+        public Vector3 Translation
         {
-            Console.WriteLine("C# says: " + value);
-        }
-
-        public void PrintCustomMessage(string message)
-        {
-            Console.WriteLine("C# says: " + message);
+            get
+            {
+                InternalCalls.Entity_GetTranslation(ID, out Vector3 translation);
+                return translation;
+            }
+            set
+            {
+                InternalCalls.Entity_SetTranslation(ID, ref value);
+            }
         }
     }
 }

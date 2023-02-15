@@ -2,7 +2,6 @@
 #include <string>
 #include <cassert>
 #include "Shader.h"
-#include "Proton\Core\Log.h"
 #include "Bindable.h"
 #include <initializer_list>
 

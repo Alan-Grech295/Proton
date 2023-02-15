@@ -27,8 +27,6 @@ namespace Proton
 
 	Application::Application()
 	{
-		//TODO: Investigate memory leaks
-		_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF);
 		s_Instance = this;
 		m_Window = Scope<Window>(Window::Create({"Proton Game Engine", 1280, 720}));
 

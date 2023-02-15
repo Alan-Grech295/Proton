@@ -137,7 +137,7 @@ namespace Proton
 					TransformComponent& transform = cameraEntity.GetComponent<TransformComponent>();
 					DirectX::XMMATRIX viewMatrix = XMMatrixInverse(nullptr, DirectX::XMMatrixRotationRollPitchYaw(transform.rotation.x, transform.rotation.y, transform.rotation.z) *
 						XMMatrixTranslationFromVector(DirectX::XMLoadFloat3(&transform.position)));
-					m_SceneRenderer->Render(viewMatrix, camera.camera.GetProjection());
+					m_SceneRenderer->Render(viewMatrix, camera.Camera.GetProjection());
 				}
 				break;
 			}
@@ -515,10 +515,12 @@ namespace Proton
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
+		m_ActiveScene->OnRuntimeStart();
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
+		m_ActiveScene->OnRuntimeStop();
 	}
 }

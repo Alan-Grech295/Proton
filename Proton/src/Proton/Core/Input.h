@@ -1,13 +1,14 @@
 #pragma once
-#include "Proton\Core\Core.h"
+#include "Core.h"
+#include "KeyCodes.h"
 
 namespace Proton
 {
 	class Input
 	{
 	public:
-		inline static bool IsKeyPressed(int keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
-		inline static bool IsKeyReleased(int keycode) { return s_Instance->IsKeyReleasedImpl(keycode); }
+		inline static bool IsKeyPressed(KeyCode keycode) { return s_Instance->IsKeyPressedImpl(keycode); }
+		inline static bool IsKeyReleased(KeyCode keycode) { return s_Instance->IsKeyReleasedImpl(keycode); }
 
 		inline static bool IsMouseButtonPressed(int button) { return s_Instance->IsMouseButtonPressedImpl(button); }
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
@@ -15,8 +16,8 @@ namespace Proton
 		inline static float GetMouseDeltaX() { return s_Instance->GetMouseXDeltaImpl(); }
 		inline static float GetMouseDeltaY() { return s_Instance->GetMouseYDeltaImpl(); }
 	protected:
-		virtual bool IsKeyPressedImpl(int keycode) = 0;
-		virtual bool IsKeyReleasedImpl(int keycode) = 0;
+		virtual bool IsKeyPressedImpl(KeyCode keycode) = 0;
+		virtual bool IsKeyReleasedImpl(KeyCode keycode) = 0;
 
 		virtual bool IsMouseButtonPressedImpl(int button) = 0;
 		virtual float GetMouseXImpl() = 0;

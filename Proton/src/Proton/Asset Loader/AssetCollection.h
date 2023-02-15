@@ -1,7 +1,6 @@
 #pragma once
-#include <unordered_map>
-#include <memory>
 #include "Proton/Core/Core.h"
+#include <unordered_map>
 #include <string>
 #include <assert.h>
 

@@ -1,10 +1,13 @@
 #include "ptpch.h"
 #include "Scene.h"
-#include "Components.h"
 #include "Entity.h"
-#include <cassert>
+#include "ScriptableEntity.h"
+#include "Components.h"
 #include "Proton\Core\Input.h"
 #include "Proton\Core\KeyCodes.h"
+#include "Proton\Scripting\ScriptEngine.h"
+
+#include <cassert>
 
 namespace Proton
 {
@@ -44,37 +47,12 @@ namespace Proton
 
 	Entity Scene::CreateEntity(const std::string& name)
 	{
-		if (m_UUIDEntity[nextUUID])
-			assert(false && ("Entity already exists!"));
-
-		Entity entity = { m_Registry.create(), this };
-
-		m_EntityUUID[entity] = nextUUID;
-		m_UUIDEntity[nextUUID] = entity;
-
-		nextUUID++;
-
-		entity.AddComponent<TransformComponent>(DirectX::XMFLOAT3{ 0, 0, 0 }, DirectX::XMFLOAT3{ 0, 0, 0 });
-		auto& tag = entity.AddComponent<TagComponent>();
-		tag.tag = name.empty() ? "Entity" : name;
-
-		NodeComponent& nodeComponent = entity.AddComponent<NodeComponent>();
-		entity.AddComponent<RootNodeTag>();
-
-		nodeComponent.m_ParentEntity = Entity::Null;
-		nodeComponent.m_RootEntity = entity;
-
-		return entity;
+		return CreateEntityWithUUID(UUID(), name);
 	}
 
-	Entity Scene::GetEntityFromUUID(uint64_t uuid)
+	Entity Scene::GetEntityByUUID(UUID uuid)
 	{
-		return Entity{ (entt::entity)m_UUIDEntity[uuid], this };
-	}
-
-	uint64_t Scene::GetUUIDFromEntity(Entity entity)
-	{
-		return m_EntityUUID[entity];
+		return m_EntityMap[uuid];
 	}
 
 	/*void Scene::DrawDebugLine(DirectX::XMFLOAT3 pointA, DirectX::XMFLOAT3 pointB, float r, float g, float b)
@@ -83,28 +61,21 @@ namespace Proton
 		m_DebugVertBuffer->EmplaceBack(pointB, DirectX::XMFLOAT3{ r, g, b });
 	}*/
 
-	Entity Scene::CreateEntityWithUUID(const uint64_t uuid, const std::string& name)
+	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
 	{
-		if (m_UUIDEntity[uuid])
-			assert(false && ("Entity already exists!"));
-
-		Entity entity = { m_Registry.create(), this };
-
-		m_EntityUUID[entity] = uuid;
-		m_UUIDEntity[uuid] = entity;
-
-		if (nextUUID <= uuid)
-			nextUUID = uuid + 1;
+		Entity entity = Entity(m_Registry.create(), this);
+		entity.AddComponent<IDComponent>(uuid);
+		m_EntityMap[uuid] = entity;
 
 		entity.AddComponent<TransformComponent>(DirectX::XMFLOAT3{ 0, 0, 0 }, DirectX::XMFLOAT3{ 0, 0, 0 });
 		auto& tag = entity.AddComponent<TagComponent>();
-		tag.tag = name.empty() ? "Entity" : name;
+		tag.Tag = name.empty() ? "Entity" : name;
 
 		NodeComponent& nodeComponent = entity.AddComponent<NodeComponent>();
 		entity.AddComponent<RootNodeTag>();
 
-		nodeComponent.m_ParentEntity = Entity::Null;
-		nodeComponent.m_RootEntity = entity;
+		nodeComponent.ParentEntity = Entity::Null;
+		nodeComponent.RootEntity = entity;
 
 		return entity;
 	}
@@ -112,12 +83,42 @@ namespace Proton
 	void Scene::DestroyEntity(Entity entity)
 	{
 		m_Registry.destroy(entity);
+		m_EntityMap.erase(entity.GetUUID());
+	}
+
+	void Scene::OnRuntimeStart()
+	{
+		//Scripting
+		{
+			ScriptEngine::OnRuntimeStart(this);
+			//Instantiate all scripts
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = Entity(e, this);
+				ScriptEngine::OnCreateEntity(entity);
+			}
+		}
+	}
+
+	void Scene::OnRuntimeStop()
+	{
+		ScriptEngine::OnRuntimeStop();
 	}
 
 	void Scene::OnRuntimeUpdate(TimeStep ts)
 	{
-		//Update Scripts
+		//Scripting
 		{
+			//C# Entity OnUpdate
+			auto view = m_Registry.view<ScriptComponent>();
+			for (auto e : view)
+			{
+				Entity entity = { e, this };
+				ScriptEngine::OnUpdateEntity(entity, ts);
+			}
+
+			//Update Scripts
 			PT_PROFILE_SCOPE("Script Updates");
 			m_Registry.view<NativeScriptComponent>().each([=](auto entity, auto& nsc)
 				{
@@ -131,7 +132,7 @@ namespace Proton
 					}
 
 					nsc.Instance->OnUpdate(ts);
-				});
+			});
 		}
 	}
 
@@ -154,7 +155,7 @@ namespace Proton
 
 			if (!cameraComponent.FixedAspectRatio)
 			{
-				cameraComponent.camera.SetViewportSize(width, height);
+				cameraComponent.Camera.SetViewportSize(width, height);
 			}
 		}
 	}

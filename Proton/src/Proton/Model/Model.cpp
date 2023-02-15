@@ -1,17 +1,19 @@
 #include "ptpch.h"
 #include "Model.h"
-#include "Proton\Renderer\Renderer.h"
+#include "Proton\Renderer\Bindables\Buffer.h"
+#include "Proton\Renderer\Bindables\Texture.h"
+#include "Proton\Renderer\Bindables\Sampler.h"
+#include "Proton\Renderer\Bindables\Topology.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/postprocess.h>
 #include <assimp/scene.h>
-#include "Proton\Core\Log.h"
 #include <unordered_map>
 #include <imgui.h>
 #include <filesystem>
 
 #include "Proton\Scene\Scene.h"
 #include "Proton\Scene\Entity.h"
-#include "Proton\Scene\Components.h"
 
 #include "Proton\Asset Loader\AssetManager.h"
 
@@ -51,18 +53,18 @@ namespace Proton
 		namespace dx = DirectX;
 		Entity childEntity = activeScene.CreateEntity(nodeData.m_Name);
 		NodeComponent& nodeComponent = childEntity.GetComponent<NodeComponent>();
-		nodeComponent.m_NodeName = nodeData.m_Name;
-		nodeComponent.m_Origin = nodeData.m_Transformation;
+		nodeComponent.NodeName = nodeData.m_Name;
+		nodeComponent.Origin = nodeData.m_Transformation;
 
-		nodeComponent.m_Children.reserve(nodeData.m_Children.size());
+		nodeComponent.Children.reserve(nodeData.m_Children.size());
 
 		MeshComponent& meshComponent = childEntity.AddComponent<MeshComponent>();
-		meshComponent.m_ModelRef = modelRef;
-		meshComponent.m_MeshPtrs.reserve(nodeData.m_Meshes.size());
+		meshComponent.ModelRef = modelRef;
+		meshComponent.MeshPtrs.reserve(nodeData.m_Meshes.size());
 
 		for (uint32_t meshIndex : nodeData.m_Meshes)
 		{
-			meshComponent.m_MeshPtrs.push_back(meshes + meshIndex);
+			meshComponent.MeshPtrs.push_back(meshes + meshIndex);
 		}
 
 		for (uint32_t childIndex : nodeData.m_Children)

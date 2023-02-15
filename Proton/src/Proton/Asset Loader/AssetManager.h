@@ -2,11 +2,11 @@
 #include <unordered_map>
 #include <filesystem>
 #include <vector>
-#include "Proton\Model\Model.h"
-#include "Proton\Scene\Components.h"
 
 namespace Proton
 {
+	class Entity;
+
 	struct path_hash
 	{
 		std::size_t operator() (const std::filesystem::path& path) const

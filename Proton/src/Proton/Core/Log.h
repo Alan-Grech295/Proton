@@ -1,6 +1,7 @@
 #pragma once
 
-#include "Core.h"
+#ifndef PT_NO_LOG
+//#include "Core.h"
 #include "spdlog/spdlog.h"
 #include "spdlog/fmt/ostr.h"
 
@@ -56,4 +57,4 @@ namespace Proton
 
 #define LAST_ERROR() GET_ERROR(GetLastError());
 #endif
-
+#endif
