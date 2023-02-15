@@ -52,6 +52,7 @@ namespace Proton
 
 	Entity Scene::GetEntityByUUID(UUID uuid)
 	{
+		PT_CORE_ASSERT(m_EntityMap.find(uuid) != m_EntityMap.end(), "Entity not found");
 		return m_EntityMap[uuid];
 	}
 
@@ -82,8 +83,8 @@ namespace Proton
 
 	void Scene::DestroyEntity(Entity entity)
 	{
-		m_Registry.destroy(entity);
 		m_EntityMap.erase(entity.GetUUID());
+		m_Registry.destroy(entity);
 	}
 
 	void Scene::OnRuntimeStart()

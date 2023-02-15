@@ -19,16 +19,10 @@
 
 namespace Proton
 {
-	//std::string ModelCreator::MAT_TAG = "Material_";
+	std::unordered_map<UUID, Ref<Model>> ModelCollection::m_Models = std::unordered_map<UUID, Ref<Model>>();
 
-	Entity ModelCreator::CreateModelEntity(const std::string& path, Scene& activeScene)
+	Ref<Model> ModelCreator::GetModelFromData(ModelData& modelData)
 	{
-		namespace dx = DirectX;
-
-		ModelData& modelData = AssetCollection::Get<ModelData>(path);
-
-		NodeData& rootNode = modelData.m_Nodes[0];
-
 		Ref<Model> model = CreateRef<Model>();
 
 		model->m_Materials.reserve(modelData.m_Materials.size());
@@ -44,10 +38,10 @@ namespace Proton
 			model->m_Meshes.push_back(meshData.CreateMesh(model->m_Materials));
 		}
 
-		return CreateNode(rootNode, modelData.m_Nodes.data(), model->m_Meshes.data(), model, activeScene);
+		return model;
 	}
 
-	Entity ModelCreator::CreateNode(NodeData& nodeData, NodeData* nodes, Mesh* meshes, Ref<Model> modelRef, Scene& activeScene)
+	static 	Entity CreateNode(NodeData& nodeData, NodeData* nodes, Mesh* meshes, Ref<Model> modelRef, Scene& activeScene)
 	{
 		//Node Creations
 		namespace dx = DirectX;
@@ -73,6 +67,19 @@ namespace Proton
 		}
 
 		return childEntity;
+	}
+
+	Entity ModelCreator::CreateModelEntity(const std::string& path, Scene& activeScene)
+	{
+		namespace dx = DirectX;
+
+		ModelData& modelData = AssetCollection::Get<ModelData>(path);
+
+		NodeData& rootNode = modelData.m_Nodes[0];
+
+		Ref<Model> model = GetModelFromData(modelData);
+
+		return CreateNode(rootNode, modelData.m_Nodes.data(), model->m_Meshes.data(), model, activeScene);
 	}
 
 	TypeElement ModelCreator::SerializeMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const MaterialData* materials)
@@ -478,28 +485,28 @@ namespace Proton
 
 		if (matData->hasSpecular && !matData->hasNormalMap)
 		{
-			pixShaderPath = "D:\\Dev\\Proton\\Proton\\PhongSpecularPS.cso";
-			vertShaderPath = "D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso";
+			pixShaderPath = CORE_PATH_STR + "Proton\\PhongSpecularPS.cso";
+			vertShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
 		}
 		else if (matData->hasNormalMap && !matData->hasSpecular)
 		{
-			pixShaderPath = "D:\\Dev\\Proton\\Proton\\PhongNormalMapPS.cso";
-			vertShaderPath = "D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso";
+			pixShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapPS.cso";
+			vertShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
 		}
 		else if (matData->hasNormalMap && matData->hasSpecular)
 		{
-			pixShaderPath = "D:\\Dev\\Proton\\Proton\\PhongNormalMapSpecPS.cso";
-			vertShaderPath = "D:\\Dev\\Proton\\Proton\\PhongNormalMapVS.cso";
+			pixShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapSpecPS.cso";
+			vertShaderPath = CORE_PATH_STR + "Proton\\PhongNormalMapVS.cso";
 		}
 		else if (!matData->hasNormalMap && !matData->hasSpecular && matData->hasDiffuseMap)
 		{
-			pixShaderPath = "D:\\Dev\\Proton\\Proton\\PhongPS.cso";
-			vertShaderPath = "D:\\Dev\\Proton\\Proton\\PhongVS.cso";
+			pixShaderPath = CORE_PATH_STR + "Proton\\PhongPS.cso";
+			vertShaderPath = CORE_PATH_STR + "Proton\\PhongVS.cso";
 		}
 		else
 		{
-			pixShaderPath = "D:\\Dev\\Proton\\Proton\\PhongNoTexPS.cso";
-			vertShaderPath = "D:\\Dev\\Proton\\Proton\\PhongVS.cso";
+			pixShaderPath = CORE_PATH_STR + "Proton\\PhongNoTexPS.cso";
+			vertShaderPath = CORE_PATH_STR + "Proton\\PhongVS.cso";
 		}
 
 		pixShader = CreateRef<SharedBindable>(ResType::PixelShader, pixShaderPath);

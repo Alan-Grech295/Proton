@@ -21,6 +21,7 @@
 #endif // PT_PLATFORM_WINDOWS
 
 #include "Proton\Core\Base.h"
+#include "Proton/Core/Assert.h"
 
 #define PT_PROFILE 1
 

@@ -15,6 +15,9 @@
 
 #define BIT(x) (1 << x)
 
+#define CORE_PATH "C:\\Dev\\Proton"
+#define CORE_PATH_STR std::string(CORE_PATH)
+
 namespace Proton
 {
 	template<typename T>

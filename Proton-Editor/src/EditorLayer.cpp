@@ -22,16 +22,6 @@ namespace Proton
 		m_IconPlay = Texture2D::Create("Resources/icons/PlayButton.png");
 		m_IconStop = Texture2D::Create("Resources/icons/StopButton.png");
 
-		std::string projectPath = __FILE__;
-		int directoryCounter = 0;
-		while (directoryCounter < 3)
-		{
-			if (projectPath.back() == '\\')
-				directoryCounter++;
-
-			projectPath.pop_back();
-		}
-
 		AssetManager::SetProjectPath(projectPath);
 		AssetManager::ScanProject();
 
@@ -56,9 +46,9 @@ namespace Proton
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
 		//ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
-		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+		ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
 
-		ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
+		ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
 
 		//m_Nanosuit = ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
 		//
@@ -462,7 +452,7 @@ namespace Proton
 		m_SceneRenderer->SetScene(m_ActiveScene);
 
 		SceneHierarchyPanel::SetScene(m_ActiveScene);
-		AssetViewerPanel::SetProjectPath("D:\\Dev\\Proton\\Proton-Editor");
+		AssetViewerPanel::SetProjectPath(projectPath);
 		AssetViewerPanel::SetScene(m_ActiveScene);
 
 		m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
@@ -484,7 +474,7 @@ namespace Proton
 			serializer.Deserialize(filepath, m_EditorCam);
 
 			SceneHierarchyPanel::SetScene(m_ActiveScene);
-			AssetViewerPanel::SetProjectPath("D:\\Dev\\Proton\\Proton-Editor");
+			AssetViewerPanel::SetProjectPath(projectPath);
 			AssetViewerPanel::SetScene(m_ActiveScene);
 
 			m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();

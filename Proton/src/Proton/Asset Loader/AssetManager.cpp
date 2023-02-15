@@ -315,7 +315,7 @@ namespace Proton
 
 		manager.m_AssetImports.clear();
 
-		manager.ScanDirectory(manager.m_ProjectPath.string() + "\\Proton-Editor\\assets");
+		manager.ScanDirectory(manager.m_ProjectPath.string());
 
 		/*for (auto& path : manager.m_PostImageImports)
 		{
@@ -456,8 +456,9 @@ namespace Proton
 		{
 			Asset asset = AssetSerializer::DeserializeAsset(path.string());
 			AssetType assetType = (AssetType)((uint32_t)asset["AssetType"]);
-			std::filesystem::path copy = path;
-#define X(ext, type, cls) if(type == assetType) { AssetCollection::Add(copy.replace_extension().string(), cls::Deserialize(asset, path.string())); return; }
+			std::filesystem::path modelPath = path;
+			modelPath = modelPath.replace_extension();
+#define X(ext, type, cls) if(type == assetType) { AssetCollection::Add(modelPath.string(), cls::Deserialize(asset, modelPath.string())); return; }
 			ASSET_TYPES
 #undef X
 			return;

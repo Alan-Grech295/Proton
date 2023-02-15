@@ -35,9 +35,9 @@ namespace Proton
 	public:
 		ConsolePanel()
 			:
-			traceIcon(Texture2D::Create("D:\\Dev\\Proton\\Proton-Editor\\Resources\\icons\\trace.png")),
-			warningIcon(Texture2D::Create("D:\\Dev\\Proton\\Proton-Editor\\Resources\\icons\\warning.png")),
-			errorIcon(Texture2D::Create("D:\\Dev\\Proton\\Proton-Editor\\Resources\\icons\\error.png"))
+			m_TraceIcon(Texture2D::Create("Resources\\icons\\trace.png")),
+			m_WarningIcon(Texture2D::Create("Resources\\icons\\warning.png")),
+			m_ErrorIcon(Texture2D::Create("Resources\\icons\\error.png"))
 		{}
 	public:
 		static void LogError(const std::string& msg);
@@ -59,7 +59,7 @@ namespace Proton
 		void DrawMessage(Message msg, uint32_t index, bool collapsed);
 		inline static bool HasMessage(const std::string& msg)
 		{
-			return !(Get().messages.find(msg) == Get().messages.end());
+			return !(Get().m_Messages.find(msg) == Get().m_Messages.end());
 		}
 
 		static void LogMessage(const std::string& msg, Message::MessageType msgType);
@@ -84,22 +84,22 @@ namespace Proton
 			return console;
 		}
 	private:
-		std::unordered_map<std::string, Message> messages;
-		std::vector<const char*> messageOrder;
-		std::vector<const char*> collapsedOrder;
-		bool collapsed = true;
-		Ref<Texture2D> traceIcon;
-		Ref<Texture2D> warningIcon;
-		Ref<Texture2D> errorIcon;
-		int selectedIndex = -1;
+		std::unordered_map<std::string, Message> m_Messages;
+		std::vector<const char*> m_MessageOrder;
+		std::vector<const char*> m_CollapsedOrder;
+		bool m_Collapsed = true;
+		Ref<Texture2D> m_TraceIcon;
+		Ref<Texture2D> m_WarningIcon;
+		Ref<Texture2D> m_ErrorIcon;
+		int m_SelectedIndex = -1;
 
-		uint32_t errors;
-		uint32_t warnings;
-		uint32_t traces;
+		uint32_t m_NumErrors;
+		uint32_t m_NumWarnings;
+		uint32_t m_NumTraces;
 
-		bool showErrors = true;
-		bool showWarnings = true;
-		bool showTraces = true;
+		bool m_ShowErrors = true;
+		bool m_ShowWarnings = true;
+		bool m_ShowTraces = true;
 	};
 	template<typename ...Params>
 	inline void ConsolePanel::LogError(Params&& ...params)
@@ -107,7 +107,7 @@ namespace Proton
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
 		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Error);
-		Get().errors++;
+		Get().m_NumErrors++;
 	}
 
 	template<typename ...Params>
@@ -116,7 +116,7 @@ namespace Proton
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
 		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Warning);
-		Get().warnings++;
+		Get().m_NumWarnings++;
 	}
 
 	template<typename ...Params>
@@ -125,6 +125,6 @@ namespace Proton
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
 		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Trace);
-		Get().traces++;
+		Get().m_NumTraces++;
 	}
 }

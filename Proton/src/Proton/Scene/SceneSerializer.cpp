@@ -130,10 +130,10 @@ namespace Proton
 
 	static void SerializeEntity(YAML::Emitter& out, Entity entity)
 	{
-		assert(entity.HasComponent<IDComponent>());
+		PT_CORE_ASSERT(entity.HasComponent<IDComponent>());
 
 		out << YAML::BeginMap;	//Entity
-		out << YAML::Key << "Entity" << YAML::Value << entity.GetUUID();
+		out << YAML::Key << "Entity" << YAML::Value << (uint64_t)entity.GetUUID();
 
 		if (entity.HasComponent<TagComponent>())
 		{
@@ -169,10 +169,10 @@ namespace Proton
 			auto& nc = entity.GetComponent<NodeComponent>();
 			//writeMesh = entity.HasComponent<RootNodeTag>() ? nc.m_PrefabName == "" : nc.m_RootEntity.GetComponent<NodeComponent>().m_PrefabName == "";
 			out << YAML::Key << "Node Name" << YAML::Value << nc.NodeName;
-			out << YAML::Key << "Is Prefab" << YAML::Value << !writeMesh;
+			//out << YAML::Key << "Is Prefab" << YAML::Value << !writeMesh;
 			//out << YAML::Key << "Prefab Path" << YAML::Value << nc.m_PrefabName;
-			out << YAML::Key << "Parent Entity" << YAML::Value << (nc.ParentEntity == Entity::Null ? LLONG_MAX : nc.ParentEntity.GetUUID());
-			out << YAML::Key << "Root Entity" << YAML::Value << (nc.RootEntity == Entity::Null ? LLONG_MAX : nc.RootEntity.GetUUID());
+			out << YAML::Key << "Parent Entity" << YAML::Value << (nc.ParentEntity == Entity::Null ? LLONG_MAX : (uint64_t)nc.ParentEntity.GetUUID());
+			out << YAML::Key << "Root Entity" << YAML::Value << (nc.RootEntity == Entity::Null ? LLONG_MAX : (uint64_t)nc.RootEntity.GetUUID());
 			out << YAML::Key << "Initial Transform" << YAML::Value << nc.Origin;
 
 			out << YAML::EndMap;	//NodeComponent
@@ -265,18 +265,6 @@ namespace Proton
 		out << YAML::EndMap;	//Entity
 	}
 
-	static void SerializeChild(YAML::Emitter& out, Entity entity)
-	{
-		NodeComponent& cc = entity.GetComponent<NodeComponent>();
-
-		SerializeEntity(out, entity);
-
-		for (Entity child : cc.Children)
-		{
-			SerializeChild(out, child);
-		}
-	}
-
 	void SceneSerializer::Serialize(const std::string& filepath, const EditorCamera& editorCam)
 	{
 		YAML::Emitter out;
@@ -300,7 +288,7 @@ namespace Proton
 
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
-		auto& view = m_Scene->m_Registry.view<RootNodeTag>();
+		auto& view = m_Scene->m_Registry.view<NodeComponent>();
 
 		auto it = view.rbegin();
 
@@ -313,13 +301,6 @@ namespace Proton
 				return;
 
 			SerializeEntity(out, entity);
-
-			NodeComponent& root = entity.GetComponent<NodeComponent>();
-
-			for (Entity child : root.Children)
-			{
-				SerializeChild(out, child);
-			}
 
 			it++;
 		}
@@ -383,39 +364,47 @@ namespace Proton
 				TransformComponent& transformComponent = deserializedEntity.GetComponent<TransformComponent>();
 				auto transformNode = entity["TransformComponent"];
 
-				transformComponent.position = transformNode["Position"].as<DirectX::XMFLOAT3>();
-				transformComponent.rotation = transformNode["Rotation"].as<DirectX::XMFLOAT3>();
-				transformComponent.scale = transformNode["Scale"].as<DirectX::XMFLOAT3>();
+				if (transformNode)
+				{
+					transformComponent.position = transformNode["Position"].as<DirectX::XMFLOAT3>();
+					transformComponent.rotation = transformNode["Rotation"].as<DirectX::XMFLOAT3>();
+					transformComponent.scale = transformNode["Scale"].as<DirectX::XMFLOAT3>();
+				}
 
 				//NodeComponent
 				auto node = entity["NodeComponent"];
-				NodeComponent& childNodeComponent = deserializedEntity.GetComponent<NodeComponent>();
-
-				childNodeComponent.Origin = node["Initial Transform"].as<DirectX::XMMATRIX>();
-
-				if (node["Parent Entity"].as<uint64_t>() != LLONG_MAX)
+				if (node)
 				{
-					Entity& parent = m_Scene->GetEntityByUUID(node["Parent Entity"].as<uint64_t>());
-					deserializedEntity.SetParent(&parent);
+					NodeComponent& nodeComponent = deserializedEntity.GetComponent<NodeComponent>();
 
-					Entity& root = m_Scene->GetEntityByUUID(node["Root Entity"].as<uint64_t>());
-					childNodeComponent.RootEntity = root;
+					nodeComponent.Origin = node["Initial Transform"].as<DirectX::XMMATRIX>();
+
+					uint64_t parentUUID = node["Parent Entity"].as<uint64_t>();
+
+					if (parentUUID != LLONG_MAX)
+					{
+						Entity& parent = m_Scene->GetEntityByUUID(parentUUID);
+						deserializedEntity.SetParent(&parent);
+
+						Entity& root = m_Scene->GetEntityByUUID(node["Root Entity"].as<uint64_t>());
+						nodeComponent.RootEntity = root;
+					}
+
+					//childNodeComponent.m_PrefabName = node["Prefab Path"].as<std::string>();
+					nodeComponent.NodeName = node["Node Name"].as<std::string>();
 				}
 
-				//childNodeComponent.m_PrefabName = node["Prefab Path"].as<std::string>();
-				childNodeComponent.NodeName = node["Node Name"].as<std::string>();
-
-				if (node["Is Prefab"].as<bool>())
+				/*if (node["Is Prefab"].as<bool>())
 				{
-					/*MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
+					MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
 					PrefabNode* node = ModelCollection::GetPrefabNode(childNodeComponent.m_RootEntity.GetComponent<NodeComponent>().m_PrefabName, childNodeComponent.m_NodeName);
 
 					for (int i = 0; i < node->numMeshes; i++)
 					{
 						meshComponent.m_MeshPtrs.push_back(node->meshes[i]);
 						meshComponent.m_NumMeshes++;
-					}*/
-				}
+					}
+				}*/
 
 				//MeshComponent
 				auto meshNode = entity["MeshComponent"];
@@ -423,18 +412,20 @@ namespace Proton
 				if (meshNode)
 				{
 					MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
+					NodeComponent& nodeComponent = deserializedEntity.GetComponent<NodeComponent>();
 
 					uint32_t i = 0;
 					YAML::Node meshDataNode;
 					while (meshDataNode = meshNode["Mesh" + std::to_string(i)])
 					{
-						/*std::string modelPath = meshDataNode["Model Path"].as<std::string>();
+						std::string modelPath = meshDataNode["Model Path"].as<std::string>();
 						std::string meshName = meshDataNode["Mesh Name"].as<std::string>();
 
-						meshComponent.m_MeshPtrs.push_back(ModelCollection::GetMesh(modelPath, meshName));
-						meshComponent.m_NumMeshes++;
+						Ref<Model> model = ModelCollection::GetOrCreate(nodeComponent.RootEntity.GetUUID(), modelPath);
+						
+						meshComponent.MeshPtrs.push_back(model->FindMeshWithName(meshName));
 
-						i++;*/
+						i++;
 					}
 				}
 

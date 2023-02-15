@@ -99,6 +99,15 @@ namespace Proton
 	class Model
 	{
 	public:
+		Mesh* FindMeshWithName(const std::string& name)
+		{
+			for (Mesh& mesh : m_Meshes)
+			{
+				if (mesh.m_Name == name)
+					return &mesh;
+			}
+		}
+	public:
 		std::vector<Mesh> m_Meshes;
 		std::vector<Material> m_Materials;
 	};
@@ -283,6 +292,7 @@ namespace Proton
 		static ModelData Serialize(const std::string& path);
 		static ModelData Deserialize(Asset& modelAsset, const std::string& path);
 		static Entity CreateModelEntity(const std::string& path, Scene& activeScene);
+		static Ref<Model> GetModelFromData(ModelData& modelData);
 	private:
 		static TypeElement SerializeMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const MaterialData* materials);
 		static void SerializeMaterial(MaterialData* matData, RawAsset& asset, const std::string& basePath, uint32_t index, const aiMaterial& aiMat);
@@ -292,7 +302,24 @@ namespace Proton
 		static void DeserializeMeshes(Asset& asset, const std::string& modelPath, MeshData* meshData, const MaterialData* materials);
 		static void DeserializeMaterials(Asset& asset, MaterialData* materialData);
 		static void DeserializeNodes(Asset& asset, NodeData* nodeData, MeshData* meshData);
+	};
 
-		static Entity CreateNode(NodeData& nodeData, NodeData* nodes, Mesh* meshes, Ref<Model> modelRef, Scene& activeScene);
+	//TEMP
+	class ModelCollection
+	{
+	public:
+		static void Add(UUID uuid, Ref<Model> model) { m_Models[uuid] = model; }
+		static Ref<Model> Get(UUID uuid) { return m_Models.at(uuid); }
+		static Ref<Model> GetOrCreate(UUID uuid, const std::string& path)
+		{
+			if (m_Models.find(uuid) != m_Models.end())
+				return m_Models.at(uuid);
+
+			Ref<Model> model = ModelCreator::GetModelFromData(AssetCollection::Get<ModelData>(path));
+			m_Models[uuid] = model;
+			return model;
+		}
+	private:
+		static std::unordered_map<UUID, Ref<Model>> m_Models;
 	};
 }
