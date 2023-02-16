@@ -185,4 +185,13 @@ namespace Proton
 			DestroyScript = [](NativeScriptComponent* nsc) { delete nsc->Instance; nsc->Instance = nullptr; };
 		}
 	};
+
+	template<typename... Component>
+	struct ComponentGroup
+	{
+	};
+
+	using AllComponents = ComponentGroup<TransformComponent, CameraComponent, MeshComponent,
+										 RootNodeTag, NodeComponent, LightComponent,
+										 ScriptComponent, NativeScriptComponent>;
 }
