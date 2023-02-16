@@ -21,7 +21,7 @@ namespace Proton
 	{
 	}
 
-	void SceneHierarchyPanel::SetScene(const Ref<Scene> scene)
+	void SceneHierarchyPanel::SetContext(const Ref<Scene> scene)
 	{
 		Get().m_Scene = scene;
 		Get().m_Selected = {};
@@ -30,32 +30,27 @@ namespace Proton
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");
-		if (!Get().m_Scene)
+
+		if (Get().m_Scene)
 		{
-			ImGui::End();
-			ImGui::Begin("Inspector");
-			ImGui::End();
-			return;
-		}
+			auto& childView = Get().m_Scene->m_Registry.view<RootNodeTag>();
 
-		auto& childView = Get().m_Scene->m_Registry.view<RootNodeTag>();
+			for (auto e : childView)
+			{
+				Get().DrawEntityNode(Get().m_Scene->m_Registry.get<IDComponent>(e).ID);
+			}
 
-		for (auto entityID : childView)
-		{
-			Entity entity(entityID, Get().m_Scene.get());
-			Get().DrawEntityNode(entity);
-		}
+			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
+				Get().m_Selected = {};
 
-		if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-			Get().m_Selected = {};
+			//Right-Click on blank space
+			if (ImGui::BeginPopupContextWindow(0, 1, false))
+			{
+				if (ImGui::MenuItem("Create Empty Entity"))
+					Get().m_Scene->CreateEntity("New Entity");
 
-		//Right-Click on blank space
-		if (ImGui::BeginPopupContextWindow(0, 1, false))
-		{
-			if (ImGui::MenuItem("Create Empty Entity"))
-				Get().m_Scene->CreateEntity("New Entity");
-
-			ImGui::EndPopup();
+				ImGui::EndPopup();
+			}
 		}
 
 		ImGui::End();
@@ -102,16 +97,19 @@ namespace Proton
 		ImGui::End();
 	}
 
-	static void DragProcedure(Entity entity, int& position)
+	void SceneHierarchyPanel::DragProcedure(Entity entity, int& position)
 	{
 		position = -1;
+
+		Ref<Scene> scene = Get().m_Scene;
+		UUID entityID = entity.GetUUID();
 
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::GetDragDropPayload() && ImGui::GetDragDropPayload()->IsDataType("SceneHierarchyObject"))
 		{
 			Entity payload = *(const Entity*)ImGui::GetDragDropPayload()->Data;
 			if (payload == entity && !ImGui::IsDragDropPayloadBeingAccepted())
 			{
-				entity.SetParent(nullptr);
+				entity.SetParent();
 			}
 		}
 
@@ -148,18 +146,18 @@ namespace Proton
 					}
 					else
 					{
-						NodeComponent entityParentNode = targetNode.ParentEntity.GetComponent<NodeComponent>();
+						NodeComponent entityParentNode = scene->GetEntityByUUID(targetNode.ParentEntity).GetComponent<NodeComponent>();
 						int pos = 0;
 						for (int i = 0; i < entityParentNode.Children.size(); i++)
 						{
-							if (entityParentNode.Children[i] == entity)
+							if (entityParentNode.Children[i] == entityID)
 							{
 								pos = i;
 								break;
 							}
 						}
 
-						draggedEntity.SetParent(&targetNode.ParentEntity, pos);
+						draggedEntity.SetParent(targetNode.ParentEntity, pos);
 					}
 				}
 				else if (percent > 0.75f)
@@ -167,35 +165,37 @@ namespace Proton
 					position = 0;
 					if (entity.HasComponent<RootNodeTag>())
 					{
-						draggedEntity.SetParent(&entity, 0);
+						draggedEntity.SetParent(entityID, 0);
 					}
 					else
 					{
-						NodeComponent entityParentNode = targetNode.ParentEntity.GetComponent<NodeComponent>();
+						NodeComponent entityParentNode = scene->GetEntityByUUID(targetNode.ParentEntity).GetComponent<NodeComponent>();
 						int pos = 0;
 						for (int i = 0; i < entityParentNode.Children.size(); i++)
 						{
-							if (entityParentNode.Children[i] == entity)
+							if (entityParentNode.Children[i] == entityID)
 							{
 								pos = i;
 								break;
 							}
 						}
 
-						draggedEntity.SetParent(&targetNode.ParentEntity, pos + 1);
+						draggedEntity.SetParent(targetNode.ParentEntity, pos + 1);
 					}
 				}
 				else
 				{
-					draggedEntity.SetParent(&entity);
+					draggedEntity.SetParent(entityID);
 				}
 			}
 			ImGui::EndDragDropTarget();
 		}
 	}
 
-	void SceneHierarchyPanel::DrawEntityNode(Entity entity)
+	void SceneHierarchyPanel::DrawEntityNode(UUID entityID)
 	{
+		Entity entity = m_Scene->GetEntityByUUID(entityID);
+
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 		auto& node = entity.GetComponent<NodeComponent>();
 		bool isLeaf = node.Children.size() == 0;
@@ -273,7 +273,7 @@ namespace Proton
 
 		if (opened)
 		{
-			for (Entity e : node.Children)
+			for (UUID e : node.Children)
 			{
 				DrawEntityNode(e);
 			}
@@ -283,18 +283,18 @@ namespace Proton
 
 		if (entityDeleted)
 		{
-			for (Entity e : node.Children)
+			for (UUID e : node.Children)
 			{
 				DeleteChildNode(e);
 			}
 
 			if (!entity.HasComponent<RootNodeTag>())
 			{
-				NodeComponent& parentComponent = node.ParentEntity.GetComponent<NodeComponent>();
+				NodeComponent& parentComponent = m_Scene->GetEntityByUUID(node.ParentEntity).GetComponent<NodeComponent>();
 
 				for (int i = 0; i < parentComponent.Children.size(); i++)
 				{
-					if (parentComponent.Children[i] == entity)
+					if (parentComponent.Children[i] == entityID)
 						parentComponent.Children.erase(parentComponent.Children.begin() + i);
 				}
 			}
@@ -306,8 +306,10 @@ namespace Proton
 		}
 	}
 
-	void SceneHierarchyPanel::DrawChildNode(Entity entity)
+	void SceneHierarchyPanel::DrawChildNode(UUID entityID)
 	{
+		Entity entity = m_Scene->GetEntityByUUID(entityID);
+
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
 		auto& node = entity.GetComponent<NodeComponent>();
@@ -369,7 +371,7 @@ namespace Proton
 
 		if (opened)
 		{
-			for (Entity& e : node.Children)
+			for (UUID e : node.Children)
 			{
 				DrawChildNode(e);
 			}
@@ -378,7 +380,7 @@ namespace Proton
 
 		if (entityDeleted)
 		{
-			for (Entity& e : node.Children)
+			for (UUID e : node.Children)
 			{
 				DeleteChildNode(e);
 			}
@@ -386,11 +388,11 @@ namespace Proton
 			//TODO: Create better entity destruction
 			if (!entity.HasComponent<RootNodeTag>())
 			{
-				NodeComponent& parentComponent = node.ParentEntity.GetComponent<NodeComponent>();
+				NodeComponent& parentComponent = m_Scene->GetEntityByUUID(node.ParentEntity).GetComponent<NodeComponent>();
 
 				for (int i = 0; i < parentComponent.Children.size(); i++)
 				{
-					if (parentComponent.Children[i] == entity)
+					if (parentComponent.Children[i] == entityID)
 						parentComponent.Children.erase(parentComponent.Children.begin() + i);
 				}
 			}
@@ -402,16 +404,16 @@ namespace Proton
 		}
 	}
 
-	void SceneHierarchyPanel::DeleteChildNode(Entity entity)
+	void SceneHierarchyPanel::DeleteChildNode(UUID entityID)
 	{
-		auto& node = entity.GetComponent<NodeComponent>();
+		auto& node = m_Scene->GetEntityByUUID(entityID).GetComponent<NodeComponent>();
 
-		for (Entity& e : node.Children)
+		for (UUID e : node.Children)
 		{
 			DeleteChildNode(e);
 		}
 
-		m_Scene->DestroyEntity(entity);
+		m_Scene->DestroyEntity(m_Scene->GetEntityByUUID(entityID));
 	}
 
 	static void DrawFloat3Control(const std::string& label, DirectX::XMFLOAT3& values, float resetValue = 0.0f, float columnWidth = 100.0f)

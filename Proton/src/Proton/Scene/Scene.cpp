@@ -22,7 +22,7 @@ namespace Proton
 		framebuffer = Framebuffer::Create(desc);*/
 
 		//Creates camera entity
-		CreateEntity("Camera").AddComponent<CameraComponent>();
+		//CreateEntity("Camera").AddComponent<CameraComponent>();
 
 		//Editor Camera
 		//m_EditorCam.SetProjectionType(SceneCamera::ProjectionType::Perspective);
@@ -45,6 +45,65 @@ namespace Proton
 
 	}
 
+	template<typename Component>
+	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+	{
+		auto view = src.view<Component>();
+
+		for (auto it = view.rbegin(); it != view.rend(); ++it)
+		{
+			auto e = *it;
+			UUID uuid = src.get<IDComponent>(e).ID;
+			PT_CORE_ASSERT(enttMap.find(uuid) != enttMap.end());
+			entt::entity dstEnttID = enttMap.at(uuid);
+
+			auto& component = src.get<Component>(e);
+			dst.emplace_or_replace<Component>(dstEnttID, component);
+		}
+	}
+
+	template<typename Component>
+	static void CopyComponentIfExists(Entity dst, Entity src)
+	{
+		if (src.HasComponent<Component>())
+			dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+	}
+
+	Ref<Scene> Scene::Copy(Ref<Scene> other)
+	{
+		Ref<Scene> newScene = CreateRef<Scene>();
+
+		std::unordered_map<UUID, entt::entity> enttMap;
+		auto& srcSceneRegistry = other->m_Registry;
+		auto& dstSceneRegistry = newScene->m_Registry;
+		
+		//Create entities in new scene
+		auto idView = srcSceneRegistry.view<IDComponent>();
+		for(auto it = idView.rbegin(); it != idView.rend(); ++it)
+		{
+			auto e = *it;
+			UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;
+			const auto& name = srcSceneRegistry.get<TagComponent>(e).Tag;
+			Entity newEntity = newScene->CreateEntityWithUUID(uuid, name, false);
+			enttMap[uuid] = (entt::entity)newEntity;
+		}
+
+		//Copy components (except IDComponent and TagComponent)
+		CopyComponent<TransformComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<CameraComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<MeshComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<RootNodeTag>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<NodeComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<LightComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<ScriptComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent<NativeScriptComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+
+		//Setting scene view port size
+		newScene->OnViewportResize(other->m_ViewportWidth, other->m_ViewportHeight);
+
+		return newScene;
+	}
+
 	Entity Scene::CreateEntity(const std::string& name)
 	{
 		return CreateEntityWithUUID(UUID(), name);
@@ -62,7 +121,7 @@ namespace Proton
 		m_DebugVertBuffer->EmplaceBack(pointB, DirectX::XMFLOAT3{ r, g, b });
 	}*/
 
-	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name)
+	Entity Scene::CreateEntityWithUUID(UUID uuid, const std::string& name, bool rootNode)
 	{
 		Entity entity = Entity(m_Registry.create(), this);
 		entity.AddComponent<IDComponent>(uuid);
@@ -73,10 +132,12 @@ namespace Proton
 		tag.Tag = name.empty() ? "Entity" : name;
 
 		NodeComponent& nodeComponent = entity.AddComponent<NodeComponent>();
-		entity.AddComponent<RootNodeTag>();
 
-		nodeComponent.ParentEntity = Entity::Null;
-		nodeComponent.RootEntity = entity;
+		if(rootNode)
+			entity.AddComponent<RootNodeTag>();
+
+		nodeComponent.ParentEntity = UUID::Null;
+		nodeComponent.RootEntity = uuid;
 
 		return entity;
 	}
@@ -159,6 +220,24 @@ namespace Proton
 				cameraComponent.Camera.SetViewportSize(width, height);
 			}
 		}
+	}
+
+	Entity Scene::DuplicateEntity(Entity entity)
+	{
+		std::string name = entity.GetName();
+		Entity newEntity = CreateEntity(name);
+
+		//Copy components (except IDComponent and TagComponent)
+		CopyComponentIfExists<TransformComponent>(newEntity, entity);
+		CopyComponentIfExists<CameraComponent>(newEntity, entity);
+		CopyComponentIfExists<MeshComponent>(newEntity, entity);
+		CopyComponentIfExists<RootNodeTag>(newEntity, entity);
+		CopyComponentIfExists<NodeComponent>(newEntity, entity);
+		CopyComponentIfExists<LightComponent>(newEntity, entity);
+		CopyComponentIfExists<ScriptComponent>(newEntity, entity);
+		CopyComponentIfExists<NativeScriptComponent>(newEntity, entity);
+
+		return newEntity;
 	}
 
 	/*void Scene::DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection)

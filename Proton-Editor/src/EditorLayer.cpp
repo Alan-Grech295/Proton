@@ -17,11 +17,6 @@ namespace Proton
 		:
 		Layer("EditorLayer")
 	{
-		//Setting working directory
-		std::string_view fileLoc = __FILE__;
-		size_t pos = fileLoc.find("Proton");
-		PT_CORE_ASSERT(pos != -1);
-		CoreUtils::CORE_PATH_STR = fileLoc.substr(0, pos + 7);
 		projectPath = CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets";
 	}
 
@@ -40,15 +35,15 @@ namespace Proton
 		desc.Height = 720;
 		desc.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH };
 		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };
-		//desc.ClearColor = new float[4] { 1.0f, 0.07f, 0.2f, 1 };
-
-		m_ActiveScene = CreateRef<Scene>();
-		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f);
 		m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
 
-		SceneHierarchyPanel::SetScene(m_ActiveScene);
+		NewScene();
+		m_EditorScene = m_ActiveScene;
+		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f);
+
+		SceneHierarchyPanel::SetContext(m_ActiveScene);
 		AssetViewerPanel::SetProjectPath(projectPath);
-		AssetViewerPanel::SetScene(m_ActiveScene);
+		AssetViewerPanel::SetContext(m_ActiveScene);
 
 
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
@@ -459,11 +454,12 @@ namespace Proton
 		m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		m_SceneRenderer->SetScene(m_ActiveScene);
 
-		SceneHierarchyPanel::SetScene(m_ActiveScene);
+		SceneHierarchyPanel::SetContext(m_ActiveScene);
 		AssetViewerPanel::SetProjectPath(projectPath);
-		AssetViewerPanel::SetScene(m_ActiveScene);
+		AssetViewerPanel::SetContext(m_ActiveScene);
 
-		m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
+		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
+		m_CameraEntity.AddComponent<CameraComponent>();
 	}
 
 	void EditorLayer::OpenScene()
@@ -472,20 +468,40 @@ namespace Proton
 
 		if (!filepath.empty())
 		{
-			saveFilePath = filepath;
-			m_ActiveScene = CreateRef<Scene>();
-			m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
+			OpenScene(filepath);
+		}
+	}
+
+	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	{
+		if (m_SceneState != SceneState::Edit)
+			OnSceneStop();
+
+		if (path.extension() != ".proton")
+		{
+			PT_CORE_ERROR("Could not open scene {0} - Not a Proton scene file", path.filename().string());
+			return;
+		}
+
+		Ref<Scene> newScene = CreateRef<Scene>();
+		SceneSerializer serializer(newScene);
+
+		if (serializer.Deserialize(saveFilePath, m_EditorCam))
+		{
+			saveFilePath = path.string();
+			m_EditorScene = newScene;
+			m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
 			m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
-			m_SceneRenderer->SetScene(m_ActiveScene);
 
-			SceneSerializer serializer(m_ActiveScene);
-			serializer.Deserialize(filepath, m_EditorCam);
+			m_ActiveScene = m_EditorScene;
 
-			SceneHierarchyPanel::SetScene(m_ActiveScene);
+			SceneHierarchyPanel::SetContext(m_ActiveScene);
 			AssetViewerPanel::SetProjectPath(projectPath);
-			AssetViewerPanel::SetScene(m_ActiveScene);
+			AssetViewerPanel::SetContext(m_ActiveScene);
 
 			m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
+
+			m_SceneRenderer->SetScene(m_ActiveScene);
 		}
 	}
 
@@ -519,12 +535,19 @@ namespace Proton
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
+
+		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
+
+		SceneHierarchyPanel::SetContext(m_ActiveScene);
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
 		m_ActiveScene->OnRuntimeStop();
+		m_ActiveScene = m_EditorScene;
+
+		SceneHierarchyPanel::SetContext(m_ActiveScene);
 	}
 }

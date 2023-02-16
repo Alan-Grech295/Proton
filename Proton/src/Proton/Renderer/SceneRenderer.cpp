@@ -108,9 +108,9 @@ namespace Proton
 			}
 		}
 
-		for (Entity& e : node.Children)
+		for (UUID e : node.Children)
 		{
-			SubmitNode(e, transformMat, cameraView, cameraProjection);
+			SubmitNode(m_Scene->GetEntityByUUID(e), transformMat, cameraView, cameraProjection);
 		}
 	}
 	

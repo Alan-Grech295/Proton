@@ -46,6 +46,7 @@ namespace Proton
 		//Node Creations
 		namespace dx = DirectX;
 		Entity childEntity = activeScene.CreateEntity(nodeData.m_Name);
+		UUID childID = childEntity.GetUUID();
 		NodeComponent& nodeComponent = childEntity.GetComponent<NodeComponent>();
 		nodeComponent.NodeName = nodeData.m_Name;
 		nodeComponent.Origin = nodeData.m_Transformation;
@@ -63,7 +64,7 @@ namespace Proton
 
 		for (uint32_t childIndex : nodeData.m_Children)
 		{
-			CreateNode(nodes[childIndex], nodes, meshes, modelRef, activeScene).SetParent(&childEntity);
+			CreateNode(nodes[childIndex], nodes, meshes, modelRef, activeScene).SetParent(childID);
 		}
 
 		return childEntity;

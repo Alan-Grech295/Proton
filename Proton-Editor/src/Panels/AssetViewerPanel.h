@@ -15,7 +15,7 @@ namespace Proton
 		static void OnImGuiRender();
 
 		static std::filesystem::path& GetSelectedPath() { return Get().m_SelectedPath; }
-		static void SetScene(const Ref<Scene> scene) { 
+		static void SetContext(const Ref<Scene> scene) { 
 			Get().m_ActiveScene = scene;
 		}
 		static void SetProjectPath(const std::string& path) { Get().startPath = path; Get().m_SelectedPath = path; }

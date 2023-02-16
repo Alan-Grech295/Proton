@@ -28,6 +28,7 @@ namespace Proton
 
 		void NewScene();
 		void OpenScene();
+		void OpenScene(const std::filesystem::path& path);
 		void SaveScene();
 		void SaveSceneAs();
 
@@ -44,6 +45,8 @@ namespace Proton
 		std::string projectPath;
 
 		Ref<Scene> m_ActiveScene;
+		Ref<Scene> m_EditorScene;
+
 		Scope<SceneRenderer> m_SceneRenderer;
 
 		Ref<Texture2D> m_IconPlay;

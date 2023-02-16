@@ -11,9 +11,6 @@
 
 namespace Proton
 {
-	//Forward declaration
-	class Entity;
-
 	struct IDComponent
 	{
 		UUID ID;
@@ -92,11 +89,12 @@ namespace Proton
 		bool placeholder;
 	};
 
+	//Check if better to convert to Entity
 	struct NodeComponent
 	{
-		std::vector<Entity> Children;
-		Entity ParentEntity;
-		Entity RootEntity;
+		std::vector<UUID> Children;
+		UUID ParentEntity;
+		UUID RootEntity;
 		std::string NodeName;
 		//std::string m_PrefabName;
 
@@ -104,22 +102,21 @@ namespace Proton
 
 		NodeComponent()
 			:
-			ParentEntity(Entity::Null),
-			RootEntity(Entity::Null),
+			ParentEntity(UUID::Null),
+			RootEntity(UUID::Null),
 			NodeName(""),
 			//m_PrefabName(""),
 			Origin(DirectX::XMMatrixIdentity())
 		{};
 
-		NodeComponent(const NodeComponent&) = default;
-		//NodeComponent(const std::string& nodeName, const std::string& prefabName, Entity parentEntity, Entity rootEntity, DirectX::FXMMATRIX& origin)
-		//	:
-		//	m_NodeName(nodeName),
-		//	//m_PrefabName(prefabName),
-		//	m_ParentEntity(parentEntity),
-		//	m_RootEntity(rootEntity),
-		//	m_Origin(origin)
-		//{}
+		NodeComponent(const NodeComponent& other)
+		{
+			Children = other.Children;
+			ParentEntity = other.ParentEntity;
+			RootEntity = other.RootEntity;
+			NodeName = other.NodeName;
+			Origin = other.Origin;
+		}
 	};
 
 	/*struct ModelComponent

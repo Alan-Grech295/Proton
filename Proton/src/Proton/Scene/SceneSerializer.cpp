@@ -171,8 +171,8 @@ namespace Proton
 			out << YAML::Key << "Node Name" << YAML::Value << nc.NodeName;
 			//out << YAML::Key << "Is Prefab" << YAML::Value << !writeMesh;
 			//out << YAML::Key << "Prefab Path" << YAML::Value << nc.m_PrefabName;
-			out << YAML::Key << "Parent Entity" << YAML::Value << (nc.ParentEntity == Entity::Null ? LLONG_MAX : (uint64_t)nc.ParentEntity.GetUUID());
-			out << YAML::Key << "Root Entity" << YAML::Value << (nc.RootEntity == Entity::Null ? LLONG_MAX : (uint64_t)nc.RootEntity.GetUUID());
+			out << YAML::Key << "Parent Entity" << YAML::Value << (nc.ParentEntity == UUID::Null ? LLONG_MAX : (uint64_t)nc.ParentEntity);
+			out << YAML::Key << "Root Entity" << YAML::Value << (nc.RootEntity == UUID::Null ? LLONG_MAX : (uint64_t)nc.RootEntity);
 			out << YAML::Key << "Initial Transform" << YAML::Value << nc.Origin;
 
 			out << YAML::EndMap;	//NodeComponent
@@ -316,6 +316,7 @@ namespace Proton
 		assert("Not Implemented!");
 	}
 
+	//TODO: Check entity order when loading
 	bool SceneSerializer::Deserialize(const std::string& filepath, EditorCamera& editorCamera)
 	{
 		m_Scene->ClearEntities();
@@ -379,15 +380,12 @@ namespace Proton
 
 					nodeComponent.Origin = node["Initial Transform"].as<DirectX::XMMATRIX>();
 
-					uint64_t parentUUID = node["Parent Entity"].as<uint64_t>();
+					UUID parentUUID = node["Parent Entity"].as<uint64_t>();
 
-					if (parentUUID != LLONG_MAX)
+					if (parentUUID != UUID::Null)
 					{
-						Entity& parent = m_Scene->GetEntityByUUID(parentUUID);
-						deserializedEntity.SetParent(&parent);
-
-						Entity& root = m_Scene->GetEntityByUUID(node["Root Entity"].as<uint64_t>());
-						nodeComponent.RootEntity = root;
+						deserializedEntity.SetParent(parentUUID);
+						nodeComponent.RootEntity = node["Root Entity"].as<uint64_t>();
 					}
 
 					//childNodeComponent.m_PrefabName = node["Prefab Path"].as<std::string>();
@@ -421,7 +419,7 @@ namespace Proton
 						std::string modelPath = meshDataNode["Model Path"].as<std::string>();
 						std::string meshName = meshDataNode["Mesh Name"].as<std::string>();
 
-						Ref<Model> model = ModelCollection::GetOrCreate(nodeComponent.RootEntity.GetUUID(), modelPath);
+						Ref<Model> model = ModelCollection::GetOrCreate(nodeComponent.RootEntity, modelPath);
 						
 						meshComponent.MeshPtrs.push_back(model->FindMeshWithName(meshName));
 

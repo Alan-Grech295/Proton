@@ -29,8 +29,10 @@ namespace Proton
 		Scene();
 		~Scene();
 
-		Entity CreateEntity(const std::string& name = std::string());
-		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = std::string());
+		static Ref<Scene> Copy(Ref<Scene> other);
+
+		Entity CreateEntity(const std::string& name = "");
+		Entity CreateEntityWithUUID(UUID uuid, const std::string& name = "", bool rootNode = true);
 		void DestroyEntity(Entity entity);
 
 		void OnRuntimeStart();
@@ -42,11 +44,11 @@ namespace Proton
 		uint32_t GetViewportWidth() { return m_ViewportWidth; }
 		uint32_t GetViewportHeight() { return m_ViewportHeight; }
 
+		Entity DuplicateEntity(Entity entity);
+
 		Entity GetEntityByUUID(UUID uuid);
 
 		Entity FindEntityWithTag(const std::string& tag);
-
-		//void SetUpdateEditorCamera(bool update) { m_UpdateEditorCam = update; }
 
 		template<typename T>
 		inline Entity FindEntityWithComponent()
@@ -67,10 +69,6 @@ namespace Proton
 		//TEMP
 		//void DrawDebugLine(DirectX::XMFLOAT3 pointA, DirectX::XMFLOAT3 pointB, float r, float g, float b);
 	private:
-		//void DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
-	public:
-	private:
-		//Ref<Framebuffer> framebuffer;
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0;
 		uint32_t m_ViewportHeight = 0;

@@ -12,6 +12,9 @@ namespace Proton
 		UUID(const UUID&) = default;
 
 		operator uint64_t() const { return m_UUID; }
+	
+	public:
+		static UUID Null;
 
 	private:
 		uint64_t m_UUID;

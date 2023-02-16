@@ -13,7 +13,7 @@
 #include "imgui.h"
 #include "Input.h"
 
-#include "Proton\Core\Base.h"
+#include "Proton\Core\Core.h"
 
 #include "Proton\Renderer\Renderer.h"
 
@@ -27,6 +27,12 @@ namespace Proton
 
 	Application::Application()
 	{
+		// Setting working directory
+		std::string_view fileLoc = __FILE__;
+		size_t pos = fileLoc.find("Proton");
+		PT_CORE_ASSERT(pos != -1);
+		CoreUtils::CORE_PATH_STR = fileLoc.substr(0, pos + 7);
+
 		s_Instance = this;
 		m_Window = Scope<Window>(Window::Create({"Proton Game Engine", 1280, 720}));
 
