@@ -27,7 +27,7 @@ namespace Proton
 		bool OnKeyPressed(KeyPressedEvent& e);
 
 		void NewScene();
-		void OpenScene();
+		void OpenScene_Dialog();
 		void OpenScene(const std::filesystem::path& path);
 		void SaveScene();
 		void SaveSceneAs();

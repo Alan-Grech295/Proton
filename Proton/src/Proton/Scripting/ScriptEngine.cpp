@@ -296,7 +296,8 @@ namespace Proton
 
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* monoMethod, void** params)
 	{
-		return mono_runtime_invoke(monoMethod, instance, params, nullptr);
+		if(monoMethod)
+			return mono_runtime_invoke(monoMethod, instance, params, nullptr);
 	}
 		
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)

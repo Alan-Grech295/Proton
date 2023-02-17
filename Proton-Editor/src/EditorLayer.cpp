@@ -44,7 +44,7 @@ namespace Proton
 		SceneHierarchyPanel::SetContext(m_ActiveScene);
 		AssetViewerPanel::SetProjectPath(projectPath);
 		AssetViewerPanel::SetContext(m_ActiveScene);
-
+		AssetViewerPanel::SetOpenSceneFunction(std::bind(&EditorLayer::OpenScene, this, std::placeholders::_1));
 
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
@@ -323,7 +323,7 @@ namespace Proton
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 				{
-					OpenScene();
+					OpenScene_Dialog();
 				}
 
 				if (ImGui::MenuItem("Save", "Ctrl+S"))
@@ -434,7 +434,7 @@ namespace Proton
 			break;
 		case Key::O:
 			if (control)
-				OpenScene();
+				OpenScene_Dialog();
 			break;
 		case Key::S:
 			if (control && shift)
@@ -462,7 +462,7 @@ namespace Proton
 		m_CameraEntity.AddComponent<CameraComponent>();
 	}
 
-	void EditorLayer::OpenScene()
+	void EditorLayer::OpenScene_Dialog()
 	{
 		std::string filepath = FileDialogs::OpenFile("Proton Scene (*.proton)\0*.proton\0");
 

@@ -29,7 +29,8 @@ namespace Proton
 		}
 
 		ImGui::Columns(2);
-
+		static bool setWidth = false;
+		if (!setWidth) { ImGui::SetColumnWidth(0, ImGui::GetWindowContentRegionMax().x / 5.0f); setWidth = true; }
 		Get().DrawDirectories();
 
 		ImGui::NextColumn();
@@ -188,17 +189,23 @@ namespace Proton
 			}
 			else 
 			{
-				if (entry.path().extension() != ".asset" && entry.path().extension() != ".prefab")
+				bool selected = false;
+				bool doubleClicked = false;
+				NamedButton(fileIcon->GetTexturePointer(), filenameStr, m_SelectedItem, doubleClicked, selected, ImVec2{ 64, 64 });
+
+				if (doubleClicked)
 				{
-					bool selected = false;
-					bool doubleClicked = false;
-					NamedButton(fileIcon->GetTexturePointer(), filenameStr, m_SelectedItem, doubleClicked, selected, ImVec2{ 64, 64 });
-					if (doubleClicked)
+					if (entry.path().extension() == ".proton")
+					{
+						m_OpenSceneFunc(entry.path());
+					}
+					else
 					{
 						std::system(entry.path().string().c_str());
 					}
 				}
-				else if (entry.path().extension() == ".prefab")
+				
+				/*if (entry.path().extension() == ".prefab")
 				{
 					bool selected = false;
 					bool doubleClicked = false;
@@ -207,10 +214,9 @@ namespace Proton
 
 					if (doubleClicked)
 					{
-						//TODO: Add
 						//ModelCreator::CreatePrefabEntity(entry.path().string(), m_ActiveScene.get());
 					}
-				}
+				}*/
 			}
 
 			onCurLine++;

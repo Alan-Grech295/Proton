@@ -51,28 +51,44 @@ namespace Proton
 		return Input::IsKeyPressed(keyCode);
 	}
 
-	void ScriptGlue::RegisterFunctions()
-	{
-		PT_ADD_INTERNAL_CALL(TransformComponent_GetPosition);
-		PT_ADD_INTERNAL_CALL(TransformComponent_SetPosition);
-
-		PT_ADD_INTERNAL_CALL(Input_IsKeyDown);
-	}
-
-	template<typename Component>
+	template<typename... Component>
 	static void RegisterComponent()
 	{
-		std::string_view typeName = typeid(Component).name();
-		size_t pos = typeName.find_last_of(':');
-		std::string_view structName = typeName.substr(pos + 1);
-		std::string managedTypename = fmt::format("Proton.{}", structName);
+		([]()
+		{
+			std::string_view typeName = typeid(Component).name();
+			size_t pos = typeName.find_last_of(':');
+			std::string_view structName = typeName.substr(pos + 1);
+			std::string managedTypename = fmt::format("Proton.{}", structName);
 
-		MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
-		s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };
+			MonoType* managedType = mono_reflection_type_from_name(managedTypename.data(), ScriptEngine::GetCoreAssemblyImage());
+			if (!managedType)
+			{
+				PT_CORE_ERROR("Could not find component type {}", managedTypename);
+				return;
+			}
+			s_EntityHasComponentFuncs[managedType] = [](Entity entity) { return entity.HasComponent<Component>(); };
+		}(), ...);
+	}
+
+	template<typename... Component>
+	static void RegisterComponent(ComponentGroup<Component...>)
+	{
+		RegisterComponent<Component...>();
 	}
 
 	void ScriptGlue::RegisterComponents()
 	{
-		RegisterComponent<TransformComponent>();
+		RegisterComponent(AllComponents{});
+	}
+
+	void ScriptGlue::RegisterFunctions()
+	{
+		PT_ADD_INTERNAL_CALL(Entity_HasComponent);
+
+		PT_ADD_INTERNAL_CALL(TransformComponent_GetPosition);
+		PT_ADD_INTERNAL_CALL(TransformComponent_SetPosition);
+
+		PT_ADD_INTERNAL_CALL(Input_IsKeyDown);
 	}
 }
