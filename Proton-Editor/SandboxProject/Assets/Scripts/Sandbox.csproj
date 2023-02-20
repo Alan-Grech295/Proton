@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x64</Platform>
-    <ProjectGuid>{D2AA3E85-3EC1-3C1B-8738-C83CF38D0DA3}</ProjectGuid>
+    <ProjectGuid>{F4C124E3-60A1-A37E-69B9-2E55D5170AE0}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Proton-ScriptCore</RootNamespace>
-    <AssemblyName>Proton-ScriptCore</AssemblyName>
+    <RootNamespace>Sandbox</RootNamespace>
+    <AssemblyName>Sandbox</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -18,8 +18,8 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <Optimize>false</Optimize>
-    <OutputPath>Proton-Editor\Resources\Scripts\</OutputPath>
-    <BaseIntermediateOutputPath>Proton-Editor\Resources\Scripts\Intermediates\Debug\</BaseIntermediateOutputPath>
+    <OutputPath>Binaries\</OutputPath>
+    <BaseIntermediateOutputPath>Intermediates\Debug\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -30,8 +30,8 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
     <Optimize>true</Optimize>
-    <OutputPath>Proton-Editor\Resources\Scripts\</OutputPath>
-    <BaseIntermediateOutputPath>Proton-Editor\Resources\Scripts\Intermediates\Release\</BaseIntermediateOutputPath>
+    <OutputPath>Binaries\</OutputPath>
+    <BaseIntermediateOutputPath>Intermediates\Release\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -42,8 +42,8 @@
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
     <Optimize>true</Optimize>
-    <OutputPath>Proton-Editor\Resources\Scripts\</OutputPath>
-    <BaseIntermediateOutputPath>Proton-Editor\Resources\Scripts\Intermediates\Dist\</BaseIntermediateOutputPath>
+    <OutputPath>Binaries\</OutputPath>
+    <BaseIntermediateOutputPath>Intermediates\Dist\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
     <DefineConstants></DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -56,16 +56,12 @@
   <ItemGroup Condition=" '$(Configuration)|$(Platform)' == 'Dist|x64' ">
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Source\Camera.cs" />
-    <Compile Include="Source\Player.cs" />
-    <Compile Include="Source\Proton\Input.cs" />
-    <Compile Include="Source\Proton\InternalCalls.cs" />
-    <Compile Include="Source\Proton\KeyCode.cs" />
-    <Compile Include="Source\Proton\Scene\Components.cs" />
-    <Compile Include="Source\Proton\Scene\Entity.cs" />
-    <Compile Include="Source\Proton\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Proton-ScriptCore\Proton-ScriptCore.csproj">
+      <Project>{D2AA3E85-3EC1-3C1B-8738-C83CF38D0DA3}</Project>
+      <Name>Proton-ScriptCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

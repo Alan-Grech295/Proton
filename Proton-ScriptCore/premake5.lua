@@ -3,8 +3,8 @@ project "Proton-ScriptCore"
 	language "C#"
 	dotnetframework "4.7.2"
 
-	targetdir ("%{wks.location}/Proton-Editor/Resources/Scripts")
-	objdir ("%{wks.location}/Proton-Editor/Resources/Scripts/Intermediates")
+	targetdir (ProtonRootDir .. "/Proton-Editor/Resources/Scripts")
+	objdir (ProtonRootDir .. "/Proton-Editor/Resources/Scripts/Intermediates")
 
 	files
 	{
