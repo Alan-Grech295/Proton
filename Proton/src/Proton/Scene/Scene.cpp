@@ -79,7 +79,7 @@ namespace Proton
 		
 		//Create entities in new scene
 		auto idView = srcSceneRegistry.view<IDComponent>();
-		for(auto it = idView.rbegin(); it != idView.rend(); ++it)
+		for(auto it = idView.begin(); it != idView.end(); ++it)
 		{
 			auto e = *it;
 			UUID uuid = srcSceneRegistry.get<IDComponent>(e).ID;

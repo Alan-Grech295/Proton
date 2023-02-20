@@ -27,6 +27,14 @@ namespace Proton
             }
         }
 
+        public TransformComponent Transform
+        { 
+            get
+            {
+                return GetComponent<TransformComponent>();
+            }
+        }
+
         public bool HasComponent<T>() where T : Component, new()
         {
             Type componentType = typeof(T);
