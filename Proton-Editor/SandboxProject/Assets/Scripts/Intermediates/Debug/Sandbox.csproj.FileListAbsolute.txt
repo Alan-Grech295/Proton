@@ -1,0 +1,9 @@
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Binaries\Sandbox.dll
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Binaries\Sandbox.pdb
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Binaries\Proton-ScriptCore.dll
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Binaries\Proton-ScriptCore.pdb
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.AssemblyReference.cache
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CoreCompileInputs.cache
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CopyComplete
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.dll
+D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.pdb

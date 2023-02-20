@@ -23,9 +23,6 @@ outputdir = "%{cfg.buildcfg}-%{cfg.system}-%{cfg.architecture}"
 include "Proton/vendor/imgui"
 include "Proton/vendor/yaml-cpp"
 include "Proton/vendor/assimp"
-
-ProtonRootDir = ".."
-
 include "Proton"
 include "Proton-ScriptCore"
 include "Proton-Editor"

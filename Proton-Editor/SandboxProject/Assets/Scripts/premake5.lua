@@ -1,4 +1,4 @@
-ProtonRootDir = "../../../.."
+local ProtonRootDir = "../../../.."
 
 workspace "Sandbox"
 	architecture "x64"
