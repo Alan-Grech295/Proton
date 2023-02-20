@@ -45,28 +45,46 @@ namespace Proton
 
 	}
 
-	template<typename Component>
+	template<typename... Component>
 	static void CopyComponent(entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
 	{
-		auto view = src.view<Component>();
-
-		for (auto it = view.rbegin(); it != view.rend(); ++it)
+		([&]()
 		{
-			auto e = *it;
-			UUID uuid = src.get<IDComponent>(e).ID;
-			PT_CORE_ASSERT(enttMap.find(uuid) != enttMap.end());
-			entt::entity dstEnttID = enttMap.at(uuid);
+			auto view = src.view<Component>();
 
-			auto& component = src.get<Component>(e);
-			dst.emplace_or_replace<Component>(dstEnttID, component);
-		}
+			for (auto it = view.rbegin(); it != view.rend(); ++it)
+			{
+				auto e = *it;
+				UUID uuid = src.get<IDComponent>(e).ID;
+				PT_CORE_ASSERT(enttMap.find(uuid) != enttMap.end());
+				entt::entity dstEnttID = enttMap.at(uuid);
+
+				auto& component = src.get<Component>(e);
+				dst.emplace_or_replace<Component>(dstEnttID, component);
+			}
+		}(), ...);
 	}
 
-	template<typename Component>
+	template<typename... Component>
+	static void CopyComponent(ComponentGroup<Component...>, entt::registry& dst, entt::registry& src, const std::unordered_map<UUID, entt::entity>& enttMap)
+	{
+		CopyComponent<Component...>(dst, src, enttMap);
+	}
+
+	template<typename... Component>
 	static void CopyComponentIfExists(Entity dst, Entity src)
 	{
-		if (src.HasComponent<Component>())
-			dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+		([&]()
+		{
+			if (src.HasComponent<Component>())
+				dst.AddOrReplaceComponent<Component>(src.GetComponent<Component>());
+		}(), ...);
+	}
+
+	template<typename... Component>
+	static void CopyComponentIfExists(ComponentGroup<Component...>, Entity dst, Entity src)
+	{
+		CopyComponentIfExists<Component...>(dst, src);
 	}
 
 	Ref<Scene> Scene::Copy(Ref<Scene> other)
@@ -89,14 +107,7 @@ namespace Proton
 		}
 
 		//Copy components (except IDComponent and TagComponent)
-		CopyComponent<TransformComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<CameraComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<MeshComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<RootNodeTag>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<NodeComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<LightComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<ScriptComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
-		CopyComponent<NativeScriptComponent>(dstSceneRegistry, srcSceneRegistry, enttMap);
+		CopyComponent(AllComponents{}, dstSceneRegistry, srcSceneRegistry, enttMap);
 
 		//Setting scene view port size
 		newScene->OnViewportResize(other->m_ViewportWidth, other->m_ViewportHeight);
@@ -228,14 +239,7 @@ namespace Proton
 		Entity newEntity = CreateEntity(name);
 
 		//Copy components (except IDComponent and TagComponent)
-		CopyComponentIfExists<TransformComponent>(newEntity, entity);
-		CopyComponentIfExists<CameraComponent>(newEntity, entity);
-		CopyComponentIfExists<MeshComponent>(newEntity, entity);
-		CopyComponentIfExists<RootNodeTag>(newEntity, entity);
-		CopyComponentIfExists<NodeComponent>(newEntity, entity);
-		CopyComponentIfExists<LightComponent>(newEntity, entity);
-		CopyComponentIfExists<ScriptComponent>(newEntity, entity);
-		CopyComponentIfExists<NativeScriptComponent>(newEntity, entity);
+		CopyComponentIfExists(AllComponents{}, newEntity, entity);
 
 		return newEntity;
 	}

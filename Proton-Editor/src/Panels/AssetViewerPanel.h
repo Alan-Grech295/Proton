@@ -20,6 +20,8 @@ namespace Proton
 		}
 		static void SetProjectPath(const std::string& path) { Get().startPath = path; Get().m_SelectedPath = path; }
 
+		static void SetOpenSceneFunction(std::function<void(const std::filesystem::path&)> func) { Get().m_OpenSceneFunc = func; }
+
 		static void AddFile(std::filesystem::path filePath);
 	private:
 		void DrawDirectories();
@@ -41,5 +43,7 @@ namespace Proton
 		Ref<Scene> m_ActiveScene;
 
 		std::string m_SelectedItem;
+
+		std::function<void(const std::filesystem::path&)> m_OpenSceneFunc;
 	};
 }

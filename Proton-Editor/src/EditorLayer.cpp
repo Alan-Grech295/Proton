@@ -44,7 +44,7 @@ namespace Proton
 		SceneHierarchyPanel::SetContext(m_ActiveScene);
 		AssetViewerPanel::SetProjectPath(projectPath);
 		AssetViewerPanel::SetContext(m_ActiveScene);
-
+		AssetViewerPanel::SetOpenSceneFunction(std::bind(&EditorLayer::OpenScene, this, std::placeholders::_1));
 
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
@@ -287,7 +287,7 @@ namespace Proton
 			m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-		m_UpdateEditorCam = ImGui::IsWindowFocused();
+		m_UpdateEditorCam = ImGui::IsWindowFocused() && m_SceneState == SceneState::Edit;
 
 		ImGui::PopStyleVar();
 
@@ -323,7 +323,7 @@ namespace Proton
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 				{
-					OpenScene();
+					OpenScene_Dialog();
 				}
 
 				if (ImGui::MenuItem("Save", "Ctrl+S"))
@@ -434,7 +434,7 @@ namespace Proton
 			break;
 		case Key::O:
 			if (control)
-				OpenScene();
+				OpenScene_Dialog();
 			break;
 		case Key::S:
 			if (control && shift)
@@ -462,7 +462,7 @@ namespace Proton
 		m_CameraEntity.AddComponent<CameraComponent>();
 	}
 
-	void EditorLayer::OpenScene()
+	void EditorLayer::OpenScene_Dialog()
 	{
 		std::string filepath = FileDialogs::OpenFile("Proton Scene (*.proton)\0*.proton\0");
 
@@ -486,7 +486,7 @@ namespace Proton
 		Ref<Scene> newScene = CreateRef<Scene>();
 		SceneSerializer serializer(newScene);
 
-		if (serializer.Deserialize(saveFilePath, m_EditorCam))
+		if (serializer.Deserialize(path.string(), m_EditorCam))
 		{
 			saveFilePath = path.string();
 			m_EditorScene = newScene;
@@ -535,19 +535,24 @@ namespace Proton
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
+		m_UpdateEditorCam = false;
 
 		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
 
 		SceneHierarchyPanel::SetContext(m_ActiveScene);
+		m_SceneRenderer->SetScene(m_ActiveScene);
 	}
 
 	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
+		m_UpdateEditorCam = true;
+
 		m_ActiveScene->OnRuntimeStop();
 		m_ActiveScene = m_EditorScene;
 
 		SceneHierarchyPanel::SetContext(m_ActiveScene);
+		m_SceneRenderer->SetScene(m_ActiveScene);
 	}
 }

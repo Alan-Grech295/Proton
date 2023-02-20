@@ -9,16 +9,8 @@ using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace Sandbox
 {
-    public class Player : Entity
+    public class Camera : Entity
     {
-        TransformComponent m_Transform;
-
-        void OnCreate()
-        {
-            Console.WriteLine($"Player.OnCreate - {ID}");
-            m_Transform = GetComponent<TransformComponent>();
-        }
-
         void OnUpdate(float ts)
         {
             //Console.WriteLine($"Player.OnUpdate: {ts}");
@@ -41,9 +33,9 @@ namespace Sandbox
             else if (Input.IsKeyDown(KeyCode.S))
                 velocity.z -= speed;
 
-            Vector3 position = m_Transform.Position;
+            Vector3 position = Position;
             position += velocity * ts;
-            m_Transform.Position = position;
+            Position = position;
         }
     }
 }
