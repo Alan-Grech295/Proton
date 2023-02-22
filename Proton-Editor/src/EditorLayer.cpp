@@ -512,6 +512,10 @@ namespace Proton
 			SceneSerializer serializer(m_ActiveScene);
 			serializer.Serialize(saveFilePath, m_EditorCam);
 		}
+		else
+		{
+			SaveSceneAs();
+		}
 	}
 
 	void EditorLayer::SaveSceneAs()
