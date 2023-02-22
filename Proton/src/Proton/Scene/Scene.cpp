@@ -161,6 +161,8 @@ namespace Proton
 
 	void Scene::OnRuntimeStart()
 	{
+		m_IsRunning = true;
+
 		//Scripting
 		{
 			ScriptEngine::OnRuntimeStart(this);
@@ -176,6 +178,8 @@ namespace Proton
 
 	void Scene::OnRuntimeStop()
 	{
+		m_IsRunning = false;
+
 		ScriptEngine::OnRuntimeStop();
 	}
 

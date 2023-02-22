@@ -66,13 +66,16 @@ namespace Proton
 			m_Registry = entt::registry();
 		}
 
+		bool IsRunning() { return m_IsRunning; }
+
 		//TEMP
 		//void DrawDebugLine(DirectX::XMFLOAT3 pointA, DirectX::XMFLOAT3 pointB, float r, float g, float b);
 	private:
 		entt::registry m_Registry;
 		uint32_t m_ViewportWidth = 0;
 		uint32_t m_ViewportHeight = 0;
-		uint64_t nextUUID = 0;
+
+		bool m_IsRunning = false;
 
 		std::unordered_map<UUID, Entity> m_EntityMap;
 

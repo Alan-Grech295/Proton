@@ -23,7 +23,7 @@ namespace Proton
 
 	void SceneHierarchyPanel::SetContext(const Ref<Scene> scene)
 	{
-		Get().m_Scene = scene;
+		Get().m_Context = scene;
 		Get().m_Selected = {};
 	}
 
@@ -31,13 +31,13 @@ namespace Proton
 	{
 		ImGui::Begin("Scene Hierarchy");
 
-		if (Get().m_Scene)
+		if (Get().m_Context)
 		{
-			auto& childView = Get().m_Scene->m_Registry.view<RootNodeTag>();
+			auto& childView = Get().m_Context->m_Registry.view<RootNodeTag>();
 
 			for (auto e : childView)
 			{
-				Get().DrawEntityNode(Get().m_Scene->m_Registry.get<IDComponent>(e).ID);
+				Get().DrawEntityNode(Get().m_Context->m_Registry.get<IDComponent>(e).ID);
 			}
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
@@ -47,7 +47,7 @@ namespace Proton
 			if (ImGui::BeginPopupContextWindow(0, 1, false))
 			{
 				if (ImGui::MenuItem("Create Empty Entity"))
-					Get().m_Scene->CreateEntity("New Entity");
+					Get().m_Context->CreateEntity("New Entity");
 
 				ImGui::EndPopup();
 			}
@@ -74,7 +74,7 @@ namespace Proton
 				if (ImGui::MenuItem("Camera"))
 				{
 					CameraComponent& camera = Get().m_Selected.AddComponent<CameraComponent>();
-					camera.Camera.SetViewportSize(Get().m_Scene->GetViewportWidth(), Get().m_Scene->GetViewportHeight());
+					camera.Camera.SetViewportSize(Get().m_Context->GetViewportWidth(), Get().m_Context->GetViewportHeight());
 					ImGui::CloseCurrentPopup();
 				}
 
@@ -101,7 +101,7 @@ namespace Proton
 	{
 		position = -1;
 
-		Ref<Scene> scene = Get().m_Scene;
+		Ref<Scene> scene = Get().m_Context;
 		UUID entityID = entity.GetUUID();
 
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::GetDragDropPayload() && ImGui::GetDragDropPayload()->IsDataType("SceneHierarchyObject"))
@@ -194,7 +194,7 @@ namespace Proton
 
 	void SceneHierarchyPanel::DrawEntityNode(UUID entityID)
 	{
-		Entity entity = m_Scene->GetEntityByUUID(entityID);
+		Entity entity = m_Context->GetEntityByUUID(entityID);
 
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 		auto& node = entity.GetComponent<NodeComponent>();
@@ -290,7 +290,7 @@ namespace Proton
 
 			if (!entity.HasComponent<RootNodeTag>())
 			{
-				NodeComponent& parentComponent = m_Scene->GetEntityByUUID(node.ParentEntity).GetComponent<NodeComponent>();
+				NodeComponent& parentComponent = m_Context->GetEntityByUUID(node.ParentEntity).GetComponent<NodeComponent>();
 
 				for (int i = 0; i < parentComponent.Children.size(); i++)
 				{
@@ -299,7 +299,7 @@ namespace Proton
 				}
 			}
 
-			m_Scene->DestroyEntity(entity);
+			m_Context->DestroyEntity(entity);
 
 			if (m_Selected == entity)
 				m_Selected = {};
@@ -308,7 +308,7 @@ namespace Proton
 
 	void SceneHierarchyPanel::DrawChildNode(UUID entityID)
 	{
-		Entity entity = m_Scene->GetEntityByUUID(entityID);
+		Entity entity = m_Context->GetEntityByUUID(entityID);
 
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 
@@ -388,7 +388,7 @@ namespace Proton
 			//TODO: Create better entity destruction
 			if (!entity.HasComponent<RootNodeTag>())
 			{
-				NodeComponent& parentComponent = m_Scene->GetEntityByUUID(node.ParentEntity).GetComponent<NodeComponent>();
+				NodeComponent& parentComponent = m_Context->GetEntityByUUID(node.ParentEntity).GetComponent<NodeComponent>();
 
 				for (int i = 0; i < parentComponent.Children.size(); i++)
 				{
@@ -397,7 +397,7 @@ namespace Proton
 				}
 			}
 
-			m_Scene->DestroyEntity(entity);
+			m_Context->DestroyEntity(entity);
 
 			if (m_Selected == entity)
 				m_Selected = {};
@@ -406,14 +406,14 @@ namespace Proton
 
 	void SceneHierarchyPanel::DeleteChildNode(UUID entityID)
 	{
-		auto& node = m_Scene->GetEntityByUUID(entityID).GetComponent<NodeComponent>();
+		auto& node = m_Context->GetEntityByUUID(entityID).GetComponent<NodeComponent>();
 
 		for (UUID e : node.Children)
 		{
 			DeleteChildNode(e);
 		}
 
-		m_Scene->DestroyEntity(m_Scene->GetEntityByUUID(entityID));
+		m_Context->DestroyEntity(m_Context->GetEntityByUUID(entityID));
 	}
 
 	static void DrawFloat3Control(const std::string& label, DirectX::XMFLOAT3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
@@ -648,7 +648,7 @@ namespace Proton
 			}
 		});
 
-		DrawComponent<ScriptComponent>("Script", entity, [entity](auto& component) mutable
+		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
 		{
 			static int selectedItem = 0;
 			if (ImGui::Combo("Class", &selectedItem, ScriptEngine::GetEntityClassNames(), ScriptEngine::GetEntityClasses().size(), -1))
@@ -657,18 +657,62 @@ namespace Proton
 			}
 
 			//Fields
-			Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
-			if (scriptInstance)
+
+			//If scene running
+			bool isRunning = scene->IsRunning();
+			if(isRunning)
 			{
-				const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+				Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
+				if (scriptInstance)
+				{
+					const auto& fields = scriptInstance->GetScriptClass()->GetFields();
+					for (const auto [name, field] : fields)
+					{
+						if (field.Type == ScriptFieldType::Float)
+						{
+							float data = scriptInstance->GetFieldValue<float>(name);
+							if (ImGui::DragFloat(name.c_str(), &data))
+							{
+								scriptInstance->SetFieldValue(name, data);
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(component.ClassName);
+				const auto& fields = entityClass->GetFields();
+
+				auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
 				for (const auto [name, field] : fields)
 				{
-					if (field.Type == ScriptFieldType::Float)
+					//Field has been set in editor
+					if (entityFields.find(name) != entityFields.end())
 					{
-						float data = scriptInstance->GetFieldValue<float>(name);
-						if (ImGui::DragFloat(name.c_str(), &data))
+						ScriptFieldInstance& scriptField = entityFields.at(name);
+
+						if (field.Type == ScriptFieldType::Float)
 						{
-							scriptInstance->SetFieldValue(name, data);
+							float data = scriptField.GetValue<float>(name);
+							if (ImGui::DragFloat(name.c_str(), &data))
+							{
+								scriptField.SetValue(data);
+							}
+						}
+					}
+					else
+					{
+						//Display control to set it 
+						if (field.Type == ScriptFieldType::Float)
+						{
+							float data = 0.0f;
+							if (ImGui::DragFloat(name.c_str(), &data))
+							{
+								ScriptFieldInstance& fieldInstance = entityFields[name];
+								fieldInstance.Field = field;
+								fieldInstance.SetValue<float>(data);
+							}
 						}
 					}
 				}

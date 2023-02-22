@@ -168,7 +168,9 @@ namespace Proton
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
 		std::vector<const char*> EntityClassNames;
+
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
 		//Runtime
 		Scene* SceneContext = nullptr;
@@ -176,9 +178,24 @@ namespace Proton
 
 	static ScriptEngineData* s_Data;
 
+	Ref<ScriptClass> ScriptEngine::GetEntityClass(const std::string& name)
+	{
+		auto it = s_Data->EntityClasses.find(name);
+		if (it == s_Data->EntityClasses.end())
+			return nullptr;
+
+		return it->second;
+	}
+
 	std::unordered_map<std::string, Ref<ScriptClass>>& ScriptEngine::GetEntityClasses()
 	{
 		return s_Data->EntityClasses;
+	}
+
+	ScriptFieldMap& ScriptEngine::GetScriptFieldMap(Entity entity)
+	{
+		PT_CORE_ASSERT(entity);
+		return s_Data->EntityScriptFields[entity.GetUUID()];
 	}
 
 	void ScriptEngine::Init()
@@ -273,8 +290,18 @@ namespace Proton
 
 		if (ScriptEngine::EntityClassExists(sc.ClassName))
 		{
+			UUID entityID = entity.GetUUID();
 			Ref<ScriptInstance> instance = CreateRef<ScriptInstance>(s_Data->EntityClasses[sc.ClassName], entity);
-			s_Data->EntityInstances[entity.GetUUID()] = instance;
+			s_Data->EntityInstances[entityID] = instance;
+
+			//Copy field values
+			PT_CORE_ASSERT(s_Data->EntityScriptFields.find(entityID) != s_Data->EntityScriptFields.end());
+			const ScriptFieldMap& fieldMap = s_Data->EntityScriptFields.at(entityID);
+			for (const auto& [name, fieldInstance] : fieldMap)
+			{
+				instance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
+			}
+
 			instance->InvokeOnCreate();
 		}
 	}
@@ -470,5 +497,4 @@ namespace Proton
 		mono_field_set_value(m_Instance, field.ClassField, (void*)value);
 		return true;
 	}
-
 }

@@ -29,7 +29,7 @@ namespace Proton
 
 		static void DragProcedure(Entity entity, int& position);
 	private:
-		Ref<Scene> m_Scene;
+		Ref<Scene> m_Context;
 		Entity m_Selected;
 	};
 }
