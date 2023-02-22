@@ -7,3 +7,12 @@ D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sa
 D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CopyComplete
 D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.dll
 D:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.pdb
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Binaries\Sandbox.dll
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Binaries\Sandbox.pdb
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Binaries\Proton-ScriptCore.dll
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Binaries\Proton-ScriptCore.pdb
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.AssemblyReference.cache
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CoreCompileInputs.cache
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.csproj.CopyComplete
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.dll
+C:\Dev\Proton\Proton-Editor\SandboxProject\Assets\Scripts\Intermediates\Debug\Sandbox.pdb

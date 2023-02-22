@@ -167,7 +167,7 @@ namespace Proton
 		ScriptClass EntityClass;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
-		//TODO: Entity UUID
+		std::vector<const char*> EntityClassNames;
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 
 		//Runtime
@@ -257,6 +257,16 @@ namespace Proton
 		return s_Data->EntityClasses.find(fullClassName) != s_Data->EntityClasses.end();
 	}
 
+	const char*const* ScriptEngine::GetEntityClassNames()
+	{
+		return s_Data->EntityClassNames.data();
+	}
+
+	const char* ScriptEngine::GetEntityClassNameByIndex(uint32_t index)
+	{
+		return s_Data->EntityClassNames[index];
+	}
+
 	void ScriptEngine::OnCreateEntity(Entity entity)
 	{
 		const auto& sc = entity.GetComponent<ScriptComponent>();
@@ -320,11 +330,13 @@ namespace Proton
 	void ScriptEngine::LoadAssemblyClasses()
 	{
 		s_Data->EntityClasses.clear();
+		s_Data->EntityClassNames.clear();
 
 		const MonoTableInfo* typeDefinitionsTable = mono_image_get_table_info(s_Data->AppAssemblyImage, MONO_TABLE_TYPEDEF);
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 		MonoClass* entityClass = mono_class_from_name(s_Data->CoreAssemblyImage, "Proton", "Entity");
 
+		s_Data->EntityClassNames.reserve(numTypes);
 		for (int32_t i = 0; i < numTypes; i++)
 		{
 			uint32_t cols[MONO_TYPEDEF_SIZE];
@@ -349,7 +361,8 @@ namespace Proton
 				continue;
 
 			Ref<ScriptClass> scriptClass = CreateRef<ScriptClass>(nameSpace, className);
-			s_Data->EntityClasses[fullName] = scriptClass;
+			auto [it, succeded] = s_Data->EntityClasses.emplace(fullName, scriptClass);
+			s_Data->EntityClassNames.push_back(it->first.c_str());
 
 			PT_CORE_WARN("{} fields:", className);
 			void* iterator = nullptr;
@@ -367,8 +380,6 @@ namespace Proton
 				}
 			}
 		}
-
-
 	}
 
 	MonoImage* ScriptEngine::GetCoreAssemblyImage()

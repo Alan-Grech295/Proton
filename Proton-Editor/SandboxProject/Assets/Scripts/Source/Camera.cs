@@ -12,6 +12,11 @@ namespace Sandbox
     public class Camera : Entity
     {
         public Entity otherEntity;
+
+        void OnCreate()
+        {
+            Console.WriteLine("Created camera entity");
+        }
         void OnUpdate(float ts)
         {
             //Console.WriteLine($"Player.OnUpdate: {ts}");

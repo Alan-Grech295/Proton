@@ -115,6 +115,9 @@ namespace Proton
 		static void OnRuntimeStop();
 
 		static bool EntityClassExists(const std::string& fullClassName);
+		static const char* const* GetEntityClassNames();
+		static const char* GetEntityClassNameByIndex(uint32_t index);
+		
 		static void OnCreateEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, float ts);
 

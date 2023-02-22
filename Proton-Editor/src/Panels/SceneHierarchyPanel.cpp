@@ -650,16 +650,11 @@ namespace Proton
 
 		DrawComponent<ScriptComponent>("Script", entity, [entity](auto& component) mutable
 		{
-			bool scriptClassExists = ScriptEngine::EntityClassExists(component.ClassName);
-
-			static char buffer[64];
-			strcpy(buffer, component.ClassName.c_str());
-
-			if (!scriptClassExists)
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.9f, 0.2f, 0.3f, 1.0f));
-
-			if (ImGui::InputText("Class", buffer, sizeof(buffer)))
-				component.ClassName = buffer;
+			static int selectedItem = 0;
+			if (ImGui::Combo("Class", &selectedItem, ScriptEngine::GetEntityClassNames(), ScriptEngine::GetEntityClasses().size(), -1))
+			{
+				component.ClassName = ScriptEngine::GetEntityClassNameByIndex(selectedItem);
+			}
 
 			//Fields
 			Ref<ScriptInstance> scriptInstance = ScriptEngine::GetEntityScriptInstance(entity.GetUUID());
@@ -678,9 +673,6 @@ namespace Proton
 					}
 				}
 			}
-
-			if (!scriptClassExists)
-				ImGui::PopStyleColor();
 		});
 	}
 }

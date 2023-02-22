@@ -9,6 +9,10 @@ bin-int/
 #Models
 !Proton/Models/**/*.obj
 
+#Assets
+**.asset
+**.asset.meta
+
 # Visual Studio files and folder
 .vs/
 **.sln
