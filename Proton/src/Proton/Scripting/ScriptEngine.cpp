@@ -170,6 +170,7 @@ namespace Proton
 		std::vector<const char*> EntityClassNames;
 
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
+		std::unordered_map<std::string, Scope<ScriptInstance>> EntityClassInstances;
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
 
 		//Runtime
@@ -205,15 +206,16 @@ namespace Proton
 		InitMono();
 		LoadAssembly("Resources/Scripts/Proton-ScriptCore.dll");
 		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+
+		//Retrieve and instantiate class with constructor
+		s_Data->EntityClass = ScriptClass("Proton", "Entity", true);
+
 		LoadAssemblyClasses();
 
 		Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 
 		ScriptGlue::RegisterFunctions();
 		ScriptGlue::RegisterComponents();
-
-		//Retrieve and instantiate class with constructor
-		s_Data->EntityClass = ScriptClass("Proton", "Entity", true);
 
 #if 0
 		//Retrieve and instantiate class with constructor
@@ -329,6 +331,14 @@ namespace Proton
 		return it->second;
 	}
 
+	const ScriptInstance& ScriptEngine::GetScriptInstanceFromClass(const std::string& className)
+	{
+		auto it = s_Data->EntityClassInstances.find(className);
+		PT_CORE_ASSERT(it != s_Data->EntityClassInstances.end());
+
+		return *(it->second.get());
+	}
+
 	void ScriptEngine::OnRuntimeStop()
 	{
 		s_Data->SceneContext = nullptr;
@@ -406,6 +416,8 @@ namespace Proton
 					scriptClass->m_Fields[fieldName] = { fieldType, fieldName, field };
 				}
 			}
+
+			s_Data->EntityClassInstances[fullName] = CreateScope<ScriptInstance>(scriptClass, Entity::Null);
 		}
 	}
 
@@ -456,6 +468,7 @@ namespace Proton
 		m_OnUpdateMethod = scriptClass->GetMethod("OnUpdate", 1);
 
 		//Call constructor
+		if(entity) 
 		{
 			UUID entityID = entity.GetUUID();
 			void* param = &entityID;
@@ -474,7 +487,7 @@ namespace Proton
 		m_ScriptClass->InvokeMethod(m_Instance, m_OnUpdateMethod, &param);
 	}
 
-	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer)
+	bool ScriptInstance::GetFieldValueInternal(const std::string& name, void* buffer) const
 	{
 		const auto& fields = m_ScriptClass->GetFields();
 		auto it = fields.find(name);

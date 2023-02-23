@@ -54,8 +54,8 @@ namespace Proton
 
 		void SetParent(UUID parentID = UUID::Null, int pos = -1);
 
-		const UUID GetUUID();
-		const std::string& GetName();
+		virtual const UUID GetUUID();
+		virtual const std::string& GetName();
 
 		operator bool() const { return m_EntityHandle != entt::null; }
 		operator entt::entity() const { return m_EntityHandle; }

@@ -12,7 +12,7 @@ namespace Sandbox
     public class Player : Entity
     {
         TransformComponent m_Transform;
-        public float m_Speed = 100.0f;
+        public float m_Speed = 20.0f;
         public float Time;
         public Entity otherEntity;
 

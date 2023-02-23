@@ -105,7 +105,7 @@ namespace Proton
 		Ref<ScriptClass> GetScriptClass() { return m_ScriptClass; }
 
 		template<typename T>
-		T GetFieldValue(const std::string& name)
+		T GetFieldValue(const std::string& name) const
 		{
 			static_assert(sizeof(T) <= 12, "Type too large!");
 
@@ -125,7 +125,7 @@ namespace Proton
 		}
 
 	private:
-		bool GetFieldValueInternal(const std::string& name, void* buffer);
+		bool GetFieldValueInternal(const std::string& name, void* buffer) const;
 		bool SetFieldValueInternal(const std::string& name, const void* value);
 	private:
 		Ref<ScriptClass> m_ScriptClass;
@@ -160,6 +160,8 @@ namespace Proton
 
 		static Scene* GetSceneContext();
 		static Ref<ScriptInstance> GetEntityScriptInstance(UUID entityID);
+
+		static const ScriptInstance& GetScriptInstanceFromClass(const std::string& className);
 
 		static Ref<ScriptClass> GetEntityClass(const std::string& name);
 		static std::unordered_map<std::string, Ref<ScriptClass>>& GetEntityClasses();

@@ -656,6 +656,9 @@ namespace Proton
 				component.ClassName = ScriptEngine::GetEntityClassNameByIndex(selectedItem);
 			}
 
+			if (component.ClassName.empty())
+				return;
+
 			//Fields
 
 			//If scene running
@@ -706,7 +709,7 @@ namespace Proton
 						//Display control to set it 
 						if (field.Type == ScriptFieldType::Float)
 						{
-							float data = 0.0f;
+							float data = ScriptEngine::GetScriptInstanceFromClass(component.ClassName).GetFieldValue<float>(field.Name);
 							if (ImGui::DragFloat(name.c_str(), &data))
 							{
 								ScriptFieldInstance& fieldInstance = entityFields[name];
