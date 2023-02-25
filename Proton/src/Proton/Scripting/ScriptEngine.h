@@ -19,15 +19,31 @@ namespace Proton
 {
 	class Entity;
 
+#define SCRIPT_FIELD_TYPES \
+		X(None,		int)\
+		X(Float,	float)\
+		X(Double,	double)\
+		X(Bool,		bool)\
+		X(Char,		char)\
+		X(SByte,	int8_t)\
+		X(Short,	int16_t)\
+		X(Int,		int32_t)\
+		X(Long,		int64_t)\
+		X(Byte,		uint8_t)\
+		X(UShort,	uint16_t)\
+		X(UInt,		uint32_t)\
+		X(ULong,	uint64_t)\
+		X(String,	std::string)\
+		X(Vector2,	DirectX::XMFLOAT2)\
+		X(Vector3,	DirectX::XMFLOAT3)\
+		X(Vector4,	DirectX::XMFLOAT4)\
+		X(Entity,	UUID)
+
 	enum class ScriptFieldType
 	{
-		None,
-		Float, Double,
-		Bool, SByte, Short, Int, Long,
-		Byte, UShort, UInt, ULong,
-		Char, String,
-		Vector2, Vector3, Vector4,
-		Entity
+#define X(t) t,
+		SCRIPT_FIELD_TYPES
+#undef X
 	};
 
 	struct ScriptField
@@ -107,7 +123,7 @@ namespace Proton
 		template<typename T>
 		T GetFieldValue(const std::string& name) const
 		{
-			static_assert(sizeof(T) <= 12, "Type too large!");
+			static_assert(sizeof(T) <= 16, "Type too large!");
 
 			bool success = GetFieldValueInternal(name, s_FieldValueBuffer);
 			if (!success)
@@ -119,7 +135,7 @@ namespace Proton
 		template<typename T>
 		bool SetFieldValue(const std::string& name, T value)
 		{
-			static_assert(sizeof(T) <= 12, "Type too large!");
+			static_assert(sizeof(T) <= 16, "Type too large!");
 
 			return SetFieldValueInternal(name, &value);
 		}
@@ -135,7 +151,7 @@ namespace Proton
 		MonoMethod* m_OnCreateMethod = nullptr;
 		MonoMethod* m_OnUpdateMethod = nullptr;
 
-		inline static char s_FieldValueBuffer[12];
+		inline static char s_FieldValueBuffer[16];
 	};
 
 	class ScriptEngine
@@ -175,4 +191,30 @@ namespace Proton
 		static MonoObject* InstantiateClass(MonoClass* monoClass);
 		static void LoadAssemblyClasses();
 	};
+
+	namespace Utils
+	{
+		inline const char* ScriptFieldTypeToString(ScriptFieldType fieldType)
+		{
+			switch (fieldType)
+			{
+#define X(t) case ScriptFieldType::t: return #t;
+				SCRIPT_FIELD_TYPES
+#undef X
+			}
+
+			PT_CORE_ASSERT(false, "Unknown ScriptFieldType");
+			return "None";
+		}
+
+		inline ScriptFieldType ScriptFieldTypeFromString(std::string_view fieldType)
+		{
+#define X(t) if(fieldType == #t) { return ScriptFieldType::t; }
+			SCRIPT_FIELD_TYPES
+#undef X
+
+			PT_CORE_ASSERT(false, "Unknown ScriptFieldType");
+			return ScriptFieldType::None;
+		}
+	}
 }

@@ -4,12 +4,35 @@
 #include "Entity.h"
 #include "Proton/Model/Model.h"
 #include "Proton/Asset Loader/AssetCollection.h"
+#include "Proton/Scripting/ScriptEngine.h"
 
 #include <yaml-cpp\yaml.h>
 #include <fstream>
 
 namespace YAML
 {
+	template<>
+	struct convert<DirectX::XMFLOAT2>
+	{
+		static Node encode(const DirectX::XMFLOAT2& rhs)
+		{
+			Node node;
+			node.push_back(rhs.x);
+			node.push_back(rhs.y);
+			return node;
+		}
+
+		static bool decode(const Node& node, DirectX::XMFLOAT2& rhs)
+		{
+			if (!node.IsSequence() || node.size() != 2)
+				return false;
+
+			rhs.x = node[0].as<float>();
+			rhs.y = node[1].as<float>();
+			return true;
+		}
+	};
+
 	template<>
 	struct convert<DirectX::XMFLOAT3>
 	{
@@ -95,6 +118,13 @@ namespace YAML
 
 namespace Proton
 {
+	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT2& v)
+	{
+		out << YAML::Flow;
+		out << YAML::BeginSeq << v.x << v.y << YAML::EndSeq;
+		return out;
+	}
+
 	YAML::Emitter& operator<<(YAML::Emitter& out, const DirectX::XMFLOAT3& v)
 	{
 		out << YAML::Flow;
@@ -254,12 +284,48 @@ namespace Proton
 		if (entity.HasComponent<ScriptComponent>())
 		{
 			out << YAML::Key << "ScriptComponent";
-			out << YAML::BeginMap;	//ScriptComponent
+			out << YAML::BeginMap;	// ScriptComponent
 
 			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
 			out << YAML::Key << "Class" << YAML::Value << scriptComponent.ClassName;
 
-			out << YAML::EndMap;	//ScriptComponent
+			//Fields
+			Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(scriptComponent.ClassName);
+			const auto& fields = entityClass->GetFields();
+			if (fields.size() > 0)
+			{
+				out << YAML::Key << "ScriptFields" << YAML::Value;
+				auto& entityFields = ScriptEngine::GetScriptFieldMap(entity);
+				out << YAML::BeginSeq;		// Script Fields
+
+				for (const auto [name, field] : fields)
+				{
+					if(entityFields.find(name) == entityFields.end())
+						continue;
+
+					out << YAML::BeginMap;	// ScriptField
+					out << YAML::Key << "Name" << YAML::Value << name;
+					out << YAML::Key << "Type" << YAML::Value << Utils::ScriptFieldTypeToString(field.Type);
+					out << YAML::Key << "Data" << YAML::Value;
+
+					ScriptFieldInstance& scriptField = entityFields.at(name);
+
+					switch (field.Type)
+					{
+#define X(typeName, type) case ScriptFieldType::typeName:				\
+							out << scriptField.GetValue<type>(name);	\
+							break;
+						SCRIPT_FIELD_TYPES
+#undef X
+					}
+
+					out << YAML::EndMap;
+
+				}
+				out << YAML::EndSeq;		// Script Fields
+			}
+
+			out << YAML::EndMap;	// ScriptComponent
 		}
 
 		out << YAML::EndMap;	//Entity

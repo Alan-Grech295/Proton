@@ -27,27 +27,40 @@ namespace Proton
 		Get().m_Selected = {};
 	}
 
+	template<typename T>
+	void SceneHierarchyPanel::DisplayAddComponentEntry(const std::string& entryName)
+	{
+		if (!m_Selected.HasComponent<T>())
+		{
+			if (ImGui::MenuItem(entryName.c_str()))
+			{
+				m_Selected.AddComponent<T>();
+				ImGui::CloseCurrentPopup();
+			}
+		}
+	}
+
 	void SceneHierarchyPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Scene Hierarchy");
 
-		if (Get().m_Context)
+		if (m_Context)
 		{
-			auto& childView = Get().m_Context->m_Registry.view<RootNodeTag>();
+			auto& childView = m_Context->m_Registry.view<RootNodeTag>();
 
 			for (auto e : childView)
 			{
-				Get().DrawEntityNode(Get().m_Context->m_Registry.get<IDComponent>(e).ID);
+				DrawEntityNode(m_Context->m_Registry.get<IDComponent>(e).ID);
 			}
 
 			if (ImGui::IsMouseDown(0) && ImGui::IsWindowHovered())
-				Get().m_Selected = {};
+				m_Selected = {};
 
 			//Right-Click on blank space
 			if (ImGui::BeginPopupContextWindow(0, 1, false))
 			{
 				if (ImGui::MenuItem("Create Empty Entity"))
-					Get().m_Context->CreateEntity("New Entity");
+					m_Context->CreateEntity("New Entity");
 
 				ImGui::EndPopup();
 			}
@@ -57,9 +70,9 @@ namespace Proton
 
 		ImGui::Begin("Inspector");
 
-		if (Get().m_Selected)
+		if (m_Selected)
 		{
-			Get().DrawComponents(Get().m_Selected);
+			DrawComponents(m_Selected);
 
 			ImGui::Separator();
 			ImGui::Text("");
@@ -70,25 +83,16 @@ namespace Proton
 
 			if (ImGui::BeginPopup("AddComponent"))
 			{
-				//TODO: Change menu items
+				//TODO: Add camera viewport resizing to DisplayAddComponentEntry
 				if (ImGui::MenuItem("Camera"))
 				{
-					CameraComponent& camera = Get().m_Selected.AddComponent<CameraComponent>();
-					camera.Camera.SetViewportSize(Get().m_Context->GetViewportWidth(), Get().m_Context->GetViewportHeight());
+					CameraComponent& camera = m_Selected.AddComponent<CameraComponent>();
+					camera.Camera.SetViewportSize(m_Context->GetViewportWidth(), m_Context->GetViewportHeight());
 					ImGui::CloseCurrentPopup();
 				}
 
-				if (ImGui::MenuItem("Light"))
-				{
-					Get().m_Selected.AddComponent<LightComponent>();
-					ImGui::CloseCurrentPopup();
-				}
-
-				if (ImGui::MenuItem("Script Component"))
-				{
-					Get().m_Selected.AddComponent<ScriptComponent>();
-					ImGui::CloseCurrentPopup();
-				}
+				DisplayAddComponentEntry<LightComponent>("Light");
+				DisplayAddComponentEntry<ScriptComponent>("Script Component");
 
 				ImGui::EndPopup();
 			}

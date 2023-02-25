@@ -62,6 +62,9 @@ namespace Proton
 
 		bool cursor = true;
 
+		bool m_ViewportFocused = false;
+		bool m_ViewportHovered = false;
+
 		struct
 		{
 			float roll = 0.0f;

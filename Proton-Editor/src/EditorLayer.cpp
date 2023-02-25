@@ -287,7 +287,10 @@ namespace Proton
 			m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
-		m_UpdateEditorCam = ImGui::IsWindowFocused() && m_SceneState == SceneState::Edit;
+		m_ViewportFocused = ImGui::IsWindowFocused();
+		m_ViewportHovered = ImGui::IsAnyWindowHovered();
+
+		m_UpdateEditorCam = m_ViewportHovered && m_SceneState == SceneState::Edit;
 
 		ImGui::PopStyleVar();
 
@@ -305,7 +308,7 @@ namespace Proton
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(enableBlend, nullptr);
 		ImGui::End();
 
-		SceneHierarchyPanel::OnImGuiRender();
+		SceneHierarchyPanel::Get().OnImGuiRender();
 		AssetViewerPanel::OnImGuiRender();
 		ConsolePanel::OnImGuiRender();
 
