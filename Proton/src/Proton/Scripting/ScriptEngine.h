@@ -19,6 +19,7 @@ namespace Proton
 {
 	class Entity;
 
+//TODO: Add string
 #define SCRIPT_FIELD_TYPES \
 		X(None,		int)\
 		X(Float,	float)\
@@ -33,11 +34,13 @@ namespace Proton
 		X(UShort,	uint16_t)\
 		X(UInt,		uint32_t)\
 		X(ULong,	uint64_t)\
-		X(String,	std::string)\
 		X(Vector2,	DirectX::XMFLOAT2)\
 		X(Vector3,	DirectX::XMFLOAT3)\
 		X(Vector4,	DirectX::XMFLOAT4)\
 		X(Entity,	UUID)
+
+	//X(String,	std::string)
+		
 
 	enum class ScriptFieldType
 	{
@@ -76,11 +79,11 @@ namespace Proton
 		template<typename T>
 		void SetValue(T value)
 		{
-			static_assert(sizeof(T) <= 12, "Type too large!");
+			static_assert(sizeof(T) <= 16, "Type too large!");
 			memcpy(m_Buffer, &value, sizeof(T));
 		}
 	private:
-		uint8_t m_Buffer[12];
+		uint8_t m_Buffer[16];
 	};
 
 	using ScriptFieldMap = std::unordered_map<std::string, ScriptFieldInstance>;

@@ -30,7 +30,7 @@ namespace Proton
 		{"System.UInt64", ScriptFieldType::ULong},
 
 		{"System.Char", ScriptFieldType::Char},
-		{"System.String", ScriptFieldType::String},
+		//{"System.String", ScriptFieldType::String},
 
 		{"Proton.Vector2", ScriptFieldType::Vector2},
 		{"Proton.Vector3", ScriptFieldType::Vector3},

@@ -5,6 +5,7 @@
 #include "Proton/Model/Model.h"
 #include "Proton/Asset Loader/AssetCollection.h"
 #include "Proton/Scripting/ScriptEngine.h"
+#include "Proton/Core/UUID.h"
 
 #include <yaml-cpp\yaml.h>
 #include <fstream>
@@ -111,6 +112,24 @@ namespace YAML
 			mat._41 = node[12].as<float>();	mat._42 = node[13].as<float>();	mat._43 = node[14].as<float>();	mat._44 = node[15].as<float>();
 			
 			rhs = DirectX::XMLoadFloat4x4(&mat);
+			return true;
+		}
+	};
+
+	template<>
+	struct convert<Proton::UUID>
+	{
+		static Node encode(const Proton::UUID& rhs)
+		{
+
+			Node node;
+			node.push_back((uint64_t)rhs);
+			return node;
+		}
+
+		static bool decode(const Node& node, Proton::UUID& rhs)
+		{
+			rhs = node.as<uint64_t>();
 			return true;
 		}
 	};
@@ -287,7 +306,7 @@ namespace Proton
 			out << YAML::BeginMap;	// ScriptComponent
 
 			auto& scriptComponent = entity.GetComponent<ScriptComponent>();
-			out << YAML::Key << "Class" << YAML::Value << scriptComponent.ClassName;
+			out << YAML::Key << "ClassName" << YAML::Value << scriptComponent.ClassName;
 
 			//Fields
 			Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(scriptComponent.ClassName);
@@ -560,7 +579,43 @@ namespace Proton
 				{
 					ScriptComponent& sc = deserializedEntity.AddComponent<ScriptComponent>();
 
-					sc.ClassName = scriptComponent["Class"].as<std::string>();
+					sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+
+					auto scriptFields = scriptComponent["ScriptFields"];
+					if (scriptFields)
+					{
+						Ref<ScriptClass> entityClass = ScriptEngine::GetEntityClass(sc.ClassName);
+						PT_CORE_ASSERT(entityClass);
+						const auto& fields = entityClass->GetFields();
+						auto& entityFields = ScriptEngine::GetScriptFieldMap(deserializedEntity);
+
+						for (auto scriptField : scriptFields)
+						{
+							std::string name = scriptField["Name"].as<std::string>();
+							std::string	typeString = scriptField["Type"].as<std::string>();
+							ScriptFieldType type = Utils::ScriptFieldTypeFromString(typeString);
+							
+							ScriptFieldInstance& fieldInstance = entityFields[name];
+							//TODO: Turn assert into Editor log message
+							PT_CORE_ASSERT(fields.find(name) != fields.end());
+							if(fields.find(name) == fields.end())
+								continue;
+
+							fieldInstance.Field = fields.at(name);
+
+							switch (type)
+							{
+#define X(typeName, t) case ScriptFieldType::typeName:					\
+							{											\
+								t data = scriptField["Data"].as<t>();	\
+								fieldInstance.SetValue(data);			\
+							}											\
+							break;
+								SCRIPT_FIELD_TYPES
+#undef X
+							}
+						}
+					}
 				}
 			}
 		}
