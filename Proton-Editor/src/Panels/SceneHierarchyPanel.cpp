@@ -495,6 +495,133 @@ namespace Proton
 		ImGui::PopID();
 	}
 
+	static void DrawScriptField(const std::string& name, const ScriptField& field, Ref<ScriptInstance> scriptInstance)
+	{
+		switch (field.Type)
+		{
+			//Floats
+		case ScriptFieldType::Float:
+		{
+			float data = scriptInstance->GetFieldValue<float>(name);
+			if (ImGui::DragFloat(name.c_str(), &data))
+			{
+				scriptInstance->SetFieldValue(name, data);
+			}
+			break;
+		}
+		case ScriptFieldType::Double:
+		{
+			float data = scriptInstance->GetFieldValue<double>(name);
+			if (ImGui::DragFloat(name.c_str(), &data))
+			{
+				scriptInstance->SetFieldValue(name, (double)data);
+			}
+			break;
+		}
+
+		case ScriptFieldType::Bool:
+		{
+			bool data = scriptInstance->GetFieldValue<bool>(name);
+			if (ImGui::Checkbox(name.c_str(), &data))
+			{
+				scriptInstance->SetFieldValue(name, data);
+			}
+			break;
+		}
+		case ScriptFieldType::Char:
+		{
+			char data = scriptInstance->GetFieldValue<char>(name);
+			if (ImGui::InputText(name.c_str(), &data, 1))
+			{
+				scriptInstance->SetFieldValue(name, data);
+			}
+			break;
+		}
+
+		//Unsigned Integers
+		case ScriptFieldType::SByte:
+		{
+			int data = scriptInstance->GetFieldValue<int8_t>(name);
+			if (ImGui::DragInt(name.c_str(), &data, 1.0f, -128, 127))
+			{
+				scriptInstance->SetFieldValue(name, (int8_t)data);
+			}
+			break;
+		}
+		case ScriptFieldType::Short:
+		{
+			int data = scriptInstance->GetFieldValue<short>(name);
+			if (ImGui::DragInt(name.c_str(), &data, 1.0f, -32768, 32767))
+			{
+				scriptInstance->SetFieldValue(name, (short)data);
+			}
+			break;
+		}
+		case ScriptFieldType::Int:
+		{
+			int data = scriptInstance->GetFieldValue<int>(name);
+			if (ImGui::DragInt(name.c_str(), &data, 1.0f, -2147483648, 2147483647))
+			{
+				scriptInstance->SetFieldValue(name, data);
+			}
+			break;
+		}
+		case ScriptFieldType::Long:
+		{
+			int data = scriptInstance->GetFieldValue<int64_t>(name);
+			if (ImGui::DragInt(name.c_str(), &data, 1.0f, -9223372036854775808, 9223372036854775807))
+			{
+				scriptInstance->SetFieldValue(name, (int64_t)data);
+			}
+			break;
+		}
+
+		//Signed Integers
+		case ScriptFieldType::Byte:
+		{
+			int data = scriptInstance->GetFieldValue<uint8_t>(name);
+			if (ImGui::DragInt(name.c_str(), &data, 1.0f, 0, 255))
+			{
+				scriptInstance->SetFieldValue(name, (uint8_t)data);
+			}
+			break;
+		}
+
+		case ScriptFieldType::UShort:
+		{
+			int data = scriptInstance->GetFieldValue<uint16_t>(name);
+			if (ImGui::DragInt(name.c_str(), &data, 1.0f, 0, 65535))
+			{
+				scriptInstance->SetFieldValue(name, (uint16_t)data);
+			}
+			break;
+		}
+
+		/*case ScriptFieldType::UInt:
+		{
+			int data = scriptInstance->GetFieldValue<uint32_t>(name);
+			if (ImGui::DragInt(name.c_str(), &data, 1.0f, 0, 4294967295))
+			{
+				scriptInstance->SetFieldValue(name, (uint32_t)data);
+			}
+			break;
+		}
+
+		case ScriptFieldType::Byte:
+		{
+			int data = scriptInstance->GetFieldValue<uint8_t>(name);
+			if (ImGui::DragInt(name.c_str(), &data, 1.0f, 0, 255))
+			{
+				scriptInstance->SetFieldValue(name, (uint8_t)data);
+			}
+			break;
+		}*/
+
+		default:
+			PT_CORE_ASSERT(false, "Field type not handled");
+		}
+	}
+
 	template<typename T, typename UIFunction>
 	static void DrawComponent(const std::string& name, Entity entity, UIFunction uiFunction)
 	{
@@ -675,14 +802,7 @@ namespace Proton
 					const auto& fields = scriptInstance->GetScriptClass()->GetFields();
 					for (const auto [name, field] : fields)
 					{
-						if (field.Type == ScriptFieldType::Float)
-						{
-							float data = scriptInstance->GetFieldValue<float>(name);
-							if (ImGui::DragFloat(name.c_str(), &data))
-							{
-								scriptInstance->SetFieldValue(name, data);
-							}
-						}
+						DrawScriptField(name, field, scriptInstance);
 					}
 				}
 			}

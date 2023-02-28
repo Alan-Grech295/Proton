@@ -18,6 +18,7 @@ namespace Proton
 		{"System.Single", ScriptFieldType::Float},
 		{"System.Double", ScriptFieldType::Double},
 		
+		{"System.Char", ScriptFieldType::Char},
 		{"System.Boolean", ScriptFieldType::Bool},
 		{"System.SByte", ScriptFieldType::SByte},
 		{"System.Int16", ScriptFieldType::Short},
@@ -29,7 +30,6 @@ namespace Proton
 		{"System.UInt32", ScriptFieldType::UInt},
 		{"System.UInt64", ScriptFieldType::ULong},
 
-		{"System.Char", ScriptFieldType::Char},
 		//{"System.String", ScriptFieldType::String},
 
 		{"Proton.Vector2", ScriptFieldType::Vector2},

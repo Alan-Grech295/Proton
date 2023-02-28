@@ -14,7 +14,18 @@ namespace Sandbox
         TransformComponent m_Transform;
         public float m_Speed = 20.0f;
         public float Time;
-        public Entity otherEntity;
+        //public Entity otherEntity;
+
+        public double v0;
+
+        public bool v1;
+        public char v2;
+
+        public sbyte v3;
+        public short v4;
+        public int v5;
+        public long v6;
+
 
         void OnCreate()
         {
