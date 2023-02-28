@@ -495,131 +495,89 @@ namespace Proton
 		ImGui::PopID();
 	}
 
-	static void DrawScriptField(const std::string& name, const ScriptField& field, Ref<ScriptInstance> scriptInstance)
+	template<ScriptFieldType type, typename T>
+	static bool DrawScriptField(const std::string& name, T* data)
 	{
-		switch (field.Type)
+		if constexpr (type == ScriptFieldType::Float || type == ScriptFieldType::Double)
+		{
+			float castData = (float)*data;
+			bool changed = ImGui::DragFloat(name.c_str(), &castData);
+			*data = static_cast<T>(castData);
+			return changed;
+		}
+		else if constexpr (type == ScriptFieldType::Bool)
+		{
+			bool changed = ImGui::Checkbox(name.c_str(), data);
+			return changed;
+		}
+		else if constexpr (type == ScriptFieldType::Char)
+		{
+			//TODO: Memory leak
+			static char* castData = new char[2];
+			castData[0] = *data;
+			castData[1] = '\0';
+			bool changed = ImGui::InputText(name.c_str(), castData, 1);
+			*data = castData[0];
+			return changed;
+		}
+		else if constexpr (type == ScriptFieldType::SByte || type == ScriptFieldType::Short ||
+			type == ScriptFieldType::Int || type == ScriptFieldType::Long ||
+			type == ScriptFieldType::Byte || type == ScriptFieldType::UShort ||
+			type == ScriptFieldType::UInt || type == ScriptFieldType::ULong)
+		{
+			int castData = (int)*data;
+			bool changed = ImGui::DragInt(name.c_str(), &castData, 1.0f, (int)std::numeric_limits<T>::min, (int)std::numeric_limits<T>::max);
+			*data = static_cast<T>(castData);
+			return changed;
+		}
+
+		/*switch (type)
 		{
 			//Floats
 		case ScriptFieldType::Float:
-		{
-			float data = scriptInstance->GetFieldValue<float>(name);
-			if (ImGui::DragFloat(name.c_str(), &data))
-			{
-				scriptInstance->SetFieldValue(name, data);
-			}
-			break;
-		}
 		case ScriptFieldType::Double:
 		{
-			float data = scriptInstance->GetFieldValue<double>(name);
-			if (ImGui::DragFloat(name.c_str(), &data))
-			{
-				scriptInstance->SetFieldValue(name, (double)data);
-			}
-			break;
+			float castData = (float)*data;
+			bool changed = ImGui::DragFloat(name.c_str(), &castData);
+			*data = (T)castData;
+			return changed;
 		}
+		break;
 
 		case ScriptFieldType::Bool:
 		{
-			bool data = scriptInstance->GetFieldValue<bool>(name);
-			if (ImGui::Checkbox(name.c_str(), &data))
-			{
-				scriptInstance->SetFieldValue(name, data);
-			}
-			break;
+			return ImGui::Checkbox(name.c_str(), data);
 		}
+		break;
 		case ScriptFieldType::Char:
 		{
-			char data = scriptInstance->GetFieldValue<char>(name);
-			if (ImGui::InputText(name.c_str(), &data, 1))
-			{
-				scriptInstance->SetFieldValue(name, data);
-			}
-			break;
+			return ImGui::InputText(name.c_str(), data, 1);
 		}
+		break;
 
-		//Unsigned Integers
+		//Integers
 		case ScriptFieldType::SByte:
-		{
-			int data = scriptInstance->GetFieldValue<int8_t>(name);
-			if (ImGui::DragInt(name.c_str(), &data, 1.0f, -128, 127))
-			{
-				scriptInstance->SetFieldValue(name, (int8_t)data);
-			}
-			break;
-		}
 		case ScriptFieldType::Short:
-		{
-			int data = scriptInstance->GetFieldValue<short>(name);
-			if (ImGui::DragInt(name.c_str(), &data, 1.0f, -32768, 32767))
-			{
-				scriptInstance->SetFieldValue(name, (short)data);
-			}
-			break;
-		}
 		case ScriptFieldType::Int:
-		{
-			int data = scriptInstance->GetFieldValue<int>(name);
-			if (ImGui::DragInt(name.c_str(), &data, 1.0f, -2147483648, 2147483647))
-			{
-				scriptInstance->SetFieldValue(name, data);
-			}
-			break;
-		}
 		case ScriptFieldType::Long:
-		{
-			int data = scriptInstance->GetFieldValue<int64_t>(name);
-			if (ImGui::DragInt(name.c_str(), &data, 1.0f, -9223372036854775808, 9223372036854775807))
-			{
-				scriptInstance->SetFieldValue(name, (int64_t)data);
-			}
-			break;
-		}
-
-		//Signed Integers
 		case ScriptFieldType::Byte:
-		{
-			int data = scriptInstance->GetFieldValue<uint8_t>(name);
-			if (ImGui::DragInt(name.c_str(), &data, 1.0f, 0, 255))
-			{
-				scriptInstance->SetFieldValue(name, (uint8_t)data);
-			}
-			break;
-		}
-
 		case ScriptFieldType::UShort:
+		case ScriptFieldType::UInt:
+		case ScriptFieldType::ULong:
 		{
-			int data = scriptInstance->GetFieldValue<uint16_t>(name);
-			if (ImGui::DragInt(name.c_str(), &data, 1.0f, 0, 65535))
-			{
-				scriptInstance->SetFieldValue(name, (uint16_t)data);
-			}
-			break;
+			int castData = (int)*data;
+			bool changed = ImGui::DragInt(name.c_str(), &castData, 1.0f, std::numeric_limits<T>::min, std::numeric_limits<T>::max);
+			*data = (T)castData;
+			return changed;
 		}
-
-		/*case ScriptFieldType::UInt:
-		{
-			int data = scriptInstance->GetFieldValue<uint32_t>(name);
-			if (ImGui::DragInt(name.c_str(), &data, 1.0f, 0, 4294967295))
-			{
-				scriptInstance->SetFieldValue(name, (uint32_t)data);
-			}
-			break;
-		}
-
-		case ScriptFieldType::Byte:
-		{
-			int data = scriptInstance->GetFieldValue<uint8_t>(name);
-			if (ImGui::DragInt(name.c_str(), &data, 1.0f, 0, 255))
-			{
-				scriptInstance->SetFieldValue(name, (uint8_t)data);
-			}
-			break;
-		}*/
+		break;
 
 		default:
 			PT_CORE_ASSERT(false, "Field type not handled");
-		}
+		}*/
+
+		PT_CORE_ASSERT(false, "Field type not handled");
+		return false;
 	}
 
 	template<typename T, typename UIFunction>
@@ -802,7 +760,21 @@ namespace Proton
 					const auto& fields = scriptInstance->GetScriptClass()->GetFields();
 					for (const auto [name, field] : fields)
 					{
-						DrawScriptField(name, field, scriptInstance);
+						int d = 0;
+						switch (field.Type)
+						{
+#define X(scriptType, type) case ScriptFieldType::scriptType: \
+							{\
+								type data = scriptInstance->GetFieldValue<type>(name);	\
+								if (DrawScriptField<ScriptFieldType::scriptType>(name, &data))\
+								{\
+									scriptInstance->SetFieldValue(name, data);\
+								}\
+							break;\
+							}
+							SCRIPT_FIELD_TYPES
+#undef X
+						}
 					}
 				}
 			}
@@ -818,28 +790,39 @@ namespace Proton
 					if (entityFields.find(name) != entityFields.end())
 					{
 						ScriptFieldInstance& scriptField = entityFields.at(name);
-
-						if (field.Type == ScriptFieldType::Float)
+						
+						switch (field.Type)
 						{
-							float data = scriptField.GetValue<float>(name);
-							if (ImGui::DragFloat(name.c_str(), &data))
-							{
-								scriptField.SetValue(data);
+#define X(scriptType, type) case ScriptFieldType::scriptType: \
+							{\
+								type data = scriptField.GetValue<type>(name);	\
+								if (DrawScriptField<ScriptFieldType::scriptType>(name, &data))\
+								{\
+									scriptField.SetValue(data);\
+								}\
+							break;\
 							}
+							SCRIPT_FIELD_TYPES
+#undef X
 						}
 					}
 					else
 					{
-						//Display control to set it 
-						if (field.Type == ScriptFieldType::Float)
+						switch (field.Type)
 						{
-							float data = ScriptEngine::GetScriptInstanceFromClass(component.ClassName).GetFieldValue<float>(field.Name);
-							if (ImGui::DragFloat(name.c_str(), &data))
-							{
-								ScriptFieldInstance& fieldInstance = entityFields[name];
-								fieldInstance.Field = field;
-								fieldInstance.SetValue<float>(data);
+#define X(scriptType, type) case ScriptFieldType::scriptType: \
+							{\
+								type data = ScriptEngine::GetScriptInstanceFromClass(component.ClassName).GetFieldValue<type>(name);	\
+								if (DrawScriptField<ScriptFieldType::scriptType>(name, &data))\
+								{\
+									ScriptFieldInstance& fieldInstance = entityFields[name]; \
+									fieldInstance.Field = field; \
+									fieldInstance.SetValue<type>(data); \
+								}\
+							break;\
 							}
+							SCRIPT_FIELD_TYPES
+#undef X
 						}
 					}
 				}
