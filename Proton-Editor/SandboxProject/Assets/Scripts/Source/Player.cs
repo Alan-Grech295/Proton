@@ -26,6 +26,11 @@ namespace Sandbox
         public int v5;
         public long v6;
 
+        public byte v7;
+        public ushort v8;
+        public uint v9;
+        public ulong v10;
+
 
         void OnCreate()
         {

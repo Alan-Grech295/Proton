@@ -288,9 +288,9 @@ namespace Proton
 		}
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
-		m_ViewportHovered = ImGui::IsAnyWindowHovered();
+		m_ViewportHovered = ImGui::IsWindowHovered();
 
-		m_UpdateEditorCam = m_ViewportHovered && m_SceneState == SceneState::Edit;
+		m_UpdateEditorCam = m_ViewportFocused && m_SceneState == SceneState::Edit;
 
 		ImGui::PopStyleVar();
 

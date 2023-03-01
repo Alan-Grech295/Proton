@@ -1,3 +1,5 @@
+#define NOMINMAX
+
 #include "SceneHierarchyPanel.h"
 #include "imgui\imgui.h"
 #include "imgui\imgui_internal.h"
@@ -513,68 +515,41 @@ namespace Proton
 		else if constexpr (type == ScriptFieldType::Char)
 		{
 			//TODO: Memory leak
-			static char* castData = new char[2];
+			static char castData[2];
 			castData[0] = *data;
-			castData[1] = '\0';
-			bool changed = ImGui::InputText(name.c_str(), castData, 1);
+			bool changed = ImGui::InputText(name.c_str(), castData, sizeof(castData));
 			*data = castData[0];
 			return changed;
 		}
 		else if constexpr (type == ScriptFieldType::SByte || type == ScriptFieldType::Short ||
-			type == ScriptFieldType::Int || type == ScriptFieldType::Long ||
-			type == ScriptFieldType::Byte || type == ScriptFieldType::UShort ||
-			type == ScriptFieldType::UInt || type == ScriptFieldType::ULong)
+			type == ScriptFieldType::Int || type == ScriptFieldType::Long)
 		{
+			int min = std::numeric_limits<T>::min();
+			int max = std::numeric_limits<T>::max();
+
+			if constexpr (sizeof(T) > sizeof(int))
+			{
+				min = std::numeric_limits<int>::min();
+				max = std::numeric_limits<int>::max();
+			}
+
 			int castData = (int)*data;
-			bool changed = ImGui::DragInt(name.c_str(), &castData, 1.0f, (int)std::numeric_limits<T>::min, (int)std::numeric_limits<T>::max);
+			bool changed = ImGui::DragInt(name.c_str(), &castData, 1.0f, min, max);
 			*data = static_cast<T>(castData);
 			return changed;
 		}
+		else if constexpr (type == ScriptFieldType::Byte || type == ScriptFieldType::UShort ||
+						   type == ScriptFieldType::UInt || type == ScriptFieldType::ULong)
+		{
+			int max = std::numeric_limits<T>::max();
+			if constexpr (std::numeric_limits<T>::max() > (T)std::numeric_limits<int>::max())
+				constexpr int max = std::numeric_limits<int>::max();
 
-		/*switch (type)
-		{
-			//Floats
-		case ScriptFieldType::Float:
-		case ScriptFieldType::Double:
-		{
-			float castData = (float)*data;
-			bool changed = ImGui::DragFloat(name.c_str(), &castData);
-			*data = (T)castData;
-			return changed;
-		}
-		break;
-
-		case ScriptFieldType::Bool:
-		{
-			return ImGui::Checkbox(name.c_str(), data);
-		}
-		break;
-		case ScriptFieldType::Char:
-		{
-			return ImGui::InputText(name.c_str(), data, 1);
-		}
-		break;
-
-		//Integers
-		case ScriptFieldType::SByte:
-		case ScriptFieldType::Short:
-		case ScriptFieldType::Int:
-		case ScriptFieldType::Long:
-		case ScriptFieldType::Byte:
-		case ScriptFieldType::UShort:
-		case ScriptFieldType::UInt:
-		case ScriptFieldType::ULong:
-		{
 			int castData = (int)*data;
-			bool changed = ImGui::DragInt(name.c_str(), &castData, 1.0f, std::numeric_limits<T>::min, std::numeric_limits<T>::max);
-			*data = (T)castData;
+			bool changed = ImGui::DragInt(name.c_str(), &castData, 1.0f, 0, max);
+			*data = static_cast<T>(castData);
 			return changed;
 		}
-		break;
-
-		default:
-			PT_CORE_ASSERT(false, "Field type not handled");
-		}*/
 
 		PT_CORE_ASSERT(false, "Field type not handled");
 		return false;
