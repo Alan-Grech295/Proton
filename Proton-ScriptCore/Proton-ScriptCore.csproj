@@ -62,6 +62,8 @@
     <Compile Include="Source\Proton\Input.cs" />
     <Compile Include="Source\Proton\InternalCalls.cs" />
     <Compile Include="Source\Proton\KeyCode.cs" />
+    <Compile Include="Source\Proton\Math\Matrix3x3.cs" />
+    <Compile Include="Source\Proton\Math\Quaternion.cs" />
     <Compile Include="Source\Proton\Math\Vector2.cs" />
     <Compile Include="Source\Proton\Math\Vector4.cs" />
     <Compile Include="Source\Proton\Scene\Camera.cs" />
