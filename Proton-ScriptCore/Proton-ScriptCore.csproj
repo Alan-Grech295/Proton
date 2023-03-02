@@ -21,7 +21,8 @@
     <OutputPath>..\Proton-Editor\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Proton-Editor\Resources\Scripts\Intermediates\Debug\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -33,7 +34,8 @@
     <OutputPath>..\Proton-Editor\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Proton-Editor\Resources\Scripts\Intermediates\Release\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -45,7 +47,8 @@
     <OutputPath>..\Proton-Editor\Resources\Scripts\</OutputPath>
     <BaseIntermediateOutputPath>..\Proton-Editor\Resources\Scripts\Intermediates\Dist\</BaseIntermediateOutputPath>
     <IntermediateOutputPath>$(BaseIntermediateOutputPath)</IntermediateOutputPath>
-    <DefineConstants></DefineConstants>
+    <DefineConstants>
+    </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -59,9 +62,12 @@
     <Compile Include="Source\Proton\Input.cs" />
     <Compile Include="Source\Proton\InternalCalls.cs" />
     <Compile Include="Source\Proton\KeyCode.cs" />
+    <Compile Include="Source\Proton\Math\Vector2.cs" />
+    <Compile Include="Source\Proton\Math\Vector4.cs" />
+    <Compile Include="Source\Proton\Scene\Camera.cs" />
     <Compile Include="Source\Proton\Scene\Components.cs" />
     <Compile Include="Source\Proton\Scene\Entity.cs" />
-    <Compile Include="Source\Proton\Vector3.cs" />
+    <Compile Include="Source\Proton\Math\Vector3.cs" />
   </ItemGroup>
   <ItemGroup>
   </ItemGroup>
