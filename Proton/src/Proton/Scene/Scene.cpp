@@ -126,6 +126,19 @@ namespace Proton
 		return m_EntityMap[uuid];
 	}
 
+	Entity Scene::FindEntityByName(std::string_view name)
+	{
+		auto view = m_Registry.view<TagComponent>();
+		for (auto entity : view)
+		{
+			const TagComponent& tc = view.get<TagComponent>(entity);
+			if (tc.Tag == name)
+				return Entity{ entity, this };
+		}
+
+		return Entity::Null;
+	}
+
 	/*void Scene::DrawDebugLine(DirectX::XMFLOAT3 pointA, DirectX::XMFLOAT3 pointB, float r, float g, float b)
 	{
 		m_DebugVertBuffer->EmplaceBack(pointA, DirectX::XMFLOAT3{ r, g, b });

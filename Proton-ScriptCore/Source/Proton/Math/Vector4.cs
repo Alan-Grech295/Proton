@@ -95,10 +95,10 @@ namespace Proton
         public void Normalize()
         {
             float invMag = 1.0f / Magnitude();
-            x /= invMag;
-            y /= invMag;
-            z /= invMag;
-            w /= invMag;
+            x *= invMag;
+            y *= invMag;
+            z *= invMag;
+            w *= invMag;
         }
 
         public float Dot(Vector4 other)

@@ -220,8 +220,8 @@ namespace Proton
 			out << YAML::Key << "Node Name" << YAML::Value << nc.NodeName;
 			//out << YAML::Key << "Is Prefab" << YAML::Value << !writeMesh;
 			//out << YAML::Key << "Prefab Path" << YAML::Value << nc.m_PrefabName;
-			out << YAML::Key << "Parent Entity" << YAML::Value << (nc.ParentEntity == UUID::Null ? LLONG_MAX : (uint64_t)nc.ParentEntity);
-			out << YAML::Key << "Root Entity" << YAML::Value << (nc.RootEntity == UUID::Null ? LLONG_MAX : (uint64_t)nc.RootEntity);
+			out << YAML::Key << "Parent Entity" << YAML::Value << (uint64_t)nc.ParentEntity;
+			out << YAML::Key << "Root Entity" << YAML::Value << (uint64_t)nc.RootEntity;
 			out << YAML::Key << "Initial Transform" << YAML::Value << nc.Origin;
 
 			out << YAML::EndMap;	//NodeComponent
@@ -580,6 +580,7 @@ namespace Proton
 					ScriptComponent& sc = deserializedEntity.AddComponent<ScriptComponent>();
 
 					sc.ClassName = scriptComponent["ClassName"].as<std::string>();
+					sc.ClassIndex = ScriptEngine::GetEntityClassIndexFromName(sc.ClassName);
 
 					auto scriptFields = scriptComponent["ScriptFields"];
 					if (scriptFields)

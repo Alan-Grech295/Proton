@@ -11,15 +11,31 @@ namespace Sandbox
 {
     public class Camera : Entity
     {
-        public Entity otherEntity;
+        public float maxDist = 5.0f;
 
+        Entity player;
         void OnCreate()
         {
             Console.WriteLine("Created camera entity");
+            player = FindEntityByName("Player");
         }
         void OnUpdate(float ts)
         {
             //Console.WriteLine($"Player.OnUpdate: {ts}");
+            if (player != null)
+            {
+                Player playerClass = player.As<Player>();
+                if((player.Position - Position).SqrMagnitude() >= maxDist * maxDist)
+                {
+                    Position = Vector3.Normalize(Position - player.Position) * maxDist + player.Position;
+                }
+
+                playerClass.m_Speed += ts;
+            }
+            else
+            {
+                Console.WriteLine("Player is null!");
+            }
 
             float speed = 100.0f;
             Vector3 velocity = Vector3.Zero;
@@ -41,7 +57,7 @@ namespace Sandbox
 
             Vector3 position = Position;
             position += velocity * ts;
-            Position = position;
+            //Position = position;
         }
     }
 }

@@ -143,6 +143,8 @@ namespace Proton
 			return SetFieldValueInternal(name, &value);
 		}
 
+		MonoObject* GetManagedObject() { return m_Instance; }
+
 	private:
 		bool GetFieldValueInternal(const std::string& name, void* buffer) const;
 		bool SetFieldValueInternal(const std::string& name, const void* value);
@@ -173,6 +175,7 @@ namespace Proton
 		static bool EntityClassExists(const std::string& fullClassName);
 		static const char* const* GetEntityClassNames();
 		static const char* GetEntityClassNameByIndex(uint32_t index);
+		static int GetEntityClassIndexFromName(std::string_view name);
 		
 		static void OnCreateEntity(Entity entity);
 		static void OnUpdateEntity(Entity entity, float ts);
@@ -187,6 +190,8 @@ namespace Proton
 		static ScriptFieldMap& GetScriptFieldMap(Entity entity);
 
 		static MonoImage* GetCoreAssemblyImage();
+
+		static MonoObject* GetManagedInstance(UUID id);
 	private:
 		static void InitMono();
 		static void ShutdownMono();

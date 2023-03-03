@@ -94,14 +94,19 @@ namespace Proton
         public void Normalize()
         {
             float invMag = 1.0f / Magnitude();
-            x /= invMag;
-            y /= invMag;
-            z /= invMag;
+            x *= invMag;
+            y *= invMag;
+            z *= invMag;
         }
 
         public float Dot(Vector3 other)
         {
             return x * other.x + y * other.y + z * other.z;
+        }
+
+        public override string ToString()
+        {
+            return $"({x}, {y}, {z})";
         }
     }
 }

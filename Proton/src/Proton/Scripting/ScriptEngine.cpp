@@ -255,6 +255,17 @@ namespace Proton
 		return s_Data->EntityClassNames[index];
 	}
 
+	int ScriptEngine::GetEntityClassIndexFromName(std::string_view name)
+	{
+		for (int i = 0; i < s_Data->EntityClassNames.size(); i++)
+		{
+			if (name == s_Data->EntityClassNames[i])
+				return i;
+		}
+
+		return -1;
+	}
+
 	void ScriptEngine::OnCreateEntity(Entity entity)
 	{
 		const auto& sc = entity.GetComponent<ScriptComponent>();
@@ -266,11 +277,13 @@ namespace Proton
 			s_Data->EntityInstances[entityID] = instance;
 
 			//Copy field values
-			PT_CORE_ASSERT(s_Data->EntityScriptFields.find(entityID) != s_Data->EntityScriptFields.end());
-			const ScriptFieldMap& fieldMap = s_Data->EntityScriptFields.at(entityID);
-			for (const auto& [name, fieldInstance] : fieldMap)
+			if (s_Data->EntityScriptFields.find(entityID) != s_Data->EntityScriptFields.end())
 			{
-				instance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
+				const ScriptFieldMap& fieldMap = s_Data->EntityScriptFields.at(entityID);
+				for (const auto& [name, fieldInstance] : fieldMap)
+				{
+					instance->SetFieldValueInternal(name, fieldInstance.m_Buffer);
+				}
 			}
 
 			instance->InvokeOnCreate();
@@ -393,6 +406,12 @@ namespace Proton
 	MonoImage* ScriptEngine::GetCoreAssemblyImage()
 	{
 		return s_Data->CoreAssemblyImage;
+	}
+
+	MonoObject* ScriptEngine::GetManagedInstance(UUID id)
+	{
+		PT_CORE_ASSERT(s_Data->EntityInstances.find(id) != s_Data->EntityInstances.end());
+		return s_Data->EntityInstances.at(id)->GetManagedObject();
 	}
 
 	MonoObject* ScriptEngine::InstantiateClass(MonoClass* monoClass)

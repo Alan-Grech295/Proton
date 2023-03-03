@@ -164,6 +164,9 @@ namespace Proton
 	{
 		std::string ClassName;
 
+		//TEMP
+		int ClassIndex = 0;
+
 		ScriptComponent() = default;
 		ScriptComponent(const ScriptComponent&) = default;
 	};

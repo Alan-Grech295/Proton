@@ -48,7 +48,7 @@ namespace Proton
 
 		Entity GetEntityByUUID(UUID uuid);
 
-		Entity FindEntityWithTag(const std::string& tag);
+		Entity FindEntityByName(std::string_view name);
 
 		template<typename T>
 		inline Entity FindEntityWithComponent()

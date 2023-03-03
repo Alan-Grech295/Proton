@@ -30,6 +30,26 @@ namespace Proton
 		return s_EntityHasComponentFuncs.at(monoComponentType)(entity);
 	}
 
+	static uint64_t Entity_FindEntityByName(MonoString* name)
+	{
+		char* nameCStr = mono_string_to_utf8(name);
+
+		Scene* scene = ScriptEngine::GetSceneContext();
+		PT_CORE_ASSERT(scene);
+		Entity entity = scene->FindEntityByName(nameCStr);
+		mono_free(nameCStr);
+
+		if (!entity)
+			return UUID::Null;
+
+		return entity.GetUUID();
+	}
+
+	static MonoObject* Entity_GetScriptInstance(UUID entityID)
+	{
+		return ScriptEngine::GetManagedInstance(entityID);
+	}
+
 	static void TransformComponent_GetPosition(UUID entityID, DirectX::XMFLOAT3* outPosition)
 	{
 		Scene* scene = ScriptEngine::GetSceneContext();
@@ -85,6 +105,8 @@ namespace Proton
 	void ScriptGlue::RegisterFunctions()
 	{
 		PT_ADD_INTERNAL_CALL(Entity_HasComponent);
+		PT_ADD_INTERNAL_CALL(Entity_FindEntityByName);
+		PT_ADD_INTERNAL_CALL(Entity_GetScriptInstance);
 
 		PT_ADD_INTERNAL_CALL(TransformComponent_GetPosition);
 		PT_ADD_INTERNAL_CALL(TransformComponent_SetPosition);
