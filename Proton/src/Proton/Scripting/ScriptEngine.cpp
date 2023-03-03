@@ -133,6 +133,9 @@ namespace Proton
 		MonoAssembly* AppAssembly = nullptr;
 		MonoImage* AppAssemblyImage = nullptr;
 
+		std::filesystem::path CoreAssemblyFilePath;
+		std::filesystem::path AppAssemblyFilePath;
+
 		ScriptClass EntityClass;
 
 		std::unordered_map<std::string, Ref<ScriptClass>> EntityClasses;
@@ -173,6 +176,8 @@ namespace Proton
 		s_Data = new ScriptEngineData();
 
 		InitMono();
+		ScriptGlue::RegisterFunctions();
+
 		LoadAssembly("Resources/Scripts/Proton-ScriptCore.dll");
 		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
 
@@ -180,12 +185,9 @@ namespace Proton
 		s_Data->EntityClass = ScriptClass("Proton", "Entity", true);
 
 		LoadAssemblyClasses();
-
-		Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
-
-		ScriptGlue::RegisterFunctions();
 		ScriptGlue::RegisterComponents();
 
+		//Utils::PrintAssemblyTypes(s_Data->CoreAssembly);
 #if 0
 		//Retrieve and instantiate class with constructor
 		s_Data->EntityClass = ScriptClass("Proton", "Entity");
@@ -228,10 +230,13 @@ namespace Proton
 
 	void ScriptEngine::ShutdownMono()
 	{
+		mono_domain_set(mono_get_root_domain(), false);
+
 		//Shutdown not working, to do later
-		/*mono_domain_unload(s_Data->AppDomain);
-		mono_jit_cleanup(s_Data->RootDomain);*/
+		mono_domain_unload(s_Data->AppDomain);
 		s_Data->AppDomain = nullptr;
+
+		mono_jit_cleanup(s_Data->RootDomain);
 		s_Data->RootDomain = nullptr;
 	}
 
@@ -330,9 +335,28 @@ namespace Proton
 
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
+		s_Data->AppAssemblyFilePath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		//PrintAssemblyTypes(s_Data->CoreAssembly);
+	}
+
+	void ScriptEngine::ReloadAssembly()
+	{
+		mono_domain_set(mono_get_root_domain(), false);
+
+		mono_domain_unload(s_Data->AppDomain);
+		//mono_domain_free(s_Data->AppDomain, true);
+
+		LoadAssembly(s_Data->CoreAssemblyFilePath);
+		LoadAppAssembly(s_Data->AppAssemblyFilePath);
+
+		//Retrieve and instantiate class with constructor
+		s_Data->EntityClass = ScriptClass("Proton", "Entity", true);
+
+		LoadAssemblyClasses();
+
+		ScriptGlue::RegisterComponents();
 	}
 
 	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
@@ -341,6 +365,7 @@ namespace Proton
 		s_Data->AppDomain = mono_domain_create_appdomain("ProtonScriptRuntime", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
 
+		s_Data->CoreAssemblyFilePath = filepath;
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 		//PrintAssemblyTypes(s_Data->CoreAssembly);

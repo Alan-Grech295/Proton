@@ -94,6 +94,7 @@ namespace Proton
 	template<typename... Component>
 	static void RegisterComponent(ComponentGroup<Component...>)
 	{
+		s_EntityHasComponentFuncs.clear();
 		RegisterComponent<Component...>();
 	}
 

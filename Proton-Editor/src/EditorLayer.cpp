@@ -4,6 +4,7 @@
 #include "Proton\Utils\PlatformUtils.h"
 #include <Proton\Math\Math.h>
 #include <Proton\Asset Loader\AssetManager.h>
+#include "Proton\Scripting\ScriptEngine.h"
 
 //TEMP
 #include "CompileTimeTests.h"
@@ -344,6 +345,16 @@ namespace Proton
 				ImGui::EndMenu();
 			}
 
+			if (ImGui::BeginMenu("Script"))
+			{
+				if (ImGui::MenuItem("Reload Assembly", "Ctrl+R"))
+				{
+					ScriptEngine::ReloadAssembly();
+				}
+
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 
@@ -444,6 +455,10 @@ namespace Proton
 				SaveSceneAs();
 			else if (control)
 				SaveScene();
+			break;
+		case Key::R:
+			if (control)
+				ScriptEngine::ReloadAssembly();
 			break;
 		}
 

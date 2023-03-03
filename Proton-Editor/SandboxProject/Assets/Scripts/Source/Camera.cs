@@ -25,7 +25,7 @@ namespace Sandbox
             if (player != null)
             {
                 Player playerClass = player.As<Player>();
-                if((player.Position - Position).SqrMagnitude() >= maxDist * maxDist)
+                if((player.Position - Position).SqrMagnitude() <= maxDist * maxDist)
                 {
                     Position = Vector3.Normalize(Position - player.Position) * maxDist + player.Position;
                 }
