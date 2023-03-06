@@ -1,13 +1,15 @@
 #include "ptpch.h"
 #include "ScriptEngine.h"
 #include "ScriptGlue.h"
+#include "Proton/Scene/Entity.h"
+#include "FileWatch.h"
+#include "Proton/Core/Application.h"
 
 #include "mono/jit/jit.h"
 #include "mono/metadata/assembly.h"
 #include "mono/metadata/object.h"
 #include "mono/metadata/tabledefs.h"
 
-#include "Proton/Scene/Entity.h"
 
 #include <assert.h>
 
@@ -144,6 +146,9 @@ namespace Proton
 		std::unordered_map<UUID, Ref<ScriptInstance>> EntityInstances;
 		std::unordered_map<std::string, Scope<ScriptInstance>> EntityClassInstances;
 		std::unordered_map<UUID, ScriptFieldMap> EntityScriptFields;
+
+		Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
+		bool AssemblyReloadPending = false;
 
 		//Runtime
 		Scene* SceneContext = nullptr;
@@ -333,12 +338,29 @@ namespace Proton
 		s_Data->EntityInstances.clear();
 	}
 
+	static void OnAppAssemblyFileSystemEvent(const std::string& path, const filewatch::Event change_type)
+	{
+		if (!s_Data->AssemblyReloadPending && change_type == filewatch::Event::modified)
+		{
+			s_Data->AssemblyReloadPending = true;
+
+			Application::Get().SubmitToMainThread([]()
+			{
+				s_Data->AppAssemblyFileWatcher.reset();
+				ScriptEngine::ReloadAssembly(); 
+			});
+		}
+	}
+
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_Data->AppAssemblyFilePath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		//PrintAssemblyTypes(s_Data->CoreAssembly);
+
+		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
+		s_Data->AssemblyReloadPending = false;
 	}
 
 	void ScriptEngine::ReloadAssembly()

@@ -109,16 +109,24 @@ namespace Proton
 
 			m_LastFrameTime = time;
 
-			for (Layer* layer : m_LayerStack)
-				layer->OnUpdate(timeStep);
+			ExecuteMainThreadQueue();
+
+			{
+				PT_PROFILE_SCOPE("LayerStack OnUpdate")
+				for (Layer* layer : m_LayerStack)
+					layer->OnUpdate(timeStep);
+			}
 
 			RenderCommand::BindSwapChain();
 			RenderCommand::Clear();
 
 			m_ImGuiLayer->Begin();
 
-			for (Layer* layer : m_LayerStack)
-				layer->OnImGuiRender();
+			{
+				PT_PROFILE_SCOPE("LayerStack OnImGuiRender")
+				for (Layer* layer : m_LayerStack)
+					layer->OnImGuiRender();
+			}
 
 			m_ImGuiLayer->End();
 
@@ -136,5 +144,15 @@ namespace Proton
 	bool Application::OnAppRender(AppRenderEvent& e)
 	{
 		return false;
+	}
+
+	void Application::ExecuteMainThreadQueue()
+	{
+		std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+
+		for (auto& func : m_MainThreadQueue)
+			func();
+
+		m_MainThreadQueue.clear();
 	}
 }

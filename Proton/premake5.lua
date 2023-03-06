@@ -21,6 +21,7 @@ project "Proton"
 	{
 		"src",
 		"vendor/spdlog/include",
+		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.DirectXTK}",
 		"%{IncludeDir.DirectXTex}",
 		"%{IncludeDir.ImGui}",

@@ -18,6 +18,7 @@ project "Proton-Editor"
 		"%{wks.location}/Proton/vendor/spdlog/include",
 		"%{wks.location}/Proton/src",
 		"%{wks.location}/Proton/vendor",
+		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.Assimp}",
 		"%{IncludeDir.DirectXTex}",
 		"%{IncludeDir.entt}"

@@ -35,10 +35,18 @@ namespace Proton
 		static inline Application& Get() { return *s_Instance; }
 
 		inline Window& GetWindow() { return *m_Window; }
+
+		void SubmitToMainThread(std::function<void()> function) 
+		{ 
+			std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
+			m_MainThreadQueue.emplace_back(function); 
+		}
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		bool OnAppRender(AppRenderEvent& e);
+
+		void ExecuteMainThreadQueue();
 	private:
 		bool m_Running = true;
 		Scope<Window> m_Window;
@@ -46,6 +54,9 @@ namespace Proton
 		LayerStack m_LayerStack;
 		float m_LastFrameTime = 0.0f;
 		__int64 m_AppStartTime = 0;
+
+		std::vector<std::function<void()>> m_MainThreadQueue;
+		std::mutex m_MainThreadQueueMutex;
 	private:
 		static Application* s_Instance;
 	};
