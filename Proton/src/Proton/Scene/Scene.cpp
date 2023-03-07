@@ -139,6 +139,11 @@ namespace Proton
 		return Entity::Null;
 	}
 
+	void Scene::Step(int frames)
+	{
+		m_StepFrames = frames;
+	}
+
 	/*void Scene::DrawDebugLine(DirectX::XMFLOAT3 pointA, DirectX::XMFLOAT3 pointB, float r, float g, float b)
 	{
 		m_DebugVertBuffer->EmplaceBack(pointA, DirectX::XMFLOAT3{ r, g, b });
@@ -198,6 +203,9 @@ namespace Proton
 
 	void Scene::OnRuntimeUpdate(TimeStep ts)
 	{
+		if (m_IsPaused && --m_StepFrames < 0)
+			return;
+
 		//Scripting
 		{
 			//C# Entity OnUpdate

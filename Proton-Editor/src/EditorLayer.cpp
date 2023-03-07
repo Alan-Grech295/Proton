@@ -25,6 +25,8 @@ namespace Proton
 	{
 		m_IconPlay = Texture2D::Create("Resources/icons/PlayButton.png");
 		m_IconStop = Texture2D::Create("Resources/icons/StopButton.png");
+		m_IconPause = Texture2D::Create("Resources/icons/PauseButton.png");
+		m_IconStep = Texture2D::Create("Resources/icons/StepButton.png");
 
 		AssetManager::SetProjectPath(projectPath);
 		AssetManager::ScanProject();
@@ -376,14 +378,35 @@ namespace Proton
 		ImGui::Begin("##toolbar", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse);
 		float size = ImGui::GetWindowHeight() - 4.0f;
 
-		Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
-		ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
-		if (ImGui::ImageButton(icon->GetTexturePointer(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
 		{
-			if (m_SceneState == SceneState::Edit)
-				OnScenePlay();
-			else if(m_SceneState == SceneState::Play)
-				OnSceneStop();
+			Ref<Texture2D> icon = m_SceneState == SceneState::Edit ? m_IconPlay : m_IconStop;
+			ImGui::SetCursorPosX((ImGui::GetWindowContentRegionMax().x * 0.5f) - (size * 0.5f));
+			if (ImGui::ImageButton(icon->GetTexturePointer(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+			{
+				if (m_SceneState == SceneState::Edit)
+					OnScenePlay();
+				else if (m_SceneState == SceneState::Play)
+					OnSceneStop();
+			}
+		}
+
+		if (m_SceneState != SceneState::Edit)
+		{
+			ImGui::SameLine();
+			bool isPaused = m_ActiveScene->IsPaused();
+			if (ImGui::ImageButton(m_IconPause->GetTexturePointer(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+			{
+				m_ActiveScene->SetPaused(!isPaused);
+			}
+
+			if (isPaused)
+			{
+				ImGui::SameLine();
+				if (ImGui::ImageButton(m_IconStep->GetTexturePointer(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+				{
+					m_ActiveScene->Step();
+				}
+			}
 		}
 
 		ImGui::PopStyleVar(2);
@@ -576,5 +599,13 @@ namespace Proton
 
 		SceneHierarchyPanel::SetContext(m_ActiveScene);
 		m_SceneRenderer->SetScene(m_ActiveScene);
+	}
+
+	void EditorLayer::OnScenePause()
+	{
+		if (m_SceneState == SceneState::Edit)
+			return;
+
+		m_ActiveScene->SetPaused(true);
 	}
 }

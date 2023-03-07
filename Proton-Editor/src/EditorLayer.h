@@ -36,6 +36,7 @@ namespace Proton
 
 		void OnScenePlay();
 		void OnSceneStop();
+		void OnScenePause();
 	private:
 		Entity m_CameraEntity;
 		Entity m_GoblinEntity;
@@ -49,8 +50,7 @@ namespace Proton
 
 		Scope<SceneRenderer> m_SceneRenderer;
 
-		Ref<Texture2D> m_IconPlay;
-		Ref<Texture2D> m_IconStop;
+		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconPause, m_IconStep;
 
 		EditorCamera m_EditorCam;
 
@@ -75,7 +75,7 @@ namespace Proton
 			float z = 0.0f;
 		} m_Transform;
 
-		enum class SceneState { Edit = 0, Play = 1};
+		enum class SceneState { Edit = 0, Play = 1, Simulate = 2 };
 
 		SceneState m_SceneState = SceneState::Edit;
 	};
