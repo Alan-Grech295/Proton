@@ -177,7 +177,7 @@ namespace Proton
 		DX_CHECK_ERROR(pDevice->CreateRenderTargetView(
 			pBackBuffer.Get(),
 			nullptr,
-			&pTarget
+			pTarget.GetAddressOf()
 		));
 
 		//Create depth stencil texture
