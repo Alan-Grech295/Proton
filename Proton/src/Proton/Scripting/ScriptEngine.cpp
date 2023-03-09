@@ -5,11 +5,12 @@
 #include "FileWatch.h"
 #include "Proton/Core/Application.h"
 
-#include "mono/jit/jit.h"
-#include "mono/metadata/assembly.h"
-#include "mono/metadata/object.h"
-#include "mono/metadata/tabledefs.h"
-
+#include <mono/jit/jit.h>
+#include <mono/metadata/assembly.h>
+#include <mono/metadata/object.h>
+#include <mono/metadata/tabledefs.h>
+#include <mono/metadata/mono-debug.h>
+#include <mono/metadata/threads.h>
 
 #include <assert.h>
 
@@ -72,7 +73,7 @@ namespace Proton
 			return buffer;
 		}
 
-		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath)
+		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPDB = false)
 		{
 			uint32_t fileSize = 0;
 			char* fileData = ReadBytes(assemblyPath, &fileSize);
@@ -84,6 +85,22 @@ namespace Proton
 			{
 				PT_CORE_ERROR(mono_image_strerror(status));
 				return nullptr;
+			}
+
+			if (loadPDB)
+			{
+				std::filesystem::path pdbPath = assemblyPath;
+				pdbPath.replace_extension(".pdb");
+
+				if (std::filesystem::exists(pdbPath))
+				{
+					uint32_t pdbFileSize;
+					char* pdbFileData = ReadBytes(pdbPath, &pdbFileSize);
+
+					mono_debug_open_image_from_memory(image, (const mono_byte*)pdbFileData, pdbFileSize);
+					PT_CORE_INFO("Loaded PDB {}", pdbPath);
+					delete[] pdbFileData;
+				}
 			}
 
 			std::string pathString = assemblyPath.string();
@@ -149,6 +166,8 @@ namespace Proton
 
 		Scope<filewatch::FileWatch<std::string>> AppAssemblyFileWatcher;
 		bool AssemblyReloadPending = false;
+
+		bool EnableDebugging = true;
 
 		//Runtime
 		Scene* SceneContext = nullptr;
@@ -227,10 +246,25 @@ namespace Proton
 	{
 		mono_set_assemblies_path("mono/lib");
 
+		if (s_Data->EnableDebugging)
+		{
+			const char* argv[2] = {
+				"--debugger-agent=transport=dt_socket,address=127.0.0.1:2550,server=y,suspend=n,loglevel=3,logfile=MonoDebugger.log",
+				"--soft-breakpoints"
+			};
+			mono_jit_parse_options(2, (char**)argv);
+			mono_debug_init(MONO_DEBUG_FORMAT_MONO);
+		}
+
 		MonoDomain* rootDomain = mono_jit_init("ProtonJITRuntime");
-		assert("No root domain" && rootDomain);
+		PT_CORE_ASSERT(rootDomain);
 
 		s_Data->RootDomain = rootDomain;
+		
+		if(s_Data->EnableDebugging)
+			mono_debug_domain_create(s_Data->RootDomain);
+
+		mono_thread_set_main(mono_thread_current());
 	}
 
 	void ScriptEngine::ShutdownMono()
@@ -355,7 +389,7 @@ namespace Proton
 	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_Data->AppAssemblyFilePath = filepath;
-		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath);
+		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		//PrintAssemblyTypes(s_Data->CoreAssembly);
 
@@ -388,7 +422,7 @@ namespace Proton
 		mono_domain_set(s_Data->AppDomain, true);
 
 		s_Data->CoreAssemblyFilePath = filepath;
-		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath);
+		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 		//PrintAssemblyTypes(s_Data->CoreAssembly);
 	}
@@ -488,8 +522,13 @@ namespace Proton
 
 	MonoObject* ScriptClass::InvokeMethod(MonoObject* instance, MonoMethod* monoMethod, void** params)
 	{
-		if(monoMethod)
-			return mono_runtime_invoke(monoMethod, instance, params, nullptr);
+		if (monoMethod)
+		{
+			MonoObject* exception = nullptr;
+			return mono_runtime_invoke(monoMethod, instance, params, &exception);
+		}
+
+		return nullptr;
 	}
 		
 	ScriptInstance::ScriptInstance(Ref<ScriptClass> scriptClass, Entity entity)
