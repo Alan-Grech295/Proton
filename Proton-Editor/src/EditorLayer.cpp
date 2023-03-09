@@ -6,8 +6,6 @@
 #include <Proton\Asset Loader\AssetManager.h>
 #include "Proton\Scripting\ScriptEngine.h"
 
-//TEMP
-#include "CompileTimeTests.h"
 #include <DirectXMath.h>
 
 #include <filesystem>
@@ -394,7 +392,10 @@ namespace Proton
 		{
 			ImGui::SameLine();
 			bool isPaused = m_ActiveScene->IsPaused();
-			if (ImGui::ImageButton(m_IconPause->GetTexturePointer(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0))
+			const ImVec4 unpausedTint(1, 1, 1, 1);
+			const ImVec4 pausedTint(0.7f, 0.7f, 0.7f, 1.0f);
+
+			if (ImGui::ImageButton(m_IconPause->GetTexturePointer(), ImVec2(size, size), ImVec2(0, 0), ImVec2(1, 1), 0, ImVec4(0, 0, 0, 0), isPaused ? pausedTint : unpausedTint))
 			{
 				m_ActiveScene->SetPaused(!isPaused);
 			}
