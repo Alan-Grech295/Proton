@@ -60,6 +60,8 @@ namespace Proton
 
 		std::string saveFilePath;
 
+		uint32_t m_AntiAliasing = 1;
+
 		bool cursor = true;
 
 		bool m_ViewportFocused = false;

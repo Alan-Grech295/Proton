@@ -22,7 +22,7 @@ namespace Proton
 		Get().m_NumTraces++;
 	}
 
-	static bool DrawMessageCounts(void* textureID, const char* label, uint32_t count)
+	static bool DrawMessageCounts(void* textureID, const char* label, uint32_t count, bool& selected)
 	{
 		const float padding = 6;
 		ImVec2 cursorPos = ImGui::GetCursorPos();
@@ -31,11 +31,14 @@ namespace Proton
 		ImGui::BeginGroup();
 		ImVec2 textSize = ImGui::CalcTextSize(text.c_str());
 		ImVec2 size = { 12 + textSize.x + 8 + padding, max(12, textSize.y) + padding };
-		bool pressed = ImGui::Button(label, size);
+		bool pressed;
+		if (pressed = ImGui::Button(label, size))
+			selected = !selected;
 
 		ImGui::SetCursorPos(ImVec2{ cursorPos.x + padding / 2.0f, cursorPos.y + padding});
 
-		ImGui::Image(textureID, ImVec2{ 12, 12 });
+		const ImVec4 clickCol(0.5f, 0.5f, 0.5f, 1.0f);
+		ImGui::Image(textureID, ImVec2{ 12, 12 }, ImVec2(0, 0), ImVec2(1, 1), selected ? ImVec4(1, 1, 1, 1) : clickCol);
 		ImGui::SameLine();
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() - padding / 2.0f);
@@ -62,18 +65,13 @@ namespace Proton
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
 
-		if (DrawMessageCounts(Get().m_ErrorIcon->GetTexturePointer(), "##errors", Get().m_NumErrors))
-			Get().m_ShowErrors = !Get().m_ShowErrors;
-
+		DrawMessageCounts(Get().m_ErrorIcon->GetTexturePointer(), "##errors", Get().m_NumErrors, Get().m_ShowErrors);
+		
 		ImGui::SameLine();
-
-		if(DrawMessageCounts(Get().m_WarningIcon->GetTexturePointer(), "##warnings", Get().m_NumWarnings))
-			Get().m_ShowWarnings = !Get().m_ShowWarnings;
-
+		DrawMessageCounts(Get().m_WarningIcon->GetTexturePointer(), "##warnings", Get().m_NumWarnings, Get().m_ShowWarnings);
+		
 		ImGui::SameLine();
-
-		if(DrawMessageCounts(Get().m_TraceIcon->GetTexturePointer(), "##traces", Get().m_NumTraces))
-			Get().m_ShowTraces = !Get().m_ShowTraces;
+		DrawMessageCounts(Get().m_TraceIcon->GetTexturePointer(), "##traces", Get().m_NumTraces, Get().m_ShowTraces);
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
 

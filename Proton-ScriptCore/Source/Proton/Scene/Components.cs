@@ -27,4 +27,19 @@ namespace Proton
             }
         }
     }
+
+    public class CameraComponent : Component
+    {
+
+    }
+
+    public class MeshComponent : Component
+    {
+
+    }
+
+    public class LightComponent : Component
+    {
+
+    }
 }

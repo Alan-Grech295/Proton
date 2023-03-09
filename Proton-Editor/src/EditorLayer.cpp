@@ -281,10 +281,10 @@ namespace Proton
 
 		if (viewportPanelSize.x != m_ViewportSize.x || viewportPanelSize.y != m_ViewportSize.y)
 		{
-			m_SceneRenderer->Resize((uint32_t)viewportPanelSize.x, (uint32_t)viewportPanelSize.y);
+			m_SceneRenderer->Resize((uint32_t)viewportPanelSize.x * m_AntiAliasing, (uint32_t)viewportPanelSize.y * m_AntiAliasing);
 			m_ViewportSize = viewportPanelSize;
 
-			m_ActiveScene->OnViewportResize(m_ViewportSize.x, m_ViewportSize.y);
+			m_ActiveScene->OnViewportResize(m_ViewportSize.x * m_AntiAliasing, m_ViewportSize.y * m_AntiAliasing);
 			m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
@@ -492,8 +492,8 @@ namespace Proton
 	void EditorLayer::NewScene()
 	{
 		m_ActiveScene = CreateRef<Scene>();
-		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-		m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+		m_ActiveScene->OnViewportResize((uint32_t)m_ViewportSize.x * m_AntiAliasing, (uint32_t)m_ViewportSize.y * m_AntiAliasing);
+		m_EditorCam.SetViewportSize(m_ViewportSize.x * m_AntiAliasing, m_ViewportSize.y * m_AntiAliasing);
 		m_SceneRenderer->SetScene(m_ActiveScene);
 
 		SceneHierarchyPanel::SetContext(m_ActiveScene);
@@ -532,8 +532,8 @@ namespace Proton
 		{
 			saveFilePath = path.string();
 			m_EditorScene = newScene;
-			m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x, (uint32_t)m_ViewportSize.y);
-			m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
+			m_EditorScene->OnViewportResize((uint32_t)m_ViewportSize.x * m_AntiAliasing, (uint32_t)m_ViewportSize.y * m_AntiAliasing);
+			m_EditorCam.SetViewportSize(m_ViewportSize.x * m_AntiAliasing, m_ViewportSize.y * m_AntiAliasing);
 
 			m_ActiveScene = m_EditorScene;
 

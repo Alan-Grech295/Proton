@@ -98,4 +98,43 @@ namespace Proton
 	{
 		return GetComponent<TagComponent>().Tag;
 	}
+
+	template<typename T>
+	void Entity::OnComponentAdded(T& component)
+	{
+		static_assert(sizeof(T) != 0, "Component cannot be of size 0");
+	}
+
+	template<>
+	void Entity::OnComponentAdded<IDComponent>(IDComponent& component){}
+
+	template<>
+	void Entity::OnComponentAdded<TransformComponent>(TransformComponent& component) {}
+
+	template<>
+	void Entity::OnComponentAdded<TagComponent>(TagComponent& component) {}
+
+	template<>
+	void Entity::OnComponentAdded<CameraComponent>(CameraComponent& component) 
+	{
+		component.Camera.SetViewportSize(m_Scene->GetViewportWidth(), m_Scene->GetViewportHeight());
+	}
+
+	template<>
+	void Entity::OnComponentAdded<MeshComponent>(MeshComponent& component) {}
+
+	template<>
+	void Entity::OnComponentAdded<RootNodeTag>(RootNodeTag& component) {}
+
+	template<>
+	void Entity::OnComponentAdded<NodeComponent>(NodeComponent& component) {}
+
+	template<>
+	void Entity::OnComponentAdded<LightComponent>(LightComponent& component) {}
+
+	template<>
+	void Entity::OnComponentAdded<ScriptComponent>(ScriptComponent& component) {}
+	
+	template<>
+	void Entity::OnComponentAdded<NativeScriptComponent>(NativeScriptComponent& component){}
 }

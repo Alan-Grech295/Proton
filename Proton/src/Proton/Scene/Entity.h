@@ -19,13 +19,17 @@ namespace Proton
 		template<typename Component, typename... Args>
 		Component& AddComponent(Args&&... args)
 		{
-			return m_Scene->m_Registry.emplace<Component>(m_EntityHandle, std::forward<Args>(args)...);
+			Component& component = m_Scene->m_Registry.emplace<Component>(m_EntityHandle, std::forward<Args>(args)...);
+			OnComponentAdded(component);
+			return component;
 		}
 
 		template<typename Component, typename... Args>
 		Component& AddOrReplaceComponent(Args&&... args)
 		{
-			return m_Scene->m_Registry.emplace_or_replace<Component>(m_EntityHandle, std::forward<Args>(args)...);
+			Component& component = m_Scene->m_Registry.emplace_or_replace<Component>(m_EntityHandle, std::forward<Args>(args)...);
+			OnComponentAdded(component);
+			return component;
 		}
 
 		template<typename Component>
@@ -62,6 +66,10 @@ namespace Proton
 		operator uint32_t() const { return (uint32_t)m_EntityHandle; }
 		bool operator==(const Entity& other) const { return m_EntityHandle == other.m_EntityHandle && m_Scene == other.m_Scene; }
 		bool operator!=(const Entity& other) const { return !(*this == other); }
+
+	private:
+		template<typename T>
+		void OnComponentAdded(T& component);
 	public:
 		static Entity& Null;
 	private:

@@ -85,14 +85,7 @@ namespace Proton
 
 			if (ImGui::BeginPopup("AddComponent"))
 			{
-				//TODO: Add camera viewport resizing to DisplayAddComponentEntry
-				if (ImGui::MenuItem("Camera"))
-				{
-					CameraComponent& camera = m_Selected.AddComponent<CameraComponent>();
-					camera.Camera.SetViewportSize(m_Context->GetViewportWidth(), m_Context->GetViewportHeight());
-					ImGui::CloseCurrentPopup();
-				}
-
+				DisplayAddComponentEntry<CameraComponent>("Camera");
 				DisplayAddComponentEntry<LightComponent>("Light");
 				DisplayAddComponentEntry<ScriptComponent>("Script Component");
 
@@ -609,7 +602,7 @@ namespace Proton
 
 			auto& tag = entity.GetComponent<TagComponent>().Tag;
 
-			char buffer[256];
+			char buffer[128];
 			memset(buffer, 0, sizeof(buffer));
 			strcpy(buffer, tag.c_str());
 
@@ -619,11 +612,7 @@ namespace Proton
 			}
 
 			std::string entityIDText = "Entity ID: " + fmt::format("{:x}", entity.GetUUID());
-			float contentAvailX = ImGui::GetContentRegionAvail().x;
 			ImGui::SameLine();
-			float remaining = ImGui::GetWindowSize().x - ImGui::GetCursorPosX();
-
-			ImGui::SetCursorPosX(contentAvailX - ImGui::CalcTextSize(entityIDText.c_str()).x);
 			ImGui::Text(entityIDText.c_str());
 		}
 
