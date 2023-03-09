@@ -170,15 +170,15 @@ namespace Proton
 
 		pTarget->Release();
 
-		pSwap->ResizeBuffers(0, m_Width, m_Height, DXGI_FORMAT_UNKNOWN, 0);
+		DX_CHECK_ERROR(pSwap->ResizeBuffers(0, m_Width, m_Height, DXGI_FORMAT_UNKNOWN, 0));
 
 		wrl::ComPtr<ID3D11Resource> pBackBuffer;
 		pSwap->GetBuffer(0, __uuidof(ID3D11Resource), &pBackBuffer);
-		pDevice->CreateRenderTargetView(
+		DX_CHECK_ERROR(pDevice->CreateRenderTargetView(
 			pBackBuffer.Get(),
 			nullptr,
 			&pTarget
-		);
+		));
 
 		//Create depth stencil texture
 		wrl::ComPtr<ID3D11Texture2D> pDepthStencil;

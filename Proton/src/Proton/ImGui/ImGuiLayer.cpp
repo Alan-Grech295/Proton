@@ -74,8 +74,6 @@ namespace Proton
 		ImGuiIO& io = ImGui::GetIO();
 		Application& app = Application::Get();
 
-		io.DisplaySize = ImVec2((float)app.GetWindow().GetWidth(), (float)app.GetWindow().GetHeight());
-
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 

@@ -606,13 +606,43 @@ namespace Proton
 			memset(buffer, 0, sizeof(buffer));
 			strcpy(buffer, tag.c_str());
 
+			ImGuiContext& context = *ImGui::GetCurrentContext();
+
+			ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2.0f);
 			if (ImGui::InputText("##Tag", buffer, sizeof(buffer)))
 			{
 				tag = std::string(buffer);
 			}
+			ImGui::PopItemWidth();
+
+			ImGui::SameLine();
+
+			float spaceLeft = ImGui::GetContentRegionAvailWidth();
 
 			std::string entityIDText = "Entity ID: " + fmt::format("{:x}", entity.GetUUID());
-			ImGui::SameLine();
+			const float elipsesSize = ImGui::CalcTextSize("...").x;	//TODO: Make to call once only 
+			float calcSize = elipsesSize;
+
+			int index;
+			for (index = 0; index < entityIDText.size(); index++)
+			{
+				char c = entityIDText[index];
+				const float char_width = (int)c < context.Font->IndexAdvanceX.Size ? context.Font->IndexAdvanceX.Data[c] : context.Font->FallbackAdvanceX;
+				calcSize += char_width;
+				if (calcSize > spaceLeft)
+					break;
+			}
+
+			if (index < entityIDText.size())
+			{
+				if (index >= 3)
+					entityIDText.resize(index - 3, ' ');
+				else
+					entityIDText = "";
+
+				entityIDText += "...";
+			}
+
 			ImGui::Text(entityIDText.c_str());
 		}
 

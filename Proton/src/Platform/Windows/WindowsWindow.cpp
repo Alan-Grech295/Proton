@@ -248,15 +248,15 @@ namespace Proton
 			}
 		case WM_SIZE:
 			{
-				uint32_t width = LOWORD(lParam);
-				uint32_t height = HIWORD(lParam);
+				m_Data.width = LOWORD(lParam);
+				m_Data.height = HIWORD(lParam);
 
-				RenderCommand::Resize(width, height);
+				RenderCommand::Resize(m_Data.width, m_Data.height);
 
 				if (!data.eventCallback)
 					break;
 
-				WindowResizeEvent event(width, height);
+				WindowResizeEvent event(m_Data.width, m_Data.height);
 				data.eventCallback(event);
 				break;
 			}
