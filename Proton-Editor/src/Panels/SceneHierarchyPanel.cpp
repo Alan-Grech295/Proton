@@ -733,9 +733,10 @@ namespace Proton
 
 		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
 		{
-			if (ImGui::Combo("Class", &component.ClassIndex, ScriptEngine::GetEntityClassNames(), ScriptEngine::GetEntityClasses().size(), -1))
+			if (ImGui::Combo("Class", &component.ClassIndex, ScriptEngine::GetEntityClassNames(), ScriptEngine::GetEntityClasses().size() + 1, -1))
 			{
-				component.ClassName = ScriptEngine::GetEntityClassNameByIndex(component.ClassIndex);
+				if (component.ClassIndex > 0)
+					component.ClassName = ScriptEngine::GetEntityClassNameByIndex(component.ClassIndex);
 			}
 
 			if (component.ClassName.empty())

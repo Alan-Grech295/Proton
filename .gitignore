@@ -2,6 +2,7 @@
 **/bin/
 !vendor/bin
 bin-int/
+Intermediates/
 
 # Proton files
 *.log
@@ -24,3 +25,4 @@ bin-int/
 **.vcxproj
 **.vcxproj.filters
 **.vcxproj.user
+**.csproj

@@ -4,6 +4,7 @@
 #include "Proton/Scene/Entity.h"
 #include "FileWatch.h"
 #include "Proton/Core/Application.h"
+#include "Proton/Core/FileSystem.h"
 
 #include <mono/jit/jit.h>
 #include <mono/metadata/assembly.h>
@@ -44,42 +45,13 @@ namespace Proton
 
 	namespace Utils
 	{
-		//TODO: Move to FileSystem class 
-		static char* ReadBytes(const std::filesystem::path& filepath, uint32_t* outSize)
-		{
-			std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
-
-			if (!stream)
-			{
-				PT_CORE_ERROR("Error opening file");
-				return nullptr;
-			}
-
-			std::streampos end = stream.tellg();
-			stream.seekg(0, std::ios::beg);
-			uint32_t size = end - stream.tellg();
-
-			if (size == 0)
-			{
-				PT_CORE_ERROR("File is empty");
-				return nullptr;
-			}
-
-			char* buffer = new char[size];
-			stream.read(buffer, size);
-			stream.close();
-
-			*outSize = (uint32_t)size;
-			return buffer;
-		}
-
 		static MonoAssembly* LoadMonoAssembly(const std::filesystem::path& assemblyPath, bool loadPDB = false)
 		{
-			uint32_t fileSize = 0;
-			char* fileData = ReadBytes(assemblyPath, &fileSize);
+			ScopedBuffer fileData = FileSystem::ReadFileBinary(assemblyPath);
+			PT_CORE_ASSERT(fileData);
 
 			MonoImageOpenStatus status;
-			MonoImage* image = mono_image_open_from_data_full(fileData, fileSize, 1, &status, 0);
+			MonoImage* image = mono_image_open_from_data_full(fileData.As<char>(), fileData.Size, 1, &status, 0);
 
 			if (status != MONO_IMAGE_OK)
 			{
@@ -94,20 +66,16 @@ namespace Proton
 
 				if (std::filesystem::exists(pdbPath))
 				{
-					uint32_t pdbFileSize;
-					char* pdbFileData = ReadBytes(pdbPath, &pdbFileSize);
+					ScopedBuffer pdbFileData = FileSystem::ReadFileBinary(pdbPath);
 
-					mono_debug_open_image_from_memory(image, (const mono_byte*)pdbFileData, pdbFileSize);
+					mono_debug_open_image_from_memory(image, pdbFileData.As<const mono_byte>(), pdbFileData.Size);
 					PT_CORE_INFO("Loaded PDB {}", pdbPath);
-					delete[] pdbFileData;
 				}
 			}
 
 			std::string pathString = assemblyPath.string();
 			MonoAssembly* assembly = mono_assembly_load_from_full(image, pathString.c_str(), &status, 0);
 			mono_image_close(image);
-
-			delete[] fileData;
 
 			return assembly;
 		}
@@ -202,8 +170,17 @@ namespace Proton
 		InitMono();
 		ScriptGlue::RegisterFunctions();
 
-		LoadAssembly("Resources/Scripts/Proton-ScriptCore.dll");
-		LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll");
+		if (!LoadAssembly("Resources/Scripts/Proton-ScriptCore.dll"))
+		{
+			PT_CORE_ERROR("[Script Engine] Could not load Proton-ScriptCore assembly!");
+			return;
+		}
+
+		if (!LoadAppAssembly("SandboxProject/Assets/Scripts/Binaries/Sandbox.dll"))
+		{
+			PT_CORE_ERROR("[Script Engine] Could not load app assembly!");
+			return;
+		}
 
 		//Retrieve and instantiate class with constructor
 		s_Data->EntityClass = ScriptClass("Proton", "Entity", true);
@@ -337,10 +314,15 @@ namespace Proton
 	void ScriptEngine::OnUpdateEntity(Entity entity, float ts)
 	{
 		UUID entityUUID = entity.GetUUID();
-		PT_CORE_ASSERT(s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end());
-
-		Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
-		instance->InvokeOnUpdate(ts);
+		if (s_Data->EntityInstances.find(entityUUID) != s_Data->EntityInstances.end())
+		{
+			Ref<ScriptInstance> instance = s_Data->EntityInstances[entityUUID];
+			instance->InvokeOnUpdate(ts);
+		}
+		else
+		{
+			PT_CORE_ERROR("Could not find ScriptInstance for entity {}", entityUUID);
+		}
 	}
 
 	Scene* ScriptEngine::GetSceneContext()
@@ -386,15 +368,20 @@ namespace Proton
 		}
 	}
 
-	void ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAppAssembly(const std::filesystem::path& filepath)
 	{
 		s_Data->AppAssemblyFilePath = filepath;
 		s_Data->AppAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+		if (s_Data->AppAssembly == nullptr)
+			return false;
+
 		s_Data->AppAssemblyImage = mono_assembly_get_image(s_Data->AppAssembly);
 		//PrintAssemblyTypes(s_Data->CoreAssembly);
 
 		s_Data->AppAssemblyFileWatcher = CreateScope<filewatch::FileWatch<std::string>>(filepath.string(), OnAppAssemblyFileSystemEvent);
 		s_Data->AssemblyReloadPending = false;
+
+		return true;
 	}
 
 	void ScriptEngine::ReloadAssembly()
@@ -415,7 +402,7 @@ namespace Proton
 		ScriptGlue::RegisterComponents();
 	}
 
-	void ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
+	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
 		//Create app domain
 		s_Data->AppDomain = mono_domain_create_appdomain("ProtonScriptRuntime", nullptr);
@@ -423,8 +410,13 @@ namespace Proton
 
 		s_Data->CoreAssemblyFilePath = filepath;
 		s_Data->CoreAssembly = Utils::LoadMonoAssembly(filepath, s_Data->EnableDebugging);
+		if (s_Data->CoreAssembly == nullptr)
+			return false;
+
 		s_Data->CoreAssemblyImage = mono_assembly_get_image(s_Data->CoreAssembly);
 		//PrintAssemblyTypes(s_Data->CoreAssembly);
+
+		return true;
 	}
 
 	void ScriptEngine::LoadAssemblyClasses()
@@ -436,7 +428,9 @@ namespace Proton
 		int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
 		MonoClass* entityClass = mono_class_from_name(s_Data->CoreAssemblyImage, "Proton", "Entity");
 
-		s_Data->EntityClassNames.reserve(numTypes);
+		s_Data->EntityClassNames.reserve(numTypes + 1);
+		s_Data->EntityClassNames.push_back("<None>");
+
 		for (int32_t i = 0; i < numTypes; i++)
 		{
 			uint32_t cols[MONO_TYPEDEF_SIZE];
