@@ -31,7 +31,7 @@ namespace Proton
 		};
 	public:
 		ConstructableBindable() {}
-		ConstructableBindable(ResourceType resourceType, std::string tag)
+		ConstructableBindable(ResourceType resourceType, const std::string& tag)
 			:
 			m_Tag(tag),
 			m_ResourceType(resourceType)
@@ -53,7 +53,7 @@ namespace Proton
 	public:
 		SharedBindable() {}
 
-		SharedBindable(ResourceType resourceType, std::string tag) : ConstructableBindable(resourceType, tag) {}
+		SharedBindable(ResourceType resourceType, const std::string& tag) : ConstructableBindable(resourceType, tag) {}
 		
 		virtual Ref<Bindable> GetRef() override
 		{

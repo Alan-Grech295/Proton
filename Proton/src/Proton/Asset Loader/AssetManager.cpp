@@ -454,11 +454,11 @@ namespace Proton
 	{
 		if (path.extension() == ".asset")
 		{
-			Asset asset = AssetSerializer::DeserializeAsset(path.string());
-			AssetType assetType = (AssetType)((uint32_t)asset["AssetType"]);
+			Ref<Asset> asset = AssetSerializer::DeserializeAsset(path.string());
+			AssetType assetType = (AssetType)((uint32_t)(*asset)["AssetType"]);
 			std::filesystem::path modelPath = path;
 			modelPath = modelPath.replace_extension();
-#define X(ext, type, cls) if(type == assetType) { AssetCollection::Add(modelPath.string(), cls::Deserialize(asset, modelPath.string())); return; }
+#define X(ext, type, cls) if(type == assetType) { AssetCollection::Add(modelPath.string(), cls::Deserialize(*asset.get(), modelPath.string())); return; }
 			ASSET_TYPES
 #undef X
 			return;

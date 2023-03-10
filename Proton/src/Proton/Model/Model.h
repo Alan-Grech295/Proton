@@ -289,8 +289,8 @@ namespace Proton
 	class ModelCreator
 	{
 	public:
-		static ModelData Serialize(const std::string& path);
-		static ModelData Deserialize(Asset& modelAsset, const std::string& path);
+		static Ref<ModelData> Serialize(const std::string& path);
+		static Ref<ModelData> Deserialize(Asset& modelAsset, const std::string& path);
 		static Entity CreateModelEntity(const std::string& path, Scene& activeScene);
 		static Ref<Model> GetModelFromData(ModelData& modelData);
 	private:
@@ -315,7 +315,7 @@ namespace Proton
 			if (m_Models.find(uuid) != m_Models.end())
 				return m_Models.at(uuid);
 
-			Ref<Model> model = ModelCreator::GetModelFromData(AssetCollection::Get<ModelData>(path));
+			Ref<Model> model = ModelCreator::GetModelFromData(*AssetCollection::Get<ModelData>(path));
 			m_Models[uuid] = model;
 			return model;
 		}

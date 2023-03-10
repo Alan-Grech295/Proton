@@ -14,7 +14,7 @@ namespace Proton
 	{
 		Data::Struct& structData = m_Data->as<Data::Struct>();
 		//TODO: Check struct child names
-		for (Element el : elements)
+		for (const Element& el : elements)
 		{
 			structData.Add(std::move(el));
 		}
@@ -25,13 +25,13 @@ namespace Proton
 		m_Type(type)
 	{
 		if (type == Type::Struct)
-			m_Data = new Data::Struct();
+			m_Data = CreateRef<Data::Struct>();
 		else if (type == Type::Array)
-			m_Data = new Data::Array();
+			m_Data = CreateRef<Data::Array>();
 		else if (type == Type::Pointer)
-			m_Data = new Data::Pointer();
+			m_Data = CreateRef<Data::Pointer>();
 		else
-			m_Data = new Data::Value();
+			m_Data = CreateRef<Data::Value>();
 	}
 
 	TypeElement::TypeElement(Type type, byte* data)
@@ -52,8 +52,8 @@ namespace Proton
 		if (arrayData.m_Size.has_value())
 			assert("Array element size exceeded!" && arrayData.m_Elements.size() < arrayData.m_Size.value());
 
-		Element e = entry;
-		arrayData.Add(std::move(e));
+		Element e(entry);
+		arrayData.Add(e);
 		return arrayData.m_Elements.size() - 1;
 	}
 
@@ -295,39 +295,35 @@ namespace Proton
 		return static_cast<T&>(*this);
 	}
 
-	Element::Element(const char* name, Type type, byte* data)
+	Element::Element(const std::string& name, Type type, byte* data)
 		:
 		TypeElement(type),
 		m_Name(name)
 	{
-		m_Data = new Data::Value(data, type);
+		m_Data = CreateRef<Data::Value>(data, type);
 	}
 
-	Element::Element(const char* name, Type type)
+	Element::Element(const std::string& name, Type type)
 		:
 		TypeElement(type),
 		m_Name(name)
 	{
 	}
 
-	Element::Element(const char* name, std::initializer_list<Element> elements)
+	Element::Element(const std::string& name, std::initializer_list<Element> elements)
 		:
 		TypeElement(std::move(elements)),
 		m_Name(name)
 	{
 	}
 
-	Element& TypeElement::Add(const char* name, Type type)
+	Element& TypeElement::Add(const std::string& name, Type type)
 	{
 		assert("Element is not a struct" && m_Type == Type::Struct);
 
 		Data::Struct& structData = m_Data->as<Data::Struct>();
 
-		uint32_t nameSize = strlen(name) + 1;
-		char* nameCopy = new char[nameSize];
-		memcpy(nameCopy, name, nameSize);
-
-		structData.Add(Element(nameCopy, type));
+		structData.Add(Element(name, type));
 		return structData.m_Elements.back();
 	}
 
@@ -339,7 +335,7 @@ namespace Proton
 		{
 			Data::Struct& structData = m_Data->as<Data::Struct&>();
 			structData.m_Elements.reserve(structData.m_Elements.size() + elements.size());
-			for (Element el : elements)
+			for (const Element& el : elements)
 			{
 				structData.Add(std::move(el));
 			}
@@ -348,7 +344,7 @@ namespace Proton
 		{
 			Data::Array& arrayData = m_Data->as<Data::Array&>();
 			//TODO: Change to copy
-			for (Element el : elements)
+			for (const Element& el : elements)
 			{
 				arrayData.Add(std::move(el));
 			}
@@ -707,10 +703,10 @@ namespace Proton
 		outStream.close();
 	}
 
-	Asset AssetSerializer::DeserializeAsset(const std::string& filepath)
+	Ref<Asset> AssetSerializer::DeserializeAsset(const std::string& filepath)
 	{
-		Asset asset = *new Asset();
-		asset.m_MetaFile = Meta::MetaFileSerializer::DeserializeMetaFile(filepath + ".meta");
+		Ref<Asset> asset = CreateRef<Asset>();
+		asset->m_MetaFile = Meta::MetaFileSerializer::DeserializeMetaFile(filepath + ".meta");
 
 		//Reads the file
 		std::ifstream inStream(filepath, std::ios::out | std::ios::binary);
@@ -721,12 +717,12 @@ namespace Proton
 		}
 
 		std::filebuf* fileBuf = inStream.rdbuf();
-		asset.m_DataSize = fileBuf->pubseekoff(0, inStream.end, inStream.in);
+		asset->m_DataSize = fileBuf->pubseekoff(0, inStream.end, inStream.in);
 		fileBuf->pubseekpos(0, inStream.in);
 
-		asset.m_Data = new byte[asset.m_DataSize];
+		asset->m_Data = new byte[asset->m_DataSize];
 
-		fileBuf->sgetn((char*)asset.m_Data, asset.m_DataSize);
+		fileBuf->sgetn((char*)asset->m_Data, asset->m_DataSize);
 
 		inStream.close();
 		//End read file
@@ -756,7 +752,7 @@ namespace Proton
 	{
 		auto [it, succeded] = m_ElementLocator.try_emplace(Data::Pointer::GetTag(m_NextPtr), m_Elements.size());
 		assert("Element with same name already exists!" && succeded);
-		m_Elements.push_back(Element(it->first.c_str(), type));
+		m_Elements.emplace_back(Element(it->first.c_str(), type));
 		m_NextPtr++;
 		return m_NextPtr - 1;
 	}

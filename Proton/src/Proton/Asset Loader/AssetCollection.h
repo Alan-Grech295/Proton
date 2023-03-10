@@ -10,19 +10,18 @@ namespace Proton
 	{
 	public:
 		template<typename T>
-		static void Add(std::string path, T& asset)
+		static void Add(std::string path, Ref<T> asset)
 		{
-			T* copy = new T(asset);
-			m_Collection[path] = copy;
+			m_Collection[path] = asset;
 		}
 
 		template<typename T>
-		static T& Get(std::string path)
+		static Ref<T> Get(std::string path)
 		{
 			PT_CORE_ASSERT(m_Collection.find(path) != m_Collection.end(), "Key not found");
-			return *static_cast<T*>(m_Collection[path]);
+			return std::static_pointer_cast<T>(m_Collection.at(path));
 		}
 	private:
-		static std::unordered_map<std::string, void*> m_Collection;
+		static std::unordered_map<std::string, Ref<void>> m_Collection;
 	};
 }

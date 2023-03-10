@@ -20,6 +20,28 @@ namespace Proton
 	public:
 		TypeElement() = default;
 
+		TypeElement(TypeElement&& other)
+			:
+			m_Type(other.m_Type)
+		{
+			m_Data = other.m_Data;
+			other.m_Data = nullptr;
+		}
+
+		//Shallow copy for now
+		TypeElement(const TypeElement& other)
+			:
+			m_Type(other.m_Type)
+		{
+			m_Data = other.m_Data;
+		}
+
+		TypeElement operator=(TypeElement other)
+		{
+			TypeElement e = TypeElement(other);
+			return e;
+		}
+
 		//TODO: Check struct child names
 		//Struct constructor
 		TypeElement(std::initializer_list<class Element> elements);
@@ -44,9 +66,9 @@ namespace Proton
 
 		//Struct Add function
 		template<typename T>
-		Element& Add(const char* name, T&& data);
+		Element& Add(const std::string& name, T&& data);
 
-		Element& Add(const char* name, Type type);
+		Element& Add(const std::string& name, Type type);
 
 		//Struct and Array Add
 		Element& Add(std::initializer_list<Element> elements);
@@ -104,7 +126,7 @@ namespace Proton
 		const bool Equals(TypeElement& other) const;
 	public:
 		Type m_Type;
-		DataBase* m_Data = nullptr;
+		Ref<DataBase> m_Data = nullptr;
 	};
 
 	//TODO: Check that no variables are named the same
@@ -114,11 +136,33 @@ namespace Proton
 	public:
 		Element() = default;
 
-		Element(const char* name, Type type, byte* data);
+		Element(const std::string& name, Type type, byte* data);
 
-		Element(const char* name, Type type);
+		Element(const std::string& name, Type type);
 
-		Element(const char* name, std::initializer_list<Element> elements);
+		Element(const std::string& name, std::initializer_list<Element> elements);
+
+		Element(Element&& other)
+			:
+			TypeElement((TypeElement&&)other),
+			m_Name(other.m_Name)
+		{
+		}
+
+		//Shallow copy for now
+		Element(const Element& other)
+			:
+			TypeElement(other),
+			m_Name(other.m_Name)
+		{
+		}
+
+		Element(const TypeElement& other)
+			:
+			TypeElement(other),
+			m_Name("")
+		{
+		}
 
 		//TODO: Create Add function templates
 
@@ -152,7 +196,7 @@ namespace Proton
 			return empty;
 		}
 	public:
-		const char* m_Name;
+		std::string m_Name;
 	};
 
 	class RawAsset
@@ -166,14 +210,14 @@ namespace Proton
 			constexpr Type type = ReverseMap<std::remove_const_t<std::remove_reference_t<T>>>::type;
 			auto [it, succeded] = m_ElementLocator.try_emplace(name, m_Elements.size());
 			assert("Element with same name already exists!" && succeded);
-			m_Elements.push_back(Element(it->first.c_str(), type, Map<type>::GetData(data)));
+			m_Elements.emplace_back(name, type, Map<type>::GetData(data));
 		}
 
 		void Add(const std::string& name, Type type)
 		{
 			auto [it, succeded] = m_ElementLocator.try_emplace(name, m_Elements.size());
 			assert("Element with same name already exists!" && succeded);
-			m_Elements.push_back(Element(it->first.c_str(), type));
+			m_Elements.emplace_back(name, type);
 		}
 
 		uint32_t AddPointer(Type type);
@@ -196,7 +240,7 @@ namespace Proton
 			Value() = default;
 			~Value() 
 			{
-				delete m_Data;
+				delete[] m_Data;
 			}
 
 			Value(byte* data, Type type)
@@ -250,7 +294,6 @@ namespace Proton
 				assert("Element with same name already exists!" && !Contains(entry.m_Name));
 				assert("Cannot add string or array to type template!" && !(m_OnlyConstElements && (entry.m_Type == Type::String || entry.m_Type == Type::Array)));
 								
-				m_Elements.push_back(std::move(entry));
 				if (entry.m_Type == Type::Struct && m_OnlyConstElements)
 				{
 					m_Elements.back().m_Data->as<Data::Struct&>().SetConstElementSize();
@@ -258,6 +301,8 @@ namespace Proton
 
 				if (m_ConstSize && (entry.m_Type == Type::String || (entry.m_Type == Type::Array && !entry.m_Data->as<Data::Array>().m_constElementSize)))
 					m_ConstSize = false;
+
+				m_Elements.emplace_back(std::move(entry));
 			}
 
 			std::vector<Element> m_Elements;
@@ -304,11 +349,11 @@ namespace Proton
 
 						//Adds the offset of each element in the struct to the element offsets
 						for (Element& e : elementData.m_Elements)
-							m_ElementOffsets->push_back(m_ElementOffsets->back() + e.GetSizeInBytes());
+							m_ElementOffsets->emplace_back(m_ElementOffsets->back() + e.GetSizeInBytes());
 					}
 				}
 
-				m_Elements.push_back(e);
+				m_Elements.emplace_back(e);
 			}
 
 			void CalcStride()
@@ -334,7 +379,7 @@ namespace Proton
 					for (auto it = m_Elements.begin(); it != (m_Elements.end() - 1); it++)
 					{
 						lastOffset += it->GetSizeInBytes();
-						m_ElementOffsets->push_back(lastOffset);
+						m_ElementOffsets->emplace_back(lastOffset);
 					}
 				}
 			}
@@ -447,18 +492,23 @@ namespace Proton
 			return *((T*)m_Data);
 		}
 
-		//String conversion operator because the standard T& operator does not work
-		operator std::string&()
+		template<typename T>
+		operator const T& () const
 		{
-			char* data = (char*)m_Data;
-			uint32_t len = (uint32_t)strlen(data);
-			return *(new std::string(data, len));
+			//assert("Cannot convert structs or arrays to data type!" && m_Type != Type::Struct && m_Type != Type::Array);
+			assert("Element being cast to type of incompatible size!" && sizeof(T) == m_Size);
+			return *((const T*)m_Data);
 		}
 
 		//Char pointer conversion operator because the standard T& operator does not work
 		operator char*()
 		{
 			return (char*)m_Data;
+		}
+
+		operator const char* () const
+		{
+			return (const char*)m_Data;
 		}
 
 		//Accesses element in a struct
@@ -522,6 +572,11 @@ namespace Proton
 		//Creates an asset from a raw asset
 		Asset(RawAsset rawAsset);
 
+		~Asset()
+		{
+			delete[] m_Data;
+		}
+
 		//Accesses a variable by name
 		ElementRef operator[](const std::string& name);
 	private:
@@ -551,11 +606,11 @@ namespace Proton
 	public:
 		static void SerializeAsset(const std::string& filepath, Asset& asset);
 
-		static Asset DeserializeAsset(const std::string& filepath);
+		static Ref<Asset> DeserializeAsset(const std::string& filepath);
 	};
 
 	template<typename T>
-	inline Element& TypeElement::Add(const char* name, T&& data)
+	inline Element& TypeElement::Add(const std::string& name, T&& data)
 	{
 		assert("Element is not a struct or array!" && (m_Type == Type::Struct || m_Type == Type::Array));
 		static_assert(ReverseMap<std::remove_const_t<std::remove_reference_t<T>>>::valid, "Unsupported SysType used in pointer conversion");
@@ -597,8 +652,7 @@ namespace Proton
 		static_assert(ReverseMap<std::remove_const_t<std::remove_reference_t<T>>>::valid, "Unsupported SysType used in pointer conversion");
 		constexpr Type type = ReverseMap<std::remove_const_t<std::remove_reference_t<T>>>::type;
 		assert("Data type does not match element type" && type == m_Type);
-		delete m_Data;
-		m_Data = new Data::Value(Map<type>::GetData(data), type);
+		m_Data = CreateRef<Data::Value>(Map<type>::GetData(data), type);
 	}
 	
 	template<typename T>

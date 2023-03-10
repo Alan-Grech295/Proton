@@ -74,13 +74,13 @@ namespace Proton
 	{
 		namespace dx = DirectX;
 
-		ModelData& modelData = AssetCollection::Get<ModelData>(path);
+		Ref<ModelData> modelData = AssetCollection::Get<ModelData>(path);
 
-		NodeData& rootNode = modelData.m_Nodes[0];
+		NodeData& rootNode = modelData->m_Nodes[0];
 
-		Ref<Model> model = GetModelFromData(modelData);
+		Ref<Model> model = GetModelFromData(*modelData);
 
-		return CreateNode(rootNode, modelData.m_Nodes.data(), model->m_Meshes.data(), model, activeScene);
+		return CreateNode(rootNode, modelData->m_Nodes.data(), model->m_Meshes.data(), model, activeScene);
 	}
 
 	TypeElement ModelCreator::SerializeMesh(MeshData* meshData, RawAsset& asset, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const MaterialData* materials)
@@ -229,7 +229,7 @@ namespace Proton
 		return meshElement;
 	}
 
-	ModelData ModelCreator::Serialize(const std::string& path)
+	Ref<ModelData> ModelCreator::Serialize(const std::string& path)
 	{
 		Assimp::Importer imp;
 		const auto pScene = imp.ReadFile(path.c_str(),
@@ -239,7 +239,7 @@ namespace Proton
 			aiProcess_GenNormals |
 			aiProcess_CalcTangentSpace);
 
-		ModelData modelData = ModelData();
+		Ref<ModelData> modelData = CreateRef<ModelData>();
 
 		if (strlen(imp.GetErrorString()) > 0)
 		{
@@ -251,8 +251,8 @@ namespace Proton
 
 		aiNode& node = *pScene->mRootNode;
 
-		modelData.m_Meshes.resize(pScene->mNumMeshes);
-		modelData.m_Materials.resize(pScene->mNumMaterials);
+		modelData->m_Meshes.resize(pScene->mNumMeshes);
+		modelData->m_Materials.resize(pScene->mNumMaterials);
 
 		RawAsset rawAsset = RawAsset();
 
@@ -263,7 +263,7 @@ namespace Proton
 
 		for (uint32_t i = 0; i < pScene->mNumMaterials; i++)
 		{
-			SerializeMaterial(modelData.m_Materials.data() + i, rawAsset, basePath, i, *pScene->mMaterials[i]);
+			SerializeMaterial(modelData->m_Materials.data() + i, rawAsset, basePath, i, *pScene->mMaterials[i]);
 		}
 
 		rawAsset.Add("Meshes", Type::Array);
@@ -277,16 +277,16 @@ namespace Proton
 
 		for (uint32_t i = 0; i < pScene->mNumMeshes; i++)
 		{
-			TypeElement meshElement = std::move(SerializeMesh(modelData.m_Meshes.data() + i, rawAsset, basePath, path, *pScene->mMeshes[i], pScene, modelData.m_Materials.data()));
+			TypeElement meshElement = std::move(SerializeMesh(modelData->m_Meshes.data() + i, rawAsset, basePath, path, *pScene->mMeshes[i], pScene, modelData->m_Materials.data()));
 			rawAsset["Meshes"].Add(meshElement);
 		}
 
-		modelData.m_Nodes.resize(CountNodes(pScene->mRootNode));
+		modelData->m_Nodes.resize(CountNodes(pScene->mRootNode));
 		rawAsset.Add("Nodes", Type::Struct);
 
 		uint32_t index = 0;
-		NodeData* nodeData = modelData.m_Nodes.data();
-		SerializeNode(nodeData, pScene->mRootNode, rawAsset, modelData.m_Meshes.data(), index);
+		NodeData* nodeData = modelData->m_Nodes.data();
+		SerializeNode(nodeData, pScene->mRootNode, rawAsset, modelData->m_Meshes.data(), index);
 
 		Asset asset = Asset(rawAsset);
 
@@ -699,18 +699,18 @@ namespace Proton
 		return sum;
 	}
 
-	ModelData ModelCreator::Deserialize(Asset& modelAsset, const std::string& path)
+	Ref<ModelData> ModelCreator::Deserialize(Asset& modelAsset, const std::string& path)
 	{
-		ModelData modelData = ModelData();
-		modelData.m_Materials.resize(modelAsset["Materials"].Size());
-		modelData.m_Meshes.resize(modelAsset["Meshes"].Size());
-		modelData.m_Nodes.resize(modelAsset["Nodes"].Size());
+		Ref<ModelData> modelData = CreateRef<ModelData>();
+		modelData->m_Materials.resize(modelAsset["Materials"].Size());
+		modelData->m_Meshes.resize(modelAsset["Meshes"].Size());
+		modelData->m_Nodes.resize(modelAsset["Nodes"].Size());
 
-		DeserializeMaterials(modelAsset, modelData.m_Materials.data());
+		DeserializeMaterials(modelAsset, modelData->m_Materials.data());
 
-		DeserializeMeshes(modelAsset, path, modelData.m_Meshes.data(), modelData.m_Materials.data());
+		DeserializeMeshes(modelAsset, path, modelData->m_Meshes.data(), modelData->m_Materials.data());
 
-		DeserializeNodes(modelAsset, modelData.m_Nodes.data(), modelData.m_Meshes.data());
+		DeserializeNodes(modelAsset, modelData->m_Nodes.data(), modelData->m_Meshes.data());
 
 		return modelData;
 	}
@@ -721,8 +721,8 @@ namespace Proton
 		for (uint32_t i = 0; i < asset["Meshes"].Size(); i++, meshData++)
 		{
 			ElementRef& mesh = asset["Meshes"][i];
-			std::string meshTag = modelPath + "%" + (std::string)*mesh["Name"];
-			meshData->Create(*mesh["Name"], modelPath);
+			std::string meshTag = modelPath + "%" + (const char*)*mesh["Name"];
+			meshData->Create((const char*)*mesh["Name"], modelPath);
 			meshData->m_Material = (uint32_t)mesh["MaterialIndex"];
 			//Set topology?
 			//meshData->m_Topology
@@ -794,7 +794,7 @@ namespace Proton
 						assert("Vertex buffer not handled" && false);
 						/*if (shared)
 						{
-							Ref<SharedBindable> vertBuf = CreateRef<SharedBindable>(ResType::VertexBuffer, (char*)data["Path"]);
+							Ref<SharedBindable> vertBuf = CreateRef<SharedBindable>(ResType::VertexBuffer, (const char*)data["Path"]);
 							vertBuf->Initialize<VertexBuffer>();
 							curStep.AddBindable(vertBuf);
 						}
@@ -809,7 +809,7 @@ namespace Proton
 						assert("Index buffer not handled" && false);
 						/*if (shared)
 						{
-							Ref<SharedBindable> indexBuf = CreateRef<SharedBindable>(ResType::IndexBuffer, (char*)data["Path"]);
+							Ref<SharedBindable> indexBuf = CreateRef<SharedBindable>(ResType::IndexBuffer, (const char*)data["Path"]);
 							indexBuf->Initialize<IndexBuffer>();
 							curStep.AddBindable(indexBuf);
 						}
@@ -824,7 +824,7 @@ namespace Proton
 						assert("Vertex constant buffer not handled" && false);
 						/*if (shared)
 						{
-							Ref<SharedBindable> vertConstBuf = CreateRef<SharedBindable>(ResType::VertexConstantBuffer, (char*)data["Path"]);
+							Ref<SharedBindable> vertConstBuf = CreateRef<SharedBindable>(ResType::VertexConstantBuffer, (const char*)data["Path"]);
 							vertConstBuf->Initialize<VertexConstantBuffer>((int)data["Slot"]);
 							curStep.AddBindable(vertConstBuf);
 						}
@@ -895,7 +895,7 @@ namespace Proton
 					case ResType::Sampler:
 						if (shared)
 						{
-							Ref<SharedBindable> sampler = CreateRef<SharedBindable>(ResType::Sampler, (char*)data);
+							Ref<SharedBindable> sampler = CreateRef<SharedBindable>(ResType::Sampler, (const char*)data);
 							sampler->Initialize<Sampler>();
 							curStep.AddBindable(sampler);
 						}
@@ -909,42 +909,42 @@ namespace Proton
 					case ResType::PixelShader:
 						if (shared)
 						{
-							Ref<SharedBindable> pixShader = CreateRef<SharedBindable>(ResType::PixelShader, (std::string)data);
+							Ref<SharedBindable> pixShader = CreateRef<SharedBindable>(ResType::PixelShader, (const char*)data);
 							pixShader->Initialize<PixelShader>();
 							curStep.AddBindable(pixShader);
 						}
 						else
 						{
 							Ref<UniqueBindable> pixShader = CreateRef<UniqueBindable>(ResType::PixelShader);
-							pixShader->Initialize<PixelShader>((std::string)data);
+							pixShader->Initialize<PixelShader>((const char*)data);
 							curStep.AddBindable(pixShader);
 						}
 						break;
 					case ResType::VertexShader:
 						if (shared)
 						{
-							Ref<SharedBindable> vertShader = CreateRef<SharedBindable>(ResType::VertexShader, (std::string)data);
+							Ref<SharedBindable> vertShader = CreateRef<SharedBindable>(ResType::VertexShader, (const char*)data);
 							vertShader->Initialize<VertexShader>();
 							curStep.AddBindable(vertShader);
 						}
 						else
 						{
 							Ref<UniqueBindable> vertShader = CreateRef<UniqueBindable>(ResType::VertexShader);
-							vertShader->Initialize<VertexShader>((std::string)data);
+							vertShader->Initialize<VertexShader>((const char*)data);
 							curStep.AddBindable(vertShader);
 						}
 						break;
 					case ResType::Texture2D:
 						if (shared)
 						{
-							Ref<SharedBindable> texture = CreateRef<SharedBindable>(ResType::Texture2D, (char*)data["Path"]);
+							Ref<SharedBindable> texture = CreateRef<SharedBindable>(ResType::Texture2D, (const char*)data["Path"]);
 							texture->Initialize<Texture2D>((int)data["Slot"]);
 							curStep.AddBindable(texture);
 						}
 						else
 						{
 							Ref<UniqueBindable> texture = CreateRef<UniqueBindable>(ResType::Texture2D);
-							texture->Initialize<Texture2D>((char*)data["Path"], (int)data["Slot"]);
+							texture->Initialize<Texture2D>((const char*)data["Path"], (int)data["Slot"]);
 							curStep.AddBindable(texture);
 						}
 						break;
@@ -952,7 +952,7 @@ namespace Proton
 						assert("Topology not handled" && false);
 						/*if (shared)
 						{
-							Ref<SharedBindable> topology = CreateRef<SharedBindable>(ResType::Topology, (char*)data["Path"]);
+							Ref<SharedBindable> topology = CreateRef<SharedBindable>(ResType::Topology, (const char*)data["Path"]);
 							topology->Initialize<Topology>();
 							curStep.AddBindable(topology);
 						}
@@ -966,7 +966,7 @@ namespace Proton
 					case ResType::Blender:
 						if (shared)
 						{
-							Ref<SharedBindable> blender = CreateRef<SharedBindable>(ResType::Blender, (char*)data["Tag"]);
+							Ref<SharedBindable> blender = CreateRef<SharedBindable>(ResType::Blender, (const char*)data["Tag"]);
 							blender->Initialize<Blender>((bool)data["Blending"]);
 							curStep.AddBindable(blender);
 						}
@@ -980,7 +980,7 @@ namespace Proton
 					case ResType::Rasterizer:
 						if (shared)
 						{
-							Ref<SharedBindable> rasterizer = CreateRef<SharedBindable>(ResType::Rasterizer, (char*)data["Tag"]);
+							Ref<SharedBindable> rasterizer = CreateRef<SharedBindable>(ResType::Rasterizer, (const char*)data["Tag"]);
 							rasterizer->Initialize<Rasterizer>((bool)data["TwoSided"]);
 							curStep.AddBindable(rasterizer);
 						}
