@@ -38,27 +38,37 @@ namespace Proton
 		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };
 		m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
 
-		NewScene();
-		m_EditorScene = m_ActiveScene;
 		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f);
+
+		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
+		if (commandLineArgs.Count > 1)
+		{
+			auto projectFilePath = commandLineArgs[1];
+			OpenProject(projectFilePath);
+		}
+		else
+		{
+			//TODO: Prompt user to select a directory
+			NewProject();
+			//NewScene();
+			//ModelCreator::CreateModelEntity(CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
+
+			//ModelCreator::CreateModelEntity(CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
+			//m_PointLight = m_ActiveScene->CreateEntity("Point Light");
+			//m_PointLight.AddComponent<LightComponent>();
+		}
+
+		m_EditorScene = m_ActiveScene;
 
 		SceneHierarchyPanel::SetContext(m_ActiveScene);
 		AssetViewerPanel::SetProjectPath(projectPath);
 		AssetViewerPanel::SetContext(m_ActiveScene);
-		AssetViewerPanel::SetOpenSceneFunction(std::bind(&EditorLayer::OpenScene, this, std::placeholders::_1));
+
+		AssetViewerPanel::SetOpenSceneFunction(std::bind(static_cast<void(EditorLayer::*)(const std::filesystem::path&)>(&EditorLayer::OpenScene), this, std::placeholders::_1));
 
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
 		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
 		//ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
-		ModelCreator::CreateModelEntity(CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
-
-		ModelCreator::CreateModelEntity(CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
-
-		//m_Nanosuit = ModelCreator::CreateModelEntity("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", m_ActiveScene.get());
-		//
-		//m_CameraEntity = m_ActiveScene->CreateEntity("Camera Entity");
-		m_PointLight = m_ActiveScene->CreateEntity("Point Light");
-		m_PointLight.AddComponent<LightComponent>();
 
 		//
 		//m_CameraEntity.AddComponent<CameraComponent>();
@@ -327,7 +337,7 @@ namespace Proton
 
 				if (ImGui::MenuItem("Open...", "Ctrl+O"))
 				{
-					OpenScene_Dialog();
+					OpenScene();
 				}
 
 				if (ImGui::MenuItem("Save", "Ctrl+S"))
@@ -472,7 +482,7 @@ namespace Proton
 			break;
 		case Key::O:
 			if (control)
-				OpenScene_Dialog();
+				OpenScene();
 			break;
 		case Key::S:
 			if (control && shift)
@@ -487,6 +497,35 @@ namespace Proton
 		}
 
 		return true;
+	}
+
+	void EditorLayer::NewProject()
+	{
+		Project::New();
+	}
+
+	void EditorLayer::OpenProject()
+	{
+		std::string filepath = FileDialogs::OpenFile("Proton Project (*.pproj)\0*.pproj\0");
+
+		if (!filepath.empty())
+		{
+			OpenProject(filepath);
+		}
+	}
+
+	void EditorLayer::OpenProject(const std::filesystem::path& path)
+	{
+		if (Project::Load(path))
+		{
+			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
+			OpenScene(startScenePath);
+		}
+	}
+
+	void EditorLayer::SaveProject()
+	{
+		//Project::SaveActive();
 	}
 
 	void EditorLayer::NewScene()
@@ -504,7 +543,7 @@ namespace Proton
 		m_CameraEntity.AddComponent<CameraComponent>();
 	}
 
-	void EditorLayer::OpenScene_Dialog()
+	void EditorLayer::OpenScene()
 	{
 		std::string filepath = FileDialogs::OpenFile("Proton Scene (*.proton)\0*.proton\0");
 

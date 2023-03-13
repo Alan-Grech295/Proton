@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include <windows.h>
 
-extern Proton::Application* Proton::CreateApplication();
+extern Proton::Application* Proton::CreateApplication(ApplicationCommandLineArgs args);
 
 //Win32 Entry point
 int CALLBACK WinMain(
@@ -36,7 +36,7 @@ int CALLBACK WinMain(
 	Proton::Log::Init();
 
 	PT_PROFILE_BEGIN_SESSION("Startup", "ProtonProfile-Startup.json");
-	auto app = Proton::CreateApplication();
+	auto app = Proton::CreateApplication({__argc, __argv});
 	PT_PROFILE_END_SESSION();
 
 	PT_PROFILE_BEGIN_SESSION("Runtime", "ProtonProfile-Runtime.json");

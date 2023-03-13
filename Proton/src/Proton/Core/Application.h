@@ -17,10 +17,29 @@
 
 namespace Proton
 {
+	struct ApplicationCommandLineArgs
+	{
+		int Count = 0;
+		char** Args = nullptr;
+
+		const char* operator[](int index) const
+		{
+			PT_CORE_ASSERT(index < Count);
+			return Args[index];
+		}
+	};
+
+	struct ApplicationSpecification
+	{
+		std::string Name = "Proton Application";
+		std::string WorkingDirectory;
+		ApplicationCommandLineArgs CommandLineArgs;
+	};
+
 	class Application
 	{
 	public:
-		Application();
+		Application(const ApplicationSpecification& specification);
 		virtual ~Application();
 
 		void Run();
@@ -41,6 +60,8 @@ namespace Proton
 			std::scoped_lock<std::mutex> lock(m_MainThreadQueueMutex);
 			m_MainThreadQueue.emplace_back(function); 
 		}
+
+		inline const ApplicationSpecification& GetSpecification() { return m_Specification; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
@@ -54,6 +75,7 @@ namespace Proton
 		LayerStack m_LayerStack;
 		float m_LastFrameTime = 0.0f;
 		__int64 m_AppStartTime = 0;
+		ApplicationSpecification m_Specification;
 
 		std::vector<std::function<void()>> m_MainThreadQueue;
 		std::mutex m_MainThreadQueueMutex;
@@ -62,6 +84,6 @@ namespace Proton
 	};
 
 	//To be defined in CLIENT
-	Application* CreateApplication();
+	Application* CreateApplication(ApplicationCommandLineArgs args);
 }
 

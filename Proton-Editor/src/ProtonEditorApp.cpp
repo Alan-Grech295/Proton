@@ -6,7 +6,8 @@ namespace Proton
 	class ProtonEditor : public Application
 	{
 	public:
-		ProtonEditor()
+		ProtonEditor(const ApplicationSpecification& specification)
+			: Application(specification)
 		{
 			PushLayer(new EditorLayer());
 		}
@@ -17,8 +18,13 @@ namespace Proton
 		}
 	};
 
-	Application* Proton::CreateApplication()
+	Application* Proton::CreateApplication(ApplicationCommandLineArgs args)
 	{
-		return new ProtonEditor();
+		Project::New()->SaveActive("Sandbox.pproj");
+		ApplicationSpecification spec;
+		spec.Name = "Proton Editor";
+		spec.CommandLineArgs = args;
+
+		return new ProtonEditor(spec);
 	}
 }

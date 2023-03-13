@@ -21,6 +21,8 @@
 
 #include "Proton\Shader Translator\ShaderParser.h"
 
+#include "Proton/Project/Project.h"
+
 //---Renderer---------------------
 #include "Proton\Renderer\RenderCommand.h"
 #include "Proton\Renderer\Renderer.h"

@@ -26,8 +26,13 @@ namespace Proton
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
 
+		void NewProject();
+		void OpenProject();
+		void OpenProject(const std::filesystem::path& path);
+		void SaveProject();
+
 		void NewScene();
-		void OpenScene_Dialog();
+		void OpenScene();
 		void OpenScene(const std::filesystem::path& path);
 		void SaveScene();
 		void SaveSceneAs();

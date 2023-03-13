@@ -402,15 +402,21 @@ namespace Proton
 	}
 
 	//TODO: Check entity order when loading
-	bool SceneSerializer::Deserialize(const std::string& filepath, EditorCamera& editorCamera)
+	bool SceneSerializer::Deserialize(const std::filesystem::path& filepath, EditorCamera& editorCamera)
 	{
 		m_Scene->ClearEntities();
 
-		std::ifstream stream(filepath);
-		std::stringstream strStream;
-		strStream << stream.rdbuf();
+		YAML::Node data;
+		try
+		{
+			data = YAML::LoadFile(filepath.string());
+		}
+		catch (YAML::ParserException e)
+		{
+			PT_CORE_ERROR("Failed to load .proton file '{0'}\n	{1}", filepath.string(), e.what());
+			return false;
+		}
 
-		YAML::Node data = YAML::Load(strStream.str());
 		if (!data["Scene"])
 			return false;
 

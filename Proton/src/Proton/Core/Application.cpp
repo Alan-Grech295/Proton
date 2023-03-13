@@ -25,7 +25,8 @@ namespace Proton
 
 	Application* Application::s_Instance = nullptr;
 
-	Application::Application()
+	Application::Application(const ApplicationSpecification& specification)
+		: m_Specification(specification)
 	{
 		// Setting working directory
 		std::string_view fileLoc = __FILE__;
@@ -33,8 +34,11 @@ namespace Proton
 		PT_CORE_ASSERT(pos != -1);
 		CoreUtils::CORE_PATH_STR = fileLoc.substr(0, pos + 7);
 
+		if (!m_Specification.WorkingDirectory.empty())
+			std::filesystem::current_path(m_Specification.WorkingDirectory);
+
 		s_Instance = this;
-		m_Window = Scope<Window>(Window::Create({"Proton Game Engine", 1280, 720}));
+		m_Window = Scope<Window>(Window::Create({m_Specification.Name, 1280, 720}));
 
 		m_Window->SetEventCallback(PT_BIND_EVENT_FN(Application::OnEvent));
 		m_Window->SetVSync(true);
