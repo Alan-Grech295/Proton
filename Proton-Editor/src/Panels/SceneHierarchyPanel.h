@@ -16,6 +16,8 @@ namespace Proton
 
 		void OnImGuiRender();
 
+		Entity GetSelectedEntity() const { return m_Selected; }
+
 		//TEMP
 		static SceneHierarchyPanel& Get()
 		{

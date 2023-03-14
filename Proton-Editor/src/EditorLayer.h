@@ -9,6 +9,8 @@
 #include <Proton\Renderer\SceneRenderer.h>
 #include "Proton\Renderer\EditorCamera.h"
 
+#include "ImGuizmo.h"
+
 namespace Proton
 {
 	class EditorLayer : public Layer
@@ -71,6 +73,8 @@ namespace Proton
 
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
+
+		int m_GuizmoType = ImGuizmo::OPERATION::TRANSLATE;
 
 		struct
 		{

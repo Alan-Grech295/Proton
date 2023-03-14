@@ -6,6 +6,7 @@
 #include <Proton\Asset Loader\AssetManager.h>
 #include "Proton\Scripting\ScriptEngine.h"
 
+#include "ImGuizmo.h"
 #include <DirectXMath.h>
 
 #include <filesystem>
@@ -317,6 +318,63 @@ namespace Proton
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(disableBlend, nullptr);
 		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID), viewportPanelSize);
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(enableBlend, nullptr);
+
+		// Guizmos
+		Entity selectedEntity = SceneHierarchyPanel::Get().GetSelectedEntity();
+		if (selectedEntity && m_GuizmoType != -1)
+		{
+			ImGuizmo::SetOrthographic(false);
+			ImGuizmo::SetDrawlist();
+
+			float windowWidth = ImGui::GetWindowWidth();
+			float windowHeight = ImGui::GetWindowHeight();
+			ImGuizmo::SetRect(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y, windowWidth, windowHeight);
+
+			DirectX::XMMATRIX cameraView = m_EditorCam.GetViewMatrix();
+			DirectX::XMMATRIX cameraProjection = m_EditorCam.GetProjection();
+
+			// Entity Transform
+			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			DirectX::XMMATRIX transform = tc.GetTransformMatrix();
+
+			ImGuizmo::Manipulate((float*)&cameraView, (float*)&cameraProjection, 
+				(ImGuizmo::OPERATION)m_GuizmoType, ImGuizmo::LOCAL, (float*)&transform);
+
+			if (ImGuizmo::IsUsing())
+			{
+				m_UpdateEditorCam = false;
+				DirectX::XMVECTOR translation;
+				DirectX::XMVECTOR rotation;
+				DirectX::XMVECTOR scale;
+				DirectX::XMMatrixDecompose(&scale, &rotation, &translation, transform);
+
+				DirectX::XMStoreFloat3(&tc.position, translation);
+
+				DirectX::XMFLOAT4 q;
+				DirectX::XMStoreFloat4(&q, rotation);
+
+				float ysqr = q.y * q.y;
+				float t0 = -2.0 * (ysqr + q.z * q.z) + 1.0;
+				float t1 = +2.0 * (q.x * q.y + q.w * q.z);
+				float t2 = -2.0 * (q.x * q.z - q.w * q.y);
+				float t3 = +2.0 * (q.y * q.z + q.w * q.x);
+				float t4 = -2.0 * (q.x * q.x + ysqr) + 1.0;
+
+				t2 = t2 > 1.0 ? 1.0 : t2;
+				t2 = t2 < -1.0 ? -1.0 : t2;
+
+				float pitch = asin(t2);
+				float roll = atan2(t3, t4);
+				float yaw = atan2(t1, t0);
+
+				DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYaw(tc.rotation.x, tc.rotation.y, tc.rotation.z);
+
+				tc.rotation;
+
+				DirectX::XMStoreFloat3(&tc.scale, scale);
+			}
+		}
+
 		ImGui::End();
 
 		SceneHierarchyPanel::Get().OnImGuiRender();

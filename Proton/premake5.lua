@@ -14,7 +14,10 @@ project "Proton"
 	{
 		"src/**.h",
 		"src/**.cpp",
-		"src/**.hlsl"
+		"src/**.hlsl",
+		-- ImGuizmo Files
+		"vendor/ImGuizmo/ImGuizmo.h",
+		"vendor/ImGuizmo/ImGuizmo.cpp"
 	}
 
 	includedirs
@@ -25,6 +28,7 @@ project "Proton"
 		"%{IncludeDir.DirectXTK}",
 		"%{IncludeDir.DirectXTex}",
 		"%{IncludeDir.ImGui}",
+		"%{IncludeDir.ImGuizmo}",
 		"%{IncludeDir.Assimp}",
 		"%{IncludeDir.entt}",
 		"%{IncludeDir.mono}",
@@ -39,6 +43,9 @@ project "Proton"
 
 		"%{Library.mono}",
 	}
+
+	filter "files:vendor/ImGuizmo/**.cpp"
+		flags { "NoPCH" }
 
 	filter "system:windows"
 		systemversion "latest"

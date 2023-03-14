@@ -21,7 +21,8 @@ project "Proton-Editor"
 		"%{IncludeDir.filewatch}",
 		"%{IncludeDir.Assimp}",
 		"%{IncludeDir.DirectXTex}",
-		"%{IncludeDir.entt}"
+		"%{IncludeDir.entt}",
+		"%{IncludeDir.ImGuizmo}"
 	}
 
 	links

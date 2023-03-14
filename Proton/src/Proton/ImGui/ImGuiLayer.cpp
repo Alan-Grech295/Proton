@@ -8,6 +8,8 @@
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
 #include "Proton\Renderer\RenderCommand.h"
 
+#include "ImGuizmo.h"
+
 namespace Proton
 {
 	ImGuiLayer::ImGuiLayer()
@@ -67,6 +69,8 @@ namespace Proton
 		ImGui_ImplDX11_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
+
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiLayer::End()

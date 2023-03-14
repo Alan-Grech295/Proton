@@ -7,3 +7,6 @@
 [submodule "Proton/vendor/assimp"]
 	path = Proton/vendor/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "Proton/vendor/ImGuizmo"]
+	path = Proton/vendor/ImGuizmo
+	url = https://github.com/TheCherno/ImGuizmo.git
