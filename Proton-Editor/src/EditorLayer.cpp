@@ -225,6 +225,31 @@ namespace Proton
 		ImGui::PopID();
 	}
 
+	static DirectX::XMFLOAT3 threeaxisrot(float r11, float r12, float r21, float r31, float r32) {
+		DirectX::XMFLOAT3 res;
+		res.x = asin(r21);
+		res.y = atan2(r11, r12);
+		res.z = atan2(r31, r32);
+		return res;
+	}
+
+	enum RotSeq { zyx, zyz, zxy, zxz, yxz, yxy, yzx, yzy, xyz, xyx, xzy, xzx };
+
+	static DirectX::XMFLOAT3 QuatToEul(DirectX::XMVECTOR quaternion)
+	{
+		DirectX::XMFLOAT4 q;
+		DirectX::XMStoreFloat4(&q, quaternion);
+
+		float r11, r12, r21, r31, r32;
+		r11 = 2 * (q.x * q.z + q.w * q.y);
+		r12 = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
+		r21 = -2 * (q.y * q.z - q.w * q.x);
+		r31 = 2 * (q.x * q.y + q.w * q.z);
+		r32 = q.w * q.w - q.x * q.x + q.y * q.y - q.z * q.z;
+
+		return { asin(r21), atan2(r11, r12), atan2(r31, r32) };
+	}
+
 	void EditorLayer::OnImGuiRender()
 	{
 		//ImGui Dockspace
@@ -335,6 +360,7 @@ namespace Proton
 
 			// Entity Transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
+			//TODO: Use Math SIMD functions to do
 			DirectX::XMMATRIX transform = tc.GetTransformMatrix();
 
 			ImGuizmo::Manipulate((float*)&cameraView, (float*)&cameraProjection, 
@@ -350,20 +376,12 @@ namespace Proton
 
 				DirectX::XMStoreFloat3(&tc.position, translation);
 
-				//
-				static const DirectX::XMFLOAT3 FORWARD = { 0, 0, 1 };
-				static const DirectX::XMVECTOR FORWARD_VEC = DirectX::XMLoadFloat3(&FORWARD);
-				DirectX::XMFLOAT3 rotatedFwd;
-				DirectX::XMStoreFloat3(&rotatedFwd, DirectX::XMVector3Rotate(FORWARD_VEC, rotation));
-				float pitch = atan2(rotatedFwd.y, rotatedFwd.z);
-				float yaw = atan2(rotatedFwd.x, rotatedFwd.z);
-				float roll = atan2(rotatedFwd.y, rotatedFwd.x);
+				DirectX::XMFLOAT4 q;
+				DirectX::XMStoreFloat4(&q, rotation);
 
-				DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYaw(tc.rotation.x, tc.rotation.y, tc.rotation.z);
-				
-				tc.rotation;
+				tc.rotation = QuatToEul(rotation);
 
-				DirectX::XMStoreFloat3(&tc.scale, scale);
+				DirectX::XMStoreFloat3(&tc.scale, scale);//*/
 			}
 		}
 

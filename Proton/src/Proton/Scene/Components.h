@@ -28,6 +28,7 @@ namespace Proton
 	{
 		DirectX::XMFLOAT3 position = { 0, 0, 0 };
 		DirectX::XMFLOAT3 rotation = { 0, 0, 0 };
+		DirectX::XMVECTOR rotQuaternion = DirectX::XMQuaternionIdentity();
 		DirectX::XMFLOAT3 scale = { 1, 1, 1 };
 
 		TransformComponent() = default;
@@ -41,6 +42,7 @@ namespace Proton
 		{
 			return DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) *
 				   DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z) *
+				   //DirectX::XMMatrixRotationQuaternion(rotQuaternion) *
 				   DirectX::XMMatrixTranslation(position.x, position.y, position.z);
 		}
 	};

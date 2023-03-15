@@ -9,4 +9,4 @@
 	url = https://github.com/assimp/assimp.git
 [submodule "Proton/vendor/ImGuizmo"]
 	path = Proton/vendor/ImGuizmo
-	url = https://github.com/TheCherno/ImGuizmo.git
+	url = https://github.com/Alan-Grech295/ImGuizmo.git
