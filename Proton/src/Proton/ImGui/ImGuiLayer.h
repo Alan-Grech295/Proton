@@ -16,6 +16,12 @@ namespace Proton
 		void Begin();
 		void End();
 
+		void BlockEvents(bool block) { m_BlockEvents = block; }
+
 		void SetDarkThemeColors();
+
+		void OnEvent(Event& e) override;
+	private:
+		bool m_BlockEvents = false;
 	};
 }

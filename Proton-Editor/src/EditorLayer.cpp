@@ -121,7 +121,7 @@ namespace Proton
 		m_ActiveScene->DrawDebugLine({ 10, 20, 0 }, { 10, 10, 0 }, 0, 1, 0);
 		m_ActiveScene->DrawDebugLine({ 10, 10, 0 }, { 0, 10, 0 }, 0, 1, 0);*/
 
-		if (m_UpdateEditorCam)
+		if(m_SceneState == SceneState::Edit && m_ViewportFocused)
 			m_EditorCam.OnUpdate(ts);
 
 		switch (m_SceneState)
@@ -326,8 +326,7 @@ namespace Proton
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
-
-		m_UpdateEditorCam = m_ViewportFocused && m_SceneState == SceneState::Edit;
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
 
 		ImGui::PopStyleVar();
 
@@ -363,12 +362,20 @@ namespace Proton
 			//TODO: Use Math SIMD functions to do
 			DirectX::XMMATRIX transform = tc.GetTransformMatrix();
 
+			//Snapping
+			bool snap = Input::IsKeyPressed(Key::Control);
+			float snapValue = 0.5f;
+			if (m_GuizmoType == ImGuizmo::OPERATION::ROTATE)
+				snapValue = 45.0f;
+
+			float snapValues[3] = { snapValue, snapValue, snapValue };
+
 			ImGuizmo::Manipulate((float*)&cameraView, (float*)&cameraProjection, 
-				(ImGuizmo::OPERATION)m_GuizmoType, ImGuizmo::LOCAL, (float*)&transform);
+				(ImGuizmo::OPERATION)m_GuizmoType, ImGuizmo::LOCAL, (float*)&transform, 
+				nullptr, snap ? snapValues : nullptr);
 
 			if (ImGuizmo::IsUsing())
 			{
-				m_UpdateEditorCam = false;
 				DirectX::XMVECTOR translation;
 				DirectX::XMVECTOR rotation;
 				DirectX::XMVECTOR scale;
@@ -496,7 +503,7 @@ namespace Proton
 
 	void EditorLayer::OnEvent(Event& e)
 	{
-		if(m_UpdateEditorCam)
+		if(m_SceneState == SceneState::Edit && m_ViewportFocused)
 			m_EditorCam.OnEvent(e);
 
 		if (e.IsEventType(EventType::WindowClose))
@@ -545,22 +552,38 @@ namespace Proton
 		switch (e.GetKeyCode())
 		{
 		case Key::N:
+		{
 			if (control)
 				NewScene();
 			break;
+		}
 		case Key::O:
+		{
 			if (control)
 				OpenScene();
 			break;
+		}
 		case Key::S:
+		{
 			if (control && shift)
 				SaveSceneAs();
 			else if (control)
 				SaveScene();
 			break;
+		}
+
+			//Gizmos
+		case Key::Q:
+			m_GuizmoType = -1;
+			break;
+		case Key::W:
+			m_GuizmoType = ImGuizmo::OPERATION::TRANSLATE;
+			break;
+		case Key::E:
+			m_GuizmoType = ImGuizmo::OPERATION::ROTATE;
+			break;
 		case Key::R:
-			if (control)
-				ScriptEngine::ReloadAssembly();
+			m_GuizmoType = ImGuizmo::OPERATION::SCALE;
 			break;
 		}
 
@@ -688,7 +711,6 @@ namespace Proton
 	void EditorLayer::OnScenePlay()
 	{
 		m_SceneState = SceneState::Play;
-		m_UpdateEditorCam = false;
 
 		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
@@ -700,7 +722,6 @@ namespace Proton
 	void EditorLayer::OnSceneStop()
 	{
 		m_SceneState = SceneState::Edit;
-		m_UpdateEditorCam = true;
 
 		m_ActiveScene->OnRuntimeStop();
 		m_ActiveScene = m_EditorScene;

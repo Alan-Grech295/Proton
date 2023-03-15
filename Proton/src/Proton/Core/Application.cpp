@@ -71,7 +71,7 @@ namespace Proton
 		{
 			(*--it)->OnEvent(e);
 
-			if (e.Handled())
+			if (e.Handled)
 				break;	
 		}
 	}

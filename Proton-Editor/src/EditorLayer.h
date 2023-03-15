@@ -61,8 +61,6 @@ namespace Proton
 
 		EditorCamera m_EditorCam;
 
-		bool m_UpdateEditorCam = true;
-
 		ImVec2 m_ViewportSize;		
 
 		std::string saveFilePath;
@@ -74,7 +72,7 @@ namespace Proton
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
 
-		int m_GuizmoType = ImGuizmo::OPERATION::TRANSLATE;
+		int m_GuizmoType = ImGuizmo::OPERATION::ROTATE;
 
 		struct
 		{
