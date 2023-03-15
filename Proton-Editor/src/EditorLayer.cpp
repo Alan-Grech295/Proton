@@ -350,25 +350,17 @@ namespace Proton
 
 				DirectX::XMStoreFloat3(&tc.position, translation);
 
-				DirectX::XMFLOAT4 q;
-				DirectX::XMStoreFloat4(&q, rotation);
-
-				float ysqr = q.y * q.y;
-				float t0 = -2.0 * (ysqr + q.z * q.z) + 1.0;
-				float t1 = +2.0 * (q.x * q.y + q.w * q.z);
-				float t2 = -2.0 * (q.x * q.z - q.w * q.y);
-				float t3 = +2.0 * (q.y * q.z + q.w * q.x);
-				float t4 = -2.0 * (q.x * q.x + ysqr) + 1.0;
-
-				t2 = t2 > 1.0 ? 1.0 : t2;
-				t2 = t2 < -1.0 ? -1.0 : t2;
-
-				float pitch = asin(t2);
-				float roll = atan2(t3, t4);
-				float yaw = atan2(t1, t0);
+				//
+				static const DirectX::XMFLOAT3 FORWARD = { 0, 0, 1 };
+				static const DirectX::XMVECTOR FORWARD_VEC = DirectX::XMLoadFloat3(&FORWARD);
+				DirectX::XMFLOAT3 rotatedFwd;
+				DirectX::XMStoreFloat3(&rotatedFwd, DirectX::XMVector3Rotate(FORWARD_VEC, rotation));
+				float pitch = atan2(rotatedFwd.y, rotatedFwd.z);
+				float yaw = atan2(rotatedFwd.x, rotatedFwd.z);
+				float roll = atan2(rotatedFwd.y, rotatedFwd.x);
 
 				DirectX::XMVECTOR quat = DirectX::XMQuaternionRotationRollPitchYaw(tc.rotation.x, tc.rotation.y, tc.rotation.z);
-
+				
 				tc.rotation;
 
 				DirectX::XMStoreFloat3(&tc.scale, scale);
