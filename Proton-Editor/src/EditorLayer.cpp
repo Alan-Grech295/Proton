@@ -121,7 +121,7 @@ namespace Proton
 		m_ActiveScene->DrawDebugLine({ 10, 20, 0 }, { 10, 10, 0 }, 0, 1, 0);
 		m_ActiveScene->DrawDebugLine({ 10, 10, 0 }, { 0, 10, 0 }, 0, 1, 0);*/
 
-		if(m_SceneState == SceneState::Edit && m_ViewportFocused)
+		if(m_UpdateEditorCamera)
 			m_EditorCam.OnUpdate(ts);
 
 		switch (m_SceneState)
@@ -327,6 +327,7 @@ namespace Proton
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
+		m_UpdateEditorCamera = m_ViewportFocused && m_SceneState != SceneState::Play;
 
 		ImGui::PopStyleVar();
 
@@ -376,6 +377,7 @@ namespace Proton
 
 			if (ImGuizmo::IsUsing())
 			{
+				m_UpdateEditorCamera = false;
 				DirectX::XMVECTOR translation;
 				DirectX::XMVECTOR rotation;
 				DirectX::XMVECTOR scale;
@@ -503,7 +505,7 @@ namespace Proton
 
 	void EditorLayer::OnEvent(Event& e)
 	{
-		if(m_SceneState == SceneState::Edit && m_ViewportFocused)
+		if(m_UpdateEditorCamera)
 			m_EditorCam.OnEvent(e);
 
 		if (e.IsEventType(EventType::WindowClose))

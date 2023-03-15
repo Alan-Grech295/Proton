@@ -72,7 +72,9 @@ namespace Proton
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;
 
-		int m_GuizmoType = ImGuizmo::OPERATION::ROTATE;
+		bool m_UpdateEditorCamera = true;
+
+		int m_GuizmoType = ImGuizmo::OPERATION::TRANSLATE;
 
 		struct
 		{
