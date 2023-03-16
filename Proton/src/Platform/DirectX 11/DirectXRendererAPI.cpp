@@ -14,12 +14,12 @@ namespace Proton
 {
 	void DirectXRendererAPI::SetClearColor(float r, float g, float b)
 	{
-		clearColor = new float[4]{ r, g, b, 1 };
+		m_ClearColour = { r, g, b, 1 };
 	}
 
 	void DirectXRendererAPI::Clear()
 	{
-		pContext->ClearRenderTargetView(pTarget.Get(), clearColor);
+		pContext->ClearRenderTargetView(pTarget.Get(), (float*)&m_ClearColour);
 		//TEMP
 		if(pDSV.Get())
 			pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);

@@ -13,7 +13,10 @@ namespace Proton
 	{
 	public:
 		DirectXVertexBuffer(const std::string& tag, BufferLayout& layout, VertexShader* vertexShader);
-		virtual ~DirectXVertexBuffer() {}
+		virtual ~DirectXVertexBuffer() 
+		{
+			delete[] m_InputLayoutDesc;
+		}
 
 		virtual void Bind() override;
 
@@ -39,14 +42,16 @@ namespace Proton
 		virtual void RecreateBuffer() override;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> m_IndexBuffer;
-		
 	};
 
 	class DirectXVertexConstantBuffer : public VertexConstantBuffer
 	{
 	public:
 		DirectXVertexConstantBuffer(const std::string& tag, int slot, int size, const void* data);
-		virtual ~DirectXVertexConstantBuffer() {}
+		virtual ~DirectXVertexConstantBuffer()
+		{
+			delete[] m_Data;
+		}
 
 		virtual void SetData(const void* data) override;
 		virtual void* GetData() override;
@@ -55,7 +60,7 @@ namespace Proton
 		virtual std::string GetUID() const noexcept override;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
-		void* m_Data;
+		uint8_t* m_Data;
 		std::string uid;
 	};
 
@@ -63,7 +68,10 @@ namespace Proton
 	{
 	public:
 		DirectXPixelConstantBuffer(const std::string& tag, int slot, int size, const void* data);
-		virtual ~DirectXPixelConstantBuffer() {}
+		virtual ~DirectXPixelConstantBuffer()
+		{
+			delete[] m_Data;
+		}
 
 		virtual void SetData(const void* data) override;
 		virtual void* GetData() override;
@@ -72,7 +80,7 @@ namespace Proton
 		virtual std::string GetUID() const noexcept override;
 	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
-		void* m_Data;
+		uint8_t* m_Data;
 		std::string uid;
 	};
 }

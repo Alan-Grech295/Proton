@@ -161,7 +161,7 @@ namespace Proton
 		m_Slot = slot;
 		m_Size = size;
 
-		m_Data = malloc(size);
+		m_Data = new uint8_t[size];
 		if (data)
 			memcpy(m_Data, data, size);
 		
@@ -221,7 +221,7 @@ namespace Proton
 		m_Slot = slot;
 		m_Size = size;
 
-		m_Data = malloc(size);
+		m_Data = new uint8_t[size];
 		if (data)
 			memcpy(m_Data, data, size);
 

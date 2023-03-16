@@ -2,6 +2,7 @@
 #include "Proton\Renderer\RendererAPI.h"
 #include <wrl.h>
 #include <d3d11.h>
+#include <DirectXMath.h>
 #include "Proton/Renderer/Bindables/Blender.h"
 
 namespace Proton
@@ -50,6 +51,6 @@ namespace Proton
 
 		bool isVSync;
 
-		float* clearColor;
+		DirectX::XMFLOAT4 m_ClearColour;
 	};
 }
