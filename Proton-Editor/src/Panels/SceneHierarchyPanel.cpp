@@ -6,7 +6,7 @@
 #include "Proton\Core\Input.h"
 #include "Proton\Core\KeyCodes.h"
 #include "Proton\Asset Loader\AssetManager.h"
-#include "AssetViewerPanel.h"
+#include "ContentBrowserPanel.h"
 #include "Proton/Scripting/ScriptEngine.h"
 
 namespace Proton
@@ -25,8 +25,8 @@ namespace Proton
 
 	void SceneHierarchyPanel::SetContext(const Ref<Scene> scene)
 	{
-		Get().m_Context = scene;
-		Get().m_Selected = {};
+		m_Context = scene;
+		m_Selected = {};
 	}
 
 	template<typename T>
@@ -100,7 +100,7 @@ namespace Proton
 	{
 		position = -1;
 
-		Ref<Scene> scene = Get().m_Context;
+		Ref<Scene> scene = m_Context;
 		UUID entityID = entity.GetUUID();
 
 		if (ImGui::IsMouseReleased(ImGuiMouseButton_Left) && ImGui::GetDragDropPayload() && ImGui::GetDragDropPayload()->IsDataType("SceneHierarchyObject"))
@@ -243,24 +243,6 @@ namespace Proton
 		{
 			if (ImGui::MenuItem("Delete Entity"))
 				entityDeleted = true;
-
-			if (entity.HasComponent<RootNodeTag>() && ImGui::MenuItem("Create Prefab"))
-			{
-				std::string tag = entity.GetComponent<TagComponent>().Tag;
-
-				uint32_t stringLen = 0;
-
-				for (int i = tag.length() - 1; i >= 0; i--)
-				{
-					if (tag.at(i) != ' ')
-					{
-						stringLen = i;
-						break;
-					}
-				}
-
-				AssetManager::CreatePrefab(entity, AssetViewerPanel::GetSelectedPath().string() + "\\" + tag.substr(0, stringLen));
-			}
 
 			ImGui::EndPopup();
 		}

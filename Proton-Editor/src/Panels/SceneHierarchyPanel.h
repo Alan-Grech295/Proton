@@ -12,25 +12,18 @@ namespace Proton
 		SceneHierarchyPanel(const Ref<Scene>& scene);
 		~SceneHierarchyPanel();
 
-		static void SetContext(const Ref<Scene> scene);
+		void SetContext(const Ref<Scene> scene);
 
 		void OnImGuiRender();
 
 		Entity GetSelectedEntity() const { return m_Selected; }
-
-		//TEMP
-		static SceneHierarchyPanel& Get()
-		{
-			static SceneHierarchyPanel panel;
-			return panel;
-		}
 	private:
 		void DrawEntityNode(UUID entityID);
 		void DrawChildNode(UUID entityID);
 		void DeleteChildNode(UUID entityID);
 		void DrawComponents(Entity entity);
 
-		static void DragProcedure(Entity entity, int& position);
+		void DragProcedure(Entity entity, int& position);
 
 		template<typename T>
 		void DisplayAddComponentEntry(const std::string& entryName);

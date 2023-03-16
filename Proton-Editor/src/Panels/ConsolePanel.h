@@ -40,29 +40,29 @@ namespace Proton
 			m_ErrorIcon(Texture2D::Create("Resources\\icons\\error.png"))
 		{}
 	public:
-		static void LogError(const std::string& msg);
-		static void LogWarning(const std::string& msg);
-		static void LogTrace(const std::string& msg);
+		void LogError(const std::string& msg);
+		void LogWarning(const std::string& msg);
+		void LogTrace(const std::string& msg);
 
 		//TEMP
 		template<typename ...Params>
-		static void LogError(Params&&... params);
+		void LogError(Params&&... params);
 		template<typename ...Params>
-		static void LogWarning(Params&&... params);
+		void LogWarning(Params&&... params);
 		template<typename ...Params>
-		static void LogTrace(Params&&... params);
+		void LogTrace(Params&&... params);
 	private:
-		static void OnImGuiRender();
+		void OnImGuiRender();
 		void Clear();
 
 		void DisplayMessages();
 		void DrawMessage(Message msg, uint32_t index, bool collapsed);
-		inline static bool HasMessage(const std::string& msg)
+		inline bool HasMessage(const std::string& msg)
 		{
-			return !(Get().m_Messages.find(msg) == Get().m_Messages.end());
+			return !(m_Messages.find(msg) == m_Messages.end());
 		}
 
-		static void LogMessage(const std::string& msg, Message::MessageType msgType);
+		void LogMessage(const std::string& msg, Message::MessageType msgType);
 
 		//TEMP
 		template<typename T>
@@ -76,12 +76,6 @@ namespace Proton
 		{
 			CompileMessage(oss, std::forward<First>(first));
 			CompileMessage(oss, std::forward<Rest>(rest)...);
-		}
-	private:
-		static ConsolePanel& Get()
-		{
-			static ConsolePanel console;
-			return console;
 		}
 	private:
 		std::unordered_map<std::string, Message> m_Messages;
@@ -107,7 +101,7 @@ namespace Proton
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
 		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Error);
-		Get().m_NumErrors++;
+		m_NumErrors++;
 	}
 
 	template<typename ...Params>
@@ -116,7 +110,7 @@ namespace Proton
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
 		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Warning);
-		Get().m_NumWarnings++;
+		m_NumWarnings++;
 	}
 
 	template<typename ...Params>
@@ -125,6 +119,6 @@ namespace Proton
 		std::ostringstream oss;
 		CompileMessage(oss, std::forward<Params>(params)...);
 		LogMessage(oss.str().substr(0, oss.str().length() - 2), Message::MessageType::Trace);
-		Get().m_NumTraces++;
+		m_NumTraces++;
 	}
 }

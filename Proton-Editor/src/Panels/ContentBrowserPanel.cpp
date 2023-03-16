@@ -1,4 +1,4 @@
-#include "AssetViewerPanel.h"
+#include "ContentBrowserPanel.h"
 #include "imgui\imgui.h"
 #include "imgui\imgui_internal.h"
 
@@ -6,7 +6,7 @@ namespace fs = std::filesystem;
 
 namespace Proton
 {
-	AssetViewerPanel::AssetViewerPanel()
+	ContentBrowserPanel::ContentBrowserPanel()
 		:
 		startPath(""),
 		m_SelectedPath(""),
@@ -14,15 +14,15 @@ namespace Proton
 		fileIcon(Texture2D::Create("Resources\\icons\\Document-Blank-icon.png"))
 	{}
 
-	AssetViewerPanel::~AssetViewerPanel()
+	ContentBrowserPanel::~ContentBrowserPanel()
 	{
 
 	}
 
-	void AssetViewerPanel::OnImGuiRender()
+	void ContentBrowserPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Asset Viewer");
-		if (Get().startPath.empty() || !Get().m_ActiveScene)
+		if (startPath.empty() || !m_ActiveScene)
 		{
 			ImGui::End();
 			return;
@@ -31,21 +31,21 @@ namespace Proton
 		ImGui::Columns(2);
 		static bool setWidth = false;
 		if (!setWidth) { ImGui::SetColumnWidth(0, ImGui::GetWindowContentRegionMax().x / 5.0f); setWidth = true; }
-		Get().DrawDirectories();
+		DrawDirectories();
 
 		ImGui::NextColumn();
 
-		Get().DrawFiles();
+		DrawFiles();
 
 		ImGui::Columns(1);
 		ImGui::End();
 	}
 
-	void AssetViewerPanel::AddFile(std::filesystem::path filePath)
+	void ContentBrowserPanel::AddFile(std::filesystem::path filePath)
 	{
 		std::ifstream inStream(filePath, std::ios::in | std::ios::binary);
 
-		std::string savePath = Get().m_SelectedPath.string() + "\\";
+		std::string savePath = m_SelectedPath.string() + "\\";
 		std::string saveName = filePath.filename().replace_extension().string();
 		std::string extension = filePath.extension().string();
 
@@ -85,7 +85,7 @@ namespace Proton
 		outStream.close();
 	}
 
-	void AssetViewerPanel::DrawDirectories()
+	void ContentBrowserPanel::DrawDirectories()
 	{
 		for (const auto& entry : fs::directory_iterator(startPath)) {
 			if (entry.is_directory()) {
@@ -94,7 +94,7 @@ namespace Proton
 		}
 	}
 
-	void AssetViewerPanel::DrawDirectory(const fs::path& pathToScan)
+	void ContentBrowserPanel::DrawDirectory(const fs::path& pathToScan)
 	{
 		std::string pathString = pathToScan.string();
 		bool isLeaf = true;
@@ -166,7 +166,7 @@ namespace Proton
 		ImGui::PopID();
 	}
 
-	void AssetViewerPanel::DrawFiles()
+	void ContentBrowserPanel::DrawFiles()
 	{
 		int maxPerLine = ImGui::GetContentRegionAvail().x / 64.0f;
 		int onCurLine = 0;
@@ -235,7 +235,7 @@ namespace Proton
 	}
 
 	//TODO: Improve Splitting
-	void AssetViewerPanel::SetSelectedPath(const fs::path& path)
+	void ContentBrowserPanel::SetSelectedPath(const fs::path& path)
 	{
 		m_SelectedPath = path;
 

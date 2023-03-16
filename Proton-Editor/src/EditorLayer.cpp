@@ -41,6 +41,12 @@ namespace Proton
 
 		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f);
 
+		m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
+		m_ConsolePanel = CreateScope<ConsolePanel>();
+		m_SceneHierarchyPanel = CreateScope<SceneHierarchyPanel>();
+
+		m_ContentBrowserPanel->SetOpenSceneFunction(std::bind(static_cast<void(EditorLayer::*)(const std::filesystem::path&)>(&EditorLayer::OpenScene), this, std::placeholders::_1));
+
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1)
 		{
@@ -51,30 +57,9 @@ namespace Proton
 		{
 			//TODO: Prompt user to select a directory
 			NewProject();
-			//NewScene();
-			//ModelCreator::CreateModelEntity(CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
-
-			//ModelCreator::CreateModelEntity(CoreUtils::CORE_PATH_STR + "Proton-Editor\\assets\\Models\\Sponza\\sponza.obj", *m_ActiveScene);
-			//m_PointLight = m_ActiveScene->CreateEntity("Point Light");
-			//m_PointLight.AddComponent<LightComponent>();
 		}
 
 		m_EditorScene = m_ActiveScene;
-
-		SceneHierarchyPanel::SetContext(m_ActiveScene);
-		AssetViewerPanel::SetProjectPath(projectPath);
-		AssetViewerPanel::SetContext(m_ActiveScene);
-
-		AssetViewerPanel::SetOpenSceneFunction(std::bind(static_cast<void(EditorLayer::*)(const std::filesystem::path&)>(&EditorLayer::OpenScene), this, std::placeholders::_1));
-
-		//D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj
-		//D:\\Dev\\Proton\\Proton-Editor\\assets\\cube.obj
-		//ModelCreator::CreateModelEntity("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\nano_textured\\nanosuit.obj", *m_ActiveScene);
-
-		//
-		//m_CameraEntity.AddComponent<CameraComponent>();
-		//
-		//m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();*/
 	}
 
 	EditorLayer::~EditorLayer()
@@ -109,17 +94,11 @@ namespace Proton
 
 		static bool vSync = true;
 
-		if (Input::IsKeyReleased(Key::D0))
+		if (Input::IsKeyReleased(Key::NUM_0))
 		{
 			vSync = !vSync;
 			Application::Get().GetWindow().SetVSync(vSync);
 		}
-
-		//TEMP
-		/*m_ActiveScene->DrawDebugLine({ 0, 10, 0 }, { 0, 20, 0 }, 0, 1, 0);
-		m_ActiveScene->DrawDebugLine({ 0, 20, 0 }, { 10, 20, 0 }, 0, 1, 0);
-		m_ActiveScene->DrawDebugLine({ 10, 20, 0 }, { 10, 10, 0 }, 0, 1, 0);
-		m_ActiveScene->DrawDebugLine({ 10, 10, 0 }, { 0, 10, 0 }, 0, 1, 0);*/
 
 		if(m_UpdateEditorCamera)
 			m_EditorCam.OnUpdate(ts);
@@ -345,7 +324,7 @@ namespace Proton
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(enableBlend, nullptr);
 
 		// Guizmos
-		Entity selectedEntity = SceneHierarchyPanel::Get().GetSelectedEntity();
+		Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();
 		if (selectedEntity && m_GuizmoType != -1)
 		{
 			ImGuizmo::SetOrthographic(false);
@@ -396,9 +375,9 @@ namespace Proton
 
 		ImGui::End();
 
-		SceneHierarchyPanel::Get().OnImGuiRender();
-		AssetViewerPanel::OnImGuiRender();
-		ConsolePanel::OnImGuiRender();
+		m_SceneHierarchyPanel->OnImGuiRender();
+		m_ContentBrowserPanel->OnImGuiRender();
+		m_ConsolePanel->OnImGuiRender();
 
 		UI_Toolbar();
 		//
@@ -505,42 +484,21 @@ namespace Proton
 
 	void EditorLayer::OnEvent(Event& e)
 	{
-		if(m_UpdateEditorCamera)
+		if (m_UpdateEditorCamera)
 			m_EditorCam.OnEvent(e);
 
 		if (e.IsEventType(EventType::WindowClose))
 		{
-			
+
 		}
 
 		if (e.IsEventType(EventType::FileDragDrop))
 		{
-			AssetViewerPanel::AddFile(((FileDragDropEvent&)e).GetFilePath());
+			m_ContentBrowserPanel->AddFile(((FileDragDropEvent&)e).GetFilePath());
 		}
 
 		EventDispatcher dispatcher(e);
 		dispatcher.Dispatch<KeyPressedEvent>(PT_BIND_EVENT_FN(EditorLayer::OnKeyPressed));
-	}
-
-	void EditorLayer::DrawScope(const ScopeNode* scope, uint32_t scopeLevel)
-	{
-		std::string tabs = "";
-		for (int i = 0; i < scopeLevel; i++) tabs += "=>";
-
-		for (int i = 0; i < scope->opNodes.size(); i++)
-		{
-			const auto node = scope->opNodes[i];
-
-			std::string showNode = tabs + node->ToString();
-
-			LOG_TRACE(showNode);
-
-			if (node->type == OpNode::OpType::Scope)
-				DrawScope(static_cast<ScopeNode*>(node), scopeLevel + 1);
-
-			if (Scoped* scoped = dynamic_cast<Scoped*>(node))
-				DrawScope(scoped->scope, scopeLevel + 1);
-		}
 	}
 
 	bool EditorLayer::OnKeyPressed(KeyPressedEvent& e)
@@ -595,6 +553,7 @@ namespace Proton
 	void EditorLayer::NewProject()
 	{
 		Project::New();
+		NewScene();
 	}
 
 	void EditorLayer::OpenProject()
@@ -628,9 +587,9 @@ namespace Proton
 		m_EditorCam.SetViewportSize(m_ViewportSize.x * m_AntiAliasing, m_ViewportSize.y * m_AntiAliasing);
 		m_SceneRenderer->SetScene(m_ActiveScene);
 
-		SceneHierarchyPanel::SetContext(m_ActiveScene);
-		AssetViewerPanel::SetProjectPath(projectPath);
-		AssetViewerPanel::SetContext(m_ActiveScene);
+		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+		m_ContentBrowserPanel->SetProjectPath(projectPath);
+		m_ContentBrowserPanel->SetContext(m_ActiveScene);
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
 		m_CameraEntity.AddComponent<CameraComponent>();
@@ -669,9 +628,9 @@ namespace Proton
 
 			m_ActiveScene = m_EditorScene;
 
-			SceneHierarchyPanel::SetContext(m_ActiveScene);
-			AssetViewerPanel::SetProjectPath(projectPath);
-			AssetViewerPanel::SetContext(m_ActiveScene);
+			m_SceneHierarchyPanel->SetContext(m_ActiveScene);
+			m_ContentBrowserPanel->SetProjectPath(projectPath);
+			m_ContentBrowserPanel->SetContext(m_ActiveScene);
 
 			m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
 
@@ -717,7 +676,7 @@ namespace Proton
 		m_ActiveScene = Scene::Copy(m_EditorScene);
 		m_ActiveScene->OnRuntimeStart();
 
-		SceneHierarchyPanel::SetContext(m_ActiveScene);
+		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
 		m_SceneRenderer->SetScene(m_ActiveScene);
 	}
 
@@ -728,7 +687,7 @@ namespace Proton
 		m_ActiveScene->OnRuntimeStop();
 		m_ActiveScene = m_EditorScene;
 
-		SceneHierarchyPanel::SetContext(m_ActiveScene);
+		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
 		m_SceneRenderer->SetScene(m_ActiveScene);
 	}
 

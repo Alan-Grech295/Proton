@@ -4,7 +4,7 @@
 #include "imgui\imgui.h"
 #include "imgui\imgui_internal.h"
 #include "Panels\SceneHierarchyPanel.h"
-#include "Panels\AssetViewerPanel.h"
+#include "Panels\ContentBrowserPanel.h"
 #include "Panels\ConsolePanel.h"
 #include <Proton\Renderer\SceneRenderer.h>
 #include "Proton\Renderer\EditorCamera.h"
@@ -23,8 +23,6 @@ namespace Proton
 		virtual void OnImGuiRender() override;
 		virtual void OnAttach() override;
 		virtual void OnEvent(Event& e) override;
-
-		void DrawScope(const ScopeNode* scope, uint32_t scopeLevel);
 	private:
 		bool OnKeyPressed(KeyPressedEvent& e);
 
@@ -54,6 +52,10 @@ namespace Proton
 
 		Ref<Scene> m_ActiveScene;
 		Ref<Scene> m_EditorScene;
+
+		Scope<ContentBrowserPanel> m_ContentBrowserPanel;
+		Scope<ConsolePanel> m_ConsolePanel;
+		Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
 		Scope<SceneRenderer> m_SceneRenderer;
 
@@ -92,6 +94,6 @@ namespace Proton
 	};
 }
 
-#define LOG_ERROR(x) Proton::ConsolePanel::LogError(x)
-#define LOG_WARNING(x) Proton::ConsolePanel::LogWarning(x)
-#define LOG_TRACE(x) Proton::ConsolePanel::LogTrace(x)
+#define LOG_ERROR(x) m_ConsolePanel->LogError(x)
+#define LOG_WARNING(x) m_ConsolePanel->LogWarning(x)
+#define LOG_TRACE(x) m_ConsolePanel->LogTrace(x)

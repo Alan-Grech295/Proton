@@ -7,19 +7,19 @@ namespace Proton
 	void ConsolePanel::LogError(const std::string& msg)
 	{
 		LogMessage(msg, Message::MessageType::Error);
-		Get().m_NumErrors++;
+		m_NumErrors++;
 	}
 
 	void ConsolePanel::LogWarning(const std::string& msg)
 	{
 		LogMessage(msg, Message::MessageType::Warning);
-		Get().m_NumWarnings++;
+		m_NumWarnings++;
 	}
 
 	void ConsolePanel::LogTrace(const std::string& msg)
 	{
 		LogMessage(msg, Message::MessageType::Trace);
-		Get().m_NumTraces++;
+		m_NumTraces++;
 	}
 
 	static bool DrawMessageCounts(void* textureID, const char* label, uint32_t count, bool& selected)
@@ -54,28 +54,28 @@ namespace Proton
 
 		if (ImGui::Button("Collapse"))
 		{
-			Get().m_Collapsed = !Get().m_Collapsed;
-			Get().m_SelectedIndex = -1;
+			m_Collapsed = !m_Collapsed;
+			m_SelectedIndex = -1;
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("Clear"))
-			Get().Clear();
+			Clear();
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
 
-		DrawMessageCounts(Get().m_ErrorIcon->GetTexturePointer(), "##errors", Get().m_NumErrors, Get().m_ShowErrors);
+		DrawMessageCounts(m_ErrorIcon->GetTexturePointer(), "##errors", m_NumErrors, m_ShowErrors);
 		
 		ImGui::SameLine();
-		DrawMessageCounts(Get().m_WarningIcon->GetTexturePointer(), "##warnings", Get().m_NumWarnings, Get().m_ShowWarnings);
+		DrawMessageCounts(m_WarningIcon->GetTexturePointer(), "##warnings", m_NumWarnings, m_ShowWarnings);
 		
 		ImGui::SameLine();
-		DrawMessageCounts(Get().m_TraceIcon->GetTexturePointer(), "##traces", Get().m_NumTraces, Get().m_ShowTraces);
+		DrawMessageCounts(m_TraceIcon->GetTexturePointer(), "##traces", m_NumTraces, m_ShowTraces);
 
 		ImGui::SetCursorPosY(ImGui::GetCursorPosY() + 8);
 
-		Get().DisplayMessages();
+		DisplayMessages();
 
 		ImGui::End();
 	}
@@ -188,13 +188,13 @@ namespace Proton
 				switch (m.messageType)
 				{
 				case Message::MessageType::Error:
-					showMsg = Get().m_ShowErrors;
+					showMsg = m_ShowErrors;
 					break;
 				case Message::MessageType::Warning:
-					showMsg = Get().m_ShowWarnings;
+					showMsg = m_ShowWarnings;
 					break;
 				case Message::MessageType::Trace:
-					showMsg = Get().m_ShowTraces;
+					showMsg = m_ShowTraces;
 					break;
 				}
 
@@ -215,13 +215,13 @@ namespace Proton
 				switch (m.messageType)
 				{
 				case Message::MessageType::Error:
-					showMsg = Get().m_ShowErrors;
+					showMsg = m_ShowErrors;
 					break;
 				case Message::MessageType::Warning:
-					showMsg = Get().m_ShowWarnings;
+					showMsg = m_ShowWarnings;
 					break;
 				case Message::MessageType::Trace:
-					showMsg = Get().m_ShowTraces;
+					showMsg = m_ShowTraces;
 					break;
 				}
 
@@ -239,7 +239,7 @@ namespace Proton
 		const char* msgPtr = nullptr;
 		if (HasMessage(newMsg))
 		{
-			Message& m = Get().m_Messages[newMsg];
+			Message& m = m_Messages[newMsg];
 			m.amount++;
 			msgPtr = m.message;
 		}
@@ -247,10 +247,10 @@ namespace Proton
 		{
 			std::string* msgCopy = new std::string(newMsg);
 			msgPtr = msgCopy->c_str();
-			Get().m_Messages[newMsg] = Message(msgPtr, msgType);
-			Get().m_CollapsedOrder.push_back(msgPtr);
+			m_Messages[newMsg] = Message(msgPtr, msgType);
+			m_CollapsedOrder.push_back(msgPtr);
 		}
 
-		Get().m_MessageOrder.push_back(msgPtr);
+		m_MessageOrder.push_back(msgPtr);
 	}
 }
