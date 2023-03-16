@@ -319,6 +319,11 @@ namespace Proton
 			m_Models[uuid] = model;
 			return model;
 		}
+
+		static void Clear()
+		{
+			m_Models.clear();
+		}
 	private:
 		static std::unordered_map<UUID, Ref<Model>> m_Models;
 	};
