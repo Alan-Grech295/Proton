@@ -9,11 +9,14 @@ namespace Proton
 	{
 		None = 0,
 		
-		//Color
-		RGBA8 = 1,
+		// Color
+		RGBA8,
 
-		//Depth
+		// Depth
 		DEPTH32F,
+
+		// Depth/Stencil
+		DEPTH24STENCIL8,
 
 		//Defaults
 		DEPTH = DEPTH32F

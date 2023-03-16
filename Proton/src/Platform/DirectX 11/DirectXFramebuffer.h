@@ -13,6 +13,11 @@ namespace Proton
 	{
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
+
+		operator bool() 
+		{
+			return pDepthStencilView;
+		}
 	};
 
 	class DirectXFramebuffer : public Framebuffer
@@ -32,6 +37,8 @@ namespace Proton
 
 		virtual void Bind() override;
 	private:
+		void Invalidate();
+	private:
 		FramebufferDescription m_Desc;
 		D3D11_VIEWPORT vp;
 
@@ -42,7 +49,6 @@ namespace Proton
 		std::vector<ID3D11RenderTargetView*> m_ColorAttachmentRenderTargets;
 		std::vector<ID3D11ShaderResourceView*> m_ColorAttachmentSRVs;
 
-		ID3D11DepthStencilView* m_DepthStencilView = nullptr;
-		ID3D11DepthStencilState* m_DSState = nullptr;
+		DepthAttachment m_DepthAttachment = {};
 	};
 }
