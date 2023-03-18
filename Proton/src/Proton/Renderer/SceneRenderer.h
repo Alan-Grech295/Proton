@@ -30,6 +30,8 @@ namespace Proton
 
 		void* GetRenderTextureID(int index) { return m_FrameBuffer->GetRenderTextureID(index); }
 
+		Ref<Framebuffer> GetFrameBuffer() { return m_FrameBuffer; }
+
 	private:
 		void SubmitNode(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
 		//void DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);

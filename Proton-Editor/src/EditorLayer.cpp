@@ -35,7 +35,12 @@ namespace Proton
 		FramebufferDescription desc;
 		desc.Width = 1280;
 		desc.Height = 720;
-		desc.Attachments = { FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::RGBA8, FramebufferTextureFormat::DEPTH };
+		desc.Attachments = { 
+			{FramebufferTextureFormat::RGBA8}, 
+			{FramebufferTextureFormat::RINT},
+			{FramebufferTextureFormat::DEPTH}
+		};
+
 		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };
 		m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
 
@@ -102,6 +107,23 @@ namespace Proton
 
 		if(m_UpdateEditorCamera)
 			m_EditorCam.OnUpdate(ts);
+
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;
+
+		ImVec2 viewportSize = { m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y };
+		//Comment to unflip
+		//my = m_ViewportSize.y - my;
+
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
+
+		if (Input::IsMouseButtonPressed(0) &&  mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)m_ViewportSize.y)
+		{
+			int pixelData = m_SceneRenderer->GetFrameBuffer()->ReadPixel<int>(1, mouseX, mouseY);
+			PT_CORE_TRACE(pixelData);
+		}
 
 		switch (m_SceneState)
 		{
@@ -204,14 +226,6 @@ namespace Proton
 		ImGui::PopID();
 	}
 
-	static DirectX::XMFLOAT3 threeaxisrot(float r11, float r12, float r21, float r31, float r32) {
-		DirectX::XMFLOAT3 res;
-		res.x = asin(r21);
-		res.y = atan2(r11, r12);
-		res.z = atan2(r31, r32);
-		return res;
-	}
-
 	enum RotSeq { zyx, zyz, zxy, zxz, yxz, yxy, yzx, yzy, xyz, xyx, xzy, xzx };
 
 	static DirectX::XMFLOAT3 QuatToEul(DirectX::XMVECTOR quaternion)
@@ -303,6 +317,8 @@ namespace Proton
 			m_EditorCam.SetViewportSize(m_ViewportSize.x, m_ViewportSize.y);
 		}
 
+		auto viewportOffset = ImGui::GetCursorPos();
+
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
 		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
@@ -322,6 +338,15 @@ namespace Proton
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(disableBlend, nullptr);
 		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID), viewportPanelSize);
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(enableBlend, nullptr);
+
+		auto windowSize = ImGui::GetWindowSize();
+		ImVec2 minBound = ImGui::GetWindowPos();
+		minBound.x += viewportOffset.x;
+		minBound.y += viewportOffset.y;
+
+		ImVec2 maxBound = { minBound.x + windowSize.x, minBound.y + windowSize.y };
+		m_ViewportBounds[0] = minBound;
+		m_ViewportBounds[1] = maxBound;
 
 		// Guizmos
 		Entity selectedEntity = m_SceneHierarchyPanel->GetSelectedEntity();

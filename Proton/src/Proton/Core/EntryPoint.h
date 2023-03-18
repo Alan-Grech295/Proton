@@ -5,8 +5,46 @@
 #include <io.h>
 #include <fcntl.h>
 #include <windows.h>
+#include "Platform/DirectX 11/Debugging/Exceptions.h"
+#include <iostream>
+//TEMP
+#include "Proton/Core/Core.h"
 
 extern Proton::Application* Proton::CreateApplication(ApplicationCommandLineArgs args);
+
+#define CATCH_EXCEPTIONS(func)	try \
+								{ \
+									func; \
+								} \
+								catch (const Proton::Exception& e) \
+								{ \
+									MessageBoxA(nullptr, e.what(), e.GetType(), MB_OK | MB_ICONEXCLAMATION); \
+								} \
+								catch (const std::exception& e) \
+								{ \
+									MessageBoxA(nullptr, e.what(), "Standard Exception", MB_OK | MB_ICONEXCLAMATION); \
+								} \
+								catch (...) \
+								{ \
+									MessageBoxA(nullptr, "No details available", "Unknown Exception", MB_OK | MB_ICONEXCLAMATION); \
+								}
+
+#define LOG_CATCH_EXCEPTIONS(func)	try \
+								{ \
+									func; \
+								} \
+								catch (const Proton::Exception& e) \
+								{ \
+									PT_CORE_ERROR("[{}] {}", e.GetType(), e.what()); __debugbreak();\
+								} \
+								catch (const std::exception& e) \
+								{ \
+									PT_CORE_ERROR("[Standard Exception] {}", e.what()); __debugbreak();\
+								} \
+								catch (...) \
+								{ \
+									PT_CORE_ERROR("[No details available] Unknown Exception"); __debugbreak();\
+								}
 
 //Win32 Entry point
 int CALLBACK WinMain(
@@ -36,15 +74,17 @@ int CALLBACK WinMain(
 	Proton::Log::Init();
 
 	PT_PROFILE_BEGIN_SESSION("Startup", "ProtonProfile-Startup.json");
-	auto app = Proton::CreateApplication({__argc, __argv});
+	Proton::Application* app;
+	LOG_CATCH_EXCEPTIONS(app = Proton::CreateApplication({ __argc, __argv }));
+
 	PT_PROFILE_END_SESSION();
 
 	PT_PROFILE_BEGIN_SESSION("Runtime", "ProtonProfile-Runtime.json");
-	app->Run();
+	CATCH_EXCEPTIONS(app->Run());
 	PT_PROFILE_END_SESSION();
 
 	PT_PROFILE_BEGIN_SESSION("Shutdown", "ProtonProfile-Shutdown.json");
-	delete app;
+	CATCH_EXCEPTIONS(delete app);
 	PT_PROFILE_END_SESSION();
 
 	//_CrtDumpMemoryLeaks();

@@ -35,6 +35,8 @@ namespace Proton
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
 
+		virtual void* ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size) override;
+
 		virtual void Bind() override;
 	private:
 		void Invalidate();
@@ -43,7 +45,7 @@ namespace Proton
 		D3D11_VIEWPORT vp;
 
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
-		FramebufferTextureSpecification m_DepthAttachmentSpecification = FramebufferTextureFormat::None;
+		FramebufferTextureSpecification m_DepthAttachmentSpecification = { FramebufferTextureFormat::None };
 
 		std::vector<ID3D11Texture2D*> m_ColorAttachmentTextures;
 		std::vector<ID3D11RenderTargetView*> m_ColorAttachmentRenderTargets;

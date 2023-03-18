@@ -11,6 +11,7 @@ namespace Proton
 		
 		// Color
 		RGBA8,
+		RINT,
 
 		// Depth
 		DEPTH32F,
@@ -22,14 +23,26 @@ namespace Proton
 		DEPTH = DEPTH32F
 	};
 
+	/*enum class FramebufferTextureUsage
+	{
+		None = 0,
+
+		GPU_RW,
+		GPU_R,
+		GPU_R_CPU_W,
+		GPU_CPU_RW
+	};*/
+
 	struct FramebufferTextureSpecification
 	{
 		FramebufferTextureSpecification() = default;
 		FramebufferTextureSpecification(FramebufferTextureFormat format)
-			:
-			TextureFormat(format) {}
+			: TextureFormat(format)//, TextureUsage(usage) 
+		{}
 
 		FramebufferTextureFormat TextureFormat = FramebufferTextureFormat::None;
+		//FramebufferTextureUsage TextureUsage = FramebufferTextureUsage::None;
+
 		//TODO: Filtering/wrap
 	};
 
@@ -64,6 +77,11 @@ namespace Proton
 		virtual void* GetRenderTextureID(uint32_t index) = 0;
 
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
+
+		template<typename T>
+		inline T ReadPixel(uint32_t targetIndex, int x, int y) { return *(T*)ReadPixel_Impl(targetIndex, x, y, (uint32_t)sizeof(T)); }
+
+		virtual void* ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size) = 0;
 
 		virtual void Clear() = 0;
 

@@ -64,6 +64,7 @@ namespace Proton
 		EditorCamera m_EditorCam;
 
 		ImVec2 m_ViewportSize;		
+		ImVec2 m_ViewportBounds[2];
 
 		std::string saveFilePath;
 

@@ -4,7 +4,7 @@
 #include "Proton\Core\Log.h"
 #include "Platform\Windows\WindowsWindow.h"
 #include "Proton\Renderer\RenderCommand.h"
-#include <Windows.h>
+#include "Debugging/Exceptions.h"
 
 #pragma comment(lib, "d3d11.lib")
 
@@ -91,7 +91,7 @@ namespace Proton
 			nullptr,
 			D3D_DRIVER_TYPE_HARDWARE,
 			nullptr,
-			0,
+			D3D11_CREATE_DEVICE_DEBUG,
 			nullptr,
 			0,
 			D3D11_SDK_VERSION,
@@ -157,7 +157,21 @@ namespace Proton
 
 	void DirectXRendererAPI::Present()
 	{
-		pSwap->Present(isVSync, 0);
+		HRESULT hr;
+#if PT_DEBUG
+		infoManager.Set();
+#endif
+		if (FAILED(hr = pSwap->Present(isVSync, 0)))
+		{
+			if (hr == DXGI_ERROR_DEVICE_REMOVED)
+			{
+				throw GFX_DEVICE_REMOVED_EXCEPT(pDevice->GetDeviceRemovedReason());
+			}
+			else
+			{
+				throw GFX_EXCEPT(hr);
+			}
+		}
 	}
 
 	void DirectXRendererAPI::Resize(uint32_t width, uint32_t height)

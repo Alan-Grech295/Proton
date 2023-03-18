@@ -19,7 +19,7 @@ cbuffer CBuf
 struct PS_OUTPUT
 {
     float4 Color : SV_Target0;
-    float4 PickID : SV_Target1;
+    int PickID : SV_Target1;
 };
 
 Texture2D tex : register(t0);
@@ -66,7 +66,7 @@ PS_OUTPUT main(float3 viewFragPos : POSITION, float3 viewNormal : NORMAL, float3
     const float3 specular = Specular(specularReflectionColour, specularIntensity, viewNormal, lv.vToL, viewFragPos, att, specPower);
 	
     output.Color = float4(saturate((diffuse + ambient) * texCol.rgb + specular * diffuseIntensity), texCol.a);
-    output.PickID = 1;
+    output.PickID = 50;
     
     return output;
 }

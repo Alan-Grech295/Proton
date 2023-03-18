@@ -2,6 +2,7 @@
 #include "DirectXFramebuffer.h"
 #include "DirectXRendererAPI.h"
 #include "Proton\Renderer\RenderCommand.h"
+#include "Debugging/Exceptions.h"
 
 namespace Proton
 {
@@ -36,7 +37,7 @@ namespace Proton
 			textureDesc.MiscFlags = 0;
 
 			// Create the render target texture.
-			DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&textureDesc, NULL, texture));
+			GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&textureDesc, NULL, texture));
 
 			// Setup the description of the render target view.
 			renderTargetViewDesc.Format = format;
@@ -44,7 +45,7 @@ namespace Proton
 			renderTargetViewDesc.Texture2D.MipSlice = 0;
 
 			// Create the render target view.
-			DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateRenderTargetView(*texture, &renderTargetViewDesc, renderTarget));
+			GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateRenderTargetView(*texture, &renderTargetViewDesc, renderTarget));
 
 			// Setup the description of the shader resource view.
 			shaderResourceViewDesc.Format = format;
@@ -53,7 +54,7 @@ namespace Proton
 			shaderResourceViewDesc.Texture2D.MipLevels = 1;
 
 			// Create the shader resource view.
-			DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateShaderResourceView(*texture, &shaderResourceViewDesc, srv));
+			GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateShaderResourceView(*texture, &shaderResourceViewDesc, srv));
 		}
 	
 		static void CreateDepthTexture(ID3D11DepthStencilView** depthStencilView, ID3D11DepthStencilState** depthStencilState, DXGI_FORMAT format, uint32_t width, uint32_t height)
@@ -64,7 +65,7 @@ namespace Proton
 			dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
 			dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
 
-			DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateDepthStencilState(&dsDesc, depthStencilState));
+			GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateDepthStencilState(&dsDesc, depthStencilState));
 
 			//Create depth stencil texture
 			Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthStencil;
@@ -78,8 +79,9 @@ namespace Proton
 			descDepth.SampleDesc.Quality = 0;
 			descDepth.Usage = D3D11_USAGE_DEFAULT;
 			descDepth.BindFlags = D3D11_BIND_DEPTH_STENCIL;
+			descDepth.CPUAccessFlags = 0;
 
-			DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&descDepth, nullptr, &pDepthStencil));
+			GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&descDepth, nullptr, &pDepthStencil));
 
 			//Create depth stencil view
 			D3D11_DEPTH_STENCIL_VIEW_DESC descDSV = {};
@@ -87,7 +89,7 @@ namespace Proton
 			descDSV.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 			descDSV.Texture2D.MipSlice = 0;
 
-			DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, depthStencilView));
+			GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateDepthStencilView(pDepthStencil.Get(), &descDSV, depthStencilView));
 		}
 	}
 
@@ -111,6 +113,28 @@ namespace Proton
 		
 	}
 
+	static std::tuple<DXGI_FORMAT> GetD3DSpecs(FramebufferTextureSpecification spec)
+	{
+		DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
+		switch (spec.TextureFormat)
+		{
+		case FramebufferTextureFormat::RGBA8:
+			format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			break;
+		case FramebufferTextureFormat::RINT:
+			format = DXGI_FORMAT_R32_SINT;
+			break;
+		case FramebufferTextureFormat::DEPTH32F:
+			format = DXGI_FORMAT_D32_FLOAT;
+			break;
+		case FramebufferTextureFormat::DEPTH24STENCIL8:
+			format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			break;
+		}
+
+		return { format };
+	}
+
 	void DirectXFramebuffer::Recreate()
 	{
 		Invalidate();
@@ -124,13 +148,7 @@ namespace Proton
 			
 			for (int i = 0; i < m_ColorAttachmentSpecifications.size(); i++)
 			{
-				DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
-				switch (m_ColorAttachmentSpecifications[i].TextureFormat)
-				{
-				case FramebufferTextureFormat::RGBA8:
-					format = DXGI_FORMAT_R8G8B8A8_UNORM;
-					break;
-				}
+				auto [format] = GetD3DSpecs(m_ColorAttachmentSpecifications[i]);
 
 				Utils::CreateRenderTarget(&m_ColorAttachmentTextures[i], &m_ColorAttachmentRenderTargets[i], &m_ColorAttachmentSRVs[i], format, m_Desc.Samples, m_Desc.Width, m_Desc.Height);
 			}
@@ -138,13 +156,7 @@ namespace Proton
 
 		if (m_DepthAttachmentSpecification.TextureFormat != FramebufferTextureFormat::None)
 		{
-			DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN;
-			switch (m_DepthAttachmentSpecification.TextureFormat)
-			{
-			case FramebufferTextureFormat::DEPTH32F:
-				format = DXGI_FORMAT_D32_FLOAT;
-				break;
-			}
+			auto [format] = GetD3DSpecs(m_DepthAttachmentSpecification);
 
 			Utils::CreateDepthTexture(m_DepthAttachment.pDepthStencilView.GetAddressOf(), m_DepthAttachment.pDSState.GetAddressOf(), format, m_Desc.Width, m_Desc.Height);
 		}
@@ -165,16 +177,17 @@ namespace Proton
 
 	void DirectXFramebuffer::Clear()
 	{
-		for (int i = 0; i < m_ColorAttachmentSpecifications.size(); i++)
+		ID3D11DeviceContext* context = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext();
+		for (int i = 0; i < m_ColorAttachmentRenderTargets.size(); i++)
 		{
 			// Clear the back buffer.
-			((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->ClearRenderTargetView(m_ColorAttachmentRenderTargets[i], m_Desc.ClearColor);
+			context->ClearRenderTargetView(m_ColorAttachmentRenderTargets[i], m_Desc.ClearColor);
 		}
 
 		// Clear the depth buffer.
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->ClearDepthStencilView(m_DepthAttachment.pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+		context->ClearDepthStencilView(m_DepthAttachment.pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->RSSetViewports(1, &vp);
+		context->RSSetViewports(1, &vp);
 	}
 
 	void DirectXFramebuffer::Resize(uint32_t width, uint32_t height)
@@ -183,6 +196,52 @@ namespace Proton
 		m_Desc.Height = height;
 
 		Recreate();
+	}
+
+	void* DirectXFramebuffer::ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size)
+	{
+		assert(targetIndex < m_ColorAttachmentTextures.size());
+		//assert(m_ColorAttachmentSpecifications[attachmentIndex].TextureFormat == FramebufferTextureFormat::RINT);
+
+		ID3D11Texture2D* texture = m_ColorAttachmentTextures[targetIndex];
+		ID3D11DeviceContext* context = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext();
+		ID3D11Device* device = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice();
+
+		D3D11_TEXTURE2D_DESC textureDesc;
+		texture->GetDesc(&textureDesc);
+
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> copyTexture;
+
+		D3D11_TEXTURE2D_DESC copyTextureDesc = {};
+		copyTextureDesc.Width = textureDesc.Width;
+		copyTextureDesc.Height = textureDesc.Height;
+		copyTextureDesc.MipLevels = 1;
+		copyTextureDesc.ArraySize = 1;
+		copyTextureDesc.BindFlags = 0;
+		copyTextureDesc.SampleDesc.Count = 1;
+		copyTextureDesc.SampleDesc.Quality = 0;
+		copyTextureDesc.Usage = D3D11_USAGE_STAGING;
+		copyTextureDesc.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+		copyTextureDesc.Format = textureDesc.Format;
+
+		// Create the render target texture.
+		GFX_THROW_INFO(device->CreateTexture2D(&copyTextureDesc, NULL, &copyTexture));
+
+		context->CopyResource(copyTexture.Get(), texture);
+
+		D3D11_MAPPED_SUBRESOURCE msr;
+		GFX_THROW_INFO(
+			context->Map(
+				copyTexture.Get(), 0, D3D11_MAP_READ, 0, &msr
+			)
+		);
+
+		void* pixel = malloc(size);
+		int pos = x * size + y * msr.RowPitch;
+		memcpy(pixel, ((char*)msr.pData) + pos, size);
+
+		context->Unmap(copyTexture.Get(), 0);
+		return pixel;
 	}
 
 	void DirectXFramebuffer::Bind()

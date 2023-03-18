@@ -209,6 +209,8 @@ namespace Proton
 	
 	void WindowsWindow::Shutdown()
 	{
+		UnregisterClassA(m_Data.title.c_str(), m_HInstance);
+
 		if (initializedImGui)
 			ImGui_ImplWin32_Shutdown();
 
