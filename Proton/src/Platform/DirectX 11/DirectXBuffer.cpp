@@ -2,6 +2,7 @@
 #include "DirectXBuffer.h"
 #include "DirectXShader.h"
 #include "Proton\Core\Log.h"
+#include "Debugging/Exceptions.h"
 
 #include "Proton\Core\Core.h"
 
@@ -44,7 +45,7 @@ namespace Proton
 
 		DirectXVertexShader& dxVertexShader = *(DirectXVertexShader*)(vertexShader);
 
-		DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateInputLayout(
+		GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateInputLayout(
 			m_InputLayoutDesc, layout.size(),
 			dxVertexShader.pBytecodeBlob->GetBufferPointer(),
 			dxVertexShader.pBytecodeBlob->GetBufferSize(),
@@ -78,7 +79,7 @@ namespace Proton
 		{
 			D3D11_MAPPED_SUBRESOURCE msr;
 			ZeroMemory(&msr, sizeof(D3D11_MAPPED_SUBRESOURCE));
-			DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
+			GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
 				m_VertexBuffer.Get(), 0,
 				D3D11_MAP_WRITE_DISCARD, 0,
 				&msr
@@ -178,12 +179,14 @@ namespace Proton
 		csd.SysMemPitch = 0;
 		csd.SysMemSlicePitch = 0;
 
-		DX_CHECK_ERROR(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&cbd, data ? &csd : nullptr, &pConstantBuffer));
+		GFX_THROW_INFO(((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&cbd, data ? &csd : nullptr, &pConstantBuffer));
 	}
 
-	void DirectXVertexConstantBuffer::SetData(const void* data)
+	void DirectXVertexConstantBuffer::SetData(const void* data, int size)
 	{
-		memcpy(m_Data, data, m_Size);
+		if (size < 0) size = m_Size;
+
+		memcpy(m_Data, data, size);
 
 		D3D11_MAPPED_SUBRESOURCE msr;
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
@@ -219,9 +222,9 @@ namespace Proton
 		uid(tag)
 	{
 		m_Slot = slot;
-		m_Size = size;
+		m_Size = size >= 16 ? size : 16;
 
-		m_Data = new uint8_t[size];
+		m_Data = new uint8_t[m_Size];
 		if (data)
 			memcpy(m_Data, data, size);
 
@@ -229,7 +232,7 @@ namespace Proton
 		cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		cbd.Usage = D3D11_USAGE_DYNAMIC;
 		cbd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		cbd.ByteWidth = size;
+		cbd.ByteWidth = m_Size;
 		cbd.MiscFlags = 0u;
 		cbd.StructureByteStride = 0u;
 
@@ -241,9 +244,11 @@ namespace Proton
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer);
 	}
 
-	void DirectXPixelConstantBuffer::SetData(const void* data)
+	void DirectXPixelConstantBuffer::SetData(const void* data, int size)
 	{
-		memcpy(m_Data, data, m_Size);
+		if (size < 0) size = m_Size;
+
+		memcpy(m_Data, data, size);
 
 		D3D11_MAPPED_SUBRESOURCE msr;
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
@@ -252,7 +257,7 @@ namespace Proton
 			&msr
 		);
 
-		memcpy(msr.pData, data, m_Size);
+		memcpy(msr.pData, data, size);
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(pConstantBuffer.Get(), 0);
 	}

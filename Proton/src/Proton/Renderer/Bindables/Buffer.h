@@ -333,7 +333,7 @@ namespace Proton
 	public:
 		virtual ~VertexConstantBuffer() {}
 
-		virtual void SetData(const void* data) = 0;
+		virtual void SetData(const void* data, int size = -1) = 0;
 		virtual void Bind() = 0;
 		virtual void* GetData() = 0;
 
@@ -358,7 +358,7 @@ namespace Proton
 	public:
 		virtual ~PixelConstantBuffer() {}
 
-		virtual void SetData(const void* data) = 0;
+		virtual void SetData(const void* data, int size = -1) = 0;
 		virtual void Bind() = 0;
 		virtual void* GetData() = 0;
 

@@ -791,54 +791,18 @@ namespace Proton
 					switch(resType)
 					{
 					case ResType::VertexBuffer:
-						assert("Vertex buffer not handled" && false);
-						/*if (shared)
-						{
-							Ref<SharedBindable> vertBuf = CreateRef<SharedBindable>(ResType::VertexBuffer, (const char*)data["Path"]);
-							vertBuf->Initialize<VertexBuffer>();
-							curStep.AddBindable(vertBuf);
-						}
-						else
-						{
-							Ref<UniqueBindable> vertBuf = CreateRef<UniqueBindable>(ResType::VertexBuffer);
-							vertBuf->Initialize<VertexBuffer>();
-							curStep.AddBindable(vertBuf);
-						}*/
+						PT_CORE_ASSERT(false, "Vertex buffer not handled");
 						break;
 					case ResType::IndexBuffer:
-						assert("Index buffer not handled" && false);
-						/*if (shared)
-						{
-							Ref<SharedBindable> indexBuf = CreateRef<SharedBindable>(ResType::IndexBuffer, (const char*)data["Path"]);
-							indexBuf->Initialize<IndexBuffer>();
-							curStep.AddBindable(indexBuf);
-						}
-						else
-						{
-							Ref<UniqueBindable> indexBuf = CreateRef<UniqueBindable>(ResType::IndexBuffer);
-							indexBuf->Initialize<IndexBuffer>();
-							curStep.AddBindable(indexBuf);
-						}*/
+						PT_CORE_ASSERT(false, "Index buffer not handled");
 						break;
 					case ResType::VertexConstantBuffer:
-						assert("Vertex constant buffer not handled" && false);
-						/*if (shared)
-						{
-							Ref<SharedBindable> vertConstBuf = CreateRef<SharedBindable>(ResType::VertexConstantBuffer, (const char*)data["Path"]);
-							vertConstBuf->Initialize<VertexConstantBuffer>((int)data["Slot"]);
-							curStep.AddBindable(vertConstBuf);
-						}
-						else
-						{
-							Ref<UniqueBindable> vertConstBuf = CreateRef<UniqueBindable>(ResType::VertexConstantBuffer);
-							vertConstBuf->Initialize<VertexConstantBuffer>();
-							curStep.AddBindable(vertConstBuf);
-						}*/
+						PT_CORE_ASSERT(false, "Vertex constant buffer not handled");
 						break;
 					case ResType::PixelConstantBuffer:
 						if (shared)
 						{
-							assert("Shared Pixel Constant Buffers not handled");
+							PT_CORE_ASSERT(false, "Shared Pixel Constant Buffers not handled");
 						}
 						else
 						{
@@ -949,19 +913,7 @@ namespace Proton
 						}
 						break;
 					case ResType::Topology:
-						assert("Topology not handled" && false);
-						/*if (shared)
-						{
-							Ref<SharedBindable> topology = CreateRef<SharedBindable>(ResType::Topology, (const char*)data["Path"]);
-							topology->Initialize<Topology>();
-							curStep.AddBindable(topology);
-						}
-						else
-						{
-							Ref<UniqueBindable> topology = CreateRef<UniqueBindable>(ResType::Topology);
-							topology->Initialize<Topology>();
-							curStep.AddBindable(topology);
-						}*/
+						PT_CORE_ASSERT(false, "Topology not handled");
 						break;
 					case ResType::Blender:
 						if (shared)
@@ -977,6 +929,7 @@ namespace Proton
 							blender->Initialize<Blender>((bool)data["Blending"]);
 							curStep.AddBindable(blender);
 						}
+						break;
 					case ResType::Rasterizer:
 						if (shared)
 						{
@@ -986,13 +939,14 @@ namespace Proton
 						}
 						else
 						{
-							assert("Not handled" && false);
+							PT_CORE_ASSERT(false, "Not handled");
 							Ref<UniqueBindable> rasterizer = CreateRef<UniqueBindable>(ResType::Rasterizer);
 							rasterizer->Initialize<Rasterizer>((bool)data["TwoSided"]);
 							curStep.AddBindable(rasterizer);
 						}
+						break;
 					default:
-						assert("Unhandled resource type");
+						PT_CORE_ASSERT(false, "Unhandled resource type");
 					}
 				}
 

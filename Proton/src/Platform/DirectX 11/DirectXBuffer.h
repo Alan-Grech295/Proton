@@ -53,7 +53,7 @@ namespace Proton
 			delete[] m_Data;
 		}
 
-		virtual void SetData(const void* data) override;
+		virtual void SetData(const void* data, int size = -1) override;
 		virtual void* GetData() override;
 		virtual void Bind() override;
 
@@ -73,7 +73,7 @@ namespace Proton
 			delete[] m_Data;
 		}
 
-		virtual void SetData(const void* data) override;
+		virtual void SetData(const void* data, int size = -1) override;
 		virtual void* GetData() override;
 		virtual void Bind() override;
 

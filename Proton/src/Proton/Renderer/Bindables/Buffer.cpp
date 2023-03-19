@@ -183,7 +183,7 @@ namespace Proton
 	{
 		PT_PROFILE_FUNCTION();
 
-		assert("Size must be greater than or equal to 16!" && size >= 16);
+		//assert("Size must be greater than or equal to 16!" && size >= 16);
 
 		switch (Renderer::GetAPI())
 		{

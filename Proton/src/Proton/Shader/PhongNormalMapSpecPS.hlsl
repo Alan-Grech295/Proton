@@ -7,7 +7,7 @@ cbuffer ObjectCBuf
     float specularIntensity;
     float specularPower;
     bool hasAlphaGloss;
-    float padding;
+    int index = 50;
 };
 
 cbuffer CBuf

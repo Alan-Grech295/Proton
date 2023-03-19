@@ -36,9 +36,9 @@ namespace Proton
 		desc.Width = 1280;
 		desc.Height = 720;
 		desc.Attachments = { 
-			{FramebufferTextureFormat::RGBA8}, 
-			{FramebufferTextureFormat::RINT},
-			{FramebufferTextureFormat::DEPTH}
+			{FramebufferTextureFormat::RGBA8, DirectX::XMFLOAT4{ 0.02f, 0.07f, 0.2f, 1 }},
+			{FramebufferTextureFormat::RINT, -1},
+			{FramebufferTextureFormat::DEPTH, 1.0f}
 		};
 
 		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };

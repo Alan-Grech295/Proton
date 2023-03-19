@@ -1,26 +1,35 @@
 #pragma once
+#include "Proton\Core\Base.h"
 #include "Proton\Core\Core.h"
+#include "Proton/Renderer/Bindables/Buffer.h"
+#include "Proton/Renderer/Bindables/Shader.h"
 #include <DirectXMath.h>
 #include <vector>
 
 namespace Proton
-{
+{						//Format, Clear Colour Size
+#define TEXTURE_FORMAT	X(RGBA8, DirectX::XMFLOAT4) \
+						X(RINT, int) \
+						X(DEPTH32F, float) \
+						X(DEPTH24STENCIL8, DirectX::XMFLOAT2)
+
 	enum class FramebufferTextureFormat
 	{
 		None = 0,
 		
 		// Color
-		RGBA8,
-		RINT,
-
-		// Depth
-		DEPTH32F,
-
-		// Depth/Stencil
-		DEPTH24STENCIL8,
+#define X(format, col) format,
+		TEXTURE_FORMAT
+#undef X
 
 		//Defaults
 		DEPTH = DEPTH32F
+	};
+
+	inline static std::unordered_map<FramebufferTextureFormat, std::string> TextureFormatToString = {
+#define X(format, col) {FramebufferTextureFormat::format, #format},
+			TEXTURE_FORMAT
+		#undef X
 	};
 
 	/*enum class FramebufferTextureUsage
@@ -36,13 +45,40 @@ namespace Proton
 	struct FramebufferTextureSpecification
 	{
 		FramebufferTextureSpecification() = default;
-		FramebufferTextureSpecification(FramebufferTextureFormat format)
-			: TextureFormat(format)//, TextureUsage(usage) 
-		{}
+
+		template<typename T>
+		FramebufferTextureSpecification(FramebufferTextureFormat format, const T& clearCol)
+			: TextureFormat(format)
+		{
+#define X(fmt, col) if(format == FramebufferTextureFormat::fmt) \
+					{ \
+						if (std::is_same<T, col>::value) \
+						{ \
+							ClearColor = malloc(sizeof(T)); \
+							memcpy(ClearColor, &clearCol, sizeof(T)); \
+						} \
+						else { PT_CORE_ERROR("Clear colour does not match format!\nFormat given: {}\nColour given: {}\nExpected Colour: {}", TextureFormatToString.at(format), typeid(T).name(), #col); } \
+					}
+			TEXTURE_FORMAT
+#undef X
+
+				// Setting shaders and buffers
+				switch (format)
+				{
+				case FramebufferTextureFormat::RINT:
+					ClearVS = VertexShader::Create(CoreUtils::CORE_PATH_STR + "Proton\\IntClearVS.cso");
+					ClearPS = PixelShader::Create(CoreUtils::CORE_PATH_STR + "Proton\\IntClearPS.cso");
+					ClearCBuf = PixelConstantBuffer::CreateUnique(0, sizeof(int), &clearCol);
+					break;
+				}
+		}
 
 		FramebufferTextureFormat TextureFormat = FramebufferTextureFormat::None;
-		//FramebufferTextureUsage TextureUsage = FramebufferTextureUsage::None;
-
+		void* ClearColor = nullptr;
+		
+		Ref<VertexShader> ClearVS;
+		Ref<PixelShader> ClearPS;
+		Ref<PixelConstantBuffer> ClearCBuf;
 		//TODO: Filtering/wrap
 	};
 

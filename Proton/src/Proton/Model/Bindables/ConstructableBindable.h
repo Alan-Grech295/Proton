@@ -57,7 +57,7 @@ namespace Proton
 		
 		virtual Ref<Bindable> GetRef() override
 		{
-			assert("Bindable not initialized" && m_Bindable);
+			PT_CORE_ASSERT(m_Bindable, "Bindable not initialized");
 			return m_Bindable;
 		}
 
@@ -107,7 +107,7 @@ namespace Proton
 		
 		virtual Ref<Bindable> GetRef() override
 		{
-			assert("Bindable not initialized" && m_Bindable);
+			PT_CORE_ASSERT(m_Bindable, "Bindable not initialized");
 
 			switch (m_ResourceType)
 			{

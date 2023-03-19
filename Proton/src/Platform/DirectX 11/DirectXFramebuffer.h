@@ -40,12 +40,13 @@ namespace Proton
 		virtual void Bind() override;
 	private:
 		void Invalidate();
+		void ClearRenderTarget(ID3D11RenderTargetView* target, FramebufferTextureSpecification& spec);
 	private:
 		FramebufferDescription m_Desc;
 		D3D11_VIEWPORT vp;
 
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
-		FramebufferTextureSpecification m_DepthAttachmentSpecification = { FramebufferTextureFormat::None };
+		FramebufferTextureSpecification m_DepthAttachmentSpecification = { FramebufferTextureFormat::None, 0 };
 
 		std::vector<ID3D11Texture2D*> m_ColorAttachmentTextures;
 		std::vector<ID3D11RenderTargetView*> m_ColorAttachmentRenderTargets;

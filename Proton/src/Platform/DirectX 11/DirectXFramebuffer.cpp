@@ -175,16 +175,36 @@ namespace Proton
 		return (void*)m_ColorAttachmentSRVs[index];
 	}
 
+	void DirectXFramebuffer::ClearRenderTarget(ID3D11RenderTargetView* target, FramebufferTextureSpecification& spec)
+	{
+		ID3D11DeviceContext* context = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext();
+		switch (spec.TextureFormat)
+		{
+		case FramebufferTextureFormat::RGBA8:
+			context->ClearRenderTargetView(target, (const float*)spec.ClearColor);
+			break;
+		case FramebufferTextureFormat::RINT:
+			context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			context->OMSetRenderTargets(1, &target, nullptr);
+			spec.ClearVS->Bind();
+			spec.ClearPS->Bind();
+			spec.ClearCBuf->Bind();
+			context->Draw(3, 0);
+			//context->ClearRenderTargetView(target, (const float*)spec.ClearColor);
+			break;
+		}
+	}
+
 	void DirectXFramebuffer::Clear()
 	{
 		ID3D11DeviceContext* context = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext();
 		for (int i = 0; i < m_ColorAttachmentRenderTargets.size(); i++)
 		{
-			// Clear the back buffer.
-			context->ClearRenderTargetView(m_ColorAttachmentRenderTargets[i], m_Desc.ClearColor);
+			// Clear the render targets
+			ClearRenderTarget(m_ColorAttachmentRenderTargets[i], m_ColorAttachmentSpecifications[i]);
 		}
 
-		// Clear the depth buffer.
+		// Clear the depth buffer
 		context->ClearDepthStencilView(m_DepthAttachment.pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 
 		context->RSSetViewports(1, &vp);
@@ -253,8 +273,6 @@ namespace Proton
 		}
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetRenderTargets((UINT)m_ColorAttachmentRenderTargets.size(), m_ColorAttachmentRenderTargets.data(), m_DepthAttachment.pDepthStencilView.Get());
-		
-		Clear();
 	}
 
 	void DirectXFramebuffer::Invalidate()

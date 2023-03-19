@@ -11,7 +11,7 @@ namespace Proton
 	{
 		//RenderCommand::BindSwapChain();
 		//RenderCommand::Clear();
-
+		m_FrameBuffer->Clear();
 		m_FrameBuffer->Bind();
 
 		Renderer::BeginScene();
