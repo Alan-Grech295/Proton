@@ -27,12 +27,12 @@ namespace Proton
 
 	//TODO: Generalize to different shaders
 	template<ElementType Type>
-	struct Map
+	struct TypeMap
 	{
 		static constexpr bool valid = false;
 	};
 
-	template<> struct Map<ElementType::Float>
+	template<> struct TypeMap<ElementType::Float>
 	{
 		using SysType = float;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -41,7 +41,7 @@ namespace Proton
 		static constexpr bool valid = true;
 	};
 
-	template<> struct Map<ElementType::Float2>
+	template<> struct TypeMap<ElementType::Float2>
 	{
 		using SysType = DirectX::XMFLOAT2;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -50,7 +50,7 @@ namespace Proton
 		static constexpr bool valid = true;
 	};
 
-	template<> struct Map<ElementType::Float3>
+	template<> struct TypeMap<ElementType::Float3>
 	{
 		using SysType = DirectX::XMFLOAT3;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -58,7 +58,7 @@ namespace Proton
 
 		static constexpr bool valid = true;
 	};
-	template<> struct Map<ElementType::Float4>
+	template<> struct TypeMap<ElementType::Float4>
 	{
 		using SysType = DirectX::XMFLOAT4;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -66,7 +66,7 @@ namespace Proton
 
 		static constexpr bool valid = true;
 	};
-	template<> struct Map<ElementType::Matrix4x4>
+	template<> struct TypeMap<ElementType::Matrix4x4>
 	{
 		using SysType = DirectX::XMFLOAT4X4;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -74,7 +74,7 @@ namespace Proton
 
 		static constexpr bool valid = true;
 	};
-	template<> struct Map<ElementType::Int>
+	template<> struct TypeMap<ElementType::Int>
 	{
 		using SysType = int;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -82,7 +82,7 @@ namespace Proton
 
 		static constexpr bool valid = true;
 	};
-	template<> struct Map<ElementType::Bool>
+	template<> struct TypeMap<ElementType::Bool>
 	{
 		using SysType = bool;
 		static constexpr uint32_t ShaderSize = sizeof(BOOL);
@@ -91,18 +91,18 @@ namespace Proton
 		static constexpr bool valid = true;
 	};
 
-#define X(el) static_assert(Map<ElementType::el>::valid, "Missing map implementation for "#el);
+#define X(el) static_assert(TypeMap<ElementType::el>::valid, "Missing TypeMap implementation for "#el);
 	LEAF_ELEMENT_TYPES
 #undef X
 
 	template<typename T>
-	struct ReverseMap
+	struct ReverseTypeMap
 	{
 		static constexpr bool valid = false;
 	};
 
 #define X(el)\
-	template<> struct ReverseMap<Map<ElementType::el>::SysType> \
+	template<> struct ReverseTypeMap<TypeMap<ElementType::el>::SysType> \
 	{ \
 		static constexpr ElementType type = ElementType::el; \
 		static constexpr bool valid = true; \
@@ -115,7 +115,7 @@ namespace Proton
 	public:
 		struct ExtraDataBase
 		{
-			virtual ~ExtraDataBase();
+			virtual ~ExtraDataBase() = default;
 
 			template<typename T>
 			T& As() { return *static_cast<T*>(this); }
@@ -124,25 +124,29 @@ namespace Proton
 		LayoutElement() = default;
 		LayoutElement(ElementType type);
 
-		template<ElementType Type>
-		void Add(const std::string& name);
+		void Add(ElementType type, const std::string& name);
 
-		template<ElementType Type>
-		void Set(uint32_t size);
+		void Set(ElementType type, uint32_t size);
 
-		uint32_t GetOffset() { return *m_Offset; }
-		uint32_t GetOffsetEnd() { return *m_Offset + GetSizeBytes(); };
-		uint32_t GetSizeBytes();
+		bool Exists() const { return m_Type != ElementType::None; }
+
+		uint32_t Finalize(uint32_t offsetIn);
+
+		LayoutElement& Type();
+
+		const uint32_t GetOffset() const { return *m_Offset; }
+		const uint32_t GetOffsetEnd() const;
+		const uint32_t GetSizeBytes() const { return GetOffsetEnd() - GetOffset(); }
 
 		LayoutElement& operator[](const std::string& name);
 		const LayoutElement& operator[](const std::string& name) const;
-		operator bool() { return m_Type != ElementType::None; }
 	private:
-		bool ValidSymbolName(const std::string& name);
+		bool ValidSymbolName(const std::string& name) const;
 
-		uint32_t AdvanceToBoundary(uint32_t offset) { return offset + (ALIGNMENT - offset % ALIGNMENT) % ALIGNMENT; }
+		//TODO: Move to API dependent functions
+		uint32_t AdvanceToBoundary(uint32_t offset) const { return offset + (ALIGNMENT - offset % ALIGNMENT) % ALIGNMENT; }
 	
-		bool CrossesBoundary(uint32_t offset, uint32_t size)
+		bool CrossesBoundary(uint32_t offset, uint32_t size) const
 		{
 			if (size > ALIGNMENT) return true;
 			const uint32_t end = offset + size;
@@ -151,7 +155,10 @@ namespace Proton
 			return pageStart != pageEnd && end % 16 != 0u;
 		}
 
-		uint32_t AdvanceIfCrossesBoundary(uint32_t offset, uint32_t size) { return CrossesBoundary(offset, size) ? AdvanceToBoundary(offset) : offset; }
+		uint32_t AdvanceIfCrossesBoundary(uint32_t offset, uint32_t size) const { return CrossesBoundary(offset, size) ? AdvanceToBoundary(offset) : offset; }
+	
+		uint32_t FinalizeStruct(uint32_t offsetIn);
+		uint32_t FinalizeArray(uint32_t offsetIn);
 	public:
 		ElementType m_Type = ElementType::None;
 		std::optional<uint32_t> m_Offset;
@@ -161,5 +168,40 @@ namespace Proton
 
 		//TODO: Set depending on graphics API
 		inline static uint32_t ALIGNMENT = 16u;
+	};
+
+	class Layout
+	{
+	public:
+		uint32_t GetSizeInBytes() const { return m_Root->GetSizeBytes(); }
+	protected:
+		Layout(Ref<LayoutElement> root)
+			: m_Root(std::move(root)) {}
+
+		Ref<LayoutElement> m_Root;
+	};
+
+	class RawLayout : public Layout
+	{
+	public:
+		RawLayout()
+			: Layout(CreateRef<LayoutElement>(ElementType::Struct))
+		{}
+
+		LayoutElement& operator[](const std::string& name) { return (*m_Root)[name]; }
+
+		void Add(ElementType type, const std::string& name) { (*m_Root).Add(type, name); }
+
+		Ref<LayoutElement> Finalize();
+	};
+	
+	class CookedLayout : public Layout
+	{
+	public:
+		CookedLayout(RawLayout&& layout)
+			: Layout(std::move(layout.Finalize()))
+		{
+
+		}
 	};
 }
