@@ -3,6 +3,8 @@
 #include <cassert>
 #include "Shader.h"
 #include "Bindable.h"
+#include "DynamicConstantBuffer.h"
+
 #include <initializer_list>
 
 namespace Proton
