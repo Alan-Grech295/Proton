@@ -101,5 +101,10 @@ namespace Proton
         {
             return x * other.x + y * other.y;
         }
+
+        public override string ToString()
+        {
+            return $"({x}, {y})";
+        }
     }
 }
