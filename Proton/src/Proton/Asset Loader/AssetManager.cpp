@@ -10,6 +10,9 @@
 #include "Proton/Asset Loader/AssetCollection.h"
 #include "Proton/Asset Loader/AssetSerializer.h"
 
+//TEMP
+#include "Proton/Renderer/Bindables/DynamicConstantBuffer.h"
+
 namespace fs = std::filesystem;
 
 namespace Proton
@@ -28,6 +31,16 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
+		RawLayout layout;
+		layout.Add(ElementType::Float, "Float1");
+		layout.Add(ElementType::Struct, "Structy");
+		layout["Structy"].Add(ElementType::Array, "Array");
+		layout["Structy"]["Array"].Set(ElementType::Int, 4);
+		layout["Structy"].Add(ElementType::Bool, "Booly");
+
+		CookedLayout cooked(std::move(layout));
+
+
 		//ModelCreator::Serialize(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
 		
 		//ModelCreator::Deserialize(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
