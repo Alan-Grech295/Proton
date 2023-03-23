@@ -201,7 +201,53 @@ namespace Proton
 		CookedLayout(RawLayout&& layout)
 			: Layout(std::move(layout.Finalize()))
 		{
-
 		}
+
+		const LayoutElement& operator[](const std::string& name) { return (*m_Root)[name]; }
+	
+		uint32_t Size() const { return m_Root->GetSizeBytes(); }
+	};
+
+	class ElementRef
+	{
+	public:
+		ElementRef(const LayoutElement* element, uint8_t* data, uint32_t arrayOffset)
+			: m_LayoutElement(element), m_Data(data), m_ArrayOffset(arrayOffset)
+		{
+		}
+
+		ElementRef operator[](const std::string& name);
+		ElementRef operator[](int index);
+
+		template<typename T>
+		operator T&()
+		{
+			static_assert(ReverseMap<std::remove_const_t<T>>::valid, "Unsupported SysType used in conversion");
+			return *reinterpret_cast<T*>(m_Data + m_ArrayOffset + m_LayoutElement->GetOffset());
+		}
+
+	private:
+		const LayoutElement* m_LayoutElement;
+		uint8_t* m_Data;
+		uint32_t m_ArrayOffset;
+	};
+
+	class Buffer
+	{
+	public:
+		Buffer(RawLayout&& layout)
+			: m_Root(std::move(layout.Finalize()))
+		{
+			m_Data = new uint8_t[m_Root->GetSizeBytes()];
+		}
+
+		~Buffer()
+		{
+			delete[] m_Data;
+		}
+
+	private:
+		Ref<LayoutElement> m_Root;
+		uint8_t* m_Data;
 	};
 }
