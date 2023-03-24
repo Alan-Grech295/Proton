@@ -1,7 +1,7 @@
 #include "ptpch.h"
 #include "DynamicConstantBuffer.h"
 
-namespace Proton
+namespace Proton::DCB
 {
 	LayoutElement LayoutElement::Null = {};
 	struct ExtraData
@@ -28,22 +28,22 @@ namespace Proton
 		};
 	};
 
-	LayoutElement::LayoutElement(ElementType type)
+	LayoutElement::LayoutElement(Type type)
 		: m_Type(type)
 	{
-		if (type == ElementType::Struct)
+		if (type == Type::Struct)
 		{
 			m_ExtraData = CreateScope<ExtraData::Struct>();
 		}
-		else if (type == ElementType::Array)
+		else if (type == Type::Array)
 		{
 			m_ExtraData = CreateScope<ExtraData::Array>();
 		}
 	}
 
-	void LayoutElement::Add(ElementType type, const std::string& name)
+	void LayoutElement::Add(Type type, const std::string& name)
 	{
-		PT_CORE_ASSERT(m_Type == ElementType::Struct, "Layout element is not a struct");
+		PT_CORE_ASSERT(m_Type == Type::Struct, "Layout element is not a struct");
 		PT_CORE_ASSERT(ValidSymbolName(name), "Invalid symbol name");
 		ExtraData::Struct& structData = m_ExtraData->As<ExtraData::Struct>();
 		PT_CORE_ASSERT(!structData.Contains(name), "Struct already contains element with same name");
@@ -51,9 +51,9 @@ namespace Proton
 		structData.Elements.emplace_back(name, LayoutElement(type));
 	}
 
-	void LayoutElement::Set(ElementType type, uint32_t size)
+	void LayoutElement::Set(Type type, uint32_t size)
 	{
-		PT_CORE_ASSERT(m_Type == ElementType::Array, "Layout element is not a struct");
+		PT_CORE_ASSERT(m_Type == Type::Array, "Layout element is not a struct");
 		ExtraData::Array& arrayData = m_ExtraData->As<ExtraData::Array>();
 
 		arrayData.TypeElement.emplace(type);
@@ -64,21 +64,21 @@ namespace Proton
 	{
 		switch (m_Type)
 		{
-#define X(el) case ElementType::el: m_Offset = AdvanceIfCrossesBoundary(offsetIn, TypeMap<ElementType::el>::ShaderSize); return *m_Offset + TypeMap<ElementType::el>::ShaderSize;
+#define X(el) case Type::el: m_Offset = AdvanceIfCrossesBoundary(offsetIn, Map<Type::el>::ShaderSize); return *m_Offset + Map<Type::el>::ShaderSize;
 			LEAF_ELEMENT_TYPES
 #undef X
-		case ElementType::Struct:
+		case Type::Struct:
 			return FinalizeStruct(offsetIn);
-		case ElementType::Array:
+		case Type::Array:
 			return FinalizeArray(offsetIn);
 		default:
 			PT_CORE_ASSERT(false, "Invalid layout element");
 		}
 	}
 
-	LayoutElement& LayoutElement::Type()
+	LayoutElement& LayoutElement::T()
 	{
-		PT_CORE_ASSERT(m_Type == ElementType::Array, "Layout element is not an array");
+		PT_CORE_ASSERT(m_Type == Type::Array, "Layout element is not an array");
 		return *m_ExtraData->As<ExtraData::Array>().TypeElement;
 	}
 
@@ -86,15 +86,15 @@ namespace Proton
 	{
 		switch (m_Type)
 		{
-#define X(el) case ElementType::el: return *m_Offset + TypeMap<ElementType::el>::ShaderSize;
+#define X(el) case Type::el: return *m_Offset + Map<Type::el>::ShaderSize;
 			LEAF_ELEMENT_TYPES
 #undef X
-		case ElementType::Struct:
+		case Type::Struct:
 		{
 			const auto& structData = m_ExtraData->As<ExtraData::Struct>();
 			return AdvanceToBoundary(structData.Elements.back().second.GetOffsetEnd());
 		}
-		case ElementType::Array:
+		case Type::Array:
 		{
 			const auto& arrayData = m_ExtraData->As<ExtraData::Array>();
 			return *m_Offset + AdvanceToBoundary(arrayData.TypeElement->GetSizeBytes()) * arrayData.Size;
@@ -107,7 +107,7 @@ namespace Proton
 
 	LayoutElement& LayoutElement::operator[](const std::string& name)
 	{
-		PT_CORE_ASSERT(m_Type == ElementType::Struct, "Layout elemente is not a struct");
+		PT_CORE_ASSERT(m_Type == Type::Struct, "Layout element is not a struct");
 		ExtraData::Struct& structData = m_ExtraData->As<ExtraData::Struct>();
 
 		for (auto& e : structData.Elements)
@@ -162,5 +162,24 @@ namespace Proton
 		//Clear this layout
 		*this = RawLayout();
 		return temp;
+	}
+
+	ElementRef ElementRef::operator[](const std::string& name) const
+	{
+		PT_CORE_ASSERT(m_LayoutElement->m_Type == Type::Struct, "Element is not a struct");
+		return ElementRef(&(*m_LayoutElement)[name], m_Data, 0);
+		
+	}
+	
+	ElementRef ElementRef::operator[](int index) const
+	{
+		PT_CORE_ASSERT(m_LayoutElement->m_Type == Type::Array, "Element is not an array");
+		ExtraData::Array& arrayData = m_LayoutElement->m_ExtraData->As<ExtraData::Array>();
+		return ElementRef(&*arrayData.TypeElement, m_Data, m_ArrayOffset + arrayData.TypeElement->GetSizeBytes() * index);
+	}
+
+	ElementRef Buffer::operator[](const std::string& name)
+	{
+		return ElementRef(&(*m_Root)[name], m_Data, 0);
 	}
 }

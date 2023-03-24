@@ -4,7 +4,7 @@
 #include <optional>
 #include <DirectXMath.h>
 
-namespace Proton
+namespace Proton::DCB
 {
 #define LEAF_ELEMENT_TYPES \
 						X(Float)\
@@ -15,7 +15,7 @@ namespace Proton
 						X(Int)\
 						X(Bool)
 
-	enum class ElementType
+	enum class Type
 	{
 		None = 0,
 #define X(el) el,
@@ -26,13 +26,13 @@ namespace Proton
 	};
 
 	//TODO: Generalize to different shaders
-	template<ElementType Type>
-	struct TypeMap
+	template<Type Type>
+	struct Map
 	{
 		static constexpr bool valid = false;
 	};
 
-	template<> struct TypeMap<ElementType::Float>
+	template<> struct Map<Type::Float>
 	{
 		using SysType = float;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -41,7 +41,7 @@ namespace Proton
 		static constexpr bool valid = true;
 	};
 
-	template<> struct TypeMap<ElementType::Float2>
+	template<> struct Map<Type::Float2>
 	{
 		using SysType = DirectX::XMFLOAT2;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -50,7 +50,7 @@ namespace Proton
 		static constexpr bool valid = true;
 	};
 
-	template<> struct TypeMap<ElementType::Float3>
+	template<> struct Map<Type::Float3>
 	{
 		using SysType = DirectX::XMFLOAT3;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -58,7 +58,7 @@ namespace Proton
 
 		static constexpr bool valid = true;
 	};
-	template<> struct TypeMap<ElementType::Float4>
+	template<> struct Map<Type::Float4>
 	{
 		using SysType = DirectX::XMFLOAT4;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -66,7 +66,7 @@ namespace Proton
 
 		static constexpr bool valid = true;
 	};
-	template<> struct TypeMap<ElementType::Matrix4x4>
+	template<> struct Map<Type::Matrix4x4>
 	{
 		using SysType = DirectX::XMFLOAT4X4;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -74,7 +74,7 @@ namespace Proton
 
 		static constexpr bool valid = true;
 	};
-	template<> struct TypeMap<ElementType::Int>
+	template<> struct Map<Type::Int>
 	{
 		using SysType = int;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
@@ -82,7 +82,7 @@ namespace Proton
 
 		static constexpr bool valid = true;
 	};
-	template<> struct TypeMap<ElementType::Bool>
+	template<> struct Map<Type::Bool>
 	{
 		using SysType = bool;
 		static constexpr uint32_t ShaderSize = sizeof(BOOL);
@@ -91,20 +91,20 @@ namespace Proton
 		static constexpr bool valid = true;
 	};
 
-#define X(el) static_assert(TypeMap<ElementType::el>::valid, "Missing TypeMap implementation for "#el);
+#define X(el) static_assert(Map<Type::el>::valid, "Missing Map implementation for "#el);
 	LEAF_ELEMENT_TYPES
 #undef X
 
 	template<typename T>
-	struct ReverseTypeMap
+	struct ReverseMap
 	{
 		static constexpr bool valid = false;
 	};
 
 #define X(el)\
-	template<> struct ReverseTypeMap<TypeMap<ElementType::el>::SysType> \
+	template<> struct ReverseMap<Map<Type::el>::SysType> \
 	{ \
-		static constexpr ElementType type = ElementType::el; \
+		static constexpr Type type = Type::el; \
 		static constexpr bool valid = true; \
 	};
 	LEAF_ELEMENT_TYPES
@@ -122,17 +122,17 @@ namespace Proton
 		};
 
 		LayoutElement() = default;
-		LayoutElement(ElementType type);
+		LayoutElement(Type type);
 
-		void Add(ElementType type, const std::string& name);
+		void Add(Type type, const std::string& name);
 
-		void Set(ElementType type, uint32_t size);
+		void Set(Type type, uint32_t size);
 
-		bool Exists() const { return m_Type != ElementType::None; }
+		bool Exists() const { return m_Type != Type::None; }
 
 		uint32_t Finalize(uint32_t offsetIn);
 
-		LayoutElement& Type();
+		LayoutElement& T();
 
 		const uint32_t GetOffset() const { return *m_Offset; }
 		const uint32_t GetOffsetEnd() const;
@@ -160,7 +160,7 @@ namespace Proton
 		uint32_t FinalizeStruct(uint32_t offsetIn);
 		uint32_t FinalizeArray(uint32_t offsetIn);
 	public:
-		ElementType m_Type = ElementType::None;
+		Type m_Type = Type::None;
 		std::optional<uint32_t> m_Offset;
 		Scope<ExtraDataBase> m_ExtraData;
 
@@ -185,12 +185,12 @@ namespace Proton
 	{
 	public:
 		RawLayout()
-			: Layout(CreateRef<LayoutElement>(ElementType::Struct))
+			: Layout(CreateRef<LayoutElement>(Type::Struct))
 		{}
 
 		LayoutElement& operator[](const std::string& name) { return (*m_Root)[name]; }
 
-		void Add(ElementType type, const std::string& name) { (*m_Root).Add(type, name); }
+		void Add(Type type, const std::string& name) { (*m_Root).Add(type, name); }
 
 		Ref<LayoutElement> Finalize();
 	};
@@ -210,23 +210,32 @@ namespace Proton
 
 	class ElementRef
 	{
+		friend class Buffer;
 	public:
-		ElementRef(const LayoutElement* element, uint8_t* data, uint32_t arrayOffset)
-			: m_LayoutElement(element), m_Data(data), m_ArrayOffset(arrayOffset)
-		{
-		}
-
-		ElementRef operator[](const std::string& name);
-		ElementRef operator[](int index);
+		ElementRef operator[](const std::string& name) const;
+		ElementRef operator[](int index) const;
 
 		template<typename T>
-		operator T&()
+		explicit operator T&() const
 		{
 			static_assert(ReverseMap<std::remove_const_t<T>>::valid, "Unsupported SysType used in conversion");
 			return *reinterpret_cast<T*>(m_Data + m_ArrayOffset + m_LayoutElement->GetOffset());
 		}
 
+		// assignment for writing to as a supported SysType
+		template<typename T>
+		T& operator=(const T& rhs) const
+		{
+			static_assert(ReverseMap<std::remove_const_t<T>>::valid, "Unsupported SysType used in assignment");
+			return static_cast<T&>(*this) = rhs;
+		}
+
 	private:
+		ElementRef(const LayoutElement* element, uint8_t* data, uint32_t arrayOffset)
+			: m_LayoutElement(element), m_Data(data), m_ArrayOffset(arrayOffset)
+		{
+		}
+
 		const LayoutElement* m_LayoutElement;
 		uint8_t* m_Data;
 		uint32_t m_ArrayOffset;
@@ -245,6 +254,8 @@ namespace Proton
 		{
 			delete[] m_Data;
 		}
+
+		ElementRef operator[](const std::string& name);
 
 	private:
 		Ref<LayoutElement> m_Root;

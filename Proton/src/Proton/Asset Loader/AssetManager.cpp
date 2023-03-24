@@ -31,14 +31,34 @@ namespace Proton
 
 	void AssetManager::ScanProject()
 	{
+		using namespace DCB;
 		RawLayout layout;
-		layout.Add(ElementType::Float, "Float1");
-		layout.Add(ElementType::Struct, "Structy");
-		layout["Structy"].Add(ElementType::Array, "Array");
-		layout["Structy"]["Array"].Set(ElementType::Int, 4);
-		layout["Structy"].Add(ElementType::Bool, "Booly");
+		layout.Add(DCB::Type::Float, "Float1");
+		layout.Add(DCB::Type::Struct, "Structy");
+		layout["Structy"].Add(DCB::Type::Array, "Array");
+		layout["Structy"]["Array"].Set(DCB::Type::Int, 4);
+		layout["Structy"].Add(DCB::Type::Bool, "Booly");
+		layout.Add(DCB::Type::Array, "Array2");
+		layout["Array2"].Set(DCB::Type::Array, 2);
+		layout["Array2"].T().Set(DCB::Type::Float, 2);
 
-		CookedLayout cooked(std::move(layout));
+		Buffer buffer(std::move(layout));
+
+		buffer["Float1"] = 2.0f;
+		float float1 = (float)buffer["Float1"];
+
+		buffer["Structy"]["Booly"] = true;
+		bool booly2 = (bool)buffer["Structy"]["Booly"];
+
+		buffer["Array2"][0][0] = 10.0f;
+		buffer["Array2"][0][1] = 20.0f;
+		buffer["Array2"][1][0] = 13.0f;
+		buffer["Array2"][1][1] = -10.0f;
+
+		float a = (float)buffer["Array2"][0][0];
+		float b = (float)buffer["Array2"][0][1];
+		float c = (float)buffer["Array2"][1][0];
+		float d = (float)buffer["Array2"][1][1];
 
 
 		//ModelCreator::Serialize(manager.m_ProjectPath.generic_string() + "/Proton-Editor/assets/Models/nano_textured/nanosuit.obj");
