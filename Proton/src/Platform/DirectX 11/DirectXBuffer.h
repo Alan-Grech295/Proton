@@ -67,20 +67,20 @@ namespace Proton
 	class DirectXPixelConstantBuffer : public PixelConstantBuffer
 	{
 	public:
-		DirectXPixelConstantBuffer(const std::string& tag, int slot, int size, const void* data);
+		DirectXPixelConstantBuffer(const std::string& tag, int slot, Ref<DCB::RawLayout> layout);
 		virtual ~DirectXPixelConstantBuffer()
 		{
 			delete[] m_Data;
 		}
 
-		virtual void SetData(const void* data, int size = -1) override;
-		virtual void* GetData() override;
+		virtual uint8_t* GetData() override;
 		virtual void Bind() override;
 
 		virtual std::string GetUID() const noexcept override;
 	private:
+		void SetData();
+	private:
 		Microsoft::WRL::ComPtr<ID3D11Buffer> pConstantBuffer;
-		uint8_t* m_Data;
 		std::string uid;
 	};
 }

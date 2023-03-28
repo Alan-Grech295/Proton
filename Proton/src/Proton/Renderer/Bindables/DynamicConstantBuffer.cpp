@@ -167,19 +167,18 @@ namespace Proton::DCB
 	ElementRef ElementRef::operator[](const std::string& name) const
 	{
 		PT_CORE_ASSERT(m_LayoutElement->m_Type == Type::Struct, "Element is not a struct");
-		return ElementRef(&(*m_LayoutElement)[name], m_Data, 0);
-		
+		return ElementRef(&(*m_LayoutElement)[name], m_Buffer, m_Data, 0);
 	}
 	
 	ElementRef ElementRef::operator[](int index) const
 	{
 		PT_CORE_ASSERT(m_LayoutElement->m_Type == Type::Array, "Element is not an array");
 		ExtraData::Array& arrayData = m_LayoutElement->m_ExtraData->As<ExtraData::Array>();
-		return ElementRef(&*arrayData.TypeElement, m_Data, m_ArrayOffset + arrayData.TypeElement->GetSizeBytes() * index);
+		return ElementRef(&*arrayData.TypeElement, m_Buffer, m_Data, m_ArrayOffset + arrayData.TypeElement->GetSizeBytes() * index);
 	}
 
 	ElementRef Buffer::operator[](const std::string& name)
 	{
-		return ElementRef(&(*m_Root)[name], m_Data, 0);
+		return ElementRef(&(*m_Root)[name], this, m_Data, 0);
 	}
 }

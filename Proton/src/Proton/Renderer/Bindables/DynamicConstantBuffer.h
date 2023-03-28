@@ -227,15 +227,17 @@ namespace Proton::DCB
 		T& operator=(const T& rhs) const
 		{
 			static_assert(ReverseMap<std::remove_const_t<T>>::valid, "Unsupported SysType used in assignment");
+			m_Buffer->m_Changed = true;
 			return static_cast<T&>(*this) = rhs;
 		}
 
 	private:
-		ElementRef(const LayoutElement* element, uint8_t* data, uint32_t arrayOffset)
-			: m_LayoutElement(element), m_Data(data), m_ArrayOffset(arrayOffset)
+		ElementRef(const LayoutElement* element, Buffer* buffer, uint8_t* data, uint32_t arrayOffset)
+			: m_LayoutElement(element), m_Buffer(buffer), m_Data(data), m_ArrayOffset(arrayOffset)
 		{
 		}
 
+		Buffer* m_Buffer;
 		const LayoutElement* m_LayoutElement;
 		uint8_t* m_Data;
 		uint32_t m_ArrayOffset;
@@ -244,10 +246,12 @@ namespace Proton::DCB
 	class Buffer
 	{
 	public:
+		Buffer() = default;
 		Buffer(RawLayout&& layout)
-			: m_Root(std::move(layout.Finalize()))
+			: m_Root(std::move(layout.Finalize())), m_Changed(true)
 		{
-			m_Data = new uint8_t[m_Root->GetSizeBytes()];
+			m_Size = m_Root->GetSizeBytes();
+			m_Data = new uint8_t[m_Size];
 		}
 
 		~Buffer()
@@ -257,8 +261,10 @@ namespace Proton::DCB
 
 		ElementRef operator[](const std::string& name);
 
-	private:
+	protected:
 		Ref<LayoutElement> m_Root;
+		bool m_Changed;
 		uint8_t* m_Data;
+		uint32_t m_Size;
 	};
 }

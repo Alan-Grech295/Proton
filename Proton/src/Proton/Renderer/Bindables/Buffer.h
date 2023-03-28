@@ -355,30 +355,27 @@ namespace Proton
 		uint32_t m_Slot;
 	};
 
-	class PixelConstantBuffer : public Bindable
+	class PixelConstantBuffer : public Bindable, public DCB::Buffer
 	{
 	public:
 		virtual ~PixelConstantBuffer() {}
 
-		virtual void SetData(const void* data, int size = -1) = 0;
 		virtual void Bind() = 0;
-		virtual void* GetData() = 0;
+		virtual uint8_t* GetData() = 0;
 
 		virtual std::string GetUID() const noexcept = 0;
 
 		template<typename...Ignore>
 		static std::string GenerateUID(const std::string& tag, Ignore&&...ignore) { return tag; }
 
-		static Ref<PixelConstantBuffer> Create(const std::string& tag, int slot, int size, const void* data);
+		static Ref<PixelConstantBuffer> Create(const std::string& tag, int slot, Ref<DCB::RawLayout> layout);
 
-		static Scope<PixelConstantBuffer> CreateUnique(int slot, int size, const void* data);
+		static Scope<PixelConstantBuffer> CreateUnique(int slot, Ref<DCB::RawLayout> layout);
 
 		static Scope<PixelConstantBuffer> CreateUnique(Ref<Bindable> other);
 
-		static PixelConstantBuffer* CreateUniquePtr(int slot, int size, const void* data);
-
+		static PixelConstantBuffer* CreateUniquePtr(int slot, Ref<DCB::RawLayout> layout);
 	protected:
-		uint32_t m_Size;
 		uint32_t m_Slot;
 	};
 }

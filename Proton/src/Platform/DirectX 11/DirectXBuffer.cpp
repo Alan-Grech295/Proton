@@ -217,16 +217,11 @@ namespace Proton
 	}
 
 	//Pixel Constant Buffer
-	DirectXPixelConstantBuffer::DirectXPixelConstantBuffer(const std::string& tag, int slot, int size, const void* data)
+	DirectXPixelConstantBuffer::DirectXPixelConstantBuffer(const std::string& tag, int slot, Ref<DCB::RawLayout> layout)
 		:
 		uid(tag)
 	{
 		m_Slot = slot;
-		m_Size = size >= 16 ? size : 16;
-
-		m_Data = new uint8_t[m_Size];
-		if (data)
-			memcpy(m_Data, data, size);
 
 		D3D11_BUFFER_DESC cbd;
 		cbd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
@@ -244,12 +239,8 @@ namespace Proton
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateBuffer(&cbd, &csd, &pConstantBuffer);
 	}
 
-	void DirectXPixelConstantBuffer::SetData(const void* data, int size)
+	void DirectXPixelConstantBuffer::SetData()
 	{
-		if (size < 0) size = m_Size;
-
-		memcpy(m_Data, data, size);
-
 		D3D11_MAPPED_SUBRESOURCE msr;
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
 			pConstantBuffer.Get(), 0,
@@ -257,19 +248,23 @@ namespace Proton
 			&msr
 		);
 
-		memcpy(msr.pData, data, size);
+		//TODO: Maybe only copy data needed?
+		memcpy(msr.pData, m_Data, m_Size);
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(pConstantBuffer.Get(), 0);
+	
+		m_Changed = false;
 	}
 
-	/*IMPORTANT: Deallocate the data as it is a copy*/
-	void* DirectXPixelConstantBuffer::GetData()
+	uint8_t* DirectXPixelConstantBuffer::GetData()
 	{
 		return m_Data;
 	}
 
 	void DirectXPixelConstantBuffer::Bind()
 	{
+		if (m_Changed)
+			SetData();
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->PSSetConstantBuffers(m_Slot, 1, pConstantBuffer.GetAddressOf());
 	}
 
