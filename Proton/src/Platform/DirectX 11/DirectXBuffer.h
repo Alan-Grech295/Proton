@@ -67,7 +67,7 @@ namespace Proton
 	class DirectXPixelConstantBuffer : public PixelConstantBuffer
 	{
 	public:
-		DirectXPixelConstantBuffer(const std::string& tag, int slot, Ref<DCB::RawLayout> layout);
+		DirectXPixelConstantBuffer(const std::string& tag, int slot, DCB::CookedLayout& layout);
 		virtual ~DirectXPixelConstantBuffer()
 		{
 			delete[] m_Data;

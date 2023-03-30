@@ -160,11 +160,9 @@ namespace Proton
 		return result;
 	}
 
-	Ref<PixelConstantBuffer> PixelConstantBuffer::Create(const std::string& tag, int slot, int size, const void* data)
+	Ref<PixelConstantBuffer> PixelConstantBuffer::Create(const std::string& tag, int slot, DCB::CookedLayout& layout)
 	{
 		PT_PROFILE_FUNCTION();
-
-		assert("Size must be greater than or equal to 16!" && size >= 16);
 
 		switch (Renderer::GetAPI())
 		{
@@ -172,14 +170,14 @@ namespace Proton
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return BindsCollection::Resolve<DirectXPixelConstantBuffer>(tag, slot, size, data);
+			return BindsCollection::Resolve<DirectXPixelConstantBuffer>(tag, slot, layout);
 		}
 
 		assert("Unknown RendererAPI!");
 		return nullptr;
 	}
 
-	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(int slot, int size, const void* data)
+	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(int slot, DCB::CookedLayout& layout)
 	{
 		PT_PROFILE_FUNCTION();
 
@@ -191,7 +189,7 @@ namespace Proton
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return CreateScope<DirectXPixelConstantBuffer>("", slot, size, data);
+			return CreateScope<DirectXPixelConstantBuffer>("", slot, layout);
 		}
 
 		assert("Unknown RendererAPI!");
@@ -202,11 +200,11 @@ namespace Proton
 	{
 		PixelConstantBuffer& pcb = dynamic_cast<PixelConstantBuffer&>(*other);
 		void* data = pcb.GetData();
-		Scope<PixelConstantBuffer> result = PixelConstantBuffer::CreateUnique(pcb.m_Slot, pcb.m_Size, data);
+		Scope<PixelConstantBuffer> result = PixelConstantBuffer::CreateUnique(pcb.m_Slot, DCB::CookedLayout(pcb.m_Root));
 		return result;
 	}
 
-	PixelConstantBuffer* PixelConstantBuffer::CreateUniquePtr(int slot, int size, const void* data)
+	PixelConstantBuffer* PixelConstantBuffer::CreateUniquePtr(int slot, DCB::CookedLayout& layout)
 	{
 		PT_PROFILE_FUNCTION();
 
@@ -216,7 +214,7 @@ namespace Proton
 			assert("RendererAPI::None is currently not supported!");
 			return nullptr;
 		case RendererAPI::API::DirectX:
-			return new DirectXPixelConstantBuffer("", slot, size, data);
+			return new DirectXPixelConstantBuffer("", slot, layout);
 		}
 
 		assert("Unknown RendererAPI!");

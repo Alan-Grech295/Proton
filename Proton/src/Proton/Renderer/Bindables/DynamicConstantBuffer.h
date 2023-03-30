@@ -172,6 +172,7 @@ namespace Proton::DCB
 
 	class Layout
 	{
+		friend class Buffer;
 	public:
 		uint32_t GetSizeInBytes() const { return m_Root->GetSizeBytes(); }
 	protected:
@@ -188,6 +189,10 @@ namespace Proton::DCB
 			: Layout(CreateRef<LayoutElement>(Type::Struct))
 		{}
 
+		RawLayout(Ref<LayoutElement> element)
+			: Layout(std::move(element))
+		{}
+
 		LayoutElement& operator[](const std::string& name) { return (*m_Root)[name]; }
 
 		void Add(Type type, const std::string& name) { (*m_Root).Add(type, name); }
@@ -197,9 +202,15 @@ namespace Proton::DCB
 	
 	class CookedLayout : public Layout
 	{
+		friend class Buffer;
 	public:
 		CookedLayout(RawLayout&& layout)
 			: Layout(std::move(layout.Finalize()))
+		{
+		}
+
+		CookedLayout(Ref<LayoutElement> element)
+			: Layout(element)
 		{
 		}
 
@@ -249,6 +260,13 @@ namespace Proton::DCB
 		Buffer() = default;
 		Buffer(RawLayout&& layout)
 			: m_Root(std::move(layout.Finalize())), m_Changed(true)
+		{
+			m_Size = m_Root->GetSizeBytes();
+			m_Data = new uint8_t[m_Size];
+		}
+
+		Buffer(CookedLayout& layout)
+			: m_Root(layout.m_Root), m_Changed(true)
 		{
 			m_Size = m_Root->GetSizeBytes();
 			m_Data = new uint8_t[m_Size];

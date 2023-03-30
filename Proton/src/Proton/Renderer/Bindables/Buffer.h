@@ -358,6 +358,7 @@ namespace Proton
 	class PixelConstantBuffer : public Bindable, public DCB::Buffer
 	{
 	public:
+		PixelConstantBuffer(DCB::CookedLayout& layout) : DCB::Buffer(layout) {}
 		virtual ~PixelConstantBuffer() {}
 
 		virtual void Bind() = 0;
@@ -368,13 +369,13 @@ namespace Proton
 		template<typename...Ignore>
 		static std::string GenerateUID(const std::string& tag, Ignore&&...ignore) { return tag; }
 
-		static Ref<PixelConstantBuffer> Create(const std::string& tag, int slot, Ref<DCB::RawLayout> layout);
+		static Ref<PixelConstantBuffer> Create(const std::string& tag, int slot, DCB::CookedLayout& layout);
 
-		static Scope<PixelConstantBuffer> CreateUnique(int slot, Ref<DCB::RawLayout> layout);
+		static Scope<PixelConstantBuffer> CreateUnique(int slot, DCB::CookedLayout& layout);
 
 		static Scope<PixelConstantBuffer> CreateUnique(Ref<Bindable> other);
 
-		static PixelConstantBuffer* CreateUniquePtr(int slot, Ref<DCB::RawLayout> layout);
+		static PixelConstantBuffer* CreateUniquePtr(int slot, DCB::CookedLayout& layout);
 	protected:
 		uint32_t m_Slot;
 	};
