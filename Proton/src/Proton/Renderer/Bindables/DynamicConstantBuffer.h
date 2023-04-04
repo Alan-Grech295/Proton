@@ -68,7 +68,7 @@ namespace Proton::DCB
 	};
 	template<> struct Map<Type::Matrix4x4>
 	{
-		using SysType = DirectX::XMFLOAT4X4;
+		using SysType = DirectX::XMMATRIX;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
 		static constexpr char* code = "M4x4";
 
@@ -223,8 +223,29 @@ namespace Proton::DCB
 	{
 		friend class Buffer;
 	public:
+		class Ptr
+		{
+			friend ElementRef;
+		public:
+			// conversion to read/write pointer to supported SysType
+			template<typename T>
+			operator T* () const
+			{
+				static_assert(ReverseMap<std::remove_const_t<T>>::valid, "Unsupported SysType used in pointer conversion");
+				return &static_cast<T&>(*ref);
+			}
+		private:
+			Ptr(ElementRef* ref) noexcept : ref(ref) {}
+			ElementRef* ref;
+		};
+
 		ElementRef operator[](const std::string& name) const;
 		ElementRef operator[](int index) const;
+
+		Ptr operator&() const
+		{
+			return Ptr(const_cast<ElementRef*>(this));
+		}
 
 		template<typename T>
 		explicit operator T&() const
@@ -256,6 +277,7 @@ namespace Proton::DCB
 
 	class Buffer
 	{
+		friend class ElementRef;
 	public:
 		Buffer() = default;
 		Buffer(RawLayout&& layout)

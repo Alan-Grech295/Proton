@@ -542,20 +542,19 @@ namespace Proton
 
 		if (!matData->hasDiffuseMap && !matData->hasSpecular && !matData->hasNormalMap)
 		{
-			struct PSMaterialConstantNoTex
-			{
-				dx::XMFLOAT4 materialColor;
-				dx::XMFLOAT4 specularColor;
-				float specularPower;
-				float padding[3];
-			} pmc;
-
-			pmc.specularPower = shininess;
-			pmc.specularColor = specularColor;
-			pmc.materialColor = diffuseColor;
-
 			Ref<UniqueBindable> pcb = CreateRef<UniqueBindable>(ResType::PixelConstantBuffer);
-			pcb->Initialize<PixelConstantBuffer>(1, sizeof(pmc), &pmc);
+
+			DCB::RawLayout layout;
+			layout.Add(DCB::Type::Float4, "materialColor");
+			layout.Add(DCB::Type::Float4, "specularColor");
+			layout.Add(DCB::Type::Float, "specularPower");
+			pcb->Initialize<PixelConstantBuffer>(1, DCB::CookedLayout(std::move(layout)));
+			PixelConstantBuffer& buf = pcb->As<PixelConstantBuffer>();
+
+			buf["materialColor"] = (dx::XMFLOAT4)diffuseColor;
+			buf["specularColor"] = (dx::XMFLOAT4)specularColor;
+			buf["specularPower"] = (float)shininess;
+
 			step.AddBindable(pcb);
 			
 			//Asset Data
@@ -570,36 +569,36 @@ namespace Proton
 			asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"]->Add({
 				Element::Create("Slot", 1),
 				Element("MaterialCol", {
-					Element::Create("X", pmc.materialColor.x),
-					Element::Create("Y", pmc.materialColor.y),
-					Element::Create("Z", pmc.materialColor.z),
-					Element::Create("W", pmc.materialColor.w),
+					Element::Create("X", diffuseColor.x),
+					Element::Create("Y", diffuseColor.y),
+					Element::Create("Z", diffuseColor.z),
+					Element::Create("W", diffuseColor.w),
 				}),
 				Element("SpecCol", {
-					Element::Create("X", pmc.specularColor.x),
-					Element::Create("Y", pmc.specularColor.y),
-					Element::Create("Z", pmc.specularColor.z),
-					Element::Create("W", pmc.specularColor.w),
+					Element::Create("X", specularColor.x),
+					Element::Create("Y", specularColor.y),
+					Element::Create("Z", specularColor.z),
+					Element::Create("W", specularColor.w),
 				}),
-				Element::Create("SpecPow", pmc.specularPower)
+				Element::Create("SpecPow", shininess)
 			});
 		}
 		else
 		{
-			struct PSMaterialConstant
-			{
-				float specularIntensity;
-				float specularPower;
-				BOOL hasAlphaGloss;
-				float padding;
-			} pmc;
-
-			pmc.specularPower = shininess;
-			pmc.specularIntensity = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
-			pmc.hasAlphaGloss = hasAlphaGloss ? TRUE : FALSE;
-
 			Ref<UniqueBindable> pcb = CreateRef<UniqueBindable>(ResType::PixelConstantBuffer);
-			pcb->Initialize<PixelConstantBuffer>(1, sizeof(pmc), &pmc);
+
+			DCB::RawLayout layout;
+			layout.Add(DCB::Type::Float, "specularIntensity");
+			layout.Add(DCB::Type::Float, "specularPower");
+			layout.Add(DCB::Type::Bool, "hasAlphaGloss");
+
+			pcb->Initialize<PixelConstantBuffer>(1, DCB::CookedLayout(std::move(layout)));
+			PixelConstantBuffer& buf = pcb->As<PixelConstantBuffer>();
+
+			buf["specularIntensity"] = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
+			buf["specularPower"] = shininess;
+			buf["hasAlphaGloss"] = hasAlphaGloss;
+
 			step.AddBindable(pcb);
 
 			//Asset Data
@@ -613,9 +612,9 @@ namespace Proton
 			asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"].SetPointer(Type::Struct, asset);
 			asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"]->Add({
 				Element::Create("Slot", 1),
-				Element::Create("SpecIntensity", pmc.specularIntensity),
-				Element::Create("SpecPower", pmc.specularPower),
-				Element::Create("HasAlphaGloss", pmc.hasAlphaGloss),
+				Element::Create("SpecIntensity", (float)buf["specularIntensity"]),
+				Element::Create("SpecPower", (float)buf["specularPower"]),
+				Element::Create("HasAlphaGloss", (bool)buf["hasAlphaGloss"]),
 			});
 		}
 
@@ -807,53 +806,38 @@ namespace Proton
 						else
 						{
 							Ref<UniqueBindable> pixConstBuf = CreateRef<UniqueBindable>(ResType::PixelConstantBuffer);
-							void* dataPtr;
-							uint32_t dataSize;
 
 							if (data.Has("SpecIntensity"))
 							{
-								struct PSMaterialConstant
-								{
-									float specularIntensity;
-									float specularPower;
-									BOOL hasAlphaGloss;
-									float padding;
-								};
+								DCB::RawLayout layout;
+								layout.Add(DCB::Type::Float, "specularIntensity");
+								layout.Add(DCB::Type::Float, "specularPower");
+								layout.Add(DCB::Type::Bool, "hasAlphaGloss");
 
-								dataSize = sizeof(PSMaterialConstant);
+								pixConstBuf->Initialize<PixelConstantBuffer>((int)data["Slot"], DCB::CookedLayout(std::move(layout)));
+								PixelConstantBuffer& buf = pixConstBuf->As<PixelConstantBuffer>();
 
-								dataPtr = new PSMaterialConstant();
-								PSMaterialConstant& pmc = *static_cast<PSMaterialConstant*>(dataPtr);
-
-								pmc.specularIntensity = data["SpecIntensity"];
-								pmc.specularPower = data["SpecPower"];
-								pmc.hasAlphaGloss = data["HasAlphaGloss"];
+								buf["specularIntensity"] = (float)data["SpecIntensity"];
+								buf["specularPower"] = (float)data["SpecPower"];
+								buf["hasAlphaGloss"] = (bool)data["HasAlphaGloss"];
 							}
 							else
 							{
 								namespace dx = DirectX;
 
-								struct PSMaterialConstantNoTex
-								{
-									dx::XMFLOAT4 materialColor;
-									dx::XMFLOAT4 specularColor;
-									float specularPower;
-									float padding[3];
-								};
+								DCB::RawLayout layout;
+								layout.Add(DCB::Type::Float4, "materialColor");
+								layout.Add(DCB::Type::Float4, "specularColor");
+								layout.Add(DCB::Type::Float, "specularPower");
+								pixConstBuf->Initialize<PixelConstantBuffer>((int)data["Slot"], DCB::CookedLayout(std::move(layout)));
+								PixelConstantBuffer& buf = pixConstBuf->As<PixelConstantBuffer>();
 
-								dataSize = sizeof(PSMaterialConstantNoTex);
-
-								dataPtr = new PSMaterialConstantNoTex();
-								PSMaterialConstantNoTex& pmc = *static_cast<PSMaterialConstantNoTex*>(dataPtr);
-
-								pmc.materialColor = data["MaterialCol"];
-								pmc.specularColor = data["SpecCol"];
-								pmc.specularPower = data["SpecPow"];
+								buf["materialColor"] = (dx::XMFLOAT4)data["MaterialCol"];
+								buf["specularColor"] = (dx::XMFLOAT4)data["SpecCol"];
+								buf["specularPower"] = (float)data["SpecPow"];	
 							}
 							
-							pixConstBuf->Initialize<PixelConstantBuffer>((int)data["Slot"], dataSize, dataPtr);
 							curStep.AddBindable(pixConstBuf);
-							delete dataPtr;
 						}
 						break;
 					case ResType::Sampler:

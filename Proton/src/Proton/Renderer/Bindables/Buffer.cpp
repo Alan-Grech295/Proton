@@ -199,8 +199,8 @@ namespace Proton
 	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(Ref<Bindable> other)
 	{
 		PixelConstantBuffer& pcb = dynamic_cast<PixelConstantBuffer&>(*other);
-		void* data = pcb.GetData();
 		Scope<PixelConstantBuffer> result = PixelConstantBuffer::CreateUnique(pcb.m_Slot, DCB::CookedLayout(pcb.m_Root));
+		memcpy(result->m_Data, pcb.GetData(), pcb.m_Size);
 		return result;
 	}
 

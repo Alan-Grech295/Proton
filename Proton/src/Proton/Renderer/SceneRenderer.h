@@ -19,6 +19,18 @@ namespace Proton
 			m_DebugPixShader = PixelShader::CreateUnique(CoreUtils::CORE_PATH_STR + "Proton\\DebugPS.cso");
 			m_DebugVertShader = VertexShader::CreateUnique(CoreUtils::CORE_PATH_STR + "Proton\\DebugVS.cso");
 			m_ViewProjBuffer = VertexConstantBuffer::CreateUnique(0, sizeof(DirectX::XMMATRIX), nullptr);
+
+			//TEMP
+			DCB::RawLayout layout;
+			layout.Add(DCB::Type::Float3, "pos");
+			layout.Add(DCB::Type::Float3, "ambient");
+			layout.Add(DCB::Type::Float3, "diffuseColor");
+			layout.Add(DCB::Type::Float, "diffuseIntensity");
+			layout.Add(DCB::Type::Float, "attConst");
+			layout.Add(DCB::Type::Float, "attLin");
+			layout.Add(DCB::Type::Float, "attQuad");
+
+			lightCBuf = PixelConstantBuffer::CreateUnique(0, DCB::CookedLayout(std::move(layout)));
 		}
 
 		//TODO: Replace with camera object 
@@ -59,7 +71,7 @@ namespace Proton
 		};
 
 		//TEMP
-		Scope<PixelConstantBuffer> lightCBuf = PixelConstantBuffer::CreateUnique(0, sizeof(PointLightData), new PointLightData());
+		Scope<PixelConstantBuffer> lightCBuf;
 
 	};
 }

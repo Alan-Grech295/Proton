@@ -27,20 +27,18 @@ namespace Proton
 		}
 
 		//Calculate Light Data (TEMP)
-		PointLightData lightData = {};
 
 		if (lightComponent)
 		{
-			DirectX::XMStoreFloat3(&lightData.pos, DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&lightTransform->position), viewMatrix));
-			lightData.ambient = lightComponent->Ambient;
-			lightData.diffuseColor = lightComponent->DiffuseColour;
-			lightData.diffuseIntensity = lightComponent->DiffuseIntensity;
-			lightData.attConst = lightComponent->AttConst;
-			lightData.attLin = lightComponent->AttLin;
-			lightData.attQuad = lightComponent->AttQuad;
+			DirectX::XMStoreFloat3(&(*lightCBuf)["pos"], DirectX::XMVector3Transform(DirectX::XMLoadFloat3(&lightTransform->position), viewMatrix));
+			(*lightCBuf)["ambient"] = lightComponent->Ambient;
+			(*lightCBuf)["diffuseColor"] = lightComponent->DiffuseColour;
+			(*lightCBuf)["diffuseIntensity"] = lightComponent->DiffuseIntensity;
+			(*lightCBuf)["attConst"] = lightComponent->AttConst;
+			(*lightCBuf)["attLin"] = lightComponent->AttLin;
+			(*lightCBuf)["attQuad"] = lightComponent->AttQuad;
 		}
 
-		lightCBuf->SetData(&lightData);
 		lightCBuf->Bind();
 
 		//End Light Data
@@ -102,7 +100,8 @@ namespace Proton
 				};
 
 				m->m_TransformCBuf->SetData(&tf);
-				m->m_TransformCBufPix->SetData(&tf);
+				(*m->m_TransformCBufPix)["modelViewProj"] = tf.modelViewProj;
+				(*m->m_TransformCBufPix)["model"] = tf.model;
 
 				Renderer::Submit(m);
 			}

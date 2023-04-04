@@ -39,6 +39,12 @@ namespace Proton
 		}
 
 		virtual Ref<Bindable> GetRef() = 0;
+
+		template<typename T>
+		T& As()
+		{
+			return *static_cast<T*>(m_Bindable.get());
+		}
 		
 	public:
 		Ref<Bindable> m_Bindable = nullptr;

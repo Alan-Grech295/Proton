@@ -68,7 +68,10 @@ namespace Proton
 				case FramebufferTextureFormat::RINT:
 					ClearVS = VertexShader::Create(CoreUtils::CORE_PATH_STR + "Proton\\IntClearVS.cso");
 					ClearPS = PixelShader::Create(CoreUtils::CORE_PATH_STR + "Proton\\IntClearPS.cso");
-					ClearCBuf = PixelConstantBuffer::CreateUnique(0, sizeof(int), &clearCol);
+					DCB::RawLayout layout;
+					layout.Add(DCB::Type::Int, "clearCol");
+					ClearCBuf = PixelConstantBuffer::CreateUnique(0, DCB::CookedLayout(std::move(layout)));
+					(*ClearCBuf)["clearCol"] = *(int*)ClearColor;
 					break;
 				}
 		}

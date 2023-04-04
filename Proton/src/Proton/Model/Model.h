@@ -65,7 +65,10 @@ namespace Proton
 			m_Material(material)
 		{
 			m_TransformCBuf = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
-			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, sizeof(Transforms), new Transforms());
+			DCB::RawLayout layout;
+			layout.Add(DCB::Type::Matrix4x4, "modelViewProj");
+			layout.Add(DCB::Type::Matrix4x4, "model");
+			m_TransformCBufPix = PixelConstantBuffer::CreateUnique(2, DCB::CookedLayout(std::move(layout)));
 			m_Topology = Topology::Create(TopologyType::TriangleList);
 		}
 
@@ -230,8 +233,12 @@ namespace Proton
 			m_TransformCBuf = CreateRef<UniqueBindable>(ConstructableBindable::ResourceType::VertexConstantBuffer);
 			m_TransformCBuf->Initialize<VertexConstantBuffer>(0, sizeof(Mesh::Transforms), new Mesh::Transforms());
 
+			DCB::RawLayout layout;
+			layout.Add(DCB::Type::Matrix4x4, "modelViewProj");
+			layout.Add(DCB::Type::Matrix4x4, "model");
+
 			m_TransformCBufPix = CreateRef<UniqueBindable>(ConstructableBindable::ResourceType::PixelConstantBuffer);
-			m_TransformCBufPix->Initialize<PixelConstantBuffer>(2, sizeof(Mesh::Transforms), new Mesh::Transforms());
+			m_TransformCBufPix->Initialize<PixelConstantBuffer>(2, DCB::CookedLayout(std::move(layout)));
 		
 			m_Topology = CreateRef<SharedBindable>(ConstructableBindable::ResourceType::Topology, "TriangleList");
 			m_Topology->m_Bindable = Topology::Create(TopologyType::TriangleList);

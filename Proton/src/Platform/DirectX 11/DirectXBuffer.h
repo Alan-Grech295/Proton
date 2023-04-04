@@ -68,10 +68,6 @@ namespace Proton
 	{
 	public:
 		DirectXPixelConstantBuffer(const std::string& tag, int slot, DCB::CookedLayout& layout);
-		virtual ~DirectXPixelConstantBuffer()
-		{
-			delete[] m_Data;
-		}
 
 		virtual uint8_t* GetData() override;
 		virtual void Bind() override;

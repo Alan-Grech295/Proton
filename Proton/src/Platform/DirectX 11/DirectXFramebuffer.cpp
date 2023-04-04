@@ -184,12 +184,12 @@ namespace Proton
 			context->ClearRenderTargetView(target, (const float*)spec.ClearColor);
 			break;
 		case FramebufferTextureFormat::RINT:
-			context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			/*context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			context->OMSetRenderTargets(1, &target, nullptr);
 			spec.ClearVS->Bind();
 			spec.ClearPS->Bind();
 			spec.ClearCBuf->Bind();
-			context->Draw(3, 0);
+			context->Draw(3, 0);*/
 			//context->ClearRenderTargetView(target, (const float*)spec.ClearColor);
 			break;
 		}
