@@ -21,7 +21,7 @@ namespace Proton
 {
 	std::unordered_map<UUID, Ref<Model>> ModelCollection::m_Models = std::unordered_map<UUID, Ref<Model>>();
 
-	Ref<Model> ModelCreator::GetModelFromData(ModelData& modelData)
+	/*Ref<Model> ModelCreator::GetModelFromData(ModelData& modelData)
 	{
 		Ref<Model> model = CreateRef<Model>();
 
@@ -449,7 +449,7 @@ namespace Proton
 		asset["Materials"][matString]["Techniques"]["Opaque"][itemIndex]["Data"]->Add({
 			Element::Create("Tag", std::string(basePath + "mat_" + std::to_string(index))),
 			Element::Create("Blending", blending)
-		});*/
+		});//*//*
 
 		//
 		//Rasterizer
@@ -976,5 +976,5 @@ namespace Proton
 				}
 			}
 		}
-	}
+	}*/
 }

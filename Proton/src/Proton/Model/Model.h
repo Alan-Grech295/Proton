@@ -9,7 +9,7 @@
 
 #include "Bindables/ConstructableBindable.h"
 #include "Proton/Asset Loader/AssetCollection.h"
-#include "Proton/Asset Loader/AssetSerializer.h"
+//#include "Proton/Asset Loader/AssetSerializer.h"
 
 struct aiNode;
 struct aiMesh;
@@ -296,7 +296,7 @@ namespace Proton
 	class ModelCreator
 	{
 	public:
-		static Ref<ModelData> Serialize(const std::string& path);
+		/*static Ref<ModelData> Serialize(const std::string& path);
 		static Ref<ModelData> Deserialize(Asset& modelAsset, const std::string& path);
 		static Entity CreateModelEntity(const std::string& path, Scene& activeScene);
 		static Ref<Model> GetModelFromData(ModelData& modelData);
@@ -308,7 +308,7 @@ namespace Proton
 
 		static void DeserializeMeshes(Asset& asset, const std::string& modelPath, MeshData* meshData, const MaterialData* materials);
 		static void DeserializeMaterials(Asset& asset, MaterialData* materialData);
-		static void DeserializeNodes(Asset& asset, NodeData* nodeData, MeshData* meshData);
+		static void DeserializeNodes(Asset& asset, NodeData* nodeData, MeshData* meshData);*/
 	};
 
 	//TEMP
@@ -317,7 +317,7 @@ namespace Proton
 	public:
 		static void Add(UUID uuid, Ref<Model> model) { m_Models[uuid] = model; }
 		static Ref<Model> Get(UUID uuid) { return m_Models.at(uuid); }
-		static Ref<Model> GetOrCreate(UUID uuid, const std::string& path)
+		/*static Ref<Model> GetOrCreate(UUID uuid, const std::string& path)
 		{
 			if (m_Models.find(uuid) != m_Models.end())
 				return m_Models.at(uuid);
@@ -325,7 +325,7 @@ namespace Proton
 			Ref<Model> model = ModelCreator::GetModelFromData(*AssetCollection::Get<ModelData>(path));
 			m_Models[uuid] = model;
 			return model;
-		}
+		}*/
 
 		static void Clear()
 		{
