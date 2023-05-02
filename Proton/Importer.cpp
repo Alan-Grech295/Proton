@@ -32,10 +32,9 @@ namespace Proton
 		{
 			matData->hasDiffuseMap = true;
 
-			Ref<SharedBindable> texture = CreateRef<SharedBindable>(ResType::Texture2D, basePath + texFileName.C_Str());
-			texture->Initialize<Texture2D>(0);
+			Ref<Texture2D> texture = Texture2D::Create(basePath + texFileName.C_Str(), 0);
 			step.AddBindable(texture);
-			hasAlphaDiffuse = static_cast<Texture2D*>(texture.get()->GetRef().get())->HasAlpha();
+			hasAlphaDiffuse = static_cast<Texture2D*>(texture.get())->HasAlpha();
 		}
 		else
 		{
@@ -45,11 +44,10 @@ namespace Proton
 		if (aiMat.GetTexture(aiTextureType_SPECULAR, 0, &texFileName) == aiReturn_SUCCESS)
 		{
 			matData->hasSpecular = true;
-			Ref<SharedBindable> specular = CreateRef<SharedBindable>(ResType::Texture2D, basePath + texFileName.C_Str());
-			specular->Initialize<Texture2D>(1);
+			Ref<Texture2D> specular = Texture2D::Create(basePath + texFileName.C_Str(), 1);
 			//Ref<Texture2D> spec = Texture2D::Create(basePath + texFileName.C_Str(), 1);
 			step.AddBindable(specular);
-			hasAlphaGloss = dynamic_cast<Texture2D*>(specular.get()->GetRef().get())->HasAlpha();
+			hasAlphaGloss = dynamic_cast<Texture2D*>(specular.get())->HasAlpha();
 		}
 		else
 		{
@@ -64,16 +62,14 @@ namespace Proton
 		if (aiMat.GetTexture(aiTextureType_NORMALS, 0, &texFileName) == aiReturn_SUCCESS)
 		{
 			matData->hasNormalMap = true;
-			Ref<SharedBindable> texture = CreateRef<SharedBindable>(ResType::Texture2D, basePath + texFileName.C_Str());
-			texture->Initialize<Texture2D>(2);
+			Ref<Texture2D> texture = Texture2D::Create(basePath + texFileName.C_Str(), 2);
 			step.AddBindable(texture);
 			//step.AddBindable(Texture2D::Create(basePath + texFileName.C_Str(), 2));
 		}
 
 		if (matData->hasSpecular || matData->hasNormalMap || matData->hasDiffuseMap)
 		{
-			Ref<SharedBindable> sampler = CreateRef<SharedBindable>(ResType::Sampler, basePath + "mat_" + std::to_string(index));
-			sampler->Initialize<Sampler>();
+			Ref<Sampler> sampler = Sampler::Create(basePath + "mat_" + std::to_string(index), 0);
 			step.AddBindable(sampler);
 			//step.AddBindable(Sampler::Create(meshTag));
 		}
@@ -85,13 +81,9 @@ namespace Proton
 
 		//*/
 		//Rasterizer
-		Ref<SharedBindable> rasterizer = CreateRef<SharedBindable>(ResType::Rasterizer, basePath + "mat_" + std::to_string(index));
-		rasterizer->Initialize<Rasterizer>(hasAlphaDiffuse);
+		Ref<Rasterizer> rasterizer = Rasterizer::Create(basePath + "mat_" + std::to_string(index), hasAlphaDiffuse);
 		step.AddBindable(rasterizer);
 		//
-
-		Ref<SharedBindable> pixShader;
-		Ref<SharedBindable> vertShader;
 
 		std::string pixShaderPath;
 		std::string vertShaderPath;
@@ -122,24 +114,20 @@ namespace Proton
 			vertShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongVS.cso";
 		}
 
-		pixShader = CreateRef<SharedBindable>(ResType::PixelShader, pixShaderPath);
-		pixShader->Initialize<PixelShader>();
-		vertShader = CreateRef<SharedBindable>(ResType::VertexShader, vertShaderPath);
-		vertShader->Initialize<VertexShader>();
+		Ref<PixelShader> pixShader = PixelShader::Create(pixShaderPath);
+		Ref<VertexShader> vertShader = VertexShader::Create(vertShaderPath);
 
 		step.AddBindable(vertShader);
 		step.AddBindable(pixShader);
 
 		if (!matData->hasDiffuseMap && !matData->hasSpecular && !matData->hasNormalMap)
 		{
-			Ref<UniqueBindable> pcb = CreateRef<UniqueBindable>(ResType::PixelConstantBuffer);
-
 			DCB::RawLayout layout;
 			layout.Add(DCB::Type::Float4, "materialColor");
 			layout.Add(DCB::Type::Float4, "specularColor");
 			layout.Add(DCB::Type::Float, "specularPower");
-			pcb->Initialize<PixelConstantBuffer>(1, DCB::CookedLayout(std::move(layout)));
-			PixelConstantBuffer& buf = pcb->As<PixelConstantBuffer>();
+			Ref<PixelConstantBuffer> pcb = PixelConstantBuffer::CreateUnique(1, DCB::CookedLayout(std::move(layout)));
+			PixelConstantBuffer& buf = *pcb;
 
 			buf["materialColor"] = (dx::XMFLOAT4)diffuseColor;
 			buf["specularColor"] = (dx::XMFLOAT4)specularColor;
@@ -149,15 +137,13 @@ namespace Proton
 		}
 		else
 		{
-			Ref<UniqueBindable> pcb = CreateRef<UniqueBindable>(ResType::PixelConstantBuffer);
-
 			DCB::RawLayout layout;
 			layout.Add(DCB::Type::Float, "specularIntensity");
 			layout.Add(DCB::Type::Float, "specularPower");
 			layout.Add(DCB::Type::Bool, "hasAlphaGloss");
 
-			pcb->Initialize<PixelConstantBuffer>(1, DCB::CookedLayout(std::move(layout)));
-			PixelConstantBuffer& buf = pcb->As<PixelConstantBuffer>();
+			Ref<PixelConstantBuffer> pcb = PixelConstantBuffer::CreateUnique(1, DCB::CookedLayout(std::move(layout)));
+			PixelConstantBuffer& buf = *pcb;
 
 			buf["specularIntensity"] = (specularColor.x + specularColor.y + specularColor.z) / 3.0f;
 			buf["specularPower"] = shininess;
@@ -169,6 +155,72 @@ namespace Proton
 		technique.AddStep(step);
 
 		matData->m_Techniques.push_back(technique);
+	}
+
+	static void SerializeMesh(Mesh* meshData, const std::string& basePath, const std::string& modelPath, const aiMesh& mesh, const aiScene* scene, const Material* materials)
+	{
+		using ResType = ConstructableBindable::ResourceType;
+
+		PT_PROFILE_FUNCTION();
+
+		namespace dx = DirectX;
+
+		using namespace std::string_literals;
+
+		auto meshTag = modelPath + "%" + mesh.mName.C_Str();
+
+		*meshData = Mesh(mesh.mName.C_Str(), modelPath, materials[mesh.mMaterialIndex]);
+
+		BufferLayout layout = {
+			{"POSITION", ShaderDataType::Float3},
+			{"NORMAL", ShaderDataType::Float3},
+			{"TANGENT", ShaderDataType::Float3},
+			{"BITANGENT", ShaderDataType::Float3},
+			{"TEXCOORD", ShaderDataType::Float2}
+		};
+
+		meshData->m_VertBuffer = CreateRef<SharedBindable>(ResType::VertexBuffer, meshTag);
+		VertexShader* vertShader = materials[mesh.mMaterialIndex].m_Techniques[0].m_Steps[0].GetResource<VertexShader>(ResType::VertexShader);
+		meshData->m_VertBuffer->Initialize<VertexBuffer>(layout, vertShader, mesh.mNumVertices);
+
+		VertexBuffer* vertBuffer = (VertexBuffer*)(meshData->m_VertBuffer.get()->m_Bindable.get());
+
+		{
+			PT_PROFILE_SCOPE("Vertex Loading - Model::SerializeMesh");
+			for (unsigned int i = 0; i < mesh.mNumVertices; i++)
+			{
+				dx::XMFLOAT3& position = *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]);
+				dx::XMFLOAT3& normal = *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]);
+				dx::XMFLOAT3& tangent = *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mTangents[i]);
+				dx::XMFLOAT3& bitangent = *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mBitangents[i]);
+				dx::XMFLOAT2& texcoord = *reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i]);
+
+				vertBuffer->EmplaceBack(
+					position,
+					normal,
+					tangent,
+					bitangent,
+					texcoord
+				);
+			}
+		}
+
+		meshData->m_IndexBuffer = CreateRef<SharedBindable>(ResType::IndexBuffer, meshTag);
+		meshData->m_IndexBuffer->Initialize<IndexBuffer>(mesh.mNumFaces * 3);
+
+		IndexBuffer* indexBuffer = (IndexBuffer*)(meshData->m_IndexBuffer.get()->m_Bindable.get());
+
+		{
+			PT_PROFILE_SCOPE("Index Loading - Model::SerializeMesh");
+			for (unsigned int i = 0; i < mesh.mNumFaces; i++)
+			{
+				const auto& face = mesh.mFaces[i];
+				assert(face.mNumIndices == 3);
+				indexBuffer->EmplaceBack(face.mIndices[0]);
+				indexBuffer->EmplaceBack(face.mIndices[1]);
+				indexBuffer->EmplaceBack(face.mIndices[2]);
+			}
+		}
 	}
 
 	Ref<Model> ModelImporter::ImportModel(const std::filesystem::path& path, const ImporterSettings& settings)
