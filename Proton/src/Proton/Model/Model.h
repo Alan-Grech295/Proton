@@ -113,9 +113,10 @@ namespace Proton
 	public:
 		std::vector<Mesh> m_Meshes;
 		std::vector<Material> m_Materials;
+		std::vector<Node> m_Nodes;
 	};
 
-	struct StepData
+	/*struct StepData
 	{
 	public:
 		StepData()
@@ -291,7 +292,7 @@ namespace Proton
 		std::vector<MeshData> m_Meshes;
 		std::vector<MaterialData> m_Materials;
 		std::vector<NodeData> m_Nodes;
-	};
+	};*/
 
 	class ModelCreator
 	{
