@@ -97,9 +97,9 @@ namespace Proton
 	};
 
 	enum class AssetType { Model, Image };
-#define ASSET_TYPES X(".obj", AssetType::Model, ModelCreator)\
-					X(".gltf", AssetType::Model, ModelCreator)\
-					X(".blend", AssetType::Model, ModelCreator)\
+#define ASSET_TYPES X(".obj", Model, ModelCreator)\
+					X(".gltf", Model, ModelCreator)\
+					X(".blend", Model, ModelCreator)\
 
 
 	class AssetManager

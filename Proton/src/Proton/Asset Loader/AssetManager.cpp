@@ -7,13 +7,36 @@
 
 #include <Platform\DirectX 11\DirectXTexture.h>
 #include "Proton\Model\Model.h"
-#include "Proton/Asset Loader/AssetCollection.h"
-#include "Proton/Asset Loader/AssetSerializer.h"
+//#include "Proton/Asset Loader/AssetCollection.h"
+//#include "Proton/Asset Loader/AssetSerializer.h"
 
 //TEMP
 #include "Proton/Renderer/Bindables/DynamicConstantBuffer.h"
 
+#include <yaml-cpp/yaml.h>
+
 namespace fs = std::filesystem;
+
+namespace YAML
+{
+	template<>
+	struct convert<Proton::UUID>
+	{
+		static Node encode(const Proton::UUID& rhs)
+		{
+
+			Node node;
+			node.push_back((uint64_t)rhs);
+			return node;
+		}
+
+		static bool decode(const Node& node, Proton::UUID& rhs)
+		{
+			rhs = node.as<uint64_t>();
+			return true;
+		}
+	};
+}
 
 namespace Proton
 {
@@ -361,9 +384,9 @@ namespace Proton
 
 		for (auto& path : manager.m_AssetImports)
 		{
-#define X(ext, type, cls) if(path.extension() == ext) { AssetCollection::Add(path.string(), cls::Serialize(path.string())); continue; }
+/*#define X(ext, type, cls) if(path.extension() == ext) { AssetCollection::Add(path.string(), cls::Serialize(path.string())); continue; }
 			ASSET_TYPES
-#undef X
+#undef X*/
 		}
 	}
 
@@ -485,7 +508,7 @@ namespace Proton
 
 	void AssetManager::HandleFile(const std::filesystem::path& path)
 	{
-		if (path.extension() == ".asset")
+		/*if (path.extension() == ".asset")
 		{
 			Ref<Asset> asset = AssetSerializer::DeserializeAsset(path.string());
 			AssetType assetType = (AssetType)((uint32_t)(*asset)["AssetType"]);
@@ -495,12 +518,32 @@ namespace Proton
 			ASSET_TYPES
 #undef X
 			return;
-		}
+		}*/
 
-		if (std::filesystem::exists(path.string() + ".asset"))
+		if (std::filesystem::exists(path.string() + ".meta"))
 			return;
 
-#define X(ext, type, cls) if(path.extension() == ext) { manager.m_AssetImports.push_back(path); return; }
+#define X(ext, type, cls) if(path.extension() == ext) \
+						{ \
+							YAML::Emitter out; \
+							out << YAML::BeginMap; \
+							\
+							out << YAML::Key << "UUID" << YAML::Value << UUID(); \
+							out << YAML::Key << "Importer" << YAML::Value << #type; \
+							 \
+							out << YAML::Key << "ImporterSettings" << YAML::Value; \
+							{ \
+								out << YAML::BeginMap; \
+								out << YAML::EndMap; \
+							} \
+							 \
+							out << YAML::EndMap; \
+							 \
+							std::ofstream fout(path.string() + ".meta"); \
+							fout << out.c_str(); \
+							 \
+							return;  \
+						}
 		ASSET_TYPES
 #undef X
 	}

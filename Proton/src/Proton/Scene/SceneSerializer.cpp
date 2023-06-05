@@ -510,9 +510,9 @@ namespace Proton
 						std::string modelPath = meshDataNode["Model Path"].as<std::string>();
 						std::string meshName = meshDataNode["Mesh Name"].as<std::string>();
 
-						Ref<Model> model = ModelCollection::GetOrCreate(nodeComponent.RootEntity, modelPath);
+						//Ref<Model> model = ModelCollection::GetOrCreate(nodeComponent.RootEntity, modelPath);
 						
-						meshComponent.MeshPtrs.push_back(model->FindMeshWithName(meshName));
+						//meshComponent.MeshPtrs.push_back(model->FindMeshWithName(meshName));
 
 						i++;
 					}
