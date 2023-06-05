@@ -17,7 +17,9 @@ Intermediates/
 
 #Scenes
 **.proton
-##
+
+## Shader compiled files
+**.cso
 
 # Visual Studio files and folder
 .vs/
