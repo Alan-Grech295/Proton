@@ -1,14 +1,15 @@
 # Binaries
-**/bin/
+**/bin/*/*/**
+!bin/*/*/**.dll
 !vendor/bin
-bin-int/
+**/bin-int/
 Intermediates/
 
 # Proton files
 *.log
 
 #Models
-!Proton/Models/**/*.obj
+!Proton/Models/**/**.obj
 
 ##TEMP
 #Assets
