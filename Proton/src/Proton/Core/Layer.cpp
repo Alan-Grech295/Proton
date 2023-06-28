@@ -10,5 +10,6 @@ namespace Proton
 
 	Layer::~Layer()
 	{
+		
 	}
 }

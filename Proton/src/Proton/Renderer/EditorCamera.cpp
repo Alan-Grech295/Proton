@@ -33,26 +33,31 @@ namespace Proton
 		else if (Input::IsMouseButtonPressed(1))
 			MouseOrbit(mouseDelta);
 
-		XMFLOAT3 translation = { 0, 0, 0 };
+		// Move with WASDQE if the left mouse button is pressed
+		if (Input::IsMouseButtonPressed(0))
+		{
+			XMFLOAT3 translation = { 0, 0, 0 };
 
-		float moveSpeed = m_MoveSpeed * ts;
+			float moveSpeed = m_MoveSpeed * ts;
 
-		if (Input::IsKeyPressed(Key::W))
-			translation.z += moveSpeed;
-		if (Input::IsKeyPressed(Key::S))
-			translation.z -= moveSpeed;
-		if (Input::IsKeyPressed(Key::D))
-			translation.x += moveSpeed;
-		if (Input::IsKeyPressed(Key::A))
-			translation.x -= moveSpeed;
+			if (Input::IsKeyPressed(Key::W))
+				translation.z += moveSpeed;
+			if (Input::IsKeyPressed(Key::S))
+				translation.z -= moveSpeed;
+			if (Input::IsKeyPressed(Key::D))
+				translation.x += moveSpeed;
+			if (Input::IsKeyPressed(Key::A))
+				translation.x -= moveSpeed;
 
-		if (Input::IsKeyPressed(Key::E))
-			translation.y += moveSpeed;
-		if (Input::IsKeyPressed(Key::Q))
-			translation.y -= moveSpeed;
+			if (Input::IsKeyPressed(Key::E))
+				translation.y += moveSpeed;
+			if (Input::IsKeyPressed(Key::Q))
+				translation.y -= moveSpeed;
 
-		m_FocalPoint = CalculateFocalPoint(translation);
+			m_FocalPoint = CalculateFocalPoint(translation);
 
+		}
+		
 		UpdateView();
 	}
 

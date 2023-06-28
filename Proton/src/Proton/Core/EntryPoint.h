@@ -44,7 +44,7 @@ extern Proton::Application* Proton::CreateApplication(ApplicationCommandLineArgs
 								catch (...) \
 								{ \
 									PT_CORE_ERROR("[No details available] Unknown Exception"); __debugbreak();\
-								}
+								}\
 
 //Win32 Entry point
 int CALLBACK WinMain(
@@ -54,7 +54,20 @@ int CALLBACK WinMain(
 	int nCmdShow)
 {
 	//TODO: Investigate memory leaks
-	_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF);
+	//_CrtSetDbgFlag(_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG) & ~_CRTDBG_ALLOC_MEM_DF);
+	//_CrtSetDbgFlag(_CRTDBG_REPORT_FLAG | _CRTDBG_LEAK_CHECK_DF);
+
+	//#include "crtdbg.h"
+	//
+	//#ifdef _DEBUG
+	//#define DEBUG_NEW   new( _NORMAL_BLOCK, __FILE__, __LINE__)
+	//#else
+	//#define DEBUG_NEW
+	//#endif
+	//
+	//#ifdef _DEBUG
+	//#define new DEBUG_NEW
+	//#endif
 
 	//Initializing console as a Win32 app does not open a console
 	AllocConsole();

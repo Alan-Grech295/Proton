@@ -5,7 +5,7 @@
 #include "imgui\imgui_internal.h"
 #include "Proton\Core\Input.h"
 #include "Proton\Core\KeyCodes.h"
-#include "Proton\Asset Loader\AssetManager.h"
+#include "Proton\Asset System\AssetManager.h"
 #include "ContentBrowserPanel.h"
 #include "Proton/Scripting/ScriptEngine.h"
 

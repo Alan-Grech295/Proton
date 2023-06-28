@@ -1,7 +1,6 @@
 #include "ptpch.h"
 #include "Texture.h"
 #include "BindsCollection.h"
-#include "Proton\Asset Loader\AssetManager.h"
 
 #ifdef PT_PLATFORM_WINDOWS
 #include "Platform\DirectX 11\DirectXTexture.h"

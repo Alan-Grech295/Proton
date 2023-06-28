@@ -17,12 +17,12 @@ namespace Proton
 			s_RendererAPI->Clear();
 		}
 
-		inline static void DrawIndexed(const UINT count)
+		inline static void DrawIndexed(UINT count)
 		{
 			s_RendererAPI->DrawIndexed(count);
 		}
 
-		inline static void Draw(const UINT count)
+		inline static void Draw(uint32_t count)
 		{
 			s_RendererAPI->Draw(count);
 		}

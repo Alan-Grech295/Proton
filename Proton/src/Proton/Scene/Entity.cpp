@@ -121,7 +121,7 @@ namespace Proton
 	}
 
 	template<>
-	void Entity::OnComponentAdded<MeshComponent>(MeshComponent& component) {}
+	void Entity::OnComponentAdded<StaticMeshComponent>(StaticMeshComponent& component) {}
 
 	template<>
 	void Entity::OnComponentAdded<RootNodeTag>(RootNodeTag& component) {}

@@ -2,7 +2,6 @@
 #include "DirectXTexture.h"
 #include "Platform\DirectX 11\DirectXRendererAPI.h"
 #include <cassert>
-#include "Proton\Asset Loader\AssetManager.h"
 
 namespace Proton
 {
@@ -20,46 +19,37 @@ namespace Proton
 
 	void DirectXTexture2D::Load(std::string path)
 	{
-		Ref<Image> image = AssetManager::GetImage(path);
+		HRESULT hr = DirectX::LoadFromWICFile(std::wstring(path.begin(), path.end()).c_str(), DirectX::WIC_FLAGS_NONE,
+			nullptr, scratch);
 
-		if (image == nullptr)
+		if (FAILED(hr))
 		{
-			image = CreateRef<Image>();
-			HRESULT hr = DirectX::LoadFromWICFile(std::wstring(path.begin(), path.end()).c_str(), DirectX::WIC_FLAGS_NONE,
-				nullptr, scratch);
-
-			if (FAILED(hr))
-			{
-				PT_CORE_ERROR("[TEXTURE PATH] {0}", path);
-				GET_ERROR(hr);
-			}
-
-			if (scratch.GetImage(0, 0, 0)->format != format)
-			{
-				DirectX::ScratchImage converted;
-				hr = DirectX::Convert(
-					*scratch.GetImage(0, 0, 0),
-					format,
-					DirectX::TEX_FILTER_DEFAULT,
-					DirectX::TEX_THRESHOLD_DEFAULT,
-					converted
-				);
-
-				scratch = std::move(converted);
-			}
-
-			image->width = (uint32_t)scratch.GetMetadata().width;
-			image->height = (uint32_t)scratch.GetMetadata().height;
-			image->isOpaque = scratch.IsAlphaAllOpaque();
-			image->pixels = new uint8_t[scratch.GetPixelsSize()];
-			image->pixels = scratch.GetPixels();
+			PT_CORE_ERROR("[TEXTURE PATH] {0}", path);
+			GET_ERROR(hr);
 		}
+
+		if (scratch.GetImage(0, 0, 0)->format != format)
+		{
+			DirectX::ScratchImage converted;
+			hr = DirectX::Convert(
+				*scratch.GetImage(0, 0, 0),
+				format,
+				DirectX::TEX_FILTER_DEFAULT,
+				DirectX::TEX_THRESHOLD_DEFAULT,
+				converted
+			);
+
+			scratch = std::move(converted);
+		}
+
+		width = scratch.GetMetadata().width;
+		height = scratch.GetMetadata().height;
 
 		//TODO: Pass texture description through constructor
 		D3D11_TEXTURE2D_DESC desc = {};
 		desc.Format = format;
-		desc.Width = image->width;
-		desc.Height = image->height;
+		desc.Width = width;
+		desc.Height = height;
 		desc.MipLevels = 0;
 		desc.ArraySize = 1;
 		desc.SampleDesc.Count = 1;
@@ -75,7 +65,7 @@ namespace Proton
 		/*for (int i = 0; i < image->width * image->height * 4; i++)
 			uint8_t pix = image->pixels[i];*/
 
-		HRESULT hr = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&desc, nullptr, &pTexture);
+		hr = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateTexture2D(&desc, nullptr, &pTexture);
 
 		if (FAILED(hr))
 		{
@@ -83,7 +73,7 @@ namespace Proton
 		}
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->UpdateSubresource(
-			pTexture.Get(), 0, nullptr, image->pixels, image->width * 4, 0
+			pTexture.Get(), 0, nullptr, scratch.GetPixels(), width * 4, 0
 		);
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
@@ -94,7 +84,7 @@ namespace Proton
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetDevice()->CreateShaderResourceView(pTexture.Get(), &srvDesc, &pTextureView);
 
-		hasAlpha = !image->isOpaque;
+		hasAlpha = !scratch.IsAlphaAllOpaque();
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->GenerateMips(pTextureView.Get());
 	}

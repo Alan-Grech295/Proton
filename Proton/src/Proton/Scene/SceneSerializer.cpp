@@ -3,9 +3,7 @@
 #include <cassert>
 #include "Entity.h"
 #include "Proton/Model/Model.h"
-#include "Proton/Asset Loader/AssetCollection.h"
 #include "Proton/Scripting/ScriptEngine.h"
-#include "Proton/Core/UUID.h"
 
 #include <yaml-cpp\yaml.h>
 #include <fstream>
@@ -243,20 +241,20 @@ namespace Proton
 			out << YAML::EndMap;	//LightComponent
 		}
 
-		if (entity.HasComponent<MeshComponent>() && writeMesh)
+		if (entity.HasComponent<StaticMeshComponent>() && writeMesh)
 		{
 			out << YAML::Key << "MeshComponent";
 			out << YAML::BeginMap;	//MeshComponent
 
-			auto& mc = entity.GetComponent<MeshComponent>();
+			auto& mc = entity.GetComponent<StaticMeshComponent>();
 
 			for (int i = 0; i < mc.MeshPtrs.size(); i++)
 			{
-				Mesh& mesh = *mc.MeshPtrs[i];
+				StaticMesh& mesh = *mc.MeshPtrs[i];
 				out << YAML::Key << ("Mesh" + std::to_string(i));
 
 				out << YAML::BeginMap;	//Mesh
-				out << YAML::Key << "Model Path" << YAML::Value << mesh.m_ModelPath;
+				//out << YAML::Key << "Model Path" << YAML::Value << mesh.m_ModelPath;
 				out << YAML::Key << "Mesh Name" << YAML::Value << mesh.m_Name;
 				out << YAML::EndMap;	//Mesh
 			}
@@ -295,7 +293,8 @@ namespace Proton
 			out << YAML::BeginMap;	//NativeScriptComponent
 
 			auto& nsc = entity.GetComponent<NativeScriptComponent>();
-			out << YAML::Key << "Type" << YAML::Value << typeid(*nsc.Instance).name();
+			// TODO: Fix
+			//out << YAML::Key << "Type" << YAML::Value << typeid(*nsc.Instance).name();
 			
 			out << YAML::EndMap;	//NativeScriptComponent
 		}
@@ -500,7 +499,7 @@ namespace Proton
 
 				if (meshNode)
 				{
-					MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
+					StaticMeshComponent& meshComponent = deserializedEntity.AddComponent<StaticMeshComponent>();
 					NodeComponent& nodeComponent = deserializedEntity.GetComponent<NodeComponent>();
 
 					uint32_t i = 0;

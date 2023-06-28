@@ -285,6 +285,8 @@ namespace Proton
 
 		uint32_t size() { return (uint32_t)m_Indices.size(); }
 
+		const uint32_t size() const { return (uint32_t)m_Indices.size(); }
+
 		void EmplaceBack(uint32_t index)
 		{
 			m_Indices.push_back(index);

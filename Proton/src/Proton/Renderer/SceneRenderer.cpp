@@ -83,11 +83,11 @@ namespace Proton
 										 node.Origin *
 										 accumulatedTransform;
 
-		if (entity.HasComponent<MeshComponent>())
+		if (entity.HasComponent<StaticMeshComponent>())
 		{
-			MeshComponent& mesh = entity.GetComponent<MeshComponent>();
+			StaticMeshComponent& mesh = entity.GetComponent<StaticMeshComponent>();
 
-			for (Mesh* m : mesh.MeshPtrs)
+			for (StaticMesh* m : mesh.MeshPtrs)
 			{
 				const auto modelView = transformMat * cameraView;
 				const Transforms tf =
@@ -99,9 +99,9 @@ namespace Proton
 					)
 				};
 
-				m->m_TransformCBuf->SetData(&tf);
-				(*m->m_TransformCBufPix)["modelViewProj"] = tf.modelViewProj;
-				(*m->m_TransformCBufPix)["model"] = tf.model;
+				m->m_TransformBufferVert->SetData(&tf);
+				(*m->m_TransformBufferPix)["modelViewProj"] = tf.modelViewProj;
+				(*m->m_TransformBufferPix)["model"] = tf.model;
 
 				Renderer::Submit(m);
 			}

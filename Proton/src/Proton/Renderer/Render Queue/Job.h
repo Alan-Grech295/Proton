@@ -1,20 +1,23 @@
 #pragma once
-#include "Step.h"
+#include "Proton/Model/StaticMesh.h"
 
 namespace Proton
 {
-	class Mesh;
+	class StaticMesh;
+	class Material;
+	class Material::Pass;
+
 	class Job
 	{
 	public:
-		Job(Mesh* mesh, Step* step)
+		Job(const StaticMesh* mesh, Ref<Material::Pass> step)
 			:
 			m_Mesh(mesh),
-			m_Step(step)
+			m_MaterialPass(step)
 		{}
 
 	public:
-		Mesh* m_Mesh;
-		Step* m_Step;
+		const StaticMesh* m_Mesh;
+		Ref<Material::Pass> m_MaterialPass;
 	};
 }

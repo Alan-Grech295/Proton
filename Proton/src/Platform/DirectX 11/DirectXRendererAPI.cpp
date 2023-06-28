@@ -25,7 +25,7 @@ namespace Proton
 			pContext->ClearDepthStencilView(pDSV.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
 
-	void DirectXRendererAPI::DrawIndexed(const UINT count)
+	void DirectXRendererAPI::DrawIndexed(UINT count)
 	{
 		pContext->DrawIndexed(count, 0u, 0u);
 	}

@@ -13,7 +13,7 @@ namespace Proton
 		virtual void SetClearColor(float r, float g, float b) override;
 		virtual void Clear() override;
 
-		virtual void DrawIndexed(const UINT count) override;
+		virtual void DrawIndexed(uint32_t count) override;
 		virtual void Draw(const UINT count) override;
 
 		virtual void SetTopology(const TopologyType topology) override;

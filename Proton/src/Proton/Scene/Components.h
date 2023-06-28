@@ -67,10 +67,10 @@ namespace Proton
 		CameraComponent(const CameraComponent&) = default;
 	};
 
-	struct MeshComponent
+	struct StaticMeshComponent
 	{
-		MeshComponent() = default;
-		MeshComponent(const MeshComponent& other) = default;
+		StaticMeshComponent() = default;
+		StaticMeshComponent(const StaticMeshComponent& other) = default;
 
 		/*MeshComponent(std::vector<Mesh*> meshPtrs)
 			:
@@ -78,7 +78,7 @@ namespace Proton
 		{}*/
 
 	public:
-		std::vector<class Mesh*> MeshPtrs;
+		std::vector<class StaticMesh*> MeshPtrs;
 		Ref<class Model> ModelRef;
 	};
 
@@ -196,7 +196,7 @@ namespace Proton
 	{
 	};
 
-	using AllComponents = ComponentGroup<TransformComponent, CameraComponent, MeshComponent,
+	using AllComponents = ComponentGroup<TransformComponent, CameraComponent, StaticMeshComponent,
 										 RootNodeTag, NodeComponent, LightComponent,
 										 ScriptComponent, NativeScriptComponent>;
 }

@@ -3,7 +3,7 @@
 #include "Proton\Scene\SceneSerializer.h"
 #include "Proton\Utils\PlatformUtils.h"
 #include <Proton\Math\Math.h>
-#include <Proton\Asset Loader\AssetManager.h>
+#include <Proton\Asset System\AssetManager.h>
 #include "Proton\Scripting\ScriptEngine.h"
 
 #include "ImGuizmo.h"
@@ -55,8 +55,11 @@ namespace Proton
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1)
 		{
-			auto projectFilePath = commandLineArgs[1];
-			OpenProject(projectFilePath);
+			NewProject();
+			Ref<Model> model = AssetManager::GetEditorAsset<Model>("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj");
+			model->CreateEntity(*m_ActiveScene);
+			/*auto projectFilePath = commandLineArgs[1];
+			OpenProject(projectFilePath);*/
 		}
 		else
 		{

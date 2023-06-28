@@ -1,11 +1,12 @@
 #include "ptpch.h"
 #include "Renderer.h"
 #include "Proton\Model\Model.h"
-#include "Proton\Model\Model.h"
+#include "Proton/Core/Core.h"
+#include "Proton\Renderer\Render Queue\Pass.h"
 
 namespace Proton
 {
-	std::array<Pass, 1> Renderer::m_RenderQueue = {Pass("Lambertian")};
+	std::array<Pass, 1> Renderer::m_RenderQueue = {Pass("Opaque")};
 
 	void Renderer::BeginScene()
 	{
@@ -20,31 +21,14 @@ namespace Proton
 
 	}
 
-	void Renderer::Submit(Mesh& mesh)
+	void Renderer::Submit(const StaticMesh* mesh)
 	{
 		PT_PROFILE_FUNCTION();
 
-		for (Technique& t : mesh.m_Material)
+		for (Ref<Material::Pass> t : mesh->material->m_Passes)
 		{
-			for (Step& s : t)
-			{
-				assert("Invalid pass ID" && (s.m_PassID < 0 && s.m_PassID >= m_RenderQueue.size()));
-				m_RenderQueue[s.m_PassID].AddJob({ &mesh, &s });
-			}
-		}
-	}
-
-	void Renderer::Submit(Mesh* mesh)
-	{
-		PT_PROFILE_FUNCTION();
-
-		for (Technique& t : mesh->m_Material)
-		{
-			for (Step& s : t)
-			{
-				assert("Invalid pass ID" && !(s.m_PassID < 0 || s.m_PassID >= m_RenderQueue.size()));
-				m_RenderQueue[s.m_PassID].AddJob({ mesh, &s });
-			}
+			PT_CORE_ASSERT(t->m_PassID >= 0 && t->m_PassID < m_RenderQueue.size(), "Invalid pass ID");
+			m_RenderQueue[t->m_PassID].AddJob({ mesh, t });
 		}
 	}
 
@@ -55,27 +39,41 @@ namespace Proton
 		RenderCommand::DrawIndexed(indexBuffer->size());
 	}
 
+	int Renderer::GetPassIDFromName(const std::string& name)
+	{
+		for (int i = 0; i < m_RenderQueue.size(); i++)
+		{
+			if (m_RenderQueue[i].m_Name == name)
+				return i;
+		}
+
+		PT_CORE_ASSERT(false, "Pass name not found!");
+		return -1;
+	}
+
 	void Renderer::Render()
 	{
 		for (Pass& p : m_RenderQueue)
 		{
 			for (Job& job : p)
 			{
-				//Bind all bindables
+				// Binding the shaders
+				job.m_MaterialPass->m_VertexShader->Bind();
+				job.m_MaterialPass->m_PixelShader->Bind();
+
+				// Bind all bindables
 				job.m_Mesh->m_IndexBuffer->Bind();
-				job.m_Mesh->m_VertBuffer->Bind();
+				job.m_Mesh->m_VertexBuffer->Bind();
 				job.m_Mesh->m_Topology->Bind();
 
-				//
-				job.m_Mesh->m_TransformCBuf->Bind();
-				job.m_Mesh->m_TransformCBufPix->Bind();
+				// Binding transform buffers
+				job.m_Mesh->m_TransformBufferVert->Bind();
+				job.m_Mesh->m_TransformBufferPix->Bind();
 
-				for (Ref<Bindable> bind : *job.m_Step)
-				{
+				for (Ref<Bindable> bind : job.m_MaterialPass->m_Bindables)
 					bind->Bind();
-				}
 
-				RenderCommand::DrawIndexed(static_cast<IndexBuffer*>(job.m_Mesh->m_IndexBuffer.get())->size());
+				RenderCommand::DrawIndexed(job.m_Mesh->m_IndexBuffer->size());
 			}
 		}
 	}
