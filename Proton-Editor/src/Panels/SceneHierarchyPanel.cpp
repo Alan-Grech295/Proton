@@ -48,7 +48,7 @@ namespace Proton
 
 		if (m_Context)
 		{
-			auto& childView = m_Context->m_Registry.view<RootNodeTag>();
+			const auto& childView = m_Context->m_Registry.view<RootNodeTag>();
 
 			for (auto e : childView)
 			{
@@ -516,9 +516,8 @@ namespace Proton
 		else if constexpr (type == ScriptFieldType::Byte || type == ScriptFieldType::UShort ||
 						   type == ScriptFieldType::UInt || type == ScriptFieldType::ULong)
 		{
-			int max = std::numeric_limits<T>::max();
-			if constexpr (std::numeric_limits<T>::max() > (T)std::numeric_limits<int>::max())
-				constexpr int max = std::numeric_limits<int>::max();
+			static constexpr int max = (std::numeric_limits<T>::max() > static_cast<T>(std::numeric_limits<int>::max())) ?
+				std::numeric_limits<int>::max() : std::numeric_limits<T>::max();
 
 			int castData = (int)*data;
 			bool changed = ImGui::DragInt(name.c_str(), &castData, 1.0f, 0, max);

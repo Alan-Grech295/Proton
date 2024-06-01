@@ -1,12 +1,12 @@
 [submodule "Proton/vendor/spdlog"]
 	path = Proton/vendor/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "Proton/vendor/yaml-cpp"]
-	path = Proton/vendor/yaml-cpp
-	url = https://github.com/thecherno/yaml-cpp
 [submodule "Proton/vendor/assimp"]
 	path = Proton/vendor/assimp
 	url = https://github.com/assimp/assimp.git
 [submodule "Proton/vendor/ImGuizmo"]
 	path = Proton/vendor/ImGuizmo
 	url = https://github.com/Alan-Grech295/ImGuizmo.git
+[submodule "Proton/vendor/yaml-cpp"]
+	path = Proton/vendor/yaml-cpp
+	url = https://github.com/TheCherno/yaml-cpp.git

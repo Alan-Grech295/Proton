@@ -217,7 +217,7 @@ namespace Proton
 	}
 
 	//Pixel Constant Buffer
-	DirectXPixelConstantBuffer::DirectXPixelConstantBuffer(const std::string& tag, int slot, DCB::CookedLayout& layout)
+	DirectXPixelConstantBuffer::DirectXPixelConstantBuffer(const std::string& tag, int slot, const DCB::CookedLayout& layout)
 		:
 		uid(tag), PixelConstantBuffer(layout)
 	{

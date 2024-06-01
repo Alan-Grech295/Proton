@@ -177,7 +177,7 @@ namespace Proton
 		return nullptr;
 	}
 
-	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(int slot, DCB::CookedLayout& layout)
+	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(int slot, const DCB::CookedLayout& layout)
 	{
 		PT_PROFILE_FUNCTION();
 
@@ -199,12 +199,13 @@ namespace Proton
 	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(Ref<Bindable> other)
 	{
 		PixelConstantBuffer& pcb = dynamic_cast<PixelConstantBuffer&>(*other);
-		Scope<PixelConstantBuffer> result = PixelConstantBuffer::CreateUnique(pcb.m_Slot, DCB::CookedLayout(pcb.m_Root));
+		DCB::CookedLayout cookedLayout = DCB::CookedLayout(pcb.m_Root);
+		Scope<PixelConstantBuffer> result = PixelConstantBuffer::CreateUnique(pcb.m_Slot, cookedLayout);
 		memcpy(result->m_Data, pcb.GetData(), pcb.m_Size);
 		return result;
 	}
 
-	PixelConstantBuffer* PixelConstantBuffer::CreateUniquePtr(int slot, DCB::CookedLayout& layout)
+	PixelConstantBuffer* PixelConstantBuffer::CreateUniquePtr(int slot, const DCB::CookedLayout& layout)
 	{
 		PT_PROFILE_FUNCTION();
 

@@ -102,7 +102,7 @@ namespace Proton
 					return e;
 			}
 
-			return BufferElement();
+			throw std::exception(std::format("Cannot find buffer element with name '{}'", tag).c_str());
 		}
 	private:
 		void CalculateOffsetsAndStride()
@@ -219,7 +219,7 @@ namespace Proton
 			return vert;
 		}
 
-		Vertex& operator[](int index)
+		Vertex operator[](int index)
 		{
 			return Vertex{ m_Data + index * m_Layout.stride, m_Layout, &m_Changed };
 		}
@@ -360,7 +360,7 @@ namespace Proton
 	class PixelConstantBuffer : public Bindable, public DCB::Buffer
 	{
 	public:
-		PixelConstantBuffer(DCB::CookedLayout& layout) : DCB::Buffer(layout) {}
+		PixelConstantBuffer(const DCB::CookedLayout& layout) : DCB::Buffer(layout) {}
 		virtual ~PixelConstantBuffer() {}
 
 		virtual void Bind() = 0;
@@ -373,11 +373,11 @@ namespace Proton
 
 		static Ref<PixelConstantBuffer> Create(const std::string& tag, int slot, DCB::CookedLayout& layout);
 
-		static Scope<PixelConstantBuffer> CreateUnique(int slot, DCB::CookedLayout& layout);
+		static Scope<PixelConstantBuffer> CreateUnique(int slot, const DCB::CookedLayout& layout);
 
 		static Scope<PixelConstantBuffer> CreateUnique(Ref<Bindable> other);
 
-		static PixelConstantBuffer* CreateUniquePtr(int slot, DCB::CookedLayout& layout);
+		static PixelConstantBuffer* CreateUniquePtr(int slot, const DCB::CookedLayout& layout);
 	protected:
 		uint32_t m_Slot;
 	};

@@ -48,8 +48,7 @@ namespace Proton
 		auto renderView = sceneRegistry.view<RootNodeTag>();
 		for (auto entity : renderView)
 		{
-			auto& [node, transform] = sceneRegistry.get<NodeComponent, TransformComponent>(entity);
-
+			const auto& [node, transform] = sceneRegistry.get<NodeComponent, TransformComponent>(entity);
 			SubmitNode(Entity(entity, m_Scene.get()), DirectX::XMMatrixIdentity(), viewMatrix, projMatrix);
 		}
 
@@ -87,7 +86,7 @@ namespace Proton
 		{
 			StaticMeshComponent& mesh = entity.GetComponent<StaticMeshComponent>();
 
-			for (StaticMesh* m : mesh.MeshPtrs)
+			for (Mesh* m : mesh.MeshPtrs)
 			{
 				const auto modelView = transformMat * cameraView;
 				const Transforms tf =

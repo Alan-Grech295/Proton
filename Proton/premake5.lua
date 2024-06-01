@@ -1,7 +1,7 @@
 project "Proton"
 	kind "StaticLib"
 	language "C++"
-	cppdialect "C++17"
+	cppdialect "C++20"
 	staticruntime "off"
 
 	targetdir ("../bin/" .. outputdir .. "/%{prj.name}")
@@ -18,6 +18,16 @@ project "Proton"
 		-- ImGuizmo Files
 		"vendor/ImGuizmo/ImGuizmo.h",
 		"vendor/ImGuizmo/ImGuizmo.cpp"
+	}
+
+	-- Exclude unused files
+	removefiles
+	{
+		"src/Proton/Shader Translator/**",
+		"src/Proton/Model/Model_Old.*",
+		"src/Proton/Asset System/AssetSerializer.*",
+		"src/Proton/Asset System/MetaFileSerializer.*",
+		"src/Proton/Asset System/TypeMap.*"
 	}
 
 	includedirs

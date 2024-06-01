@@ -218,7 +218,7 @@ namespace Proton
 		return material;
 	}
 
-	void ModelSerializer::DeserializeMesh(StaticMesh* outMesh, const aiMesh& mesh, const std::string& modelPath, const std::vector<Ref<Material>>& materials)
+	void ModelSerializer::DeserializeMesh(Mesh* outMesh, const aiMesh& mesh, const std::string& modelPath, const std::vector<Ref<Material>>& materials)
 	{
 		namespace dx = DirectX;
 
@@ -226,7 +226,7 @@ namespace Proton
 
 		auto meshTag = modelPath + "%" + mesh.mName.C_Str();
 
-		*outMesh = StaticMesh();
+		*outMesh = Mesh();
 
 		outMesh->m_Name = mesh.mName.C_Str();
 
@@ -282,7 +282,7 @@ namespace Proton
 		outMesh->m_IndexBuffer = indexBuffer;
 	}
 	
-	Node* ModelSerializer::DeserializeNode(Node*& outNode, const aiNode& assimpNode, std::vector<StaticMesh>& meshes, uint32_t& index)
+	Node* ModelSerializer::DeserializeNode(Node*& outNode, const aiNode& assimpNode, std::vector<Mesh>& meshes, uint32_t& index)
 	{
 		Node* curNode = outNode;
 		*curNode = Node();

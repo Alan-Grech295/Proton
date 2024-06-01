@@ -39,7 +39,7 @@ namespace Proton
 
 		meshComponent.MeshPtrs.reserve(node.m_Meshes.size());
 
-		for (StaticMesh* mesh : node.m_Meshes)
+		for (Mesh* mesh : node.m_Meshes)
 		{
 			meshComponent.MeshPtrs.push_back(mesh);
 		}

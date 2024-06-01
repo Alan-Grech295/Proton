@@ -177,6 +177,20 @@ namespace Proton::DCB
 		return ElementRef(&*arrayData.TypeElement, m_Buffer, m_Data, m_ArrayOffset + arrayData.TypeElement->GetSizeBytes() * index);
 	}
 
+	Buffer::Buffer(RawLayout&& layout)
+		: m_Root(std::move(layout.Finalize())), m_Changed(true)
+	{
+		m_Size = m_Root->GetSizeBytes();
+		m_Data = new uint8_t[m_Size];
+	}
+
+	Buffer::Buffer(const CookedLayout& layout)
+		: m_Root(layout.m_Root), m_Changed(true)
+	{
+		m_Size = m_Root->GetSizeBytes();
+		m_Data = new uint8_t[m_Size];
+	}
+
 	ElementRef Buffer::operator[](const std::string& name)
 	{
 		return ElementRef(&(*m_Root)[name], this, m_Data, 0);

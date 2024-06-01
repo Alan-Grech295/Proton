@@ -250,7 +250,7 @@ namespace Proton
 
 			for (int i = 0; i < mc.MeshPtrs.size(); i++)
 			{
-				StaticMesh& mesh = *mc.MeshPtrs[i];
+				Mesh& mesh = *mc.MeshPtrs[i];
 				out << YAML::Key << ("Mesh" + std::to_string(i));
 
 				out << YAML::BeginMap;	//Mesh
@@ -372,7 +372,7 @@ namespace Proton
 
 		out << YAML::Key << "Entities" << YAML::Value << YAML::BeginSeq;
 
-		auto& view = m_Scene->m_Registry.view<NodeComponent>();
+		const auto& view = m_Scene->m_Registry.view<NodeComponent>();
 
 		auto it = view.rbegin();
 
@@ -425,7 +425,8 @@ namespace Proton
 		auto editorCam = data["Editor Camera"];
 		if (editorCam)
 		{
-			editorCamera.m_FocalPoint = XMLoadFloat3(&editorCam["Focal Point"].as<XMFLOAT3>());
+			const auto focalPoint = editorCam["Focal Point"].as<XMFLOAT3>();
+			editorCamera.m_FocalPoint = XMLoadFloat3(&focalPoint);
 			editorCamera.m_Distance = editorCam["Distance"].as<float>();
 			editorCamera.m_Yaw = editorCam["Yaw"].as<float>();
 			editorCamera.m_Pitch = editorCam["Pitch"].as<float>();

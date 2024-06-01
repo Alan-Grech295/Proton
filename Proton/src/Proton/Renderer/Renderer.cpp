@@ -21,7 +21,7 @@ namespace Proton
 
 	}
 
-	void Renderer::Submit(const StaticMesh* mesh)
+	void Renderer::Submit(const Mesh* mesh)
 	{
 		PT_PROFILE_FUNCTION();
 

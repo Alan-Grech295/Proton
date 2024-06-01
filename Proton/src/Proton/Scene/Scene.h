@@ -53,7 +53,7 @@ namespace Proton
 		template<typename T>
 		inline Entity FindEntityWithComponent()
 		{
-			auto& view = m_Registry.view<T>();
+			const auto& view = m_Registry.view<T>();
 
 			if (view.empty())
 				return Entity::Null;

@@ -24,7 +24,7 @@ namespace Proton
 		inline void SetViewportSize(float width, float height) { m_ViewportWidth = width; m_ViewportHeight = height; UpdateProjection(); }
 
 		const XMMATRIX& GetViewMatrix() const { return m_ViewMatrix; }
-		XMMATRIX& GetViewProjection() const { return m_ViewMatrix * m_ProjectionMatrix; }
+		const XMMATRIX& GetViewProjection() const { return m_ViewMatrix * m_ProjectionMatrix; }
 
 		XMVECTOR GetUpDirection() const;
 		XMVECTOR GetRightDirection() const;

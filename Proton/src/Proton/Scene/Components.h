@@ -78,7 +78,7 @@ namespace Proton
 		{}*/
 
 	public:
-		std::vector<class StaticMesh*> MeshPtrs;
+		std::vector<class Mesh*> MeshPtrs;
 		Ref<class Model> ModelRef;
 	};
 

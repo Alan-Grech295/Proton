@@ -56,7 +56,7 @@ namespace Proton
 		if (commandLineArgs.Count > 1)
 		{
 			NewProject();
-			Ref<Model> model = AssetManager::GetEditorAsset<Model>("D:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj");
+			Ref<Model> model = AssetManager::GetEditorAsset<Model>("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj");
 			model->CreateEntity(*m_ActiveScene);
 			/*auto projectFilePath = commandLineArgs[1];
 			OpenProject(projectFilePath);*/

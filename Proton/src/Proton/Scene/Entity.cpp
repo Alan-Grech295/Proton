@@ -5,7 +5,7 @@
 
 namespace Proton
 {
-	Entity& Entity::Null = Entity{ entt::null, nullptr };
+	Entity Entity::Null = Entity{ entt::null, nullptr };
 	Entity::Entity(entt::entity entityHandler, Scene* scene)
 		:
 		m_EntityHandle(entityHandler),
@@ -97,6 +97,12 @@ namespace Proton
 	const std::string& Entity::GetName()
 	{
 		return GetComponent<TagComponent>().Tag;
+	}
+
+	template<typename T>
+	void Entity::AddScript()
+	{
+		AddComponent<NativeScriptComponent>().Bind<T>();
 	}
 
 	template<typename T>

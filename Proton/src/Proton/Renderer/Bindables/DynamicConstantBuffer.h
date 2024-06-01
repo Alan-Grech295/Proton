@@ -36,7 +36,7 @@ namespace Proton::DCB
 	{
 		using SysType = float;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
-		static constexpr char* code = "F1";
+		static constexpr const char* code = "F1";
 
 		static constexpr bool valid = true;
 	};
@@ -45,7 +45,7 @@ namespace Proton::DCB
 	{
 		using SysType = DirectX::XMFLOAT2;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
-		static constexpr char* code = "F2";
+		static constexpr const char* code = "F2";
 
 		static constexpr bool valid = true;
 	};
@@ -54,7 +54,7 @@ namespace Proton::DCB
 	{
 		using SysType = DirectX::XMFLOAT3;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
-		static constexpr char* code = "F3";
+		static constexpr const char* code = "F3";
 
 		static constexpr bool valid = true;
 	};
@@ -62,7 +62,7 @@ namespace Proton::DCB
 	{
 		using SysType = DirectX::XMFLOAT4;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
-		static constexpr char* code = "F4";
+		static constexpr const char* code = "F4";
 
 		static constexpr bool valid = true;
 	};
@@ -70,7 +70,7 @@ namespace Proton::DCB
 	{
 		using SysType = DirectX::XMMATRIX;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
-		static constexpr char* code = "M4x4";
+		static constexpr const char* code = "M4x4";
 
 		static constexpr bool valid = true;
 	};
@@ -78,7 +78,7 @@ namespace Proton::DCB
 	{
 		using SysType = int;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
-		static constexpr char* code = "I1";
+		static constexpr const char* code = "I1";
 
 		static constexpr bool valid = true;
 	};
@@ -86,7 +86,7 @@ namespace Proton::DCB
 	{
 		using SysType = bool;
 		static constexpr uint32_t ShaderSize = sizeof(BOOL);
-		static constexpr char* code = "B";
+		static constexpr const char* code = "B";
 
 		static constexpr bool valid = true;
 	};
@@ -219,6 +219,29 @@ namespace Proton::DCB
 		uint32_t Size() const { return m_Root->GetSizeBytes(); }
 	};
 
+	class Buffer
+	{
+		friend class ElementRef;
+	public:
+		Buffer() = default;
+		Buffer(RawLayout&& layout);
+
+		Buffer(const CookedLayout& layout);
+
+		~Buffer()
+		{
+			delete[] m_Data;
+		}
+
+		ElementRef operator[](const std::string& name);
+
+	protected:
+		Ref<LayoutElement> m_Root;
+		bool m_Changed;
+		uint8_t* m_Data;
+		uint32_t m_Size;
+	};
+
 	class ElementRef
 	{
 		friend class Buffer;
@@ -273,38 +296,5 @@ namespace Proton::DCB
 		const LayoutElement* m_LayoutElement;
 		uint8_t* m_Data;
 		uint32_t m_ArrayOffset;
-	};
-
-	class Buffer
-	{
-		friend class ElementRef;
-	public:
-		Buffer() = default;
-		Buffer(RawLayout&& layout)
-			: m_Root(std::move(layout.Finalize())), m_Changed(true)
-		{
-			m_Size = m_Root->GetSizeBytes();
-			m_Data = new uint8_t[m_Size];
-		}
-
-		Buffer(CookedLayout& layout)
-			: m_Root(layout.m_Root), m_Changed(true)
-		{
-			m_Size = m_Root->GetSizeBytes();
-			m_Data = new uint8_t[m_Size];
-		}
-
-		~Buffer()
-		{
-			delete[] m_Data;
-		}
-
-		ElementRef operator[](const std::string& name);
-
-	protected:
-		Ref<LayoutElement> m_Root;
-		bool m_Changed;
-		uint8_t* m_Data;
-		uint32_t m_Size;
 	};
 }

@@ -4,7 +4,7 @@
 
 namespace Proton
 {
-	class StaticMesh
+	class Mesh
 	{
 		struct Transforms
 		{
@@ -12,7 +12,7 @@ namespace Proton
 			DirectX::XMMATRIX model;
 		};
 	public:
-		StaticMesh() 
+		Mesh() 
 		{
 			m_TransformBufferVert = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
 			DCB::RawLayout layout;

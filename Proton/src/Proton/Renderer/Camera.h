@@ -7,7 +7,7 @@ namespace Proton
 	{
 	public:
 		Camera() = default;
-		Camera(DirectX::XMMATRIX& projection)
+		Camera(const DirectX::XMMATRIX& projection)
 			:
 			m_ProjectionMatrix(projection) {}
 

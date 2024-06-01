@@ -41,7 +41,7 @@ namespace Proton
 		template<typename Component>
 		bool HasComponent()
 		{
-			return m_Scene->m_Registry.has<Component>(m_EntityHandle);
+			return m_Scene->m_Registry.any_of<Component>(m_EntityHandle);
 		}
 
 		template<typename Component>
@@ -51,10 +51,7 @@ namespace Proton
 		}
 
 		template<typename T>
-		void AddScript()
-		{
-			AddComponent<NativeScriptComponent>().Bind<T>();
-		}
+		void AddScript();
 
 		void SetParent(UUID parentID = UUID::Null, int pos = -1);
 
@@ -71,7 +68,7 @@ namespace Proton
 		template<typename T>
 		void OnComponentAdded(T& component);
 	public:
-		static Entity& Null;
+		static Entity Null;
 	private:
 		entt::entity m_EntityHandle{ entt::null };
 		Scene* m_Scene = nullptr;

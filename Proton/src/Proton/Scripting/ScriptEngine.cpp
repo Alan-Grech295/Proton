@@ -405,7 +405,7 @@ namespace Proton
 	bool ScriptEngine::LoadAssembly(const std::filesystem::path& filepath)
 	{
 		//Create app domain
-		s_Data->AppDomain = mono_domain_create_appdomain("ProtonScriptRuntime", nullptr);
+		s_Data->AppDomain = mono_domain_create_appdomain((char*)"ProtonScriptRuntime", nullptr);
 		mono_domain_set(s_Data->AppDomain, true);
 
 		s_Data->CoreAssemblyFilePath = filepath;
