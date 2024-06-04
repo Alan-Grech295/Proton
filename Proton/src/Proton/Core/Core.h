@@ -40,4 +40,13 @@ namespace Proton
 	{
 		return std::make_shared<T>(std::forward<Args>(args)...);
 	}
+
+	template<typename T, typename P>
+	constexpr Ref<T> CastRef(Ref<P> ref)
+	{
+		return std::static_pointer_cast<T>(ref);
+	}
+
+	template<typename T>
+	using WeakRef = std::weak_ptr<T>;
 }

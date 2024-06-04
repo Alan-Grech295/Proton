@@ -94,6 +94,7 @@ namespace Proton
 	{
 		return GetComponent<IDComponent>().ID;
 	}
+
 	const std::string& Entity::GetName()
 	{
 		return GetComponent<TagComponent>().Tag;
@@ -127,7 +128,7 @@ namespace Proton
 	}
 
 	template<>
-	void Entity::OnComponentAdded<StaticMeshComponent>(StaticMeshComponent& component) {}
+	void Entity::OnComponentAdded<MeshComponent>(MeshComponent& component) {}
 
 	template<>
 	void Entity::OnComponentAdded<RootNodeTag>(RootNodeTag& component) {}

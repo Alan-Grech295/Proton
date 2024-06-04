@@ -8,7 +8,7 @@
 
 namespace Proton
 {
-	Ref<Texture2D> Texture2D::Create(std::string path, int slot)
+	Ref<Texture2D> Texture2D::Create(const std::string& path, int slot)
 	{
 		PT_PROFILE_FUNCTION();
 

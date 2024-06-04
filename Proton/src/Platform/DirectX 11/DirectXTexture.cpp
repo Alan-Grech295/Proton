@@ -5,7 +5,7 @@
 
 namespace Proton
 {
-	DirectXTexture2D::DirectXTexture2D(std::string path, int slot)
+	DirectXTexture2D::DirectXTexture2D(const std::string& path, int slot)
 	{
 		m_Slot = slot;
 		m_Path = path;
@@ -17,7 +17,7 @@ namespace Proton
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->PSSetShaderResources(m_Slot, 1, pTextureView.GetAddressOf());
 	}
 
-	void DirectXTexture2D::Load(std::string path)
+	void DirectXTexture2D::Load(const std::string& path)
 	{
 		HRESULT hr = DirectX::LoadFromWICFile(std::wstring(path.begin(), path.end()).c_str(), DirectX::WIC_FLAGS_NONE,
 			nullptr, scratch);

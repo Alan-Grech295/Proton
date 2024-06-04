@@ -19,7 +19,7 @@ namespace Proton
 		ProjectSerializer serializer(project);
 		if (serializer.Deserialize(path))
 		{
-			s_ActiveProject->m_ProjectDirectory = path.parent_path();
+			project->m_ProjectDirectory = std::filesystem::absolute(path.parent_path());
 			s_ActiveProject = project;
 			return s_ActiveProject;
 		}
@@ -32,7 +32,7 @@ namespace Proton
 		ProjectSerializer serializer(s_ActiveProject);
 		if (serializer.Serialize(path))
 		{
-			s_ActiveProject->m_ProjectDirectory = path.parent_path();
+			s_ActiveProject->m_ProjectDirectory = std::filesystem::absolute(path.parent_path());
 			return true;
 		}
 

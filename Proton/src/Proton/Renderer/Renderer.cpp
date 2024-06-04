@@ -21,14 +21,14 @@ namespace Proton
 
 	}
 
-	void Renderer::Submit(const Mesh* mesh)
+	void Renderer::Submit(const Mesh* mesh, VertexConstantBuffer* vertTransformBuf, PixelConstantBuffer* pixTransformBuf)
 	{
 		PT_PROFILE_FUNCTION();
 
 		for (Ref<Material::Pass> t : mesh->material->m_Passes)
 		{
 			PT_CORE_ASSERT(t->m_PassID >= 0 && t->m_PassID < m_RenderQueue.size(), "Invalid pass ID");
-			m_RenderQueue[t->m_PassID].AddJob({ mesh, t });
+			m_RenderQueue[t->m_PassID].AddJob({ mesh, vertTransformBuf, pixTransformBuf, t });
 		}
 	}
 
@@ -58,22 +58,22 @@ namespace Proton
 			for (Job& job : p)
 			{
 				// Binding the shaders
-				job.m_MaterialPass->m_VertexShader->Bind();
-				job.m_MaterialPass->m_PixelShader->Bind();
+				job.MaterialPass->m_VertexShader->Bind();
+				job.MaterialPass->m_PixelShader->Bind();
 
 				// Bind all bindables
-				job.m_Mesh->m_IndexBuffer->Bind();
-				job.m_Mesh->m_VertexBuffer->Bind();
-				job.m_Mesh->m_Topology->Bind();
+				job.Mesh->m_IndexBuffer->Bind();
+				job.Mesh->m_VertexBuffer->Bind();
+				job.Mesh->m_Topology->Bind();
 
 				// Binding transform buffers
-				job.m_Mesh->m_TransformBufferVert->Bind();
-				job.m_Mesh->m_TransformBufferPix->Bind();
+				job.VertConstBuf->Bind();
+				job.PixConstBuf->Bind();
 
-				for (Ref<Bindable> bind : job.m_MaterialPass->m_Bindables)
+				for (Ref<Bindable> bind : job.MaterialPass->m_Bindables)
 					bind->Bind();
 
-				RenderCommand::DrawIndexed(job.m_Mesh->m_IndexBuffer->size());
+				RenderCommand::DrawIndexed(job.Mesh->m_IndexBuffer->size());
 			}
 		}
 	}

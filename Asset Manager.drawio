@@ -1,0 +1,113 @@
+<mxfile host="Electron" modified="2024-06-02T20:13:45.982Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/24.4.6 Chrome/124.0.6367.207 Electron/30.0.6 Safari/537.36" etag="0495-NdqHYBb7_b8_n5w" version="24.4.6" type="device">
+  <diagram name="Page-1" id="s1o9P2wB5GYVm1UVTe90">
+    <mxGraphModel dx="1195" dy="697" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-31" value="On Asset load" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-1" target="5xO5ulIbjKp1GPoWiXpJ-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="440" y="340" />
+              <mxPoint x="440" y="340" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-1" value="Asset Manager" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="250" y="310" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-2" value="Keeps track of UUID to path (and vice versa) map&amp;nbsp;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="60" y="430" width="90" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-3" target="5xO5ulIbjKp1GPoWiXpJ-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-3" value="Editor Asset Manager" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="415" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-4" target="5xO5ulIbjKp1GPoWiXpJ-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-4" value="Runtime Asset Manager" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="344" y="415" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-7" value="Stores asset meta data and loads assets from UUID (using the meta data)" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="237.5" y="250" width="145" height="48.33" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-9" value="Steps:&amp;nbsp;&lt;div&gt;&lt;ol&gt;&lt;li&gt;Project is opened&lt;/li&gt;&lt;li&gt;Project directory is scanned and asset to UUID map is created. Previous asset map saved is validated and/or updated.&lt;/li&gt;&lt;li&gt;If an asset is to be loaded, the correct loader is called returning the correct data type.&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;" style="text;strokeColor=none;align=left;fillColor=none;html=1;verticalAlign=top;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="382.5" y="60" width="300" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-10" value="Asset Loader" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="310" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-11" target="5xO5ulIbjKp1GPoWiXpJ-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="400" />
+              <mxPoint x="730" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-20" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-11" target="5xO5ulIbjKp1GPoWiXpJ-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-25" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-11" target="5xO5ulIbjKp1GPoWiXpJ-19">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="502" />
+              <mxPoint x="830" y="502" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-11" value="Mesh Loader" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="520" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-12" target="5xO5ulIbjKp1GPoWiXpJ-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-12" target="5xO5ulIbjKp1GPoWiXpJ-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-12" target="5xO5ulIbjKp1GPoWiXpJ-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-12" value="Image Loader" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="670" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-15" target="5xO5ulIbjKp1GPoWiXpJ-10">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="870" y="400" />
+              <mxPoint x="730" y="400" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-22" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-15" target="5xO5ulIbjKp1GPoWiXpJ-18">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="870" y="502" />
+              <mxPoint x="670" y="502" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="5xO5ulIbjKp1GPoWiXpJ-15" target="5xO5ulIbjKp1GPoWiXpJ-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-15" value="... Loader" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="810" y="420" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-18" value="Editor Load" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="610" y="525" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-19" value="Runtime Load" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="770" y="525" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-29" value="Loads assets from their &quot;editable&quot; file (ex: mesh from .obj file)" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="605" y="600" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="5xO5ulIbjKp1GPoWiXpJ-30" value="Loads assets from the asset pack" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="765" y="600" width="130" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

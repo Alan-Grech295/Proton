@@ -82,28 +82,25 @@ namespace Proton
 										 node.Origin *
 										 accumulatedTransform;
 
-		if (entity.HasComponent<StaticMeshComponent>())
+		if (entity.HasComponent<MeshComponent>())
 		{
-			StaticMeshComponent& mesh = entity.GetComponent<StaticMeshComponent>();
+			MeshComponent& mesh = entity.GetComponent<MeshComponent>();
 
-			for (Mesh* m : mesh.MeshPtrs)
+			const auto modelView = transformMat * cameraView;
+			const Transforms tf =
 			{
-				const auto modelView = transformMat * cameraView;
-				const Transforms tf =
-				{
-					DirectX::XMMatrixTranspose(modelView),
-					DirectX::XMMatrixTranspose(
-						modelView *
-						cameraProjection
-					)
-				};
+				DirectX::XMMatrixTranspose(modelView),
+				DirectX::XMMatrixTranspose(
+					modelView *
+					cameraProjection
+				)
+			};
 
-				m->m_TransformBufferVert->SetData(&tf);
-				(*m->m_TransformBufferPix)["modelViewProj"] = tf.modelViewProj;
-				(*m->m_TransformBufferPix)["model"] = tf.model;
+			mesh.TransformBufferVert->SetData(&tf);
+			(*mesh.TransformBufferPix)["modelViewProj"] = tf.modelViewProj;
+			(*mesh.TransformBufferPix)["model"] = tf.model;
 
-				Renderer::Submit(m);
-			}
+			Renderer::Submit(mesh.PMesh, mesh.TransformBufferVert.get(), mesh.TransformBufferPix.get());
 		}
 
 		for (UUID e : node.Children)

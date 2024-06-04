@@ -8,13 +8,13 @@ namespace Proton
 	class DirectXTexture2D : public Texture2D
 	{
 	public:
-		DirectXTexture2D(std::string path, int slot = 0);
+		DirectXTexture2D(const std::string& path, int slot = 0);
 		//DirectXTexture2D(uint32_t assetID, int slot = 0);
 		virtual ~DirectXTexture2D() {}
 
 		virtual void Bind() override;
 
-		virtual void Load(std::string path) override;
+		virtual void Load(const std::string& path) override;
 		//virtual void Load(uint32_t assetID) override;
 		virtual Color GetPixel(int x, int y) const override;
 		virtual void* GetTexturePointer() const override;

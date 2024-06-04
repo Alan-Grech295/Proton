@@ -38,6 +38,16 @@ namespace Proton
 			return GetAssetDirectory() / path;
 		}
 
+		// Assuming that a non-relative path is from the Asset directory
+		static std::filesystem::path GetAssetRelativePath(const std::filesystem::path& path)
+		{
+			PT_CORE_ASSERT(s_ActiveProject);
+			if(path.is_absolute())
+				return std::filesystem::relative(path, GetAssetDirectory());
+
+			return path;
+		}
+
 		ProjectConfig& GetConfig() 
 		{ 
 			return m_Config; 

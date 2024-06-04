@@ -3,7 +3,6 @@
 #include "Proton\Scene\SceneSerializer.h"
 #include "Proton\Utils\PlatformUtils.h"
 #include <Proton\Math\Math.h>
-#include <Proton\Asset System\AssetManager.h>
 #include "Proton\Scripting\ScriptEngine.h"
 
 #include "ImGuizmo.h"
@@ -26,9 +25,6 @@ namespace Proton
 		m_IconStop = Texture2D::Create("Resources/icons/StopButton.png");
 		m_IconPause = Texture2D::Create("Resources/icons/PauseButton.png");
 		m_IconStep = Texture2D::Create("Resources/icons/StepButton.png");
-
-		AssetManager::SetProjectPath(projectPath);
-		AssetManager::ScanProject();
 
 		Application::Get().GetWindow().ShowCursor();
 
@@ -55,11 +51,19 @@ namespace Proton
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1)
 		{
-			NewProject();
-			Ref<Model> model = AssetManager::GetEditorAsset<Model>("C:\\Dev\\Proton\\Proton-Editor\\assets\\Models\\Sponza\\sponza.obj");
-			model->CreateEntity(*m_ActiveScene);
-			/*auto projectFilePath = commandLineArgs[1];
-			OpenProject(projectFilePath);*/
+			auto projectFilePath = commandLineArgs[1];
+			OpenProject(projectFilePath);
+			//NewProject();
+
+
+			/*Ref<Model> model = assetManager.LoadAsset<Model>("Models\\Sponza\\sponza.obj");
+			Model::CreateEntity(model, *m_ActiveScene);*/
+
+			/*Ref<Model> nano = assetManager.LoadAsset<Model>("Models\\nano_textured\\nanosuit.obj");
+			Model::CreateEntity(nano, *m_ActiveScene);*/
+
+			/*Ref<Model> cube = assetManager.LoadAsset<Model>("Models\\cube.obj");
+			Model::CreateEntity(cube, *m_ActiveScene);*/
 		}
 		else
 		{
@@ -598,8 +602,21 @@ namespace Proton
 	{
 		if (Project::Load(path))
 		{
-			auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene);
-			OpenScene(startScenePath);
+			//AssetManager::SetProjectPath(std::filesystem::absolute(path).remove_filename());
+			//AssetManager::ScanProject();
+
+			assetManager.ScanDirectory(Project::GetAssetDirectory());
+
+			if (Project::GetActive()->GetConfig().StartScene != "")
+			{
+				NewScene();
+				/*auto startScenePath = std::filesystem::absolute(path).remove_filename() / Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene).make_preferred();
+				OpenScene(startScenePath);*/
+			}
+			else
+			{
+				NewScene();
+			}
 		}
 	}
 

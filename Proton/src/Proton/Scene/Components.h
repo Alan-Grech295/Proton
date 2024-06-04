@@ -4,6 +4,7 @@
 #include "SceneCamera.h"
 #include "Scene.h"
 #include "Proton/Core/UUID.h"
+#include "Proton/Model/Mesh.h"
 
 #include <vector>
 #include <DirectXMath.h>
@@ -67,10 +68,30 @@ namespace Proton
 		CameraComponent(const CameraComponent&) = default;
 	};
 
-	struct StaticMeshComponent
+	struct MeshComponent
 	{
-		StaticMeshComponent() = default;
-		StaticMeshComponent(const StaticMeshComponent& other) = default;
+		struct Transforms
+		{
+			DirectX::XMMATRIX modelViewProj;
+			DirectX::XMMATRIX model;
+		};
+
+		MeshComponent()
+		{
+			TransformBufferVert = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
+			DCB::RawLayout layout;
+			layout.Add(DCB::Type::Matrix4x4, "modelViewProj");
+			layout.Add(DCB::Type::Matrix4x4, "model");
+			TransformBufferPix = PixelConstantBuffer::CreateUnique(2, DCB::CookedLayout(std::move(layout)));
+		}
+
+		// Copy constructor
+		MeshComponent(const MeshComponent& other)
+			: PMesh(other.PMesh), ModelRef(other.ModelRef)
+		{
+			TransformBufferVert = VertexConstantBuffer::CreateUnique(other.TransformBufferVert.get());
+			TransformBufferPix = PixelConstantBuffer::CreateUnique(other.TransformBufferPix.get());
+		}
 
 		/*MeshComponent(std::vector<Mesh*> meshPtrs)
 			:
@@ -78,8 +99,11 @@ namespace Proton
 		{}*/
 
 	public:
-		std::vector<class Mesh*> MeshPtrs;
+		Mesh* PMesh = nullptr;
 		Ref<class Model> ModelRef;
+
+		Ref<VertexConstantBuffer> TransformBufferVert;
+		Ref<PixelConstantBuffer> TransformBufferPix;
 	};
 
 	struct RootNodeTag
@@ -196,7 +220,7 @@ namespace Proton
 	{
 	};
 
-	using AllComponents = ComponentGroup<TransformComponent, CameraComponent, StaticMeshComponent,
+	using AllComponents = ComponentGroup<TransformComponent, CameraComponent, MeshComponent,
 										 RootNodeTag, NodeComponent, LightComponent,
 										 ScriptComponent, NativeScriptComponent>;
 }

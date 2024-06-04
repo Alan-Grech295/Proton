@@ -1,10 +1,9 @@
 #pragma once
 #include "Proton/Renderer/Bindables/Binds.h"
-#include "Proton/Asset System/Asset.h"
 
 namespace Proton
 {
-	class Material : public Asset
+	class Material
 	{
 	public:
 		class Pass
@@ -24,8 +23,7 @@ namespace Proton
 		};
 
 	public:
-		Material(UUID uuid)
-			: Asset(uuid)
+		Material()
 		{}
 
 		void AddPass(Ref<Pass> pass)

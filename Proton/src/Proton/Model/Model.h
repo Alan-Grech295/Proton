@@ -1,6 +1,5 @@
 #pragma once
 #include "Mesh.h"
-#include "Proton/Asset System/Asset.h"
 #include "Proton/Scene/Entity.h"
 
 namespace Proton
@@ -20,18 +19,25 @@ namespace Proton
 		DirectX::XMMATRIX m_Transformation;
 	};
 
-	class Model : public Asset
+	class Model
 	{
 	public:
-		Model(UUID uuid) 
-			: Asset(uuid) 
+		Model()
 		{}
 
-		Entity CreateEntity(Scene& activeScene);
+		static Entity CreateEntity(Ref<Model> model, Scene& activeScene);
 
-		static Ref<Model> DeserializeEditor(const std::filesystem::path& path, UUID uuid);
+		~Model()
+		{
+			m_Meshes.~vector();
+			m_Nodes.~vector();
+		}
+
+		//static Ref<Model> DeserializeEditor(const std::filesystem::path& path, UUID uuid);
 	private:
-		Entity CreateNodeEntity(Node& node, Scene& activeScene);
+		static Entity CreateNodeEntity(Node& node, Scene& activeScene, Ref<Model> model);
+		static Entity CreateMeshEntity(Entity parentEntity, Scene& activeScene, Ref<Model> modelRef, Mesh* mesh);
+		static void AddMeshComponent(Entity entity, Ref<Model> modelRef, Mesh* mesh);
 	public:
 		// Nodes and meshes are model specific
 		std::vector<Node> m_Nodes;

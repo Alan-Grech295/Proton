@@ -10,14 +10,18 @@ namespace Proton
 	class Job
 	{
 	public:
-		Job(const Mesh* mesh, Ref<Material::Pass> step)
+		Job(const Mesh* mesh, VertexConstantBuffer* vertConstBuf, PixelConstantBuffer* pixConstBuf, Ref<Material::Pass> step)
 			:
-			m_Mesh(mesh),
-			m_MaterialPass(step)
+			Mesh(mesh),
+			MaterialPass(step),
+			VertConstBuf(vertConstBuf),
+			PixConstBuf(pixConstBuf)
 		{}
 
 	public:
-		const Mesh* m_Mesh;
-		Ref<Material::Pass> m_MaterialPass;
+		const Mesh* Mesh = nullptr;
+		VertexConstantBuffer* VertConstBuf = nullptr;
+		PixelConstantBuffer* PixConstBuf = nullptr;
+		Ref<Material::Pass> MaterialPass;
 	};
 }

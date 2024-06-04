@@ -8,6 +8,7 @@
 #include "Panels\ConsolePanel.h"
 #include <Proton\Renderer\SceneRenderer.h>
 #include "Proton\Renderer\EditorCamera.h"
+#include "Proton/Asset System/Editor/EditorAssetManager.h"
 
 #include "ImGuizmo.h"
 
@@ -62,6 +63,8 @@ namespace Proton
 		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconPause, m_IconStep;
 
 		EditorCamera m_EditorCam;
+
+		EditorAssetManager assetManager;
 
 		ImVec2 m_ViewportSize;		
 		ImVec2 m_ViewportBounds[2];

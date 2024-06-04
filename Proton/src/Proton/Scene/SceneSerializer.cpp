@@ -241,25 +241,25 @@ namespace Proton
 			out << YAML::EndMap;	//LightComponent
 		}
 
-		if (entity.HasComponent<StaticMeshComponent>() && writeMesh)
+		if (entity.HasComponent<MeshComponent>() && writeMesh)
 		{
 			out << YAML::Key << "MeshComponent";
-			out << YAML::BeginMap;	//MeshComponent
+			out << YAML::BeginMap;	//StaticMeshComponent
 
-			auto& mc = entity.GetComponent<StaticMeshComponent>();
+			auto& mc = entity.GetComponent<MeshComponent>();
 
-			for (int i = 0; i < mc.MeshPtrs.size(); i++)
-			{
-				Mesh& mesh = *mc.MeshPtrs[i];
-				out << YAML::Key << ("Mesh" + std::to_string(i));
+			//for (int i = 0; i < mc.MeshPtrs.size(); i++)
+			//{
+			//	Mesh& mesh = *mc.MeshPtrs[i];
+			//	out << YAML::Key << ("PMesh" + std::to_string(i));
 
-				out << YAML::BeginMap;	//Mesh
-				//out << YAML::Key << "Model Path" << YAML::Value << mesh.m_ModelPath;
-				out << YAML::Key << "Mesh Name" << YAML::Value << mesh.m_Name;
-				out << YAML::EndMap;	//Mesh
-			}
+			//	out << YAML::BeginMap;	//Mesh
+			//	//out << YAML::Key << "Model UUID" << YAML::Value << mesh.m_Model->m_UUID;
+			//	out << YAML::Key << "PMesh Name" << YAML::Value << mesh.m_Name;
+			//	out << YAML::EndMap;	//Mesh
+			//}
 
-			out << YAML::EndMap;	//MeshComponent
+			out << YAML::EndMap;	//StaticMeshComponent
 		}
 
 		if (entity.HasComponent<CameraComponent>())
@@ -500,15 +500,15 @@ namespace Proton
 
 				if (meshNode)
 				{
-					StaticMeshComponent& meshComponent = deserializedEntity.AddComponent<StaticMeshComponent>();
+					MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
 					NodeComponent& nodeComponent = deserializedEntity.GetComponent<NodeComponent>();
 
 					uint32_t i = 0;
 					YAML::Node meshDataNode;
-					while (meshDataNode = meshNode["Mesh" + std::to_string(i)])
+					while (meshDataNode = meshNode["PMesh" + std::to_string(i)])
 					{
-						std::string modelPath = meshDataNode["Model Path"].as<std::string>();
-						std::string meshName = meshDataNode["Mesh Name"].as<std::string>();
+						/*std::string modelPath = meshDataNode["Model Path"].as<std::string>();
+						std::string meshName = meshDataNode["Mesh Name"].as<std::string>();*/
 
 						//Ref<Model> model = ModelCollection::GetOrCreate(nodeComponent.RootEntity, modelPath);
 						

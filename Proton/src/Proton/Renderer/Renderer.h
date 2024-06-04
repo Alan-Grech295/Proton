@@ -13,7 +13,7 @@ namespace Proton
 		static void BeginScene();
 		static void EndScene();
 
-		static void Submit(const class Mesh* mesh);
+		static void Submit(const class Mesh* mesh, class VertexConstantBuffer* vertTransformBuf, class PixelConstantBuffer* pixTransformBuf);
 
 		static void Submit(VertexBuffer* vertBuffer, IndexBuffer* indexBuffer);
 
