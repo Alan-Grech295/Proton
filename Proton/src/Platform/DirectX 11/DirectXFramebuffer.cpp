@@ -184,12 +184,12 @@ namespace Proton
 			context->ClearRenderTargetView(target, (const float*)spec.ClearColor);
 			break;
 		case FramebufferTextureFormat::RINT:
-			/*context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			context->OMSetRenderTargets(1, &target, nullptr);
 			spec.ClearVS->Bind();
 			spec.ClearPS->Bind();
 			spec.ClearCBuf->Bind();
-			context->Draw(3, 0);*/
+			context->Draw(3, 0);
 			//context->ClearRenderTargetView(target, (const float*)spec.ClearColor);
 			break;
 		}
@@ -218,7 +218,7 @@ namespace Proton
 		Recreate();
 	}
 
-	void* DirectXFramebuffer::ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size)
+	void DirectXFramebuffer::ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size, void* dest)
 	{
 		assert(targetIndex < m_ColorAttachmentTextures.size());
 		//assert(m_ColorAttachmentSpecifications[attachmentIndex].TextureFormat == FramebufferTextureFormat::RINT);
@@ -256,12 +256,10 @@ namespace Proton
 			)
 		);
 
-		void* pixel = malloc(size);
 		int pos = x * size + y * msr.RowPitch;
-		memcpy(pixel, ((char*)msr.pData) + pos, size);
+		memcpy(dest, ((char*)msr.pData) + pos, size);
 
 		context->Unmap(copyTexture.Get(), 0);
-		return pixel;
 	}
 
 	void DirectXFramebuffer::Bind()

@@ -28,9 +28,7 @@ namespace Proton
 			assert("Unknown RendererAPI!");
 		}
 
-		vertexBuffer->m_Data = (char*)malloc(numElements * layout.stride);
-		vertexBuffer->m_End = vertexBuffer->m_Data;
-		vertexBuffer->m_MaxSize = numElements * layout.stride;
+		vertexBuffer->Allocate(numElements * layout.stride);
 		
 		return vertexBuffer;
 	}
@@ -52,9 +50,7 @@ namespace Proton
 			assert("Unknown RendererAPI!");
 		}
 
-		vertexBuffer->m_Data = (char*)malloc(numElements * layout.stride);
-		vertexBuffer->m_End = vertexBuffer->m_Data;
-		vertexBuffer->m_MaxSize = numElements * layout.stride;
+		vertexBuffer->Allocate(numElements * layout.stride);
 
 		return vertexBuffer;
 	}
@@ -154,7 +150,12 @@ namespace Proton
 
 	Scope<VertexConstantBuffer> VertexConstantBuffer::CreateUnique(Ref<Bindable> other)
 	{
-		VertexConstantBuffer* vcb = dynamic_cast<VertexConstantBuffer*>(other.get());
+		return CreateUnique(other.get());
+	}
+
+	Scope<VertexConstantBuffer> VertexConstantBuffer::CreateUnique(Bindable* other)
+	{
+		VertexConstantBuffer* vcb = static_cast<VertexConstantBuffer*>(other);
 		void* data = vcb->GetData();
 		Scope< VertexConstantBuffer> result = VertexConstantBuffer::CreateUnique(vcb->m_Slot, vcb->m_Size, data);
 		return result;
@@ -198,10 +199,15 @@ namespace Proton
 
 	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(Ref<Bindable> other)
 	{
-		PixelConstantBuffer& pcb = dynamic_cast<PixelConstantBuffer&>(*other);
-		DCB::CookedLayout cookedLayout = DCB::CookedLayout(pcb.m_Root);
-		Scope<PixelConstantBuffer> result = PixelConstantBuffer::CreateUnique(pcb.m_Slot, cookedLayout);
-		memcpy(result->m_Data, pcb.GetData(), pcb.m_Size);
+		return CreateUnique(other.get());
+	}
+
+	Scope<PixelConstantBuffer> PixelConstantBuffer::CreateUnique(Bindable* other)
+	{
+		PixelConstantBuffer* pcb = static_cast<PixelConstantBuffer*>(other);
+		DCB::CookedLayout cookedLayout = DCB::CookedLayout(pcb->m_Root);
+		Scope<PixelConstantBuffer> result = PixelConstantBuffer::CreateUnique(pcb->m_Slot, cookedLayout);
+		memcpy(result->m_Data, pcb->GetData(), pcb->m_Size);
 		return result;
 	}
 

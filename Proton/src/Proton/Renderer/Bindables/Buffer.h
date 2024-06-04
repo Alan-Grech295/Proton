@@ -195,7 +195,11 @@ namespace Proton
 	{
 		friend class BindsCollection;
 	public:
-		virtual ~VertexBuffer() {}
+		virtual ~VertexBuffer()
+		{
+			if(m_Data)
+				free(m_Data);
+		}
 
 		virtual const BufferLayout& GetLayout() const = 0;
 
@@ -238,10 +242,19 @@ namespace Proton
 
 		void Clear()
 		{
-			delete[] m_Data;
+			if (!m_Data) return;
+			free(m_Data);
 			m_Data = nullptr;
 			m_End = nullptr;
 			m_Changed = true;
+		}
+
+		void Allocate(int size)
+		{
+			Clear();
+			m_Data = (char*)malloc(size);
+			m_End = m_Data;
+			m_MaxSize = size;
 		}
 
 		uint32_t size() { return (uint32_t)(m_End - m_Data) / m_Layout.stride; }
@@ -266,8 +279,8 @@ namespace Proton
 	protected:
 		std::string m_Uid;
 		VertexShader* m_Shader;
-		char* m_Data;
-		char* m_End;
+		char* m_Data = nullptr;
+		char* m_End = nullptr;
 		uint32_t m_MaxSize = 0;
 		BufferLayout m_Layout;
 		bool m_Changed = true;
@@ -352,6 +365,8 @@ namespace Proton
 
 		static Scope<VertexConstantBuffer> CreateUnique(Ref<Bindable> other);
 
+		static Scope<VertexConstantBuffer> CreateUnique(Bindable* other);
+
 	protected:
 		uint32_t m_Size;
 		uint32_t m_Slot;
@@ -376,6 +391,7 @@ namespace Proton
 		static Scope<PixelConstantBuffer> CreateUnique(int slot, const DCB::CookedLayout& layout);
 
 		static Scope<PixelConstantBuffer> CreateUnique(Ref<Bindable> other);
+		static Scope<PixelConstantBuffer> CreateUnique(Bindable* other);
 
 		static PixelConstantBuffer* CreateUniquePtr(int slot, const DCB::CookedLayout& layout);
 	protected:

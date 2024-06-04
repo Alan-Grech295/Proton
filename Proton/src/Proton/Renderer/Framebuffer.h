@@ -118,9 +118,14 @@ namespace Proton
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
 		template<typename T>
-		inline T ReadPixel(uint32_t targetIndex, int x, int y) { return *(T*)ReadPixel_Impl(targetIndex, x, y, (uint32_t)sizeof(T)); }
+		inline T ReadPixel(uint32_t targetIndex, int x, int y) 
+		{ 
+			T pixel = T();
+			ReadPixel_Impl(targetIndex, x, y, (uint32_t)sizeof(T), &pixel);
+			return pixel;
+		}
 
-		virtual void* ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size) = 0;
+		virtual void ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size, void* dest) = 0;
 
 		virtual void Clear() = 0;
 

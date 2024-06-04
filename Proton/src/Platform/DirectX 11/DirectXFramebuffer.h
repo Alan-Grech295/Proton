@@ -35,7 +35,7 @@ namespace Proton
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
 
-		virtual void* ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size) override;
+		virtual void ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size, void* dest) override;
 
 		virtual void Bind() override;
 	private:

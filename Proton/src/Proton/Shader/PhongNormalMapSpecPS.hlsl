@@ -66,7 +66,7 @@ PS_OUTPUT main(float3 viewFragPos : POSITION, float3 viewNormal : NORMAL, float3
 	const float3 specular = Specular(specularReflectionColour, specularIntensity, viewNormal, lv.vToL, viewFragPos, att, specPower);
 	
 	output.Color = float4(saturate((diffuse + ambient) * texCol.rgb + specular * diffuseIntensity), texCol.a);
-	output.PickID = 50;
+	output.PickID = 10;
 	
 	return output;
 }
