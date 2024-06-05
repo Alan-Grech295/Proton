@@ -1,0 +1,1179 @@
+ID: 9121887600092708294
+Type: Model
+Sub assets:
+  - ID: 18194079135841183518
+    Type: Mesh
+    Path: sponza_00
+  - ID: 7801252577295232542
+    Type: Mesh
+    Path: sponza_01
+  - ID: 2741258013126405446
+    Type: Mesh
+    Path: vasegrp7
+  - ID: 4979791442193573166
+    Type: Mesh
+    Path: sponza_03
+  - ID: 11494597881497826686
+    Type: Mesh
+    Path: sponza_05
+  - ID: 13466339662520102405
+    Type: Mesh
+    Path: sponza_06
+  - ID: 14227142210471502848
+    Type: Mesh
+    Path: sponza_07
+  - ID: 2523736994979004234
+    Type: Mesh
+    Path: sponza_08
+  - ID: 4382781182041357739
+    Type: Mesh
+    Path: sponza_09
+  - ID: 11824031020664549628
+    Type: Mesh
+    Path: sponza_10
+  - ID: 9949183057290892371
+    Type: Mesh
+    Path: sponza_11
+  - ID: 3484292096068926814
+    Type: Mesh
+    Path: sponza_12
+  - ID: 7931689170028570650
+    Type: Mesh
+    Path: sponza_13
+  - ID: 17950327378891459598
+    Type: Mesh
+    Path: sponza_14
+  - ID: 1293582441334175990
+    Type: Mesh
+    Path: sponza_15
+  - ID: 16850826351724549805
+    Type: Mesh
+    Path: sponza_16
+  - ID: 13578161746544195257
+    Type: Mesh
+    Path: sponza_17
+  - ID: 8052901633977294439
+    Type: Mesh
+    Path: sponza_18
+  - ID: 9422184509628978015
+    Type: Mesh
+    Path: sponza_19
+  - ID: 8224165352908600600
+    Type: Mesh
+    Path: sponza_20
+  - ID: 13393344690270935078
+    Type: Mesh
+    Path: sponza_21
+  - ID: 9509720443991214392
+    Type: Mesh
+    Path: sponza_22
+  - ID: 12057807973639515504
+    Type: Mesh
+    Path: sponza_23
+  - ID: 1306615440026479743
+    Type: Mesh
+    Path: sponza_24
+  - ID: 14118412683705916124
+    Type: Mesh
+    Path: sponza_25
+  - ID: 795391607101857213
+    Type: Mesh
+    Path: sponza_26
+  - ID: 6230340609176105156
+    Type: Mesh
+    Path: sponza_27
+  - ID: 16499359059185539338
+    Type: Mesh
+    Path: sponza_28
+  - ID: 16739221082482734142
+    Type: Mesh
+    Path: sponza_29
+  - ID: 14813705023226361932
+    Type: Mesh
+    Path: sponza_30
+  - ID: 3029816904908793344
+    Type: Mesh
+    Path: sponza_31
+  - ID: 6656564576480120402
+    Type: Mesh
+    Path: sponza_32
+  - ID: 15593450451771554635
+    Type: Mesh
+    Path: sponza_33
+  - ID: 8270024943582531280
+    Type: Mesh
+    Path: sponza_34
+  - ID: 5467829315864988635
+    Type: Mesh
+    Path: sponza_35
+  - ID: 12833818712590428092
+    Type: Mesh
+    Path: sponza_36
+  - ID: 12282192439963629583
+    Type: Mesh
+    Path: sponza_37
+  - ID: 1992756697602360934
+    Type: Mesh
+    Path: sponza_38
+  - ID: 9948666420000756207
+    Type: Mesh
+    Path: sponza_39
+  - ID: 6411480269180315691
+    Type: Mesh
+    Path: sponza_40
+  - ID: 9711634931354966968
+    Type: Mesh
+    Path: sponza_41
+  - ID: 10219424563538742950
+    Type: Mesh
+    Path: sponza_42
+  - ID: 7514719611866883730
+    Type: Mesh
+    Path: sponza_43
+  - ID: 5191390249706866078
+    Type: Mesh
+    Path: sponza_44
+  - ID: 4683177685689607125
+    Type: Mesh
+    Path: sponza_45
+  - ID: 11768551621127110654
+    Type: Mesh
+    Path: sponza_46
+  - ID: 1097002946554809814
+    Type: Mesh
+    Path: sponza_47
+  - ID: 4796930554907640829
+    Type: Mesh
+    Path: sponza_48
+  - ID: 5296880797276985611
+    Type: Mesh
+    Path: sponza_49
+  - ID: 8747306659178871092
+    Type: Mesh
+    Path: sponza_50
+  - ID: 13724190119400930317
+    Type: Mesh
+    Path: sponza_51
+  - ID: 1409297606806874618
+    Type: Mesh
+    Path: sponza_52
+  - ID: 17594920886915018416
+    Type: Mesh
+    Path: sponza_53
+  - ID: 10412086623827357475
+    Type: Mesh
+    Path: sponza_54
+  - ID: 3737239705195179329
+    Type: Mesh
+    Path: sponza_55
+  - ID: 6109245851522208935
+    Type: Mesh
+    Path: sponza_56
+  - ID: 14315782787498859382
+    Type: Mesh
+    Path: sponza_57
+  - ID: 733223632964749731
+    Type: Mesh
+    Path: sponza_58
+  - ID: 4592273192117543987
+    Type: Mesh
+    Path: sponza_59
+  - ID: 924061062506108922
+    Type: Mesh
+    Path: sponza_60
+  - ID: 12805383488489010332
+    Type: Mesh
+    Path: sponza_61
+  - ID: 11433238741499739456
+    Type: Mesh
+    Path: sponza_62
+  - ID: 7374688122613036556
+    Type: Mesh
+    Path: sponza_63
+  - ID: 1704903895549029530
+    Type: Mesh
+    Path: sponza_64
+  - ID: 9223470059350629253
+    Type: Mesh
+    Path: sponza_65
+  - ID: 12730527286676029273
+    Type: Mesh
+    Path: sponza_66
+  - ID: 9482024262886701385
+    Type: Mesh
+    Path: sponza_67
+  - ID: 4847245770164613884
+    Type: Mesh
+    Path: sponza_68
+  - ID: 7369208765584284085
+    Type: Mesh
+    Path: sponza_69
+  - ID: 7797399353349628601
+    Type: Mesh
+    Path: sponza_70
+  - ID: 14396494319153661061
+    Type: Mesh
+    Path: sponza_71
+  - ID: 12883626717825123910
+    Type: Mesh
+    Path: bricks
+  - ID: 191114502498137731
+    Type: Mesh
+    Path: sponza_72
+  - ID: 5443080065257955148
+    Type: Mesh
+    Path: sponza_73
+  - ID: 5143717345019309148
+    Type: Mesh
+    Path: sponza_74
+  - ID: 2373539161458365154
+    Type: Mesh
+    Path: sponza_75
+  - ID: 2667409274016607429
+    Type: Mesh
+    Path: sponza_76
+  - ID: 2411191005713985765
+    Type: Mesh
+    Path: sponza_77
+  - ID: 8236956527931655341
+    Type: Mesh
+    Path: sponza_78
+  - ID: 3230114477500427736
+    Type: Mesh
+    Path: sponza_79
+  - ID: 12119850192727147417
+    Type: Mesh
+    Path: sponza_80
+  - ID: 5706351340267679173
+    Type: Mesh
+    Path: sponza_81
+  - ID: 11435603760530683997
+    Type: Mesh
+    Path: sponza_82
+  - ID: 6512760588927265127
+    Type: Mesh
+    Path: sponza_83
+  - ID: 15065779191422074868
+    Type: Mesh
+    Path: sponza_84
+  - ID: 13254196443161236084
+    Type: Mesh
+    Path: sponza_85
+  - ID: 15509509780513381092
+    Type: Mesh
+    Path: sponza_86
+  - ID: 15738429184591870898
+    Type: Mesh
+    Path: sponza_87
+  - ID: 13355642515722178916
+    Type: Mesh
+    Path: sponza_88
+  - ID: 14415556261740749162
+    Type: Mesh
+    Path: sponza_89
+  - ID: 6245299304756466791
+    Type: Mesh
+    Path: sponza_90
+  - ID: 8240185008416803668
+    Type: Mesh
+    Path: sponza_91
+  - ID: 14609444634186966087
+    Type: Mesh
+    Path: sponza_92
+  - ID: 18320332809643680622
+    Type: Mesh
+    Path: sponza_93
+  - ID: 4671082202750164221
+    Type: Mesh
+    Path: sponza_94
+  - ID: 6478832936487952192
+    Type: Mesh
+    Path: sponza_95
+  - ID: 18099942545855596252
+    Type: Mesh
+    Path: sponza_96
+  - ID: 4211609444424792763
+    Type: Mesh
+    Path: sponza_97
+  - ID: 4428104757210546798
+    Type: Mesh
+    Path: sponza_98
+  - ID: 7977889470755827629
+    Type: Mesh
+    Path: sponza_99
+  - ID: 12166444402595932922
+    Type: Mesh
+    Path: sponza_100
+  - ID: 978248756158386789
+    Type: Mesh
+    Path: sponza_101
+  - ID: 14589351230414567680
+    Type: Mesh
+    Path: sponza_102
+  - ID: 5574431933113243930
+    Type: Mesh
+    Path: sponza_103
+  - ID: 8999946435142962734
+    Type: Mesh
+    Path: sponza_104
+  - ID: 10285568699617459639
+    Type: Mesh
+    Path: sponza_105
+  - ID: 6680342669512042189
+    Type: Mesh
+    Path: sponza_106
+  - ID: 12743570984305169891
+    Type: Mesh
+    Path: sponza_107
+  - ID: 13175148639674419609
+    Type: Mesh
+    Path: sponza_108
+  - ID: 15544603049744427740
+    Type: Mesh
+    Path: sponza_109
+  - ID: 6537280234977529586
+    Type: Mesh
+    Path: sponza_110
+  - ID: 17256902842121795599
+    Type: Mesh
+    Path: sponza_111
+  - ID: 5795184944735172308
+    Type: Mesh
+    Path: sponza_112
+  - ID: 10972635420361134164
+    Type: Mesh
+    Path: sponza_113
+  - ID: 8566241602543082410
+    Type: Mesh
+    Path: sponza_114
+  - ID: 4150286922026047660
+    Type: Mesh
+    Path: sponza_115
+  - ID: 1018523254066636307
+    Type: Mesh
+    Path: sponza_116
+  - ID: 11945240767328803991
+    Type: Mesh
+    Path: sponza_117
+  - ID: 10504455370015178253
+    Type: Mesh
+    Path: sponza_118
+  - ID: 11974639491611724378
+    Type: Mesh
+    Path: sponza_119
+  - ID: 12718814829171454081
+    Type: Mesh
+    Path: sponza_120
+  - ID: 13798767424580492676
+    Type: Mesh
+    Path: sponza_121
+  - ID: 14114235808889112029
+    Type: Mesh
+    Path: sponza_122
+  - ID: 133204979351901882
+    Type: Mesh
+    Path: sponza_123
+  - ID: 1726778468696929022
+    Type: Mesh
+    Path: sponza_124
+  - ID: 14572140869422740075
+    Type: Mesh
+    Path: sponza_125
+  - ID: 6674530754673983247
+    Type: Mesh
+    Path: sponza_126
+  - ID: 11578711010187802311
+    Type: Mesh
+    Path: sponza_127
+  - ID: 3780368094300598359
+    Type: Mesh
+    Path: sponza_128
+  - ID: 8513350363099052300
+    Type: Mesh
+    Path: sponza_129
+  - ID: 9368514874600760073
+    Type: Mesh
+    Path: sponza_130
+  - ID: 724701321352235182
+    Type: Mesh
+    Path: sponza_131
+  - ID: 7191659159712261567
+    Type: Mesh
+    Path: sponza_132
+  - ID: 16819782531056800429
+    Type: Mesh
+    Path: sponza_133
+  - ID: 7533768989103497090
+    Type: Mesh
+    Path: sponza_134
+  - ID: 8877877668455014854
+    Type: Mesh
+    Path: sponza_135
+  - ID: 4600696550044103570
+    Type: Mesh
+    Path: sponza_136
+  - ID: 14089112554538170116
+    Type: Mesh
+    Path: sponza_137
+  - ID: 16641310079108464011
+    Type: Mesh
+    Path: sponza_138
+  - ID: 6465002907939871345
+    Type: Mesh
+    Path: sponza_139
+  - ID: 12900878763503752022
+    Type: Mesh
+    Path: sponza_140
+  - ID: 17833600196799421604
+    Type: Mesh
+    Path: sponza_141
+  - ID: 17926708989503798958
+    Type: Mesh
+    Path: sponza_142
+  - ID: 12741395195282818532
+    Type: Mesh
+    Path: sponza_143
+  - ID: 13587748235781693776
+    Type: Mesh
+    Path: sponza_144
+  - ID: 11896778528499113715
+    Type: Mesh
+    Path: sponza_145
+  - ID: 2412607266782276317
+    Type: Mesh
+    Path: sponza_146
+  - ID: 8071341017180490502
+    Type: Mesh
+    Path: sponza_147
+  - ID: 17432622326689194028
+    Type: Mesh
+    Path: sponza_148
+  - ID: 14690938756011517814
+    Type: Mesh
+    Path: sponza_149
+  - ID: 16570206948649891643
+    Type: Mesh
+    Path: sponza_150
+  - ID: 14325513097083439915
+    Type: Mesh
+    Path: sponza_151
+  - ID: 7092344436160321859
+    Type: Mesh
+    Path: sponza_152
+  - ID: 14665202013412462752
+    Type: Mesh
+    Path: sponza_153
+  - ID: 17145700519210862711
+    Type: Mesh
+    Path: sponza_154
+  - ID: 8329101213014337389
+    Type: Mesh
+    Path: sponza_155
+  - ID: 7514138631571650628
+    Type: Mesh
+    Path: sponza_156
+  - ID: 15539502259428836608
+    Type: Mesh
+    Path: sponza_157
+  - ID: 15453444562479870924
+    Type: Mesh
+    Path: sponza_158
+  - ID: 12994926065554183408
+    Type: Mesh
+    Path: sponza_159
+  - ID: 7775576239440816688
+    Type: Mesh
+    Path: sponza_160
+  - ID: 3912822310364041263
+    Type: Mesh
+    Path: sponza_161
+  - ID: 14101087020771399412
+    Type: Mesh
+    Path: sponza_162
+  - ID: 9013519043535266903
+    Type: Mesh
+    Path: sponza_163
+  - ID: 14799100279363994846
+    Type: Mesh
+    Path: sponza_164
+  - ID: 2217337075981187954
+    Type: Mesh
+    Path: sponza_165
+  - ID: 3459359134309415733
+    Type: Mesh
+    Path: sponza_166
+  - ID: 3948580366149692474
+    Type: Mesh
+    Path: sponza_167
+  - ID: 9257679018883237502
+    Type: Mesh
+    Path: sponza_168
+  - ID: 8964917261997172953
+    Type: Mesh
+    Path: sponza_169
+  - ID: 10220329955875259255
+    Type: Mesh
+    Path: sponza_170
+  - ID: 565622270609756576
+    Type: Mesh
+    Path: sponza_171
+  - ID: 1389313715375036936
+    Type: Mesh
+    Path: sponza_172
+  - ID: 1947209453857714701
+    Type: Mesh
+    Path: sponza_173
+  - ID: 401391671500674356
+    Type: Mesh
+    Path: sponza_174
+  - ID: 15856146843820687213
+    Type: Mesh
+    Path: sponza_175
+  - ID: 9084201967333524386
+    Type: Mesh
+    Path: sponza_176
+  - ID: 13491368550192057136
+    Type: Mesh
+    Path: sponza_177
+  - ID: 794618827455383410
+    Type: Mesh
+    Path: sponza_178
+  - ID: 8992685890594199795
+    Type: Mesh
+    Path: sponza_179
+  - ID: 14037073210711562347
+    Type: Mesh
+    Path: sponza_180
+  - ID: 12109510579763403609
+    Type: Mesh
+    Path: sponza_181
+  - ID: 14099355770317344775
+    Type: Mesh
+    Path: sponza_182
+  - ID: 9187845649710535635
+    Type: Mesh
+    Path: sponza_183
+  - ID: 735080822891263589
+    Type: Mesh
+    Path: sponza_184
+  - ID: 1281720613909694728
+    Type: Mesh
+    Path: sponza_185
+  - ID: 16564698807960159344
+    Type: Mesh
+    Path: sponza_186
+  - ID: 16290252863755307742
+    Type: Mesh
+    Path: sponza_187
+  - ID: 13350144054976079492
+    Type: Mesh
+    Path: sponza_188
+  - ID: 410743291725743857
+    Type: Mesh
+    Path: sponza_189
+  - ID: 5430314479119893565
+    Type: Mesh
+    Path: sponza_190
+  - ID: 5996469210932068055
+    Type: Mesh
+    Path: sponza_191
+  - ID: 4968113381907114297
+    Type: Mesh
+    Path: sponza_192
+  - ID: 17453730913604001180
+    Type: Mesh
+    Path: sponza_193
+  - ID: 15369020854831203019
+    Type: Mesh
+    Path: sponza_194
+  - ID: 738550686038729545
+    Type: Mesh
+    Path: sponza_195
+  - ID: 8570841265841415606
+    Type: Mesh
+    Path: sponza_196
+  - ID: 15384102569483307707
+    Type: Mesh
+    Path: sponza_197
+  - ID: 17843436578359968352
+    Type: Mesh
+    Path: sponza_198
+  - ID: 914920832419207951
+    Type: Mesh
+    Path: sponza_199
+  - ID: 13203837818324921465
+    Type: Mesh
+    Path: sponza_200
+  - ID: 14493439105858257572
+    Type: Mesh
+    Path: sponza_201
+  - ID: 13009395280051638854
+    Type: Mesh
+    Path: sponza_202
+  - ID: 7711778716486665396
+    Type: Mesh
+    Path: sponza_203
+  - ID: 10126764947897942320
+    Type: Mesh
+    Path: sponza_204
+  - ID: 17776291887017412528
+    Type: Mesh
+    Path: sponza_205
+  - ID: 14561384317867081013
+    Type: Mesh
+    Path: sponza_206
+  - ID: 16831379641503509367
+    Type: Mesh
+    Path: sponza_207
+  - ID: 7569304050054614900
+    Type: Mesh
+    Path: sponza_208
+  - ID: 14321936420844355632
+    Type: Mesh
+    Path: sponza_209
+  - ID: 14938125052847753909
+    Type: Mesh
+    Path: sponza_210
+  - ID: 11389327473045407955
+    Type: Mesh
+    Path: sponza_211
+  - ID: 17300048502898153122
+    Type: Mesh
+    Path: sponza_212
+  - ID: 10595526877440450115
+    Type: Mesh
+    Path: sponza_213
+  - ID: 17929671702283378721
+    Type: Mesh
+    Path: sponza_214
+  - ID: 13368818475790880855
+    Type: Mesh
+    Path: sponza_215
+  - ID: 1744101540084292299
+    Type: Mesh
+    Path: sponza_216
+  - ID: 6939432457806731971
+    Type: Mesh
+    Path: sponza_217
+  - ID: 7305837118713828210
+    Type: Mesh
+    Path: sponza_218
+  - ID: 7580100901133637386
+    Type: Mesh
+    Path: sponza_219
+  - ID: 12426786477003340241
+    Type: Mesh
+    Path: sponza_220
+  - ID: 16537748532251771366
+    Type: Mesh
+    Path: sponza_221
+  - ID: 14390185436867848742
+    Type: Mesh
+    Path: sponza_222
+  - ID: 10076956996631124017
+    Type: Mesh
+    Path: sponza_223
+  - ID: 16307489142250865437
+    Type: Mesh
+    Path: sponza_224
+  - ID: 17042539375496294460
+    Type: Mesh
+    Path: sponza_225
+  - ID: 17796989702911170895
+    Type: Mesh
+    Path: sponza_226
+  - ID: 4072603171938691430
+    Type: Mesh
+    Path: sponza_227
+  - ID: 389556185800048099
+    Type: Mesh
+    Path: sponza_228
+  - ID: 6175979560490876899
+    Type: Mesh
+    Path: sponza_229
+  - ID: 13090486163931283038
+    Type: Mesh
+    Path: sponza_230
+  - ID: 11676775481950530946
+    Type: Mesh
+    Path: sponza_231
+  - ID: 17294013170317500616
+    Type: Mesh
+    Path: sponza_232
+  - ID: 6050674116414707315
+    Type: Mesh
+    Path: sponza_233
+  - ID: 15187958568384056036
+    Type: Mesh
+    Path: sponza_234
+  - ID: 42036039934355434
+    Type: Mesh
+    Path: sponza_235
+  - ID: 11368146796255346792
+    Type: Mesh
+    Path: sponza_236
+  - ID: 6064318212892960054
+    Type: Mesh
+    Path: sponza_237
+  - ID: 6448524327857603217
+    Type: Mesh
+    Path: sponza_238
+  - ID: 11869551893499003471
+    Type: Mesh
+    Path: sponza_239
+  - ID: 13116799264322624523
+    Type: Mesh
+    Path: sponza_240
+  - ID: 11698366202249618584
+    Type: Mesh
+    Path: sponza_241
+  - ID: 11796732479129754329
+    Type: Mesh
+    Path: sponza_242
+  - ID: 1450770926122687375
+    Type: Mesh
+    Path: sponza_243
+  - ID: 4746937397147844390
+    Type: Mesh
+    Path: sponza_244
+  - ID: 7080149015306551263
+    Type: Mesh
+    Path: sponza_245
+  - ID: 7889759206912308289
+    Type: Mesh
+    Path: sponza_246
+  - ID: 5638944742709953802
+    Type: Mesh
+    Path: sponza_247
+  - ID: 1986732225920452778
+    Type: Mesh
+    Path: sponza_248
+  - ID: 7285979339263923819
+    Type: Mesh
+    Path: sponza_249
+  - ID: 15205194636581969798
+    Type: Mesh
+    Path: sponza_250
+  - ID: 5805177432590086825
+    Type: Mesh
+    Path: sponza_251
+  - ID: 18026527700965976669
+    Type: Mesh
+    Path: sponza_252
+  - ID: 890936382702265136
+    Type: Mesh
+    Path: sponza_253
+  - ID: 4195394172725061599
+    Type: Mesh
+    Path: sponza_254
+  - ID: 13011629702757991322
+    Type: Mesh
+    Path: sponza_255
+  - ID: 12047924877552204241
+    Type: Mesh
+    Path: sponza_256
+  - ID: 601465480558992179
+    Type: Mesh
+    Path: sponza_257
+  - ID: 12123556045176370360
+    Type: Mesh
+    Path: sponza_258
+  - ID: 13994558082882561500
+    Type: Mesh
+    Path: sponza_259
+  - ID: 8068913095422516378
+    Type: Mesh
+    Path: sponza_260
+  - ID: 7437333787520769369
+    Type: Mesh
+    Path: sponza_261
+  - ID: 10391274822650105126
+    Type: Mesh
+    Path: sponza_262
+  - ID: 5831005677236959170
+    Type: Mesh
+    Path: sponza_263
+  - ID: 9386329292652909564
+    Type: Mesh
+    Path: sponza_264
+  - ID: 16040560403386825033
+    Type: Mesh
+    Path: sponza_265
+  - ID: 5724789350611371451
+    Type: Mesh
+    Path: sponza_266
+  - ID: 8743224393562442378
+    Type: Mesh
+    Path: sponza_267
+  - ID: 14089574508215495939
+    Type: Mesh
+    Path: sponza_268
+  - ID: 3199065319134219528
+    Type: Mesh
+    Path: sponza_269
+  - ID: 6713305252150588156
+    Type: Mesh
+    Path: sponza_270
+  - ID: 4019067923633898678
+    Type: Mesh
+    Path: sponza_271
+  - ID: 16085379276071205226
+    Type: Mesh
+    Path: sponza_272
+  - ID: 12077000012045532411
+    Type: Mesh
+    Path: sponza_273
+  - ID: 9099162761701812844
+    Type: Mesh
+    Path: sponza_274
+  - ID: 1445089695861600370
+    Type: Mesh
+    Path: sponza_275
+  - ID: 752749923906621901
+    Type: Mesh
+    Path: sponza_276
+  - ID: 7271038929554564032
+    Type: Mesh
+    Path: sponza_277
+  - ID: 11477207460626887421
+    Type: Mesh
+    Path: sponza_278
+  - ID: 17043423391552316757
+    Type: Mesh
+    Path: sponza_279
+  - ID: 9611403204951693659
+    Type: Mesh
+    Path: sponza_280
+  - ID: 7747616899691286616
+    Type: Mesh
+    Path: sponza_281
+  - ID: 4818232330961394398
+    Type: Mesh
+    Path: sponza_282
+  - ID: 13903102974503742784
+    Type: Mesh
+    Path: sponza_283
+  - ID: 13995468846701971857
+    Type: Mesh
+    Path: sponza_284
+  - ID: 8067902412963177689
+    Type: Mesh
+    Path: sponza_285
+  - ID: 850216719959068161
+    Type: Mesh
+    Path: sponza_286
+  - ID: 5532504102160039212
+    Type: Mesh
+    Path: sponza_287
+  - ID: 6308351642617286467
+    Type: Mesh
+    Path: sponza_288
+  - ID: 10575801962036186782
+    Type: Mesh
+    Path: sponza_289
+  - ID: 16717658352235971122
+    Type: Mesh
+    Path: sponza_290
+  - ID: 16670842066519993811
+    Type: Mesh
+    Path: sponza_291
+  - ID: 4758015775641847545
+    Type: Mesh
+    Path: sponza_292
+  - ID: 16919746036852539598
+    Type: Mesh
+    Path: sponza_293
+  - ID: 6524757041705240185
+    Type: Mesh
+    Path: sponza_294
+  - ID: 12134266685283146057
+    Type: Mesh
+    Path: sponza_295
+  - ID: 1278738445733734249
+    Type: Mesh
+    Path: sponza_296
+  - ID: 2118398742365567736
+    Type: Mesh
+    Path: sponza_297
+  - ID: 12144342287809491881
+    Type: Mesh
+    Path: sponza_298
+  - ID: 11670243148070127063
+    Type: Mesh
+    Path: sponza_299
+  - ID: 1462395217676680400
+    Type: Mesh
+    Path: sponza_300
+  - ID: 8800571341138982818
+    Type: Mesh
+    Path: sponza_301
+  - ID: 14008396619400510759
+    Type: Mesh
+    Path: sponza_302
+  - ID: 10566798088910034745
+    Type: Mesh
+    Path: sponza_303
+  - ID: 12548456632764129906
+    Type: Mesh
+    Path: sponza_304
+  - ID: 10411464839162377308
+    Type: Mesh
+    Path: sponza_305
+  - ID: 3309138807653413978
+    Type: Mesh
+    Path: sponza_306
+  - ID: 6031892294578868086
+    Type: Mesh
+    Path: sponza_307
+  - ID: 14009280667554778059
+    Type: Mesh
+    Path: sponza_308
+  - ID: 9579370513457428558
+    Type: Mesh
+    Path: sponza_309
+  - ID: 16021451686740256920
+    Type: Mesh
+    Path: sponza_310
+  - ID: 8072918732142490803
+    Type: Mesh
+    Path: sponza_311
+  - ID: 16170062618070661379
+    Type: Mesh
+    Path: sponza_312
+  - ID: 3828545396841448679
+    Type: Mesh
+    Path: sponza_313
+  - ID: 10479026951066000504
+    Type: Mesh
+    Path: sponza_314
+  - ID: 9157153538189309682
+    Type: Mesh
+    Path: sponza_315
+  - ID: 3944704336440118912
+    Type: Mesh
+    Path: sponza_316
+  - ID: 9122155948785529065
+    Type: Mesh
+    Path: sponza_317
+  - ID: 4262762120364628565
+    Type: Mesh
+    Path: sponza_318
+  - ID: 16544055915389735336
+    Type: Mesh
+    Path: sponza_319
+  - ID: 8159937657106001531
+    Type: Mesh
+    Path: sponza_320
+  - ID: 13808928322517048730
+    Type: Mesh
+    Path: sponza_321
+  - ID: 3577227352170809880
+    Type: Mesh
+    Path: sponza_322
+  - ID: 5442209154755486228
+    Type: Mesh
+    Path: sponza_323
+  - ID: 6803930716383301823
+    Type: Mesh
+    Path: sponza_324
+  - ID: 1427423622760498537
+    Type: Mesh
+    Path: sponza_325
+  - ID: 6730783238887864331
+    Type: Mesh
+    Path: sponza_326
+  - ID: 10951367482692993330
+    Type: Mesh
+    Path: sponza_327
+  - ID: 3496372391366988741
+    Type: Mesh
+    Path: sponza_328
+  - ID: 4554195235335907541
+    Type: Mesh
+    Path: sponza_329
+  - ID: 17393466998348364908
+    Type: Mesh
+    Path: sponza_330
+  - ID: 16364288895824474752
+    Type: Mesh
+    Path: sponza_331
+  - ID: 12504415366665066925
+    Type: Mesh
+    Path: sponza_332
+  - ID: 1920269568373330043
+    Type: Mesh
+    Path: sponza_333
+  - ID: 7192812094765365921
+    Type: Mesh
+    Path: sponza_334
+  - ID: 14508502026310120249
+    Type: Mesh
+    Path: sponza_335
+  - ID: 13805609018997333850
+    Type: Mesh
+    Path: sponza_336
+  - ID: 2574258756258209679
+    Type: Mesh
+    Path: sponza_337
+  - ID: 15873236795168646543
+    Type: Mesh
+    Path: sponza_338
+  - ID: 7251722231532720011
+    Type: Mesh
+    Path: sponza_339
+  - ID: 18235166022755979112
+    Type: Mesh
+    Path: sponza_340
+  - ID: 17213082591064225631
+    Type: Mesh
+    Path: sponza_341
+  - ID: 4204514197773684649
+    Type: Mesh
+    Path: sponza_342
+  - ID: 11449137078321356387
+    Type: Mesh
+    Path: sponza_343
+  - ID: 11635319016065897414
+    Type: Mesh
+    Path: sponza_344
+  - ID: 1023552197751030188
+    Type: Mesh
+    Path: sponza_345
+  - ID: 6252463812251119842
+    Type: Mesh
+    Path: sponza_346
+  - ID: 11771207395123202194
+    Type: Mesh
+    Path: sponza_347
+  - ID: 8136736881620783014
+    Type: Mesh
+    Path: sponza_348
+  - ID: 3067649518708729564
+    Type: Mesh
+    Path: sponza_349
+  - ID: 13413310059490815309
+    Type: Mesh
+    Path: sponza_350
+  - ID: 10145852554606055776
+    Type: Mesh
+    Path: sponza_351
+  - ID: 3961427399110746098
+    Type: Mesh
+    Path: sponza_352
+  - ID: 26900848078936618
+    Type: Mesh
+    Path: sponza_353
+  - ID: 14082438406703587809
+    Type: Mesh
+    Path: sponza_354
+  - ID: 17359738426365110271
+    Type: Mesh
+    Path: sponza_355
+  - ID: 17706377161926641737
+    Type: Mesh
+    Path: sponza_356
+  - ID: 2323363842660856069
+    Type: Mesh
+    Path: sponza_357
+  - ID: 5928326780605853711
+    Type: Mesh
+    Path: sponza_358
+  - ID: 13473216135974505579
+    Type: Mesh
+    Path: sponza_359
+  - ID: 13137492763323816659
+    Type: Mesh
+    Path: sponza_360
+  - ID: 3629469820168790934
+    Type: Mesh
+    Path: sponza_361
+  - ID: 5474084763598675602
+    Type: Mesh
+    Path: sponza_362
+  - ID: 8562741984476379616
+    Type: Mesh
+    Path: sponza_363
+  - ID: 14577528235765480755
+    Type: Mesh
+    Path: sponza_364
+  - ID: 4980898085821433848
+    Type: Mesh
+    Path: sponza_365
+  - ID: 1978316612949478595
+    Type: Mesh
+    Path: sponza_366
+  - ID: 5069517364140106460
+    Type: Mesh
+    Path: vasegrp1
+  - ID: 1446838278111683711
+    Type: Mesh
+    Path: sponza_367
+  - ID: 8347180141279427630
+    Type: Mesh
+    Path: vasegrp8
+  - ID: 15018522633176023692
+    Type: Mesh
+    Path: sponza_368
+  - ID: 11527299092575270295
+    Type: Mesh
+    Path: vasegrp2
+  - ID: 3725090732220052930
+    Type: Mesh
+    Path: sponza_369
+  - ID: 14599109882072753415
+    Type: Mesh
+    Path: vasegrp3
+  - ID: 1288765688360090959
+    Type: Mesh
+    Path: sponza_370
+  - ID: 13581341168912227461
+    Type: Mesh
+    Path: vasegrp4
+  - ID: 16253890653709541035
+    Type: Mesh
+    Path: sponza_371
+  - ID: 8139269750731895217
+    Type: Mesh
+    Path: vasegrp5
+  - ID: 5288047868882188665
+    Type: Mesh
+    Path: sponza_372
+  - ID: 3201637088598684717
+    Type: Mesh
+    Path: vasegrp6
+  - ID: 2228377323494585730
+    Type: Mesh
+    Path: sponza_373
+  - ID: 13148187816595992379
+    Type: Mesh
+    Path: sponza_374
+  - ID: 16192922287363278017
+    Type: Mesh
+    Path: sponza_375
+  - ID: 18313897638507412020
+    Type: Mesh
+    Path: sponza_376
+  - ID: 9223316993012800736
+    Type: Mesh
+    Path: sponza_377
+  - ID: 10728166572476587052
+    Type: Mesh
+    Path: newGroup1
+  - ID: 767416586224212173
+    Type: Mesh
+    Path: sponza_378
+  - ID: 6012673796124004127
+    Type: Mesh
+    Path: Material__298
+  - ID: 6915925238172467063
+    Type: Mesh
+    Path: sponza_379
+  - ID: 4972455668108886187
+    Type: Mesh
+    Path: sponza_380
+  - ID: 6914457100849473254
+    Type: Mesh
+    Path: sponza_381
+  - ID: 13496722140263949859
+    Type: Mesh
+    Path: sponza_382

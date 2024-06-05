@@ -56,14 +56,14 @@ namespace Proton
 			//NewProject();
 
 
-			/*Ref<Model> model = assetManager.LoadAsset<Model>("Models\\Sponza\\sponza.obj");
-			Model::CreateEntity(model, *m_ActiveScene);*/
+			Ref<Model> model = assetManager.LoadAsset<Model>("Models\\Sponza\\sponza.obj");
+			Model::CreateEntity(model, *m_ActiveScene);
 
-			/*Ref<Model> nano = assetManager.LoadAsset<Model>("Models\\nano_textured\\nanosuit.obj");
-			Model::CreateEntity(nano, *m_ActiveScene);*/
+			Ref<Model> nano = assetManager.LoadAsset<Model>("Models\\nano_textured\\nanosuit.obj");
+			Model::CreateEntity(nano, *m_ActiveScene);
 
-			/*Ref<Model> cube = assetManager.LoadAsset<Model>("Models\\cube.obj");
-			Model::CreateEntity(cube, *m_ActiveScene);*/
+			Ref<Model> cube = assetManager.LoadAsset<Model>("Models\\cube.obj");
+			Model::CreateEntity(cube, *m_ActiveScene);
 		}
 		else
 		{

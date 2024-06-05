@@ -53,7 +53,7 @@ namespace Proton
 
         aiNode& node = *pScene->mRootNode;
 
-        model->m_Meshes.resize(pScene->mNumMeshes);
+        model->m_Meshes.reserve(pScene->mNumMeshes);
         std::vector<Ref<Material>> materials;
         materials.resize(pScene->mNumMaterials);
 
@@ -66,10 +66,18 @@ namespace Proton
             //AssetManager::AddAsset(materialUUID, mat);
         }
 
+        EditorAssetManager& assetManager = AssetManager::Instance<EditorAssetManager>();
+
         // Mesh deserialization
         for (int i = 0; i < pScene->mNumMeshes; i++)
         {
-            DeserializeMesh(&model->m_Meshes[i], *pScene->mMeshes[i], modelPath.string(), model, materials);
+            model->m_Meshes.push_back(
+                assetManager.AddOrLoadSubAsset<Mesh>(modelPath, pScene->mMeshes[i]->mName.C_Str(), 
+                    AssetHandle::Mesh, [pScene, i, modelPath, model, materials]() 
+                    { 
+                        return DeserializeMesh(*pScene->mMeshes[i], modelPath.string(), model, materials); 
+                    })
+            );
         }
 
         int nodeCount = CountAssimpNodes(pScene->mRootNode);
@@ -231,19 +239,19 @@ namespace Proton
         return material;
     }
 
-    void ModelLoader::DeserializeMesh(Mesh* outMesh, const aiMesh& mesh, const std::string& modelPath, Ref<Model> model, const std::vector<Ref<Material>>& materials)
+    Ref<Mesh> ModelLoader::DeserializeMesh(const aiMesh& aiMesh, const std::string& modelPath, Ref<Model> model, const std::vector<Ref<Material>>& materials)
     {
         namespace dx = DirectX;
 
         using namespace std::string_literals;
 
-        auto meshTag = modelPath + "%" + mesh.mName.C_Str();
+        auto meshTag = modelPath + "%" + aiMesh.mName.C_Str();
 
-        *outMesh = Mesh(model);
+        Ref<Mesh> mesh = CreateRef<Mesh>(model);
 
-        outMesh->m_Name = mesh.mName.C_Str();
+        mesh->m_Name = aiMesh.mName.C_Str();
 
-        outMesh->material = materials[mesh.mMaterialIndex];
+        mesh->material = materials[aiMesh.mMaterialIndex];
 
         BufferLayout layout = {
             {"POSITION", ShaderDataType::Float3},
@@ -253,18 +261,18 @@ namespace Proton
             {"TEXCOORD", ShaderDataType::Float2}
         };
 
-        VertexShader* vertShader = outMesh->material->m_Passes[0]->m_VertexShader.get();
-        Ref<VertexBuffer> vertBuffer = VertexBuffer::Create(meshTag, layout, vertShader, mesh.mNumVertices);
+        VertexShader* vertShader = mesh->material->m_Passes[0]->m_VertexShader.get();
+        Ref<VertexBuffer> vertBuffer = VertexBuffer::Create(meshTag, layout, vertShader, aiMesh.mNumVertices);
 
         {
             PT_PROFILE_SCOPE("Vertex Loading - Model::SerializeMesh");
-            for (unsigned int i = 0; i < mesh.mNumVertices; i++)
+            for (unsigned int i = 0; i < aiMesh.mNumVertices; i++)
             {
-                dx::XMFLOAT3& position = *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mVertices[i]);
-                dx::XMFLOAT3& normal = *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mNormals[i]);
-                dx::XMFLOAT3& tangent = *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mTangents[i]);
-                dx::XMFLOAT3& bitangent = *reinterpret_cast<dx::XMFLOAT3*>(&mesh.mBitangents[i]);
-                dx::XMFLOAT2& texcoord = *reinterpret_cast<dx::XMFLOAT2*>(&mesh.mTextureCoords[0][i]);
+                dx::XMFLOAT3& position = *reinterpret_cast<dx::XMFLOAT3*>(&aiMesh.mVertices[i]);
+                dx::XMFLOAT3& normal = *reinterpret_cast<dx::XMFLOAT3*>(&aiMesh.mNormals[i]);
+                dx::XMFLOAT3& tangent = *reinterpret_cast<dx::XMFLOAT3*>(&aiMesh.mTangents[i]);
+                dx::XMFLOAT3& bitangent = *reinterpret_cast<dx::XMFLOAT3*>(&aiMesh.mBitangents[i]);
+                dx::XMFLOAT2& texcoord = *reinterpret_cast<dx::XMFLOAT2*>(&aiMesh.mTextureCoords[0][i]);
 
                 vertBuffer->EmplaceBack(
                     position,
@@ -276,15 +284,15 @@ namespace Proton
             }
         }
 
-        outMesh->m_VertexBuffer = vertBuffer;
+        mesh->m_VertexBuffer = vertBuffer;
 
-        Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(meshTag, mesh.mNumFaces * 3);
+        Ref<IndexBuffer> indexBuffer = IndexBuffer::Create(meshTag, aiMesh.mNumFaces * 3);
 
         {
             PT_PROFILE_SCOPE("Index Loading - Model::SerializeMesh");
-            for (unsigned int i = 0; i < mesh.mNumFaces; i++)
+            for (unsigned int i = 0; i < aiMesh.mNumFaces; i++)
             {
-                const auto& face = mesh.mFaces[i];
+                const auto& face = aiMesh.mFaces[i];
                 assert(face.mNumIndices == 3);
                 indexBuffer->EmplaceBack(face.mIndices[0]);
                 indexBuffer->EmplaceBack(face.mIndices[1]);
@@ -292,10 +300,11 @@ namespace Proton
             }
         }
 
-        outMesh->m_IndexBuffer = indexBuffer;
+        mesh->m_IndexBuffer = indexBuffer;
+        return mesh;
     }
 
-    Node* ModelLoader::DeserializeNode(Node*& outNode, const aiNode& assimpNode, std::vector<Mesh>& meshes, uint32_t& index)
+    Node* ModelLoader::DeserializeNode(Node*& outNode, const aiNode& assimpNode, std::vector<Ref<Mesh>>& meshes, uint32_t& index)
     {
         Node* curNode = outNode;
         *curNode = Node();
@@ -310,7 +319,7 @@ namespace Proton
         curNode->m_Meshes.reserve(assimpNode.mNumMeshes);
         for (int i = 0; i < assimpNode.mNumMeshes; i++)
         {
-            curNode->m_Meshes.push_back(&meshes[assimpNode.mMeshes[i]]);
+            curNode->m_Meshes.push_back(meshes[assimpNode.mMeshes[i]]);
         }
 
         curNode->m_Children.reserve(assimpNode.mNumChildren);

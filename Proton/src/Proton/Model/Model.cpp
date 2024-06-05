@@ -40,9 +40,10 @@ namespace Proton
 		{
 			AddMeshComponent(childEntity, model, node.m_Meshes[0]);
 		}
+
 		else if (node.m_Meshes.size() > 1)
 		{
-			for (Mesh* mesh : node.m_Meshes)
+			for (Ref<Mesh> mesh : node.m_Meshes)
 			{
 				CreateMeshEntity(childEntity, activeScene, model, mesh);
 			}
@@ -56,7 +57,7 @@ namespace Proton
 		return childEntity;
 	}
 
-	Entity Model::CreateMeshEntity(Entity parentEntity, Scene& activeScene, Ref<Model> modelRef, Mesh* mesh)
+	Entity Model::CreateMeshEntity(Entity parentEntity, Scene& activeScene, Ref<Model> modelRef, Ref<Mesh> mesh)
 	{
 		namespace dx = DirectX;
 
@@ -71,11 +72,11 @@ namespace Proton
 		return childEntity;
 	}
 
-	void Model::AddMeshComponent(Entity entity, Ref<Model> modelRef, Mesh* mesh)
+	void Model::AddMeshComponent(Entity entity, Ref<Model> modelRef, Ref<Mesh> mesh)
 	{
 		MeshComponent& meshComponent = entity.AddComponent<MeshComponent>();
 		meshComponent.ModelRef = modelRef;
-		meshComponent.PMesh = mesh;
+		meshComponent.PMesh = mesh.get();
 	}
 }
 
