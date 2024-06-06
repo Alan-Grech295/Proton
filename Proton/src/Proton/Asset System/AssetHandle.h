@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 namespace Proton
 {
@@ -43,9 +44,19 @@ namespace Proton
             return AssetTypeName[(int)type];
         }
 
-        void AddSubAsset(UUID assetID)
+        inline static AssetType NameToType(const std::string& name)
+        {
+            return AssetNameType[name];
+        }
+
+        inline void AddSubAsset(UUID assetID)
         {
             SubAssets.push_back(assetID);
+        }
+
+        void AddSubAsset(Ref<AssetHandle> asset)
+        {
+            AddSubAsset(asset->ID);
         }
 
         inline void SetSubAsset(const std::string& relativePath)
@@ -70,5 +81,7 @@ namespace Proton
 #define X(name) + 1
         static std::array<std::string, 0 TYPES> AssetTypeName;
 #undef X
+
+        static std::unordered_map<std::string, AssetType> AssetNameType;
     };
 }

@@ -1,2 +1,24 @@
 ID: 16839754354804687082
 Type: Model
+Sub assets:
+  - ID: 13606430365086580508
+    Type: Mesh
+    Path: Visor
+  - ID: 9953201104694703884
+    Type: Mesh
+    Path: Legs
+  - ID: 576149261143800492
+    Type: Mesh
+    Path: hands
+  - ID: 14518631728688414219
+    Type: Mesh
+    Path: Lights
+  - ID: 14167799212835685337
+    Type: Mesh
+    Path: Arms
+  - ID: 13197127656676175084
+    Type: Mesh
+    Path: Helmet
+  - ID: 12057863963297525874
+    Type: Mesh
+    Path: Body

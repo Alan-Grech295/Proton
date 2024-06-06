@@ -11,4 +11,10 @@ namespace Proton
         TYPES
 #undef X
     };
+
+    std::unordered_map<std::string, AssetHandle::AssetType> AssetHandle::AssetNameType = {
+#define X(name) { #name, AssetType::name },
+        TYPES
+#undef X
+    };
 }

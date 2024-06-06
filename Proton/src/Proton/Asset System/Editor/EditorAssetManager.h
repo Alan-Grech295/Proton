@@ -9,6 +9,7 @@
 namespace YAML
 {
     class Emitter;
+    class Node;
 }
 
 namespace Proton
@@ -46,7 +47,7 @@ namespace Proton
             return LoadAsset<T>(std::filesystem::path(path));
         }
 
-        void ScanDirectory(const std::filesystem::path& path);        
+        void ScanDirectory(const std::filesystem::path& path, bool loadAssets = true);        
 
         template<typename T>
         Ref<T> AddOrLoadSubAsset(const std::filesystem::path& parentPath, const std::string& name, AssetHandle::AssetType type, const std::function<Ref<T>()>& loadFunc)
@@ -56,7 +57,7 @@ namespace Proton
 
             if (AddOrLoadAssetInternal(parentPath / name, type, loadFunc, assetHandle, asset))
             {
-                std::filesystem::path relativePath = std::filesystem::relative(parentPath, Project::GetAssetDirectory());
+                std::filesystem::path relativePath = Project::GetAssetRelativePath(parentPath);
                 Ref<AssetHandle> parentAsset = uuidToAsset[pathToUUID[relativePath]];
                 assetHandle->SetSubAsset(name);
                 parentAsset->AddSubAsset(assetHandle->ID);
@@ -73,6 +74,9 @@ namespace Proton
         void SaveMetaFile(const std::filesystem::path& savePath, Ref<AssetHandle> assetHandle);
 
         void OutputAsset(YAML::Emitter& out, Ref<AssetHandle> assetHandle);
+
+        void ReadMetaFile(const std::filesystem::path& path);
+        Ref<AssetHandle> ParseMetaData(const YAML::Node& node, const std::filesystem::path& path, bool subAsset = false);
 
         void LoadAllAssets();
     protected:
