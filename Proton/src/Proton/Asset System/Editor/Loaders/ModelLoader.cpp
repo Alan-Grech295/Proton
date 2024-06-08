@@ -73,9 +73,9 @@ namespace Proton
         {
             model->m_Meshes.push_back(
                 assetManager.AddOrLoadSubAsset<Mesh>(modelPath, pScene->mMeshes[i]->mName.C_Str(), 
-                    AssetHandle::Mesh, [pScene, i, modelPath, model, materials]() 
+                    AssetHandle::Mesh, [pScene, i, modelPath, model, materials](UUID assetID) 
                     { 
-                        return DeserializeMesh(*pScene->mMeshes[i], modelPath.string(), model, materials); 
+                        return DeserializeMesh(*pScene->mMeshes[i], modelPath.string(), assetID, materials); 
                     })
             );
         }
@@ -239,7 +239,7 @@ namespace Proton
         return material;
     }
 
-    Ref<Mesh> ModelLoader::DeserializeMesh(const aiMesh& aiMesh, const std::string& modelPath, Ref<Model> model, const std::vector<Ref<Material>>& materials)
+    Ref<Mesh> ModelLoader::DeserializeMesh(const aiMesh& aiMesh, const std::string& modelPath, UUID assetID, const std::vector<Ref<Material>>& materials)
     {
         namespace dx = DirectX;
 
@@ -247,7 +247,7 @@ namespace Proton
 
         auto meshTag = modelPath + "%" + aiMesh.mName.C_Str();
 
-        Ref<Mesh> mesh = CreateRef<Mesh>(model);
+        Ref<Mesh> mesh = CreateRef<Mesh>(assetID);
 
         mesh->m_Name = aiMesh.mName.C_Str();
 

@@ -33,6 +33,8 @@ namespace Proton
 			m_Nodes.~vector();
 		}
 
+		Ref<Mesh> GetMeshByName(const std::string& name);
+
 		//static Ref<Model> DeserializeEditor(const std::filesystem::path& path, UUID uuid);
 	private:
 		static Entity CreateNodeEntity(Node& node, Scene& activeScene, Ref<Model> model);

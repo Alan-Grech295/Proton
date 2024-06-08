@@ -3,11 +3,10 @@
 
 namespace Proton
 {
-	Mesh::Mesh(Ref<class Model> model)
+	Mesh::Mesh(UUID assetID)
+		: m_AssetID(assetID)
 	{
 		m_Topology = Topology::Create(TopologyType::TriangleList);
-
-		m_Model = model;
 	}
 }
 

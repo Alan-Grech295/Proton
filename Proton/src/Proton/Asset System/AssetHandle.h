@@ -13,13 +13,14 @@ namespace Proton
         struct ExtraSubAssetData
         {
         public:
-            ExtraSubAssetData(const std::string& RelativePath)
-                : RelativePath(RelativePath)
+            ExtraSubAssetData(const std::string& relativePath, Ref<AssetHandle> parentAssetHandle)
+                : RelativePath(relativePath), ParentAssetHandle(parentAssetHandle)
             {
             }
 
         public:
             std::string RelativePath;
+            Ref<AssetHandle> ParentAssetHandle;
         };
 
 #define TYPES X(Model) \
@@ -59,9 +60,9 @@ namespace Proton
             AddSubAsset(asset->ID);
         }
 
-        inline void SetSubAsset(const std::string& relativePath)
+        inline void SetSubAsset(const std::string& relativePath, Ref<AssetHandle> parentAssetHandle = nullptr)
         {
-            SubAssetData = CreateScope<ExtraSubAssetData>(relativePath);
+            SubAssetData = CreateScope<ExtraSubAssetData>(relativePath, parentAssetHandle);
         }
 
         bool IsSubAsset() const

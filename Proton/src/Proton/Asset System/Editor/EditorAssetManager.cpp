@@ -5,6 +5,7 @@
 // Loaders
 #include "Loaders/ModelLoader.h"
 #include "Loaders/ImageLoader.h"
+#include "Loaders/MeshLoader.h"
 
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -43,6 +44,8 @@ namespace Proton
             return ImageLoader::LoadImageEditor(assetPath);
         case AssetHandle::Model:
             return ModelLoader::LoadModelEditor(assetPath);
+        case AssetHandle::Mesh:
+            return MeshLoader::LoadMeshEditor(assetPath);
         }
 
         PT_CORE_ASSERT(false, "Could not find appropriate asset loader");
@@ -74,7 +77,7 @@ namespace Proton
         SaveMetaFiles();
     }
 
-    bool EditorAssetManager::AddOrLoadAssetInternal(const std::filesystem::path& path, AssetHandle::AssetType type, const std::function<Ref<void>()>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset)
+    bool EditorAssetManager::AddOrLoadAssetInternal(const std::filesystem::path& path, AssetHandle::AssetType type, const std::function<Ref<void>(UUID)>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset)
     {
         std::filesystem::path relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
 
@@ -89,7 +92,7 @@ namespace Proton
             }
             
             // Asset handle is loaded but actual asset is not loaded
-            Ref<void> asset = loadFunc();
+            Ref<void> asset = loadFunc(assetID);
 
             loadedAssets[assetID] = asset;
             outAssetHandle = uuidToAsset[assetID];
@@ -103,7 +106,7 @@ namespace Proton
         pathToUUID.emplace(relativePath, assetID);
         uuidToPath.emplace(assetID, relativePath);
 
-        Ref<void> asset = loadFunc();
+        Ref<void> asset = loadFunc(assetID);
 
         loadedAssets[assetID] = asset;
         outAssetHandle = handle->second;
@@ -206,6 +209,7 @@ namespace Proton
             for (const YAML::Node& subNode : node["Sub assets"])
             {
                 Ref<AssetHandle> subAssetHandle = ParseMetaData(subNode, path / subNode["Path"].as<std::string>(), true);
+                subAssetHandle->SubAssetData->ParentAssetHandle = assetHandle;
                 assetHandle->AddSubAsset(subAssetHandle);
             }
         }

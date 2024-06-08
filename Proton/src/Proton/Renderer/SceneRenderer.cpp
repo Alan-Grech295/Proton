@@ -100,7 +100,7 @@ namespace Proton
 			(*mesh.TransformBufferPix)["modelViewProj"] = tf.modelViewProj;
 			(*mesh.TransformBufferPix)["model"] = tf.model;
 
-			Renderer::Submit(mesh.PMesh, mesh.TransformBufferVert.get(), mesh.TransformBufferPix.get());
+			Renderer::Submit(mesh.PMesh.get(), mesh.TransformBufferVert.get(), mesh.TransformBufferPix.get());
 		}
 
 		for (UUID e : node.Children)
