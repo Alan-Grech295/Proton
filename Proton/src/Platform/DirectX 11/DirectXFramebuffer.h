@@ -11,12 +11,39 @@ namespace Proton
 {
 	struct DepthAttachment
 	{
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> pDepthTexture;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilView> pDepthStencilView;
 		Microsoft::WRL::ComPtr<ID3D11DepthStencilState> pDSState;
 
 		operator bool() 
 		{
 			return pDepthStencilView;
+		}
+
+		void Release()
+		{
+			pDepthStencilView->Release();
+			pDSState->Release();
+			pDepthTexture->Release();
+		}
+	};
+
+	struct ColorAttachment
+	{
+		Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture;
+		Microsoft::WRL::ComPtr<ID3D11RenderTargetView> pRenderTarget;
+		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pSRV;
+
+		operator bool()
+		{
+			return pRenderTarget;
+		}
+
+		void Release()
+		{
+			pTexture->Release();
+			pRenderTarget->Release();
+			pSRV->Release();
 		}
 	};
 
@@ -35,7 +62,7 @@ namespace Proton
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
 
-		virtual void ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size, void* dest) override;
+		virtual void ReadPixel_Impl(uint32_t targetIndex, bool depth, int x, int y, uint32_t size, void* dest) override;
 
 		virtual void Bind() override;
 	private:
@@ -48,9 +75,8 @@ namespace Proton
 		std::vector<FramebufferTextureSpecification> m_ColorAttachmentSpecifications;
 		FramebufferTextureSpecification m_DepthAttachmentSpecification = { FramebufferTextureFormat::None, 0 };
 
-		std::vector<ID3D11Texture2D*> m_ColorAttachmentTextures;
-		std::vector<ID3D11RenderTargetView*> m_ColorAttachmentRenderTargets;
-		std::vector<ID3D11ShaderResourceView*> m_ColorAttachmentSRVs;
+		std::vector<ColorAttachment> m_ColorAttachments;
+		std::vector<ID3D11RenderTargetView*> m_RenderTargets;
 
 		DepthAttachment m_DepthAttachment = {};
 	};

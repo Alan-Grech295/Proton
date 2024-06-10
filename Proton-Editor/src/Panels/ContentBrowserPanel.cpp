@@ -1,4 +1,6 @@
 #include "ContentBrowserPanel.h"
+#include "Proton/Project/Project.h"
+
 #include "imgui\imgui.h"
 #include "imgui\imgui_internal.h"
 
@@ -8,7 +10,6 @@ namespace Proton
 {
 	ContentBrowserPanel::ContentBrowserPanel()
 		:
-		startPath(""),
 		m_SelectedPath(""),
 		folderIcon(Texture2D::Create("Resources\\icons\\Folder-icon.png")),
 		fileIcon(Texture2D::Create("Resources\\icons\\Document-Blank-icon.png"))
@@ -22,7 +23,7 @@ namespace Proton
 	void ContentBrowserPanel::OnImGuiRender()
 	{
 		ImGui::Begin("Asset Viewer");
-		if (startPath.empty() || !m_ActiveScene)
+		if (!Project::GetActive() || !m_ActiveScene)
 		{
 			ImGui::End();
 			return;
@@ -31,11 +32,16 @@ namespace Proton
 		ImGui::Columns(2);
 		static bool setWidth = false;
 		if (!setWidth) { ImGui::SetColumnWidth(0, ImGui::GetWindowContentRegionMax().x / 5.0f); setWidth = true; }
+
+		ImGui::BeginChild("##directories");
 		DrawDirectories();
+		ImGui::EndChild();
 
 		ImGui::NextColumn();
 
+		ImGui::BeginChild("##files");
 		DrawFiles();
+		ImGui::EndChild();
 
 		ImGui::Columns(1);
 		ImGui::End();
@@ -87,7 +93,7 @@ namespace Proton
 
 	void ContentBrowserPanel::DrawDirectories()
 	{
-		for (const auto& entry : fs::directory_iterator(startPath)) {
+		for (const auto& entry : fs::directory_iterator(Project::GetAssetDirectory())) {
 			if (entry.is_directory()) {
 				DrawDirectory(entry);
 			}
@@ -96,9 +102,9 @@ namespace Proton
 
 	void ContentBrowserPanel::DrawDirectory(const fs::path& pathToScan)
 	{
-		std::string pathString = pathToScan.string();
 		bool isLeaf = true;
-		bool defaultOpen = pathString.size() != m_SelectedPathString.size() && pathString == m_SelectedPathString.substr(0, pathString.size());
+		auto rel = fs::relative(m_SelectedPath, pathToScan);
+		bool defaultOpen = pathToScan != m_SelectedPath && !rel.empty() && rel.native()[0] != '.';
 
 		for (const auto& entry : fs::directory_iterator(pathToScan)) {
 			if (entry.is_directory()) {
@@ -111,7 +117,8 @@ namespace Proton
 									ImGuiTreeNodeFlags_OpenOnDoubleClick |
 									(isLeaf ? ImGuiTreeNodeFlags_Leaf : 0) |
 									ImGuiTreeNodeFlags_SpanAvailWidth |
-									(defaultOpen ? ImGuiTreeNodeFlags_DefaultOpen : 0);
+									(defaultOpen ? ImGuiTreeNodeFlags_DefaultOpen : 0) |
+									(pathToScan == m_SelectedPath ? ImGuiTreeNodeFlags_Selected : 0);
 
 		bool opened = ImGui::TreeNodeEx(pathToScan.string().c_str(), flags, pathToScan.filename().string().c_str());
 
@@ -189,9 +196,25 @@ namespace Proton
 			}
 			else 
 			{
+				if (entry.path().extension() == ".meta") continue;
+
 				bool selected = false;
 				bool doubleClicked = false;
 				NamedButton(fileIcon->GetTexturePointer(), filenameStr, m_SelectedItem, doubleClicked, selected, ImVec2{ 64, 64 });
+
+				ImGui::PushID(filenameStr.c_str());
+				ImGuiDragDropFlags src_flags = 0;
+				src_flags |= ImGuiDragDropFlags_SourceNoDisableHover;     // Keep the source displayed as hovered
+				src_flags |= ImGuiDragDropFlags_SourceNoHoldToOpenOthers; // Because our dragging is local, we disable the feature of opening foreign treenodes/tabs while dragging
+				src_flags |= ImGuiDragDropFlags_SourceAllowNullID;
+				if (ImGui::BeginDragDropSource(src_flags))
+				{
+					std::string pathStr = entry.path().string();
+					ImGui::SetDragDropPayload("FILE", pathStr.c_str(), pathStr.length() + 1);
+					ImGui::EndDragDropSource();
+				}
+
+				ImGui::PopID();
 
 				if (doubleClicked)
 				{
@@ -238,8 +261,5 @@ namespace Proton
 	void ContentBrowserPanel::SetSelectedPath(const fs::path& path)
 	{
 		m_SelectedPath = path;
-
-		m_SelectedPathString = path.string();
-		PT_CORE_TRACE("Selected path {0}", m_SelectedPathString);
 	}
 }

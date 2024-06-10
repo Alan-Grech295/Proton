@@ -47,6 +47,12 @@ namespace Proton
             return LoadAsset<T>(std::filesystem::path(path));
         }
 
+        inline bool HasAsset(const std::string& path)
+        {
+            std::filesystem::path relPath = Project::GetAssetRelativePath(path);
+            return pathToUUID.contains(relPath);
+        }
+
         inline Ref<AssetHandle> GetAssetHandle(const std::filesystem::path& path)
         {
             return AssetManager::GetAssetHandle(pathToUUID[Project::GetAssetRelativePath(path)]);

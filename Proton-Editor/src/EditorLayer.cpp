@@ -4,6 +4,7 @@
 #include "Proton\Utils\PlatformUtils.h"
 #include <Proton\Math\Math.h>
 #include "Proton\Scripting\ScriptEngine.h"
+#include "FileLoader.h"
 
 #include "ImGuizmo.h"
 #include <DirectXMath.h>
@@ -129,7 +130,7 @@ namespace Proton
 		if (Input::IsMouseButtonPressed(0) &&  mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)m_ViewportSize.y)
 		{
 			int pixelData = m_SceneRenderer->GetFrameBuffer()->ReadPixel<int>(1, mouseX, mouseY);
-			PT_CORE_TRACE(pixelData);
+			//PT_CORE_TRACE(pixelData);
 		}
 
 		switch (m_SceneState)
@@ -343,7 +344,52 @@ namespace Proton
 		ImDrawCallback enableBlend = [](const ImDrawList* parent_list, const ImDrawCmd* cmd) { RenderCommand::EnableBlending(); };
 		
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(disableBlend, nullptr);
+		// Draw viewport
 		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID), viewportPanelSize);
+
+		if (ImGui::BeginDragDropTarget())
+		{
+			ImGuiDragDropFlags targetFlags = 0;
+			targetFlags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
+
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("FILE", targetFlags))
+			{
+				auto [mx, my] = ImGui::GetMousePos();
+				mx -= m_ViewportBounds[0].x;
+				my -= m_ViewportBounds[0].y;
+
+				int mouseX = (int)mx;
+				int mouseY = (int)my;
+
+				float depthPixelData = m_SceneRenderer->GetFrameBuffer()->ReadDepthPixel<float>(mouseX, mouseY);
+				float camNear = m_EditorCam.GetNearClip();
+				float camFar = m_EditorCam.GetFarClip();
+				float actualDist = camFar * camNear / (camFar - depthPixelData * (camFar - camNear));
+
+				DirectX:XMVECTOR uv = DirectX::XMVectorSet(mx / viewportPanelSize.x * 2.0f - 1.0f, (viewportPanelSize.y - my) / viewportPanelSize.y * 2.0f - 1.0f, 0, 1);
+
+				DirectX::XMVECTOR direction = DirectX::XMVector4Transform(uv,
+					DirectX::XMMatrixInverse(nullptr, m_EditorCam.GetProjection()));
+
+				DirectX::XMFLOAT4 dir4;
+				DirectX::XMStoreFloat4(&dir4, direction);
+
+				direction = DirectX::XMVectorSet(dir4.x, dir4.y, dir4.z, 0);
+				direction = DirectX::XMVector4Transform(direction, DirectX::XMMatrixInverse(nullptr, m_EditorCam.GetViewMatrix()));
+				direction = DirectX::XMVector3Normalize(direction);
+				
+				DirectX::XMFLOAT3 placementPos;
+
+				DirectX::XMStoreFloat3(&placementPos, 
+					DirectX::XMVectorAdd(m_EditorCam.GetPosition(), 
+										 DirectX::XMVectorScale(direction, actualDist)));
+
+				std::string path = std::string((char*)payload->Data, payload->DataSize);
+				FileLoader::LoadFile(path, placementPos, *m_ActiveScene);
+			}
+			ImGui::EndDragDropTarget();
+		}
+
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(enableBlend, nullptr);
 
 		auto windowSize = ImGui::GetWindowSize();
@@ -633,7 +679,6 @@ namespace Proton
 		m_SceneRenderer->SetScene(m_ActiveScene);
 
 		m_SceneHierarchyPanel->SetContext(m_ActiveScene);
-		m_ContentBrowserPanel->SetProjectPath(projectPath);
 		m_ContentBrowserPanel->SetContext(m_ActiveScene);
 
 		m_CameraEntity = m_ActiveScene->CreateEntity("Camera");
@@ -674,7 +719,6 @@ namespace Proton
 			m_ActiveScene = m_EditorScene;
 
 			m_SceneHierarchyPanel->SetContext(m_ActiveScene);
-			m_ContentBrowserPanel->SetProjectPath(projectPath);
 			m_ContentBrowserPanel->SetContext(m_ActiveScene);
 
 			m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();

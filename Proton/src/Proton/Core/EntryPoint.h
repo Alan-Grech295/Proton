@@ -93,11 +93,11 @@ int CALLBACK WinMain(
 	PT_PROFILE_END_SESSION();
 
 	PT_PROFILE_BEGIN_SESSION("Runtime", "ProtonProfile-Runtime.json");
-	CATCH_EXCEPTIONS(app->Run());
+	LOG_CATCH_EXCEPTIONS(app->Run());
 	PT_PROFILE_END_SESSION();
 
 	PT_PROFILE_BEGIN_SESSION("Shutdown", "ProtonProfile-Shutdown.json");
-	CATCH_EXCEPTIONS(delete app);
+	LOG_CATCH_EXCEPTIONS(delete app);
 	PT_PROFILE_END_SESSION();
 
 	//_CrtDumpMemoryLeaks();
