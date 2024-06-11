@@ -1,6 +1,210 @@
-ID: 8634800213475833723
+ID: 13543022539285632331
 Type: Model
 Sub assets:
-  - ID: 8216696794815840089
+  - ID: 15861128695262447218
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 5330925267106190174
+    Type: Material
+    Path: Material
+  - ID: 18207839310651987181
+    Type: Mesh
+    Path: Cube
+  - ID: 13188284853453616363
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 7899045850863442624
+    Type: Material
+    Path: Material
+  - ID: 17089697170353439941
+    Type: Mesh
+    Path: Cube
+  - ID: 17671013585767161763
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 673613065530934565
+    Type: Material
+    Path: Material
+  - ID: 4862457210475946113
+    Type: Mesh
+    Path: Cube
+  - ID: 10104246098532495891
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 18084599914337569132
+    Type: Material
+    Path: Material
+  - ID: 9091973918258024404
+    Type: Mesh
+    Path: Cube
+  - ID: 15865487471952091381
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 16481847841175545264
+    Type: Material
+    Path: Material
+  - ID: 14845829164755449028
+    Type: Mesh
+    Path: Cube
+  - ID: 4004831975465699836
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 1713453924008336532
+    Type: Material
+    Path: Material
+  - ID: 16010896669185762059
+    Type: Mesh
+    Path: Cube
+  - ID: 17102348971539617379
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 15903175449171610037
+    Type: Material
+    Path: Material
+  - ID: 7540108345156605878
+    Type: Mesh
+    Path: Cube
+  - ID: 10552023507941964169
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 4108864924823311882
+    Type: Material
+    Path: Material
+  - ID: 6916269020268648534
+    Type: Mesh
+    Path: Cube
+  - ID: 10865904426669351488
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 10642844987213330948
+    Type: Material
+    Path: Material
+  - ID: 9341173763128933716
+    Type: Mesh
+    Path: Cube
+  - ID: 10862114433076709424
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 5280062392813078179
+    Type: Material
+    Path: Material
+  - ID: 1920085566970165374
+    Type: Mesh
+    Path: Cube
+  - ID: 7877867815182771021
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 13729650974968994579
+    Type: Material
+    Path: Material
+  - ID: 18415448681481692941
+    Type: Mesh
+    Path: Cube
+  - ID: 12352851319335623338
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 7446496800954710403
+    Type: Material
+    Path: Material
+  - ID: 18403795882770417228
+    Type: Mesh
+    Path: Cube
+  - ID: 14692008977698399234
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 8591504655735115094
+    Type: Material
+    Path: Material
+  - ID: 4855576579201200839
+    Type: Mesh
+    Path: Cube
+  - ID: 6895746415634574147
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 5562683817179099700
+    Type: Material
+    Path: Material
+  - ID: 7100811456163080015
+    Type: Mesh
+    Path: Cube
+  - ID: 8456108714563059873
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 4098530684455031992
+    Type: Material
+    Path: Material
+  - ID: 1053874201925987685
+    Type: Mesh
+    Path: Cube
+  - ID: 16921673099614142256
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 9739451100989017946
+    Type: Material
+    Path: Material
+  - ID: 12363685952521424426
+    Type: Mesh
+    Path: Cube
+  - ID: 169924467218876747
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 15624238827690928144
+    Type: Material
+    Path: Material
+  - ID: 17846336279370935177
+    Type: Mesh
+    Path: Cube
+  - ID: 2610693939234516668
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 14905940403677683742
+    Type: Material
+    Path: Material
+  - ID: 741477597370386696
+    Type: Mesh
+    Path: Cube
+  - ID: 13042606162640429284
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 5295968426380086851
+    Type: Material
+    Path: Material
+  - ID: 10767370638672504936
+    Type: Mesh
+    Path: Cube
+  - ID: 2110381000502985551
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 6982277473454900516
+    Type: Material
+    Path: Material
+  - ID: 146230782349768764
+    Type: Mesh
+    Path: Cube
+  - ID: 17232533442834557725
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 15841677165193080912
+    Type: Material
+    Path: Material
+  - ID: 12282192770979734714
+    Type: Mesh
+    Path: Cube
+  - ID: 14017437871658573609
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 3078882269116432252
+    Type: Material
+    Path: Material
+  - ID: 15839686298828650092
+    Type: Mesh
+    Path: Cube
+  - ID: 7660830536904928947
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 771041953512047770
+    Type: Material
+    Path: Material
+  - ID: 16681817462052175089
     Type: Mesh
     Path: Cube

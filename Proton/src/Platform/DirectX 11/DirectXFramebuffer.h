@@ -59,6 +59,7 @@ namespace Proton
 		virtual void* GetRenderTextureID(uint32_t index) override;
 
 		virtual void Clear() override;
+		virtual void ClearDepth() override;
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
 

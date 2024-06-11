@@ -1,24 +1,969 @@
-ID: 16839754354804687082
+ID: 6326257310833564833
 Type: Model
 Sub assets:
-  - ID: 13606430365086580508
+  - ID: 1734674947233065954
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 16475877648426794904
+    Type: Material
+    Path: Arm
+  - ID: 9671729398536535909
+    Type: Material
+    Path: Body
+  - ID: 18077892067934035793
+    Type: Material
+    Path: Glass
+  - ID: 17843170519427401590
+    Type: Material
+    Path: Hand
+  - ID: 7332608159566340317
+    Type: Material
+    Path: Helmet
+  - ID: 6345088416586131929
+    Type: Material
+    Path: Leg
+  - ID: 6321103064394556771
     Type: Mesh
     Path: Visor
-  - ID: 9953201104694703884
+  - ID: 7474700848616132338
     Type: Mesh
     Path: Legs
-  - ID: 576149261143800492
+  - ID: 16740113931513425872
     Type: Mesh
     Path: hands
-  - ID: 14518631728688414219
+  - ID: 15384464500355197075
     Type: Mesh
     Path: Lights
-  - ID: 14167799212835685337
+  - ID: 4897227353261106565
     Type: Mesh
     Path: Arms
-  - ID: 13197127656676175084
+  - ID: 5109665521253082526
     Type: Mesh
     Path: Helmet
-  - ID: 12057863963297525874
+  - ID: 2051865516654238952
+    Type: Mesh
+    Path: Body
+  - ID: 16530303339080418428
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 6930039256072657351
+    Type: Material
+    Path: Arm
+  - ID: 18343138139937671573
+    Type: Material
+    Path: Body
+  - ID: 17818050338662786665
+    Type: Material
+    Path: Glass
+  - ID: 3519591762501514689
+    Type: Material
+    Path: Hand
+  - ID: 12156098523423308051
+    Type: Material
+    Path: Helmet
+  - ID: 5812088162349001127
+    Type: Material
+    Path: Leg
+  - ID: 13925290704459531184
+    Type: Mesh
+    Path: Visor
+  - ID: 18404194374688535877
+    Type: Mesh
+    Path: Legs
+  - ID: 15958515313718628725
+    Type: Mesh
+    Path: hands
+  - ID: 14709379221954656520
+    Type: Mesh
+    Path: Lights
+  - ID: 10306490474675625812
+    Type: Mesh
+    Path: Arms
+  - ID: 14277326764353743480
+    Type: Mesh
+    Path: Helmet
+  - ID: 17224914673025843363
+    Type: Mesh
+    Path: Body
+  - ID: 5009361451566304402
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 8913047504855507184
+    Type: Material
+    Path: Arm
+  - ID: 15811236712349476129
+    Type: Material
+    Path: Body
+  - ID: 9446708979349324575
+    Type: Material
+    Path: Glass
+  - ID: 15853823319651879409
+    Type: Material
+    Path: Hand
+  - ID: 12749165927292904199
+    Type: Material
+    Path: Helmet
+  - ID: 10988058476232394219
+    Type: Material
+    Path: Leg
+  - ID: 5566117265865238855
+    Type: Mesh
+    Path: Visor
+  - ID: 4799043876784242700
+    Type: Mesh
+    Path: Legs
+  - ID: 18015997454514685835
+    Type: Mesh
+    Path: hands
+  - ID: 6941882375153711154
+    Type: Mesh
+    Path: Lights
+  - ID: 4452004172917202203
+    Type: Mesh
+    Path: Arms
+  - ID: 15110730807655035580
+    Type: Mesh
+    Path: Helmet
+  - ID: 2821349785076399462
+    Type: Mesh
+    Path: Body
+  - ID: 16735180196493180848
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 8989919328816645214
+    Type: Material
+    Path: Arm
+  - ID: 13159335262581018433
+    Type: Material
+    Path: Body
+  - ID: 498807400776433119
+    Type: Material
+    Path: Glass
+  - ID: 8920706106547457829
+    Type: Material
+    Path: Hand
+  - ID: 9861341110883194291
+    Type: Material
+    Path: Helmet
+  - ID: 7305666814157531679
+    Type: Material
+    Path: Leg
+  - ID: 7917424036451977098
+    Type: Mesh
+    Path: Visor
+  - ID: 6010069881629859445
+    Type: Mesh
+    Path: Legs
+  - ID: 48156121651814731
+    Type: Mesh
+    Path: hands
+  - ID: 14924678367697867854
+    Type: Mesh
+    Path: Lights
+  - ID: 3102227302061663929
+    Type: Mesh
+    Path: Arms
+  - ID: 7789638516653342263
+    Type: Mesh
+    Path: Helmet
+  - ID: 4954785141409711299
+    Type: Mesh
+    Path: Body
+  - ID: 10080159732168244580
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 11885775093346385048
+    Type: Material
+    Path: Arm
+  - ID: 5573166680131914164
+    Type: Material
+    Path: Body
+  - ID: 12910973428905296187
+    Type: Material
+    Path: Glass
+  - ID: 17673207378783608117
+    Type: Material
+    Path: Hand
+  - ID: 1282084993755102342
+    Type: Material
+    Path: Helmet
+  - ID: 13451314854124345785
+    Type: Material
+    Path: Leg
+  - ID: 7281841761200044087
+    Type: Mesh
+    Path: Visor
+  - ID: 17388736695741290250
+    Type: Mesh
+    Path: Legs
+  - ID: 9494284750987346443
+    Type: Mesh
+    Path: hands
+  - ID: 8231604774852287097
+    Type: Mesh
+    Path: Lights
+  - ID: 11637945383387897609
+    Type: Mesh
+    Path: Arms
+  - ID: 12537841470008649235
+    Type: Mesh
+    Path: Helmet
+  - ID: 12724952125359439500
+    Type: Mesh
+    Path: Body
+  - ID: 8918758711847395674
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 9346252577080749178
+    Type: Material
+    Path: Arm
+  - ID: 17380358206025395553
+    Type: Material
+    Path: Body
+  - ID: 11762483631485022522
+    Type: Material
+    Path: Glass
+  - ID: 10221788106055627213
+    Type: Material
+    Path: Hand
+  - ID: 10923724315111064962
+    Type: Material
+    Path: Helmet
+  - ID: 745140639278060109
+    Type: Material
+    Path: Leg
+  - ID: 2331474649633792582
+    Type: Mesh
+    Path: Visor
+  - ID: 17914590343969956121
+    Type: Mesh
+    Path: Legs
+  - ID: 6128549542215527172
+    Type: Mesh
+    Path: hands
+  - ID: 7457351970044917578
+    Type: Mesh
+    Path: Lights
+  - ID: 17577389450051488104
+    Type: Mesh
+    Path: Arms
+  - ID: 4794037612452233610
+    Type: Mesh
+    Path: Helmet
+  - ID: 16294586401494572742
+    Type: Mesh
+    Path: Body
+  - ID: 11540121221328384126
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 11388480051709471031
+    Type: Material
+    Path: Arm
+  - ID: 14535274886224874720
+    Type: Material
+    Path: Body
+  - ID: 15534637191330730324
+    Type: Material
+    Path: Glass
+  - ID: 8696203283148567620
+    Type: Material
+    Path: Hand
+  - ID: 15742557795543309018
+    Type: Material
+    Path: Helmet
+  - ID: 1624529579191754016
+    Type: Material
+    Path: Leg
+  - ID: 10336888941475066515
+    Type: Mesh
+    Path: Visor
+  - ID: 9661033135597672543
+    Type: Mesh
+    Path: Legs
+  - ID: 7869928250868567695
+    Type: Mesh
+    Path: hands
+  - ID: 5241119810057880764
+    Type: Mesh
+    Path: Lights
+  - ID: 16755598145504122126
+    Type: Mesh
+    Path: Arms
+  - ID: 13827427550749016316
+    Type: Mesh
+    Path: Helmet
+  - ID: 6463143090845770039
+    Type: Mesh
+    Path: Body
+  - ID: 1218037705537836374
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 5119409955613142688
+    Type: Material
+    Path: Arm
+  - ID: 6662719905844015606
+    Type: Material
+    Path: Body
+  - ID: 4083743638064871704
+    Type: Material
+    Path: Glass
+  - ID: 2305361451494997303
+    Type: Material
+    Path: Hand
+  - ID: 17555712865342301413
+    Type: Material
+    Path: Helmet
+  - ID: 5768713631970411286
+    Type: Material
+    Path: Leg
+  - ID: 17320477933102243925
+    Type: Mesh
+    Path: Visor
+  - ID: 10778913079006552830
+    Type: Mesh
+    Path: Legs
+  - ID: 5539999544710672777
+    Type: Mesh
+    Path: hands
+  - ID: 5577809456098840629
+    Type: Mesh
+    Path: Lights
+  - ID: 4695949276730392945
+    Type: Mesh
+    Path: Arms
+  - ID: 4791178591791104893
+    Type: Mesh
+    Path: Helmet
+  - ID: 17581121272786539049
+    Type: Mesh
+    Path: Body
+  - ID: 1025788359225996215
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 13812818943976128395
+    Type: Material
+    Path: Arm
+  - ID: 365957903394588513
+    Type: Material
+    Path: Body
+  - ID: 3353968914438798512
+    Type: Material
+    Path: Glass
+  - ID: 7551738196211363520
+    Type: Material
+    Path: Hand
+  - ID: 10116202055619393896
+    Type: Material
+    Path: Helmet
+  - ID: 15941565027362326592
+    Type: Material
+    Path: Leg
+  - ID: 17401813735713400438
+    Type: Mesh
+    Path: Visor
+  - ID: 16432762205300738841
+    Type: Mesh
+    Path: Legs
+  - ID: 5760267166039961283
+    Type: Mesh
+    Path: hands
+  - ID: 10947453853971473091
+    Type: Mesh
+    Path: Lights
+  - ID: 6917885369024324956
+    Type: Mesh
+    Path: Arms
+  - ID: 5163857214357504783
+    Type: Mesh
+    Path: Helmet
+  - ID: 5898912275334205893
+    Type: Mesh
+    Path: Body
+  - ID: 16978556080275340029
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 452352537228896111
+    Type: Material
+    Path: Arm
+  - ID: 16584590841304195505
+    Type: Material
+    Path: Body
+  - ID: 10389100923248510452
+    Type: Material
+    Path: Glass
+  - ID: 12725920784021430910
+    Type: Material
+    Path: Hand
+  - ID: 14536123599235964457
+    Type: Material
+    Path: Helmet
+  - ID: 14375951751212234264
+    Type: Material
+    Path: Leg
+  - ID: 847374624164833793
+    Type: Mesh
+    Path: Visor
+  - ID: 12039064151518411271
+    Type: Mesh
+    Path: Legs
+  - ID: 15702790977549186948
+    Type: Mesh
+    Path: hands
+  - ID: 8756606867045799258
+    Type: Mesh
+    Path: Lights
+  - ID: 1417242004596697951
+    Type: Mesh
+    Path: Arms
+  - ID: 10531479189515966390
+    Type: Mesh
+    Path: Helmet
+  - ID: 13764222958262808762
+    Type: Mesh
+    Path: Body
+  - ID: 17011223855673258705
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 154955631172015104
+    Type: Material
+    Path: Arm
+  - ID: 1194007105269478862
+    Type: Material
+    Path: Body
+  - ID: 329341391544271779
+    Type: Material
+    Path: Glass
+  - ID: 18323057624184067748
+    Type: Material
+    Path: Hand
+  - ID: 9941858970780301653
+    Type: Material
+    Path: Helmet
+  - ID: 4282298290216104169
+    Type: Material
+    Path: Leg
+  - ID: 7822831672110768102
+    Type: Mesh
+    Path: Visor
+  - ID: 14156574965218438230
+    Type: Mesh
+    Path: Legs
+  - ID: 13777330102420270826
+    Type: Mesh
+    Path: hands
+  - ID: 6689715065281664955
+    Type: Mesh
+    Path: Lights
+  - ID: 13650280944595498601
+    Type: Mesh
+    Path: Arms
+  - ID: 16360804786916331321
+    Type: Mesh
+    Path: Helmet
+  - ID: 8220449272889700282
+    Type: Mesh
+    Path: Body
+  - ID: 10200988005493414249
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 7620951357138242330
+    Type: Material
+    Path: Arm
+  - ID: 9628538085550092007
+    Type: Material
+    Path: Body
+  - ID: 13509016817813207344
+    Type: Material
+    Path: Glass
+  - ID: 1612119183320181569
+    Type: Material
+    Path: Hand
+  - ID: 5931963765473689991
+    Type: Material
+    Path: Helmet
+  - ID: 77675508036911079
+    Type: Material
+    Path: Leg
+  - ID: 6473506901846650972
+    Type: Mesh
+    Path: Visor
+  - ID: 5995035853075139926
+    Type: Mesh
+    Path: Legs
+  - ID: 2319447087936141999
+    Type: Mesh
+    Path: hands
+  - ID: 3681527363312927350
+    Type: Mesh
+    Path: Lights
+  - ID: 4560599993813834205
+    Type: Mesh
+    Path: Arms
+  - ID: 10031190944439179141
+    Type: Mesh
+    Path: Helmet
+  - ID: 13556172284076507000
+    Type: Mesh
+    Path: Body
+  - ID: 3417446700778991930
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 1248866275895592743
+    Type: Material
+    Path: Arm
+  - ID: 8286074715478711270
+    Type: Material
+    Path: Body
+  - ID: 10303881622030230598
+    Type: Material
+    Path: Glass
+  - ID: 14341414189386343406
+    Type: Material
+    Path: Hand
+  - ID: 11917588319090223693
+    Type: Material
+    Path: Helmet
+  - ID: 2726567391977850593
+    Type: Material
+    Path: Leg
+  - ID: 4599950761092480048
+    Type: Mesh
+    Path: Visor
+  - ID: 1755999877222379187
+    Type: Mesh
+    Path: Legs
+  - ID: 15181899209693579841
+    Type: Mesh
+    Path: hands
+  - ID: 16113581760457106485
+    Type: Mesh
+    Path: Lights
+  - ID: 4808455258956334714
+    Type: Mesh
+    Path: Arms
+  - ID: 13889910967608315982
+    Type: Mesh
+    Path: Helmet
+  - ID: 1966518561731309668
+    Type: Mesh
+    Path: Body
+  - ID: 9861781902432149336
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 15650378151697297010
+    Type: Material
+    Path: Arm
+  - ID: 17650199820822358686
+    Type: Material
+    Path: Body
+  - ID: 11000282156846481771
+    Type: Material
+    Path: Glass
+  - ID: 4339585086430031978
+    Type: Material
+    Path: Hand
+  - ID: 9858542982783961862
+    Type: Material
+    Path: Helmet
+  - ID: 15041689006652812259
+    Type: Material
+    Path: Leg
+  - ID: 9588247604609500670
+    Type: Mesh
+    Path: Visor
+  - ID: 5882078668173524391
+    Type: Mesh
+    Path: Legs
+  - ID: 17695699713625731314
+    Type: Mesh
+    Path: hands
+  - ID: 1185072911792936139
+    Type: Mesh
+    Path: Lights
+  - ID: 4252708020409813098
+    Type: Mesh
+    Path: Arms
+  - ID: 5978514088306891588
+    Type: Mesh
+    Path: Helmet
+  - ID: 4011226810139556382
+    Type: Mesh
+    Path: Body
+  - ID: 6449104413762717206
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 5794294221820615144
+    Type: Material
+    Path: Arm
+  - ID: 10460344458814440459
+    Type: Material
+    Path: Body
+  - ID: 4129850103302834166
+    Type: Material
+    Path: Glass
+  - ID: 17948035891804078548
+    Type: Material
+    Path: Hand
+  - ID: 12771873901140832390
+    Type: Material
+    Path: Helmet
+  - ID: 8285292631332659955
+    Type: Material
+    Path: Leg
+  - ID: 5578844016022348864
+    Type: Mesh
+    Path: Visor
+  - ID: 1629525024521143139
+    Type: Mesh
+    Path: Legs
+  - ID: 4184128161019969308
+    Type: Mesh
+    Path: hands
+  - ID: 12251155133332723141
+    Type: Mesh
+    Path: Lights
+  - ID: 13749761429226110417
+    Type: Mesh
+    Path: Arms
+  - ID: 10522331342005733984
+    Type: Mesh
+    Path: Helmet
+  - ID: 5173179964584601349
+    Type: Mesh
+    Path: Body
+  - ID: 2228560500264713894
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 1602439935291354082
+    Type: Material
+    Path: Arm
+  - ID: 3234802451816156728
+    Type: Material
+    Path: Body
+  - ID: 8558484445943835679
+    Type: Material
+    Path: Glass
+  - ID: 16822175759495183782
+    Type: Material
+    Path: Hand
+  - ID: 13558283772113949155
+    Type: Material
+    Path: Helmet
+  - ID: 950558841947393121
+    Type: Material
+    Path: Leg
+  - ID: 17689604443171208574
+    Type: Mesh
+    Path: Visor
+  - ID: 17871131277902914628
+    Type: Mesh
+    Path: Legs
+  - ID: 12024391403530291197
+    Type: Mesh
+    Path: hands
+  - ID: 17611987400604910340
+    Type: Mesh
+    Path: Lights
+  - ID: 1775167500597730024
+    Type: Mesh
+    Path: Arms
+  - ID: 4499298661547311246
+    Type: Mesh
+    Path: Helmet
+  - ID: 6198099801469738864
+    Type: Mesh
+    Path: Body
+  - ID: 16274353015238799861
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 3487845882229789584
+    Type: Material
+    Path: Arm
+  - ID: 13330954314576414852
+    Type: Material
+    Path: Body
+  - ID: 492195868660574806
+    Type: Material
+    Path: Glass
+  - ID: 1107191145664094377
+    Type: Material
+    Path: Hand
+  - ID: 3043880874057285364
+    Type: Material
+    Path: Helmet
+  - ID: 8726813000837625795
+    Type: Material
+    Path: Leg
+  - ID: 3116378704608101970
+    Type: Mesh
+    Path: Visor
+  - ID: 12802340425174660163
+    Type: Mesh
+    Path: Legs
+  - ID: 9920109898067143043
+    Type: Mesh
+    Path: hands
+  - ID: 2906767986060488096
+    Type: Mesh
+    Path: Lights
+  - ID: 16008673096278563710
+    Type: Mesh
+    Path: Arms
+  - ID: 12539044446150463780
+    Type: Mesh
+    Path: Helmet
+  - ID: 13520786633010973312
+    Type: Mesh
+    Path: Body
+  - ID: 8224839594399137987
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 4025034704881560882
+    Type: Material
+    Path: Arm
+  - ID: 4749919610392560759
+    Type: Material
+    Path: Body
+  - ID: 14046936270164426262
+    Type: Material
+    Path: Glass
+  - ID: 2495743964087348795
+    Type: Material
+    Path: Hand
+  - ID: 298313226653416459
+    Type: Material
+    Path: Helmet
+  - ID: 7402574449845568795
+    Type: Material
+    Path: Leg
+  - ID: 16067158463045513209
+    Type: Mesh
+    Path: Visor
+  - ID: 4090331589176291806
+    Type: Mesh
+    Path: Legs
+  - ID: 14127621371545778499
+    Type: Mesh
+    Path: hands
+  - ID: 8301206011168873898
+    Type: Mesh
+    Path: Lights
+  - ID: 14751490572592634083
+    Type: Mesh
+    Path: Arms
+  - ID: 6835933116054692085
+    Type: Mesh
+    Path: Helmet
+  - ID: 4342233123394336090
+    Type: Mesh
+    Path: Body
+  - ID: 13706508306752966088
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 13182964937820291507
+    Type: Material
+    Path: Arm
+  - ID: 12310322164706485549
+    Type: Material
+    Path: Body
+  - ID: 12051428836800692431
+    Type: Material
+    Path: Glass
+  - ID: 13280124763569734102
+    Type: Material
+    Path: Hand
+  - ID: 3426786816839825999
+    Type: Material
+    Path: Helmet
+  - ID: 17619091294519650630
+    Type: Material
+    Path: Leg
+  - ID: 6105083815784306105
+    Type: Mesh
+    Path: Visor
+  - ID: 6858566193202111346
+    Type: Mesh
+    Path: Legs
+  - ID: 10250733185213055462
+    Type: Mesh
+    Path: hands
+  - ID: 15109488211434162749
+    Type: Mesh
+    Path: Lights
+  - ID: 15192403028402281188
+    Type: Mesh
+    Path: Arms
+  - ID: 5053870154847440226
+    Type: Mesh
+    Path: Helmet
+  - ID: 13288919718893704801
+    Type: Mesh
+    Path: Body
+  - ID: 18444962319078035376
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 9789735002435373630
+    Type: Material
+    Path: Arm
+  - ID: 15232820562049917093
+    Type: Material
+    Path: Body
+  - ID: 16915646334634747723
+    Type: Material
+    Path: Glass
+  - ID: 6429948001698157314
+    Type: Material
+    Path: Hand
+  - ID: 1494158772863339175
+    Type: Material
+    Path: Helmet
+  - ID: 3197422851719325015
+    Type: Material
+    Path: Leg
+  - ID: 2696406221959500836
+    Type: Mesh
+    Path: Visor
+  - ID: 11872533251514430781
+    Type: Mesh
+    Path: Legs
+  - ID: 14102124285226961178
+    Type: Mesh
+    Path: hands
+  - ID: 6065539531247747764
+    Type: Mesh
+    Path: Lights
+  - ID: 144013262240492917
+    Type: Mesh
+    Path: Arms
+  - ID: 796865677708377405
+    Type: Mesh
+    Path: Helmet
+  - ID: 17583584483526911187
+    Type: Mesh
+    Path: Body
+  - ID: 5788712038560264078
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 5871264144639396458
+    Type: Material
+    Path: Arm
+  - ID: 11718498051844321612
+    Type: Material
+    Path: Body
+  - ID: 8787863583756896063
+    Type: Material
+    Path: Glass
+  - ID: 686092871131121280
+    Type: Material
+    Path: Hand
+  - ID: 9819828414024734173
+    Type: Material
+    Path: Helmet
+  - ID: 10020614327841253522
+    Type: Material
+    Path: Leg
+  - ID: 11258838194024156960
+    Type: Mesh
+    Path: Visor
+  - ID: 694715214980547465
+    Type: Mesh
+    Path: Legs
+  - ID: 3663778501621622070
+    Type: Mesh
+    Path: hands
+  - ID: 1924175742275352595
+    Type: Mesh
+    Path: Lights
+  - ID: 6212608647469496263
+    Type: Mesh
+    Path: Arms
+  - ID: 14087806578002608954
+    Type: Mesh
+    Path: Helmet
+  - ID: 8042439929908810011
+    Type: Mesh
+    Path: Body
+  - ID: 13786672655423770857
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 11339945787019303720
+    Type: Material
+    Path: Arm
+  - ID: 5612129784911505722
+    Type: Material
+    Path: Body
+  - ID: 6023305073421833338
+    Type: Material
+    Path: Glass
+  - ID: 3775313285477719079
+    Type: Material
+    Path: Hand
+  - ID: 12881291799576593758
+    Type: Material
+    Path: Helmet
+  - ID: 15447411281461518778
+    Type: Material
+    Path: Leg
+  - ID: 14854011895110520189
+    Type: Mesh
+    Path: Visor
+  - ID: 5405990257457468198
+    Type: Mesh
+    Path: Legs
+  - ID: 6238708856572315330
+    Type: Mesh
+    Path: hands
+  - ID: 18146673495634851757
+    Type: Mesh
+    Path: Lights
+  - ID: 15879907270065882048
+    Type: Mesh
+    Path: Arms
+  - ID: 12123919698223825460
+    Type: Mesh
+    Path: Helmet
+  - ID: 13896976880497084823
+    Type: Mesh
+    Path: Body
+  - ID: 3657393197319476849
+    Type: Material
+    Path: DefaultMaterial
+  - ID: 7730847823001342796
+    Type: Material
+    Path: Arm
+  - ID: 4483013109645833743
+    Type: Material
+    Path: Body
+  - ID: 3450392810560638550
+    Type: Material
+    Path: Glass
+  - ID: 9596767631586467692
+    Type: Material
+    Path: Hand
+  - ID: 10492373355512346051
+    Type: Material
+    Path: Helmet
+  - ID: 179984476099721903
+    Type: Material
+    Path: Leg
+  - ID: 12659577121476653379
+    Type: Mesh
+    Path: Visor
+  - ID: 1831277876052364639
+    Type: Mesh
+    Path: Legs
+  - ID: 17205854309691167046
+    Type: Mesh
+    Path: hands
+  - ID: 13491745997040540484
+    Type: Mesh
+    Path: Lights
+  - ID: 4240809317880673278
+    Type: Mesh
+    Path: Arms
+  - ID: 5492633431415247633
+    Type: Mesh
+    Path: Helmet
+  - ID: 15857641512700984221
     Type: Mesh
     Path: Body

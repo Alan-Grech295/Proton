@@ -7,6 +7,9 @@
 namespace Proton
 {
 	std::array<Pass, 1> Renderer::m_RenderQueue = {Pass("Opaque")};
+	std::array<std::vector<std::function<void()>>, 1> Renderer::m_PreRenderCallbacks = { 
+		std::vector<std::function<void()>>(), 
+	};
 
 	void Renderer::BeginScene()
 	{
@@ -21,14 +24,14 @@ namespace Proton
 
 	}
 
-	void Renderer::Submit(const Mesh* mesh, VertexConstantBuffer* vertTransformBuf, PixelConstantBuffer* pixTransformBuf)
+	void Renderer::Submit(const Mesh* mesh, const std::vector<Ref<Material>>& materials, VertexConstantBuffer* vertTransformBuf, PixelConstantBuffer* pixTransformBuf)
 	{
 		PT_PROFILE_FUNCTION();
 
-		for (Ref<Material::Pass> t : mesh->material->m_Passes)
+		for (Ref<Material> m : materials)
 		{
-			PT_CORE_ASSERT(t->m_PassID >= 0 && t->m_PassID < m_RenderQueue.size(), "Invalid pass ID");
-			m_RenderQueue[t->m_PassID].AddJob({ mesh, vertTransformBuf, pixTransformBuf, t });
+			PT_CORE_ASSERT(m->m_PassID >= 0 && m->m_PassID < m_RenderQueue.size(), "Invalid pass ID");
+			m_RenderQueue[m->m_PassID].AddJob({ mesh, vertTransformBuf, pixTransformBuf, m });
 		}
 	}
 
@@ -51,30 +54,47 @@ namespace Proton
 		return -1;
 	}
 
+	void Renderer::AddPreRenderCallback(const std::string& pass, std::function<void()> callback)
+	{
+		int passID = GetPassIDFromName(pass);
+		m_PreRenderCallbacks[passID].push_back(callback);
+	}
+
 	void Renderer::Render()
 	{
+		int i = 0;
 		for (Pass& p : m_RenderQueue)
 		{
-			for (Job& job : p)
+			for (auto callback : m_PreRenderCallbacks[i++])
 			{
-				// Binding the shaders
-				job.MaterialPass->m_VertexShader->Bind();
-				job.MaterialPass->m_PixelShader->Bind();
-
-				// Bind all bindables
-				job.Mesh->m_IndexBuffer->Bind();
-				job.Mesh->m_VertexBuffer->Bind();
-				job.Mesh->m_Topology->Bind();
-
-				// Binding transform buffers
-				job.VertConstBuf->Bind();
-				job.PixConstBuf->Bind();
-
-				for (Ref<Bindable> bind : job.MaterialPass->m_Bindables)
-					bind->Bind();
-
-				RenderCommand::DrawIndexed(job.Mesh->m_IndexBuffer->size());
+				callback();
 			}
+
+			RenderPass(p);
+		}
+	}
+
+	void Renderer::RenderPass(Pass& pass)
+	{
+		for (Job& job : pass)
+		{
+			// Binding the shaders
+			job.Material->m_VertexShader->Bind();
+			job.Material->m_PixelShader->Bind();
+
+			// Bind all bindables
+			job.Mesh->m_IndexBuffer->Bind();
+			job.Mesh->m_VertexBuffer->Bind();
+			job.Mesh->m_Topology->Bind();
+
+			// Binding transform buffers
+			job.VertConstBuf->Bind();
+			job.PixConstBuf->Bind();
+
+			for (Ref<Bindable> bind : job.Material->m_Bindables)
+				bind->Bind();
+
+			RenderCommand::DrawIndexed(job.Mesh->m_IndexBuffer->size());
 		}
 	}
 

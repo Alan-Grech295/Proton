@@ -6,7 +6,7 @@
 #include "Panels\SceneHierarchyPanel.h"
 #include "Panels\ContentBrowserPanel.h"
 #include "Panels\ConsolePanel.h"
-#include <Proton\Renderer\SceneRenderer.h>
+#include "EditorSceneRenderer/EditorSceneRenderer.h"
 #include "Proton\Renderer\EditorCamera.h"
 #include "Proton/Asset System/Editor/EditorAssetManager.h"
 
@@ -58,7 +58,7 @@ namespace Proton
 		Scope<ConsolePanel> m_ConsolePanel;
 		Scope<SceneHierarchyPanel> m_SceneHierarchyPanel;
 
-		Scope<SceneRenderer> m_SceneRenderer;
+		Scope<EditorSceneRenderer> m_SceneRenderer;
 
 		Ref<Texture2D> m_IconPlay, m_IconStop, m_IconPause, m_IconStep;
 
@@ -74,6 +74,13 @@ namespace Proton
 		uint32_t m_AntiAliasing = 1;
 
 		bool cursor = true;
+
+		// Dragging check
+		const float dragThreshold = 5;
+		float mouseClickX;
+		float mouseClickY;
+		bool dragging = false;
+		bool initClick = true;
 
 		bool m_ViewportFocused = false;
 		bool m_ViewportHovered = false;

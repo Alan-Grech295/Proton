@@ -1,9 +1,12 @@
 #pragma once
 #include "Proton\Scene\Scene.h"
 #include "EditorCamera.h"
+#include "Proton/Model/Material.h"
 
 namespace Proton
 {
+	class Mesh;
+
 	class SceneRenderer
 	{
 		friend class Scene;
@@ -34,7 +37,7 @@ namespace Proton
 		}
 
 		//TODO: Replace with camera object 
-		void Render(const DirectX::XMMATRIX& viewMatrix, const DirectX::XMMATRIX& projMatrix);
+		virtual void Render(const DirectX::XMMATRIX& viewMatrix, const DirectX::XMMATRIX& projMatrix);
 
 		void SetScene(const Ref<Scene> scene) { m_Scene = scene; }
 
@@ -44,10 +47,13 @@ namespace Proton
 
 		Ref<Framebuffer> GetFrameBuffer() { return m_FrameBuffer; }
 
+	protected:
+		virtual void SubmitMesh(Entity entity, const Mesh* mesh, const std::vector<Ref<Material>>& materials, VertexConstantBuffer* vertTransformBuf, PixelConstantBuffer* pixTransformBuf);
+
 	private:
 		void SubmitNode(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
 		//void DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection);
-	private:
+	protected:
 		Ref<Framebuffer> m_FrameBuffer;
 		Ref<Scene> m_Scene;
 
@@ -57,7 +63,7 @@ namespace Proton
 		Scope<PixelShader> m_DebugPixShader;
 		Scope<VertexConstantBuffer> m_ViewProjBuffer;
 
-	private:
+	protected:
 		//TEMP
 		struct PointLightData
 		{

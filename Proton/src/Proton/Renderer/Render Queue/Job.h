@@ -5,15 +5,14 @@ namespace Proton
 {
 	class Mesh;
 	class Material;
-	class Material::Pass;
 
 	class Job
 	{
 	public:
-		Job(const Mesh* mesh, VertexConstantBuffer* vertConstBuf, PixelConstantBuffer* pixConstBuf, Ref<Material::Pass> step)
+		Job(const Mesh* mesh, VertexConstantBuffer* vertConstBuf, PixelConstantBuffer* pixConstBuf, Ref<Material> step)
 			:
 			Mesh(mesh),
-			MaterialPass(step),
+			Material(step),
 			VertConstBuf(vertConstBuf),
 			PixConstBuf(pixConstBuf)
 		{}
@@ -22,6 +21,6 @@ namespace Proton
 		const Mesh* Mesh = nullptr;
 		VertexConstantBuffer* VertConstBuf = nullptr;
 		PixelConstantBuffer* PixConstBuf = nullptr;
-		Ref<Material::Pass> MaterialPass;
+		Ref<Material> Material;
 	};
 }

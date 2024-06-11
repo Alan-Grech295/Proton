@@ -6,6 +6,7 @@
 #include "Loaders/ModelLoader.h"
 #include "Loaders/ImageLoader.h"
 #include "Loaders/MeshLoader.h"
+#include "Loaders/MaterialLoader.h"
 
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -46,6 +47,8 @@ namespace Proton
             return ModelLoader::LoadModelEditor(assetPath);
         case AssetHandle::Mesh:
             return MeshLoader::LoadMeshEditor(assetPath);
+        case AssetHandle::Material:
+            return MaterialLoader::LoadMaterialEditor(assetPath);
         }
 
         PT_CORE_ASSERT(false, "Could not find appropriate asset loader");
@@ -77,10 +80,8 @@ namespace Proton
         SaveMetaFiles();
     }
 
-    bool EditorAssetManager::AddOrLoadAssetInternal(const std::filesystem::path& path, AssetHandle::AssetType type, const std::function<Ref<void>(UUID)>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset)
+    bool EditorAssetManager::AddOrLoadAssetInternal(const std::filesystem::path& relativePath, AssetHandle::AssetType type, const std::function<Ref<void>(UUID)>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset)
     {
-        std::filesystem::path relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
-
         if (pathToUUID.contains(relativePath))
         {
             UUID assetID = pathToUUID[relativePath];

@@ -13,16 +13,26 @@ namespace Proton
 		virtual bool IsKeyPressedImpl(KeyCode keycode) override;
 		virtual bool IsKeyReleasedImpl(KeyCode keycode) override;
 		virtual bool IsMouseButtonPressedImpl(int button) override;
+		virtual bool IsMouseButtonReleasedImpl(int button) override;
 		virtual float GetMouseXImpl() override;
 		virtual float GetMouseYImpl() override;
 		virtual float GetMouseXDeltaImpl() override;
 		virtual float GetMouseYDeltaImpl() override;
+
+		virtual void ResetState();
+
+		virtual void KeyDown(int keycode);
+		virtual void KeyUp(int keycode);
+
+		virtual void MouseButtonDown(int mb);
+		virtual void MouseButtonUp(int mb);
 	private:
 		static constexpr unsigned int nKeys = 256;
 		static constexpr unsigned int nMouseButtons = 3;
 		std::bitset<nKeys> pressedKeyStates;
 		std::bitset<nKeys> releasedKeyStates;
-		std::bitset<nMouseButtons> mbStates;
+		std::bitset<nMouseButtons> mbPressedStates;
+		std::bitset<nMouseButtons> mbReleasedStates;
 		float mousePosX = 0;
 		float mousePosY = 0;
 		float mouseDeltaX = 0;

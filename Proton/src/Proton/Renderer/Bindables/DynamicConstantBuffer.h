@@ -13,6 +13,7 @@ namespace Proton::DCB
 						X(Float4)\
 						X(Matrix4x4)\
 						X(Int)\
+						X(UInt)\
 						X(Bool)
 
 	enum class Type
@@ -79,6 +80,14 @@ namespace Proton::DCB
 		using SysType = int;
 		static constexpr uint32_t ShaderSize = sizeof(SysType);
 		static constexpr const char* code = "I1";
+
+		static constexpr bool valid = true;
+	};
+	template<> struct Map<Type::UInt>
+	{
+		using SysType = uint32_t;
+		static constexpr uint32_t ShaderSize = sizeof(SysType);
+		static constexpr const char* code = "UI1";
 
 		static constexpr bool valid = true;
 	};

@@ -6,5 +6,7 @@ namespace Proton
 	{
 	public:
 		virtual void Bind() = 0;
+
+		virtual Ref<Bindable> Clone() = 0;
 	};
 }

@@ -273,13 +273,13 @@ namespace Proton
 	{
 		auto [transform, node] = m_Registry.get<TransformComponent, NodeComponent>(entity);
 
-		DirectX::XMMATRIX transformMat = transform.GetTransformMatrix() * 
+		DirectX::XMMATRIX transformMat = transform.GetLocalTransformMatrix() * 
 										 node.m_Origin * 
 										 accumulatedTransform;
 		
-		if (entity.HasComponent<MeshComponent>())
+		if (entity.HasComponent<MeshRendererComponent>())
 		{
-			MeshComponent& mesh = entity.GetComponent<MeshComponent>();
+			MeshRendererComponent& mesh = entity.GetComponent<MeshRendererComponent>();
 
 			for (int i = 0; i < mesh.m_NumMeshes; i++)
 			{

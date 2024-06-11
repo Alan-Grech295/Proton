@@ -136,6 +136,7 @@ namespace Proton
 		virtual void ReadPixel_Impl(uint32_t targetIndex, bool depth, int x, int y, uint32_t size, void* dest) = 0;
 
 		virtual void Clear() = 0;
+		virtual void ClearDepth() = 0;
 
 		static Ref<Framebuffer> Create(const FramebufferDescription& desc);
 	};

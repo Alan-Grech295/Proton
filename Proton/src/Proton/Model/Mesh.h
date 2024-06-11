@@ -17,7 +17,7 @@ namespace Proton
 		Ref<IndexBuffer> m_IndexBuffer;
 		Ref<Topology> m_Topology;
 
-		Ref<Material> material;
+		Ref<Material> m_DefaultMaterial;
 
 		UUID m_AssetID;
 	};

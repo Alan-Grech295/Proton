@@ -209,10 +209,17 @@ namespace Proton
             ClearRenderTarget(m_ColorAttachments[i].pRenderTarget.Get(), m_ColorAttachmentSpecifications[i]);
         }
 
-        // Clear the depth buffer
-        context->ClearDepthStencilView(m_DepthAttachment.pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+        ClearDepth();
 
         context->RSSetViewports(1, &vp);
+    }
+
+    void DirectXFramebuffer::ClearDepth()
+    {
+        ID3D11DeviceContext* context = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext();
+
+        // Clear the depth buffer
+        context->ClearDepthStencilView(m_DepthAttachment.pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
 
     void DirectXFramebuffer::Resize(uint32_t width, uint32_t height)

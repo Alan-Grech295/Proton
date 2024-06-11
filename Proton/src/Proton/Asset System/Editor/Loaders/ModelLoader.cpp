@@ -54,28 +54,31 @@ namespace Proton
         aiNode& node = *pScene->mRootNode;
 
         model->m_Meshes.reserve(pScene->mNumMeshes);
-        std::vector<Ref<Material>> materials;
-        materials.resize(pScene->mNumMaterials);
+        model->m_DefaultMaterials.reserve(pScene->mNumMaterials);
+
+        EditorAssetManager& assetManager = AssetManager::Instance<EditorAssetManager>();
 
         // Material deserialization
         for (int i = 0; i < pScene->mNumMaterials; i++)
         {
             //UUID materialUUID = UUID();
-            Ref<Material> mat = DeserializeAssimpMaterial(basePath, *pScene->mMaterials[i]);
-            materials[i] = mat;
+            model->m_DefaultMaterials.push_back(assetManager.AddOrLoadSubAsset<Material>(modelPath, pScene->mMaterials[i]->GetName().C_Str(),
+                AssetHandle::Material, [pScene, i, basePath](UUID assetID)
+                {
+                    return DeserializeAssimpMaterial(basePath, *pScene->mMaterials[i], assetID);
+                })
+            );
             //AssetManager::AddAsset(materialUUID, mat);
         }
-
-        EditorAssetManager& assetManager = AssetManager::Instance<EditorAssetManager>();
 
         // Mesh deserialization
         for (int i = 0; i < pScene->mNumMeshes; i++)
         {
             model->m_Meshes.push_back(
                 assetManager.AddOrLoadSubAsset<Mesh>(modelPath, pScene->mMeshes[i]->mName.C_Str(), 
-                    AssetHandle::Mesh, [pScene, i, modelPath, model, materials](UUID assetID) 
+                    AssetHandle::Mesh, [pScene, i, modelPath, model](UUID assetID)
                     { 
-                        return DeserializeMesh(*pScene->mMeshes[i], modelPath.string(), assetID, materials); 
+                        return DeserializeMesh(*pScene->mMeshes[i], modelPath.string(), assetID, model->m_DefaultMaterials);
                     })
             );
         }
@@ -91,14 +94,37 @@ namespace Proton
         return model;
     }
 
-    Ref<Material> ModelLoader::DeserializeAssimpMaterial(const std::string& basePath, const aiMaterial& aiMat)
+    //Ref<Material> ModelLoader::CreatePickMaterial()
+    //{
+    //    namespace dx = DirectX;
+
+    //    // Single pass
+    //    Ref<Material> material = CreateRef<Material>("Pick");
+
+    //    std::string pixShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PickerPS.cso";
+    //    std::string vertShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PickerVS.cso";
+
+    //    material->m_PixelShader = PixelShader::Create(pixShaderPath);
+    //    material->m_VertexShader = VertexShader::Create(vertShaderPath);
+
+    //    DCB::RawLayout layout;
+    //    layout.Add(DCB::Type::UInt, "EntityID");
+
+    //    Ref<PixelConstantBuffer> pcb = PixelConstantBuffer::CreateUnique(1, DCB::CookedLayout(std::move(layout)));
+
+    //    (*pcb)["EntityID"] = 100;
+
+    //    material->AddBindable(pcb);
+
+    //    return material;
+    //}
+
+    Ref<Material> ModelLoader::DeserializeAssimpMaterial(const std::string& basePath, const aiMaterial& aiMat, UUID assetID)
     {
         namespace dx = DirectX;
 
         // Single pass
-        Ref<Material> material = CreateRef<Material>();
-
-        Ref<Material::Pass> opaque = CreateRef<Material::Pass>("Opaque");
+        Ref<Material> material = CreateRef<Material>("Opaque", aiMat.GetName().C_Str(), assetID);
 
         float shininess = 40.0f;
         bool hasAlphaGloss = false;
@@ -116,7 +142,7 @@ namespace Proton
             material->hasDiffuseMap = true;
             Ref<Texture2D> diffuse = assetManager.LoadAsset<Texture2D>(basePath + texFileName.C_Str());
             diffuse->SetSlot(0);
-            opaque->AddBindable(diffuse);
+            material->AddBindable(diffuse);
             hasAlphaDiffuse = diffuse->HasAlpha();
         }
         else
@@ -130,7 +156,7 @@ namespace Proton
             material->hasSpecular = true;
             Ref<Texture2D> specular = assetManager.LoadAsset<Texture2D>(basePath + texFileName.C_Str());
             specular->SetSlot(1);
-            opaque->AddBindable(specular);
+            material->AddBindable(specular);
             hasAlphaGloss = specular->HasAlpha();
         }
         else
@@ -149,13 +175,13 @@ namespace Proton
             material->hasNormalMap = true;
             Ref<Texture2D> normal = assetManager.LoadAsset<Texture2D>(basePath + texFileName.C_Str());
             normal->SetSlot(2);
-            opaque->AddBindable(normal);
+            material->AddBindable(normal);
         }
 
         // Sampler
         if (material->hasSpecular || material->hasNormalMap || material->hasDiffuseMap)
         {
-            opaque->AddBindable(Sampler::Create(basePath + "mat_" + aiMat.GetName().C_Str()));
+            material->AddBindable(Sampler::Create(basePath + "mat_" + aiMat.GetName().C_Str()));
         }
 
         //Blender code if it needs to be added
@@ -165,7 +191,7 @@ namespace Proton
         });//*/
 
         //Rasterizer
-        opaque->AddBindable(Rasterizer::Create(basePath + "mat_" + aiMat.GetName().C_Str(), hasAlphaDiffuse));
+        material->AddBindable(Rasterizer::Create(basePath + "mat_" + aiMat.GetName().C_Str(), hasAlphaDiffuse));
 
         // Shaders
         std::string pixShaderPath;
@@ -197,8 +223,8 @@ namespace Proton
             vertShaderPath = CoreUtils::CORE_PATH_STR + "Proton\\PhongVS.cso";
         }
 
-        opaque->m_PixelShader = PixelShader::Create(pixShaderPath);
-        opaque->m_VertexShader = VertexShader::Create(vertShaderPath);
+        material->m_PixelShader = PixelShader::Create(pixShaderPath);
+        material->m_VertexShader = VertexShader::Create(vertShaderPath);
 
         // TODO: Convert pixel constant buffer creation to reflect
         // pixel shader (i.e. pixel shader is chosen first then the 
@@ -216,7 +242,7 @@ namespace Proton
             (*pcb)["specularColor"] = (dx::XMFLOAT4)specularColor;
             (*pcb)["specularPower"] = (float)shininess;
 
-            opaque->AddBindable(pcb);
+            material->AddBindable(pcb);
         }
         else
         {
@@ -231,10 +257,8 @@ namespace Proton
             (*pcb)["specularPower"] = shininess;
             (*pcb)["hasAlphaGloss"] = hasAlphaGloss;
 
-            opaque->AddBindable(pcb);
+            material->AddBindable(pcb);
         }
-
-        material->AddPass(opaque);
 
         return material;
     }
@@ -251,7 +275,7 @@ namespace Proton
 
         mesh->m_Name = aiMesh.mName.C_Str();
 
-        mesh->material = materials[aiMesh.mMaterialIndex];
+        mesh->m_DefaultMaterial = materials[aiMesh.mMaterialIndex];
 
         BufferLayout layout = {
             {"POSITION", ShaderDataType::Float3},
@@ -261,7 +285,7 @@ namespace Proton
             {"TEXCOORD", ShaderDataType::Float2}
         };
 
-        VertexShader* vertShader = mesh->material->m_Passes[0]->m_VertexShader.get();
+        VertexShader* vertShader = mesh->m_DefaultMaterial->m_VertexShader.get();
         Ref<VertexBuffer> vertBuffer = VertexBuffer::Create(meshTag, layout, vertShader, aiMesh.mNumVertices);
 
         {

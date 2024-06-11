@@ -2,6 +2,10 @@
 #include "../AssetManager.h"
 #include "Proton/Project/Project.h"
 
+#include "Proton/Model/Model.h"
+#include "Proton/Model/Mesh.h"
+#include "Proton/Model/Material.h"
+
 #include <unordered_map>
 #include <filesystem>
 #include <string>
@@ -21,6 +25,11 @@ namespace Proton
                        X(".png", Image) \
                        X(".jpg", Image) 
 
+#define ASSET_TYPE X(Model, Model) \
+X(Mesh, Mesh) \
+X(Material, Material) \
+X(Image, Texture2D) 
+
     public:
         EditorAssetManager() 
         {
@@ -36,15 +45,32 @@ namespace Proton
         }
 
         template<typename T>
-        inline Ref<T> LoadAsset(const std::string& path)
+        inline Ref<T> LoadSubAsset(const std::filesystem::path& path)
         {
-            return LoadAsset<T>(std::filesystem::path(path));
+            std::filesystem::path relPath = GetSubAssetPath<T>(path);
+            PT_CORE_ASSERT(pathToUUID.contains(relPath), "Asset not found")
+            return AssetManager::LoadAsset<T>(pathToUUID[relPath]);
+        }
+
+        inline std::filesystem::path GetSubAssetPath(AssetHandle::AssetType type, const std::filesystem::path& path) const
+        {
+            std::filesystem::path result = Project::GetAssetRelativePath(path);
+            switch (type)
+            {
+#define X(name) case AssetHandle::name: result = result.string() + "_" + #name; break;
+                TYPES
+#undef X
+            }
+
+            return result;
         }
 
         template<typename T>
-        inline Ref<T> LoadAsset(const char* path)
+        inline std::filesystem::path GetSubAssetPath(const std::filesystem::path& path) const
         {
-            return LoadAsset<T>(std::filesystem::path(path));
+#define X(handleType, type) if constexpr (std::is_same<T, type>::value) { return GetSubAssetPath(AssetHandle::handleType, path); }
+            ASSET_TYPE
+#undef X
         }
 
         inline bool HasAsset(const std::string& path)
@@ -53,9 +79,20 @@ namespace Proton
             return pathToUUID.contains(relPath);
         }
 
+        inline bool HasSubAsset(const std::string& path, AssetHandle::AssetType type)
+        {
+            std::filesystem::path relPath = GetSubAssetPath(type, path);
+            return pathToUUID.contains(relPath);
+        }
+
         inline Ref<AssetHandle> GetAssetHandle(const std::filesystem::path& path)
         {
             return AssetManager::GetAssetHandle(pathToUUID[Project::GetAssetRelativePath(path)]);
+        }
+
+        inline Ref<AssetHandle> GetSubAssetHandle(const std::filesystem::path& path, AssetHandle::AssetType type)
+        {
+            return AssetManager::GetAssetHandle(pathToUUID[GetSubAssetPath(type, path)]);
         }
 
         void ScanDirectory(const std::filesystem::path& path, bool loadAssets = true);        
@@ -66,7 +103,7 @@ namespace Proton
             Ref<AssetHandle> assetHandle;
             Ref<void> asset;
 
-            if (AddOrLoadAssetInternal(parentPath / name, type, loadFunc, assetHandle, asset))
+            if (AddOrLoadAssetInternal(GetSubAssetPath<T>(parentPath / name), type, loadFunc, assetHandle, asset))
             {
                 std::filesystem::path relativePath = Project::GetAssetRelativePath(parentPath);
                 Ref<AssetHandle> parentAsset = uuidToAsset[pathToUUID[relativePath]];
@@ -88,7 +125,7 @@ namespace Proton
         }
 
     private:
-        bool AddOrLoadAssetInternal(const std::filesystem::path& path, AssetHandle::AssetType type, const std::function<Ref<void>(UUID)>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset);
+        bool AddOrLoadAssetInternal(const std::filesystem::path& relativePath, AssetHandle::AssetType type, const std::function<Ref<void>(UUID)>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset);
 
         void HandleFile(const std::filesystem::path& path);
         void SaveMetaFiles();
