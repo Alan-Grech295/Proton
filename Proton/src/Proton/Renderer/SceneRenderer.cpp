@@ -78,8 +78,7 @@ namespace Proton
 
 		auto [transform, node] = sceneRegistry.get<TransformComponent, NodeComponent>(entity);
 
-		DirectX::XMMATRIX transformMat = transform.GetLocalTransformMatrix() *
-										 node.Origin *
+		DirectX::XMMATRIX transformMat = entity.LocalTransform() *
 										 accumulatedTransform;
 
 		if (entity.HasComponent<MeshRendererComponent>())

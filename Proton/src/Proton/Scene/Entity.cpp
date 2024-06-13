@@ -118,23 +118,38 @@ namespace Proton
         return e.HasParent(*this);
     }
 
+    DirectX::XMMATRIX Entity::LocalTransform()
+    {
+        if (!HasComponent<TransformComponent>()) return DirectX::XMMatrixIdentity();
+        if (!HasComponent<NodeComponent>()) return DirectX::XMMatrixIdentity();
+
+        return GetComponent<TransformComponent>().GetLocalTransformMatrix() *
+               GetComponent<NodeComponent>().Origin;
+    }
+
     DirectX::XMMATRIX Entity::LocalToWorld()
     {
         // Return zero matrix instead?
         if (!HasComponent<TransformComponent>()) return DirectX::XMMatrixIdentity();
+        if (!HasComponent<NodeComponent>()) return DirectX::XMMatrixIdentity();
 
-        DirectX::XMMATRIX worldTransform = GetComponent<TransformComponent>().GetLocalTransformMatrix();
+        // TODO: Find way to not store transforms
+        std::vector<DirectX::XMMATRIX> transforms;
         Entity parentEntity = GetParent();
 
         while (parentEntity != Entity::Null)
         {
-            if (parentEntity.HasComponent<TransformComponent>())
-            {
-                worldTransform = DirectX::XMMatrixMultiply(parentEntity.GetComponent<TransformComponent>().GetLocalTransformMatrix(),
-                    worldTransform);
-            }
+            transforms.push_back(parentEntity.LocalTransform());
+            //worldTransform = worldTransform * parentEntity.LocalTransform();
 
             parentEntity = parentEntity.GetParent();
+        }
+
+        DirectX::XMMATRIX worldTransform = LocalTransform();
+
+        for (auto it = transforms.rbegin(); it != transforms.rend(); ++it)
+        {
+            worldTransform *= *it;
         }
 
         return worldTransform;
@@ -144,19 +159,23 @@ namespace Proton
     {
         if (!HasComponent<TransformComponent>()) return worldTransform;
 
-        DirectX::XMMATRIX localTransform = worldTransform;
+        // TODO: Find way to not store transforms
+        std::vector<DirectX::XMMATRIX> transforms;
         Entity parentEntity = GetParent();
 
         while (parentEntity != Entity::Null)
         {
-            if (parentEntity.HasComponent<TransformComponent>())
-            {
-                localTransform = DirectX::XMMatrixMultiply(localTransform,
-                    DirectX::XMMatrixInverse(nullptr,
-                                             parentEntity.GetComponent<TransformComponent>().GetLocalTransformMatrix()));
-            }
+            transforms.push_back(DirectX::XMMatrixInverse(nullptr,
+                parentEntity.LocalTransform()));
 
             parentEntity = parentEntity.GetParent();
+        }
+
+        DirectX::XMMATRIX localTransform = worldTransform;
+
+        for (auto it = transforms.rbegin(); it != transforms.rend(); ++it)
+        {
+            localTransform *= *it;
         }
 
         return localTransform;

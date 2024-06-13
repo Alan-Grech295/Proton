@@ -8,9 +8,8 @@ namespace Proton
 	class Pass
 	{
 	public:
-		Pass(const std::string& name)
-			:
-			m_Name(name)
+		Pass(const std::string& name, int passID)
+			: m_Name(name), m_PassID(passID)
 		{}
 
 		Pass()
@@ -18,7 +17,7 @@ namespace Proton
 			m_Name("")
 		{}
 
-		void AddJob(Job job)
+		void AddJob(Ref<Job> job)
 		{
 			m_Jobs.push_back(std::move(job));
 		}
@@ -28,18 +27,19 @@ namespace Proton
 			m_Jobs.clear();
 		}
 
-		std::vector<Job>::iterator begin()
+		std::vector<Ref<Job>>::iterator begin()
 		{
 			return m_Jobs.begin();
 		}
 
-		std::vector<Job>::iterator end()
+		std::vector<Ref<Job>>::iterator end()
 		{
 			return m_Jobs.end();
 		}
 	public:
 		std::string m_Name;
+		int m_PassID = -1;
 	private:
-		std::vector<Job> m_Jobs;
+		std::vector<Ref<Job>> m_Jobs;
 	};
 }

@@ -36,6 +36,7 @@ namespace Proton
 		desc.Attachments = { 
 			{FramebufferTextureFormat::RGBA8, DirectX::XMFLOAT4{ 0.02f, 0.07f, 0.2f, 1 }},
 			{FramebufferTextureFormat::RINT, -1},
+			{FramebufferTextureFormat::RINT, -1},
 			{FramebufferTextureFormat::DEPTH, 1.0f}
 		};
 
@@ -146,7 +147,9 @@ namespace Proton
 			case SceneState::Edit:
 			{
 				m_ActiveScene->OnEditorUpdate(ts);
+				m_SceneRenderer->SetSelectedEntity(m_SceneHierarchyPanel->GetSelectedEntity());
 				m_SceneRenderer->Render(m_EditorCam.GetViewMatrix(), m_EditorCam.GetProjection());
+				m_SceneRenderer->RenderPickOutline();
 				break;
 			}
 			case SceneState::Play:
@@ -261,7 +264,6 @@ namespace Proton
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
-		PT_CORE_TRACE("{0}", m_ViewportHovered);
 		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportHovered);
 		m_UpdateEditorCamera = m_ViewportHovered && m_SceneState != SceneState::Play;
 
@@ -278,7 +280,7 @@ namespace Proton
 		
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(disableBlend, nullptr);
 		// Draw viewport
-		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID), viewportPanelSize);
+		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID ? 2 : 0), viewportPanelSize);
 
 		if (ImGui::BeginDragDropTarget())
 		{
@@ -404,6 +406,7 @@ namespace Proton
 			if (entityID != -1)
 			{
 				m_SceneHierarchyPanel->SelectEntity(Entity((entt::entity)entityID, m_ActiveScene.get()));
+
 			}
 		}
 

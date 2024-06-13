@@ -64,6 +64,7 @@ namespace Proton
 		bool HasParent(Entity e) const;
 		bool HasChild(Entity e) const;
 
+		DirectX::XMMATRIX LocalTransform();
 		DirectX::XMMATRIX LocalToWorld();
 
 		DirectX::XMMATRIX WorldToLocal(DirectX::FXMMATRIX worldTransform);

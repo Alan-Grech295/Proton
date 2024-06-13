@@ -5,33 +5,38 @@
 
 namespace Proton
 {
-	class DirectXTexture2D : public Texture2D
-	{
-	public:
-		DirectXTexture2D(const std::string& path, int slot = 0);
-		//DirectXTexture2D(uint32_t assetID, int slot = 0);
-		virtual ~DirectXTexture2D() {}
+    class DirectXTexture2D : public Texture2D
+    {
+    public:
+        DirectXTexture2D(const std::string& path, int slot = 0);
 
-		virtual void Bind() override;
+        DirectXTexture2D(Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture, 
+                         Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView, 
+                         int slot = 0);
+        //DirectXTexture2D(uint32_t assetID, int slot = 0);
+        virtual ~DirectXTexture2D() {}
 
-		virtual void Load(const std::string& path) override;
-		//virtual void Load(uint32_t assetID) override;
-		virtual Color GetPixel(int x, int y) const override;
-		virtual void* GetTexturePointer() const override;
+        virtual void Bind() override;
+        virtual void Unbind() override;
 
-		virtual bool HasAlpha() const override;
+        virtual void Load(const std::string& path) override;
+        //virtual void Load(uint32_t assetID) override;
+        virtual Color GetPixel(int x, int y) const override;
+        virtual void* GetTexturePointer() const override;
 
-		virtual std::string GetUID() const noexcept override;
-	public:
-		static constexpr DXGI_FORMAT format = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM;
-	private:
-		Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView;
-		bool hasAlpha;
-		int width, height;
-		DirectX::ScratchImage scratch;
+        virtual bool HasAlpha() const override;
 
-	};
+        virtual std::string GetUID() const noexcept override;
+    public:
+        static constexpr DXGI_FORMAT format = DXGI_FORMAT::DXGI_FORMAT_R8G8B8A8_UNORM;
+    private:
+        Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture;
+        Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView;
+        bool hasAlpha;
+        int width, height;
+        DirectX::ScratchImage scratch;
+
+    };
 }
 
 

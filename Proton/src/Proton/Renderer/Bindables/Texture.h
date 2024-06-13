@@ -18,6 +18,8 @@ namespace Proton
 
 		virtual void Bind() = 0;
 
+		virtual void Unbind() = 0;
+
 		virtual Ref<Bindable> Clone() override
 		{
 			return Clone(*this);

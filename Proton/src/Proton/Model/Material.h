@@ -18,7 +18,7 @@ namespace Proton
 		}
 
 		template<typename T>
-		Ref<T> GetBindable()
+		const Ref<T> GetBindable() const
 		{
 			static_assert(std::is_base_of<Bindable, T>::value, "Type has to be a bindable");
 			for (Ref<Bindable> bind : m_Bindables)
@@ -33,19 +33,17 @@ namespace Proton
 		}
 
 		template<typename T>
-		Ref<T> GetAllBindables()
+		void SetBindable(Ref<T> bindable)
 		{
 			static_assert(std::is_base_of<Bindable, T>::value, "Type has to be a bindable");
-			std::vector<Ref<T>> bindables;
-			for (Ref<Bindable> bind : m_Bindables)
+			for (Ref<Bindable>& bind : m_Bindables)
 			{
 				if (dynamic_cast<T*>(bind.get()))
 				{
-					bindables.push_back(CastRef<T>(bind));
+					bind = bindable;
+					return;
 				}
 			}
-
-			return bindables;
 		}
 
 		Ref<Material> Clone();
