@@ -8,17 +8,6 @@ Intermediates/
 # Proton files
 *.log
 
-#Models
-!Proton/Models/**/**.obj
-
-##TEMP
-#Assets
-**.asset
-**.asset.meta
-
-#Scenes
-**.proton
-
 ## Shader compiled files
 **.cso
 
