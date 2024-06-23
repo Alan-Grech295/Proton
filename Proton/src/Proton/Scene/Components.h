@@ -39,7 +39,7 @@ namespace Proton
 			position(position),
 			rotation(rotation) {}
 
-		DirectX::XMMATRIX GetTransformMatrix()
+		DirectX::XMMATRIX GetLocalTransformMatrix()
 		{
 			return DirectX::XMMatrixScaling(scale.x, scale.y, scale.z) *
 				   DirectX::XMMatrixRotationRollPitchYaw(rotation.x, rotation.y, rotation.z) *
@@ -68,7 +68,7 @@ namespace Proton
 		CameraComponent(const CameraComponent&) = default;
 	};
 
-	struct MeshComponent
+	struct MeshRendererComponent
 	{
 		struct Transforms
 		{
@@ -76,7 +76,7 @@ namespace Proton
 			DirectX::XMMATRIX model;
 		};
 
-		MeshComponent()
+		MeshRendererComponent()
 		{
 			TransformBufferVert = VertexConstantBuffer::CreateUnique(0, sizeof(Transforms), new Transforms());
 			DCB::RawLayout layout;
@@ -86,20 +86,22 @@ namespace Proton
 		}
 
 		// Copy constructor
-		MeshComponent(const MeshComponent& other)
-			: PMesh(other.PMesh)
+		MeshRendererComponent(const MeshRendererComponent& other)
+			: PMesh(other.PMesh), Materials(other.Materials)
 		{
 			TransformBufferVert = VertexConstantBuffer::CreateUnique(other.TransformBufferVert.get());
 			TransformBufferPix = PixelConstantBuffer::CreateUnique(other.TransformBufferPix.get());
 		}
 
-		/*MeshComponent(std::vector<Mesh*> meshPtrs)
+		/*MeshRendererComponent(std::vector<Mesh*> meshPtrs)
 			:
 			m_MeshPtrs(meshPtrs)
 		{}*/
 
 	public:
 		Ref<Mesh> PMesh = nullptr;
+
+		std::vector<Ref<Material>> Materials;
 
 		Ref<VertexConstantBuffer> TransformBufferVert;
 		Ref<PixelConstantBuffer> TransformBufferPix;
@@ -219,7 +221,7 @@ namespace Proton
 	{
 	};
 
-	using AllComponents = ComponentGroup<TransformComponent, CameraComponent, MeshComponent,
+	using AllComponents = ComponentGroup<TransformComponent, CameraComponent, MeshRendererComponent,
 										 RootNodeTag, NodeComponent, LightComponent,
 										 ScriptComponent, NativeScriptComponent>;
 }

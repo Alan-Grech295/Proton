@@ -31,7 +31,7 @@ namespace Proton
 		return DXGI_FORMAT_UNKNOWN;
 	}
 	//Vertex Buffer
-	DirectXVertexBuffer::DirectXVertexBuffer(const std::string& tag, BufferLayout& layout, VertexShader* vertexShader)
+	DirectXVertexBuffer::DirectXVertexBuffer(const std::string& tag, const BufferLayout& layout, VertexShader* vertexShader)
 		:
 		m_InputLayoutDesc(new D3D11_INPUT_ELEMENT_DESC[layout.size()])
 	{
@@ -184,9 +184,8 @@ namespace Proton
 
 	void DirectXVertexConstantBuffer::SetData(const void* data, int size)
 	{
+		VertexConstantBuffer::SetData(data, size);
 		if (size < 0) size = m_Size;
-
-		memcpy(m_Data, data, size);
 
 		D3D11_MAPPED_SUBRESOURCE msr;
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Map(
@@ -198,12 +197,6 @@ namespace Proton
 		memcpy(msr.pData, data, m_Size);
 
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(pConstantBuffer.Get(), 0);
-	}
-
-	/*IMPORTANT: Deallocate the data as it is a copy*/
-	void* DirectXVertexConstantBuffer::GetData()
-	{
-		return m_Data;
 	}
 
 	void DirectXVertexConstantBuffer::Bind()
@@ -254,11 +247,6 @@ namespace Proton
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->Unmap(pConstantBuffer.Get(), 0);
 	
 		m_Changed = false;
-	}
-
-	uint8_t* DirectXPixelConstantBuffer::GetData()
-	{
-		return m_Data;
 	}
 
 	void DirectXPixelConstantBuffer::Bind()

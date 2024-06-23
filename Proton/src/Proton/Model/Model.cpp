@@ -35,6 +35,18 @@ namespace Proton
 		return nullptr;
 	}
 
+	Ref<Material> Model::GetMaterialByName(const std::string& name)
+	{
+		for (Ref<Material> mat : m_DefaultMaterials)
+		{
+			if (mat->m_Name == name)
+				return mat;
+		}
+
+		PT_CORE_ASSERT(false, "Could not find material");
+		return nullptr;
+	}
+
 	Entity Proton::Model::CreateNodeEntity(Node& node, Scene& activeScene, Ref<Model> model)
 	{
 		//Node Creations
@@ -86,8 +98,17 @@ namespace Proton
 
 	void Model::AddMeshComponent(Entity entity, Ref<Model> modelRef, Ref<Mesh> mesh)
 	{
-		MeshComponent& meshComponent = entity.AddComponent<MeshComponent>();
+		MeshRendererComponent& meshComponent = entity.AddComponent<MeshRendererComponent>();
 		meshComponent.PMesh = mesh;
+
+		meshComponent.Materials.push_back(mesh->m_DefaultMaterial);
+
+		/*Ref<Material> pickMaterial = GetPickMaterial()->Clone();
+		(*pickMaterial->GetBindable<PixelConstantBuffer>())["EntityID"] = (uint32_t)entity;
+
+		meshComponent.Materials.push_back(pickMaterial);*/
+		// TODO: Only run in editor mode
+		//(*mesh->m_Materials[1]->GetBindable<PixelConstantBuffer>())["EntityID"] = (uint32_t)entity;
 	}
 }
 

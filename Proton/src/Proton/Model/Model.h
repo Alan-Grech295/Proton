@@ -27,14 +27,8 @@ namespace Proton
 
 		static Entity CreateEntity(Ref<Model> model, Scene& activeScene);
 
-		~Model()
-		{
-			m_Meshes.~vector();
-			m_Nodes.~vector();
-		}
-
 		Ref<Mesh> GetMeshByName(const std::string& name);
-
+		Ref<Material> GetMaterialByName(const std::string& name);
 		//static Ref<Model> DeserializeEditor(const std::filesystem::path& path, UUID uuid);
 	private:
 		static Entity CreateNodeEntity(Node& node, Scene& activeScene, Ref<Model> model);
@@ -44,6 +38,7 @@ namespace Proton
 		// Nodes and meshes are model specific
 		std::vector<Node> m_Nodes;
 		std::vector<Ref<Mesh>> m_Meshes;
+		std::vector<Ref<Material>> m_DefaultMaterials;
 		// Note: Materials are not being stored in the model as different materials
 		// can be used in different models 
 	};

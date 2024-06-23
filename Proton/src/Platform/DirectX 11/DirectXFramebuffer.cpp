@@ -181,6 +181,13 @@ namespace Proton
         return (void*)m_ColorAttachments[index].pSRV.Get();
     }
 
+    Ref<Texture2D> DirectXFramebuffer::GetRenderTexture(uint32_t index)
+    {
+        ColorAttachment& attachment = m_ColorAttachments[index];
+
+        return CreateRef<DirectXTexture2D>(attachment.pTexture, attachment.pSRV);
+    }
+
     void DirectXFramebuffer::ClearRenderTarget(ID3D11RenderTargetView* target, FramebufferTextureSpecification& spec)
     {
         ID3D11DeviceContext* context = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext();
@@ -209,10 +216,24 @@ namespace Proton
             ClearRenderTarget(m_ColorAttachments[i].pRenderTarget.Get(), m_ColorAttachmentSpecifications[i]);
         }
 
-        // Clear the depth buffer
-        context->ClearDepthStencilView(m_DepthAttachment.pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
+        ClearDepth();
 
         context->RSSetViewports(1, &vp);
+    }
+
+    void DirectXFramebuffer::Clear(uint32_t targetIndex)
+    {
+        PT_CORE_ASSERT(targetIndex >= 0 && targetIndex < m_ColorAttachments.size(), "Invalid target index");
+        ID3D11DeviceContext* context = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext();
+        ClearRenderTarget(m_ColorAttachments[targetIndex].pRenderTarget.Get(), m_ColorAttachmentSpecifications[targetIndex]);
+    }
+
+    void DirectXFramebuffer::ClearDepth()
+    {
+        ID3D11DeviceContext* context = ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext();
+
+        // Clear the depth buffer
+        context->ClearDepthStencilView(m_DepthAttachment.pDepthStencilView.Get(), D3D11_CLEAR_DEPTH, 1.0f, 0);
     }
 
     void DirectXFramebuffer::Resize(uint32_t width, uint32_t height)
@@ -267,15 +288,29 @@ namespace Proton
         context->Unmap(copyTexture.Get(), 0);
     }
 
-    void DirectXFramebuffer::Bind()
+    void DirectXFramebuffer::Bind(bool depth)
     {
-        if (m_DepthAttachment.pDSState)
+        if (depth && m_DepthAttachment.pDSState)
         {
             //Bind depth stencil state
             ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetDepthStencilState(m_DepthAttachment.pDSState.Get(), 1);
         }
 
-        ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetRenderTargets((UINT)m_ColorAttachments.size(), m_RenderTargets.data(), m_DepthAttachment.pDepthStencilView.Get());
+        ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetRenderTargets((UINT)m_ColorAttachments.size(), m_RenderTargets.data(), depth ? m_DepthAttachment.pDepthStencilView.Get() : nullptr);
+    }
+
+    void DirectXFramebuffer::BindExclude(uint32_t excludeIndex, bool depth)
+    {
+        if (depth && m_DepthAttachment.pDSState)
+        {
+            //Bind depth stencil state
+            ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetDepthStencilState(m_DepthAttachment.pDSState.Get(), 1);
+        }
+
+        std::vector<ID3D11RenderTargetView*> renderTargets = m_RenderTargets;
+        renderTargets[excludeIndex] = nullptr;
+
+        ((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->OMSetRenderTargets((UINT)m_ColorAttachments.size(), renderTargets.data(), depth ? m_DepthAttachment.pDepthStencilView.Get() : nullptr);
     }
 
     void DirectXFramebuffer::Invalidate()

@@ -11,6 +11,7 @@ namespace Proton
 		inline static bool IsKeyReleased(KeyCode keycode) { return s_Instance->IsKeyReleasedImpl(keycode); }
 
 		inline static bool IsMouseButtonPressed(int button) { return s_Instance->IsMouseButtonPressedImpl(button); }
+		inline static bool IsMouseButtonReleased(int button) { return s_Instance->IsMouseButtonReleasedImpl(button); }
 		inline static float GetMouseX() { return s_Instance->GetMouseXImpl(); }
 		inline static float GetMouseY() { return s_Instance->GetMouseYImpl(); }
 		inline static float GetMouseDeltaX() { return s_Instance->GetMouseXDeltaImpl(); }
@@ -20,6 +21,7 @@ namespace Proton
 		virtual bool IsKeyReleasedImpl(KeyCode keycode) = 0;
 
 		virtual bool IsMouseButtonPressedImpl(int button) = 0;
+		virtual bool IsMouseButtonReleasedImpl(int button) = 0;
 		virtual float GetMouseXImpl() = 0;
 		virtual float GetMouseYImpl() = 0;
 		virtual float GetMouseXDeltaImpl() = 0;

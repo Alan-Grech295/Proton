@@ -2,6 +2,7 @@
 #include "Proton\Core\Base.h"
 #include "Proton\Core\Core.h"
 #include "Proton/Renderer/Bindables/Buffer.h"
+#include "Proton/Renderer/Bindables/Texture.h"
 #include "Proton/Renderer/Bindables/Shader.h"
 #include <DirectXMath.h>
 #include <vector>
@@ -109,11 +110,14 @@ namespace Proton
 	class Framebuffer
 	{
 	public:
-		virtual void Bind() = 0;
+		virtual void Bind(bool depth = true) = 0;
+		virtual void BindExclude(uint32_t excludeIndex, bool depth = true) = 0;
 
 		virtual const FramebufferDescription& GetDescription() const = 0;
 
 		virtual void* GetRenderTextureID(uint32_t index) = 0;
+
+		virtual Ref<Texture2D> GetRenderTexture(uint32_t index) = 0;
 
 		virtual void Resize(uint32_t width, uint32_t height) = 0;
 
@@ -136,6 +140,8 @@ namespace Proton
 		virtual void ReadPixel_Impl(uint32_t targetIndex, bool depth, int x, int y, uint32_t size, void* dest) = 0;
 
 		virtual void Clear() = 0;
+		virtual void Clear(uint32_t targetIndex) = 0;
+		virtual void ClearDepth() = 0;
 
 		static Ref<Framebuffer> Create(const FramebufferDescription& desc);
 	};

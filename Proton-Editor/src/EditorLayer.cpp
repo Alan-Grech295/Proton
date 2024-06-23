@@ -4,6 +4,7 @@
 #include "Proton\Utils\PlatformUtils.h"
 #include <Proton\Math\Math.h>
 #include "Proton\Scripting\ScriptEngine.h"
+#include "Proton/Scene/Entity.h"
 #include "FileLoader.h"
 
 #include "ImGuizmo.h"
@@ -35,12 +36,12 @@ namespace Proton
 		desc.Attachments = { 
 			{FramebufferTextureFormat::RGBA8, DirectX::XMFLOAT4{ 0.02f, 0.07f, 0.2f, 1 }},
 			{FramebufferTextureFormat::RINT, -1},
+			{FramebufferTextureFormat::RINT, -1},
 			{FramebufferTextureFormat::DEPTH, 1.0f}
 		};
 
 		desc.ClearColor = new float[4]{ 0.02f, 0.07f, 0.2f, 1 };
-		m_SceneRenderer = CreateScope<SceneRenderer>(m_ActiveScene, desc);
-
+		m_SceneRenderer = CreateScope<EditorSceneRenderer>(m_ActiveScene, desc);
 		m_EditorCam = EditorCamera(45.0f, 1.778f, 0.1f, 10000.0f);
 
 		m_ContentBrowserPanel = CreateScope<ContentBrowserPanel>();
@@ -58,12 +59,12 @@ namespace Proton
 
 
 			/*Ref<Model> model = assetManager.LoadAsset<Model>("Models\\Sponza\\sponza.obj");
-			Model::CreateEntity(model, *m_ActiveScene);
+			Model::CreateEntity(model, *m_ActiveScene);*/
 
-			Ref<Model> nano = assetManager.LoadAsset<Model>("Models\\nano_textured\\nanosuit.obj");
-			Model::CreateEntity(nano, *m_ActiveScene);
+			/*Ref<Model> nano = assetManager.LoadAsset<Model>("Models\\nano_textured\\nanosuit.obj");
+			Model::CreateEntity(nano, *m_ActiveScene);*/
 
-			Ref<Model> cube = assetManager.LoadAsset<Model>("Models\\cube.obj");
+			/*Ref<Model> cube = assetManager.LoadAsset<Model>("Models\\cube.obj");
 			Model::CreateEntity(cube, *m_ActiveScene);*/
 		}
 		else
@@ -116,21 +117,29 @@ namespace Proton
 		if(m_UpdateEditorCamera)
 			m_EditorCam.OnUpdate(ts);
 
-		auto [mx, my] = ImGui::GetMousePos();
-		mx -= m_ViewportBounds[0].x;
-		my -= m_ViewportBounds[0].y;
-
-		ImVec2 viewportSize = { m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y };
-		//Comment to unflip
-		//my = m_ViewportSize.y - my;
-
-		int mouseX = (int)mx;
-		int mouseY = (int)my;
-
-		if (Input::IsMouseButtonPressed(0) &&  mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)m_ViewportSize.y)
+		if (Input::IsMouseButtonPressed(0))
 		{
-			int pixelData = m_SceneRenderer->GetFrameBuffer()->ReadPixel<int>(1, mouseX, mouseY);
-			//PT_CORE_TRACE(pixelData);
+			if (initClick)
+			{
+				initClick = false;
+				dragging = false;
+				mouseClickX = Input::GetMouseX();
+				mouseClickY = Input::GetMouseY();
+			}
+			
+			float dX = (mouseClickX - Input::GetMouseX());
+			float dY = (mouseClickY - Input::GetMouseY());
+
+			float sqrDist = dX * dX + dY * dY;
+
+			if (sqrDist >= dragThreshold * dragThreshold)
+			{
+				dragging = true;
+			}
+		}
+		else
+		{
+			initClick = true;
 		}
 
 		switch (m_SceneState)
@@ -138,7 +147,9 @@ namespace Proton
 			case SceneState::Edit:
 			{
 				m_ActiveScene->OnEditorUpdate(ts);
+				m_SceneRenderer->SetSelectedEntity(m_SceneHierarchyPanel->GetSelectedEntity());
 				m_SceneRenderer->Render(m_EditorCam.GetViewMatrix(), m_EditorCam.GetProjection());
+				m_SceneRenderer->RenderPickOutline();
 				break;
 			}
 			case SceneState::Play:
@@ -156,82 +167,6 @@ namespace Proton
 				break;
 			}
 		}
-	}
-
-	//TEMP
-	static void DrawFloat3Control(const std::string& label, DirectX::XMFLOAT3& values, float resetValue = 0.0f, float columnWidth = 100.0f)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		auto boldFont = io.Fonts->Fonts[0];
-
-		ImGui::PushID(label.c_str());
-
-		ImGui::Columns(2, 0, false);
-		ImGui::SetColumnWidth(0, columnWidth);
-		ImGui::Text(label.c_str());
-		ImGui::NextColumn();
-
-		ImGui::PushMultiItemsWidths(3, ImGui::CalcItemWidth());
-		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2{ 0, 0 });
-
-		float lineHeight = GImGui->Font->FontSize + GImGui->Style.FramePadding.y * 2.0f;
-		ImVec2 buttonSize = { lineHeight + 3, lineHeight };
-
-		//X
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
-
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("X", buttonSize))
-			values.x = resetValue;
-
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##X", &values.x, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		//Y
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
-
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("Y", buttonSize))
-			values.y = resetValue;
-
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Y", &values.y, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-		ImGui::SameLine();
-
-		//Z
-		ImGui::PushStyleColor(ImGuiCol_Button, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.2f, 0.35f, 0.9f, 1.0f });
-		ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.1f, 0.25f, 0.8f, 1.0f });
-
-		ImGui::PushFont(boldFont);
-		if (ImGui::Button("Z", buttonSize))
-			values.z = resetValue;
-
-		ImGui::PopFont();
-		ImGui::PopStyleColor(3);
-
-		ImGui::SameLine();
-		ImGui::DragFloat("##Z", &values.z, 0.1f, 0.0f, 0.0f, "%.2f");
-		ImGui::PopItemWidth();
-
-		ImGui::PopStyleVar();
-
-		ImGui::Columns(1);
-
-		ImGui::PopID();
 	}
 
 	enum RotSeq { zyx, zyz, zxy, zxz, yxz, yxy, yzx, yzy, xyz, xyx, xzy, xzx };
@@ -290,7 +225,7 @@ namespace Proton
 		// any change of dockspace/settings would lead to windows being stuck in limbo and never being visible.
 		if (!opt_padding)
 			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-		ImGui::Begin("DockSpace Demo", &dockspaceOpen, window_flags);
+		ImGui::Begin("DockSpace", &dockspaceOpen, window_flags);
 		if (!opt_padding)
 			ImGui::PopStyleVar();
 
@@ -329,8 +264,8 @@ namespace Proton
 
 		m_ViewportFocused = ImGui::IsWindowFocused();
 		m_ViewportHovered = ImGui::IsWindowHovered();
-		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportFocused && !m_ViewportHovered);
-		m_UpdateEditorCamera = m_ViewportFocused && m_SceneState != SceneState::Play;
+		Application::Get().GetImGuiLayer()->BlockEvents(!m_ViewportHovered);
+		m_UpdateEditorCamera = m_ViewportHovered && m_SceneState != SceneState::Play;
 
 		ImGui::PopStyleVar();
 
@@ -345,7 +280,7 @@ namespace Proton
 		
 		ImGui::GetCurrentWindow()->DrawList->AddCallback(disableBlend, nullptr);
 		// Draw viewport
-		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID), viewportPanelSize);
+		ImGui::Image(m_SceneRenderer->GetRenderTextureID(texID ? 2 : 0), viewportPanelSize);
 
 		if (ImGui::BeginDragDropTarget())
 		{
@@ -418,7 +353,7 @@ namespace Proton
 			// Entity Transform
 			auto& tc = selectedEntity.GetComponent<TransformComponent>();
 			//TODO: Use Math SIMD functions to do
-			DirectX::XMMATRIX transform = tc.GetTransformMatrix();
+			DirectX::XMMATRIX transform = selectedEntity.LocalToWorld();
 
 			//Snapping
 			bool snap = Input::IsKeyPressed(Key::Control);
@@ -435,6 +370,7 @@ namespace Proton
 			if (ImGuizmo::IsUsing())
 			{
 				m_UpdateEditorCamera = false;
+				transform = selectedEntity.WorldToLocal(transform);
 				DirectX::XMVECTOR translation;
 				DirectX::XMVECTOR rotation;
 				DirectX::XMVECTOR scale;
@@ -448,6 +384,29 @@ namespace Proton
 				tc.rotation = QuatToEul(rotation);
 
 				DirectX::XMStoreFloat3(&tc.scale, scale);//*/
+			}
+		}
+
+		auto [mx, my] = ImGui::GetMousePos();
+		mx -= m_ViewportBounds[0].x;
+		my -= m_ViewportBounds[0].y;
+
+		ImVec2 viewportSize = { m_ViewportBounds[1].x - m_ViewportBounds[0].x, m_ViewportBounds[1].y - m_ViewportBounds[0].y };
+		//Comment to unflip
+		//my = m_ViewportSize.y - my;
+
+		int mouseX = (int)mx;
+		int mouseY = (int)my;
+
+		// Entity Picking
+		if (!ImGuizmo::IsOver() && Input::IsMouseButtonReleased(0) && !dragging &&
+			mouseX >= 0 && mouseY >= 0 && mouseX < (int)viewportSize.x && mouseY < (int)m_ViewportSize.y)
+		{
+			int entityID = m_SceneRenderer->GetFrameBuffer()->ReadPixel<int>(1, mouseX, mouseY);
+			if (entityID != -1)
+			{
+				m_SceneHierarchyPanel->SelectEntity(Entity((entt::entity)entityID, m_ActiveScene.get()));
+
 			}
 		}
 

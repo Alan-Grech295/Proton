@@ -48,6 +48,12 @@ namespace Proton
 		return PixelShader::CreateUnique(dynamic_cast<PixelShader&>(*other).m_Path);
 	}
 
+	Ref<PixelShader> PixelShader::Clone(const PixelShader& other)
+	{
+		Ref<PixelShader> clone = std::move(CreateUnique(other.m_Path));
+		return clone;
+	}
+
 	Ref<VertexShader> VertexShader::Create(std::string path)
 	{
 		PT_PROFILE_FUNCTION();
@@ -83,5 +89,11 @@ namespace Proton
 	{
 		assert("Test first before using!" && false);
 		return VertexShader::CreateUnique(dynamic_cast<VertexShader&>(*other).m_Path);
+	}
+
+	Ref<VertexShader> VertexShader::Clone(const VertexShader& other)
+	{
+		Ref<VertexShader> clone = std::move(CreateUnique(other.m_Path));
+		return clone;
 	}
 }

@@ -33,7 +33,7 @@ namespace Proton
 		return vertexBuffer;
 	}
 
-	Scope<VertexBuffer> VertexBuffer::CreateUnique(BufferLayout& layout, VertexShader* vertexShader, uint32_t numElements)
+	Scope<VertexBuffer> VertexBuffer::CreateUnique(const BufferLayout& layout, VertexShader* vertexShader, uint32_t numElements)
 	{
 		PT_PROFILE_FUNCTION();
 
@@ -58,8 +58,15 @@ namespace Proton
 	Scope<VertexBuffer> VertexBuffer::CreateUnique(Ref<Bindable> other)
 	{
 		assert("Test first before using!" && false);
-		VertexBuffer& vb = dynamic_cast<VertexBuffer&>(*other);
-		return VertexBuffer::CreateUnique(const_cast<BufferLayout&>(vb.GetLayout()), vb.m_Shader, vb.m_MaxSize);
+		VertexBuffer& vb = *static_cast<VertexBuffer*>(other.get());
+		return VertexBuffer::CreateUnique(const_cast<BufferLayout&>(vb.GetLayout()), vb.m_Shader, vb.size());
+	}
+
+	Ref<VertexBuffer> VertexBuffer::Clone(const VertexBuffer& other)
+	{
+		Ref<VertexBuffer> clone = CreateUnique(other.m_Layout, other.m_Shader, other.size());
+		clone->SetRawData(other.m_Data, other.sizeBytes());
+		return clone;
 	}
 
 	Ref<IndexBuffer> IndexBuffer::Create(const std::string& tag, uint32_t size)
@@ -107,9 +114,23 @@ namespace Proton
 	Scope<IndexBuffer> IndexBuffer::CreateUnique(Ref<Bindable> other)
 	{
 		assert("Test first before using!" && false);
-		return IndexBuffer::CreateUnique((uint32_t)dynamic_cast<IndexBuffer*>(other.get())->m_Indices.size());
+		return IndexBuffer::CreateUnique((uint32_t)static_cast<IndexBuffer*>(other.get())->m_Indices.size());
 	}
-	
+
+	Ref<IndexBuffer> IndexBuffer::Clone(const IndexBuffer& other)
+	{
+		Ref<IndexBuffer> clone = std::move(CreateUnique(other.size()));
+		clone->SetRawData(other.m_Indices.data(), other.m_Indices.size());
+		return clone;
+	}
+
+	void VertexConstantBuffer::SetData(const void* data, int size)
+	{
+		if (size < 0) size = m_Size;
+
+		memcpy(m_Data, data, size);
+	}
+
 	Ref<VertexConstantBuffer> VertexConstantBuffer::Create(const std::string& tag, int slot, int size, const void* data)
 	{
 		PT_PROFILE_FUNCTION();
@@ -161,6 +182,12 @@ namespace Proton
 		return result;
 	}
 
+	Ref<VertexConstantBuffer> VertexConstantBuffer::Clone(const VertexConstantBuffer& other)
+	{
+		Ref<VertexConstantBuffer> clone = std::move(CreateUnique(other.m_Slot, other.m_Size, other.GetData()));
+		return clone;
+	}
+
 	Ref<PixelConstantBuffer> PixelConstantBuffer::Create(const std::string& tag, int slot, DCB::CookedLayout& layout)
 	{
 		PT_PROFILE_FUNCTION();
@@ -209,6 +236,15 @@ namespace Proton
 		Scope<PixelConstantBuffer> result = PixelConstantBuffer::CreateUnique(pcb->m_Slot, cookedLayout);
 		memcpy(result->m_Data, pcb->GetData(), pcb->m_Size);
 		return result;
+	}
+
+	Ref<PixelConstantBuffer> PixelConstantBuffer::Clone(const PixelConstantBuffer& other)
+	{
+		Ref<PixelConstantBuffer> clone = std::move(CreateUnique(other.m_Slot, DCB::CookedLayout(other.m_Root)));
+		clone->m_Size = other.m_Size;
+		memcpy(clone->m_Data, other.m_Data, other.m_Size);
+		clone->m_Changed = true;
+		return clone;
 	}
 
 	PixelConstantBuffer* PixelConstantBuffer::CreateUniquePtr(int slot, const DCB::CookedLayout& layout)

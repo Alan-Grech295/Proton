@@ -30,13 +30,7 @@ namespace Proton
 
 	void WindowsWindow::OnUpdate(TimeStep ts)
 	{
-		input->mouseDeltaX = 0;
-		input->mouseDeltaY = 0;
-
-		input->accMouseDeltaX = 0;
-		input->accMouseDeltaY = 0;
-
-		input->releasedKeyStates.reset();
+		input->ResetState();
 
 		//Message handling
 		MSG msg;
@@ -266,7 +260,7 @@ namespace Proton
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
 			{
-				input->pressedKeyStates[(int)wParam] = true;
+				input->KeyDown((int)wParam);
 				//PT_CORE_WARN("KeyDown " + std::to_string(wParam));
 				KeyPressedEvent event((int)wParam, (int)lParam & 0xffff);
 				data.eventCallback(event);
@@ -276,8 +270,7 @@ namespace Proton
 		case WM_KEYUP:
 			{
 				//PT_CORE_WARN("KeyUp " + std::to_string(wParam));
-				input->pressedKeyStates[wParam] = false;
-				input->releasedKeyStates[wParam] = true;
+				input->KeyUp((int)wParam);
 				KeyReleasedEvent event(wParam);
 				data.eventCallback(event);
 				break;
@@ -290,7 +283,7 @@ namespace Proton
 			//Mouse messages
 		case WM_LBUTTONDOWN:
 			{
-				input->mbStates[0] = true;
+				input->MouseButtonDown(0);
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonPressedEvent event(0, pt.x, pt.y);
 				data.eventCallback(event);
@@ -298,7 +291,7 @@ namespace Proton
 			break;
 		case WM_LBUTTONUP:
 			{
-				input->mbStates[0] = false;
+				input->MouseButtonUp(0);
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonReleasedEvent event(0, pt.x, pt.y);
 				data.eventCallback(event);
@@ -314,7 +307,7 @@ namespace Proton
 			break;
 		case WM_RBUTTONDOWN:
 			{
-				input->mbStates[1] = true;
+				input->MouseButtonDown(1);
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonPressedEvent event(1, pt.x, pt.y);
 				data.eventCallback(event);
@@ -322,7 +315,7 @@ namespace Proton
 			break;
 		case WM_RBUTTONUP:
 			{
-				input->mbStates[1] = false;
+				input->MouseButtonUp(1);
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonReleasedEvent event(1, pt.x, pt.y);
 				data.eventCallback(event);
@@ -338,7 +331,7 @@ namespace Proton
 			break;
 		case WM_MBUTTONDOWN:
 		{
-			input->mbStates[2] = true;
+			input->MouseButtonDown(2);
 			const POINTS pt = MAKEPOINTS(lParam);
 			MouseButtonPressedEvent event(2, pt.x, pt.y);
 			data.eventCallback(event);
@@ -354,7 +347,7 @@ namespace Proton
 		break;
 		case WM_MBUTTONUP:
 			{
-				input->mbStates[2] = false;
+				input->MouseButtonUp(2);
 				const POINTS pt = MAKEPOINTS(lParam);
 				MouseButtonReleasedEvent event(2, pt.x, pt.y);
 				data.eventCallback(event);

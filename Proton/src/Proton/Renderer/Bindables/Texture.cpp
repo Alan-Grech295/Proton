@@ -47,4 +47,11 @@ namespace Proton
 		Texture2D& tex = dynamic_cast<Texture2D&>(*other);
 		return Texture2D::CreateUnique(tex.m_Path, tex.m_Slot);
 	}
+
+	Ref<Texture2D> Texture2D::Clone(const Texture2D& other)
+	{
+		// TODO: Better clone
+		Ref<Texture2D> clone = std::move(CreateUnique(other.m_Path, other.m_Slot));
+		return clone;
+	}
 }

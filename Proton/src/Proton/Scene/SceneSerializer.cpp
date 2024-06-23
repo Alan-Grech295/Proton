@@ -242,16 +242,27 @@ namespace Proton
 			out << YAML::EndMap;	//LightComponent
 		}
 
-		if (entity.HasComponent<MeshComponent>() && writeMesh)
+		if (entity.HasComponent<MeshRendererComponent>() && writeMesh)
 		{
-			out << YAML::Key << "MeshComponent";
-			out << YAML::BeginMap;	//StaticMeshComponent
+			out << YAML::Key << "MeshRendererComponent";
+			out << YAML::BeginMap;	//MeshRendererComponent
 
-			auto& mc = entity.GetComponent<MeshComponent>();
+			auto& mc = entity.GetComponent<MeshRendererComponent>();
 
 			out << YAML::Key << "Asset ID" << YAML::Value << mc.PMesh->m_AssetID;
 
-			out << YAML::EndMap;	//StaticMeshComponent
+			out << YAML::Key << "Materials";
+			out << YAML::BeginSeq;	//Materials
+
+			for (auto mat : mc.Materials)
+			{
+				if (mat->assetID == UUID::Null) continue;
+				out << mat->assetID;
+			}
+
+			out << YAML::EndSeq;	//Materials
+
+			out << YAML::EndMap;	//MeshRendererComponent
 		}
 
 		if (entity.HasComponent<CameraComponent>())
@@ -475,14 +486,19 @@ namespace Proton
 					nodeComponent.NodeName = node["Node Name"].as<std::string>();
 				}
 
-				//MeshComponent
-				auto meshNode = entity["MeshComponent"];
+				//MeshRendererComponent
+				auto meshNode = entity["MeshRendererComponent"];
 
 				if (meshNode)
 				{
-					MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
+					MeshRendererComponent& meshComponent = deserializedEntity.AddComponent<MeshRendererComponent>();
 					UUID meshAssetID = meshNode["Asset ID"].as<UUID>();
 					meshComponent.PMesh = AssetManager::LoadAsset<Mesh>(meshAssetID);
+
+					for (auto mat : meshNode["Materials"])
+					{
+						meshComponent.Materials.push_back(AssetManager::LoadAsset<Material>(mat.as<UUID>()));
+					}
 				}
 				
 				//LightComponent

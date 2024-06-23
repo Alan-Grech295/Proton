@@ -22,6 +22,11 @@ namespace Proton
 
 		virtual void Bind() override;
 
+		virtual Ref<Bindable> Clone() override
+		{
+			return Clone(*this);
+		}
+
 		TopologyType GetTopology() { return m_Topology; }
 
 		std::string GetUID() const noexcept { return GenerateUID(m_Topology); }
@@ -46,6 +51,11 @@ namespace Proton
 		{
 			assert("No need for unique topology" && false);
 			return CreateScope<Topology>(TopologyType::None);
+		}
+
+		static Ref<Topology> Clone(const Topology& other)
+		{
+			return Create(other.m_Topology);
 		}
 
 	private:

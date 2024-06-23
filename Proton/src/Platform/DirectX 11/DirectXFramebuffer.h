@@ -1,5 +1,6 @@
 #pragma once
 #include "Proton\Renderer\Framebuffer.h"
+#include "DirectXTexture.h"
 #include <wrl.h>
 #include <d3d11.h>
 #include <Windows.h>
@@ -58,13 +59,18 @@ namespace Proton
 
 		virtual void* GetRenderTextureID(uint32_t index) override;
 
+		virtual Ref<Texture2D> GetRenderTexture(uint32_t index) override;
+
 		virtual void Clear() override;
+		virtual void Clear(uint32_t targetIndex) override;
+		virtual void ClearDepth() override;
 
 		virtual void Resize(uint32_t width, uint32_t height) override;
 
 		virtual void ReadPixel_Impl(uint32_t targetIndex, bool depth, int x, int y, uint32_t size, void* dest) override;
 
-		virtual void Bind() override;
+		virtual void Bind(bool depth) override;
+		virtual void BindExclude(uint32_t excludeIndex, bool depth = true) override;
 	private:
 		void Invalidate();
 		void ClearRenderTarget(ID3D11RenderTargetView* target, FramebufferTextureSpecification& spec);

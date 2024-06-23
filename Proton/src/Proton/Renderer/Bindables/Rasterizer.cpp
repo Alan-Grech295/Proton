@@ -49,4 +49,10 @@ namespace Proton
 		assert("Test first before using!" && false);
 		return Rasterizer::CreateUnique(dynamic_cast<Rasterizer&>(*other).m_TwoSided);
 	}
+
+	Ref<Rasterizer> Rasterizer::Clone(const Rasterizer& other)
+	{
+		Ref<Rasterizer> clone = std::move(CreateUnique(other.m_TwoSided));
+		return clone;
+	}
 }

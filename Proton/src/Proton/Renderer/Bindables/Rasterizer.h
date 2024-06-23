@@ -11,6 +11,11 @@ namespace Proton
 
 		virtual void Bind() = 0;
 
+		virtual Ref<Bindable> Clone() override
+		{
+			return Clone(*this);
+		}
+
 		virtual std::string GetUID() const noexcept = 0;
 
 		template<typename...Ignore>
@@ -21,6 +26,7 @@ namespace Proton
 		static Scope<Rasterizer> CreateUnique(bool twoSided);
 
 		static Scope<Rasterizer> CreateUnique(Ref<Bindable> other);
+		static Ref<Rasterizer> Clone(const Rasterizer& other);
 	protected:
 		bool m_TwoSided;
 	};

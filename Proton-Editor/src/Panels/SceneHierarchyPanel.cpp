@@ -199,10 +199,12 @@ namespace Proton
 		auto& tag = entity.GetComponent<TagComponent>().Tag;
 		auto& node = entity.GetComponent<NodeComponent>();
 		bool isLeaf = node.Children.size() == 0;
+		bool containsSelectedEntity = entity.HasChild(m_Selected);
 
 		ImGuiTreeNodeFlags flags = (m_Selected == entity ? ImGuiTreeNodeFlags_Selected : 0) |
 			ImGuiTreeNodeFlags_OpenOnArrow |
 			ImGuiTreeNodeFlags_OpenOnDoubleClick |
+			(containsSelectedEntity ? ImGuiTreeNodeFlags_DefaultOpen : 0) |
 			(isLeaf ? ImGuiTreeNodeFlags_Leaf : 0) |
 			ImGuiTreeNodeFlags_SpanAvailWidth;
 
@@ -846,7 +848,7 @@ namespace Proton
 			}
 		});
 
-		DrawComponent<MeshComponent>("Mesh", entity, [entity, scene = m_Context](MeshComponent& component) mutable 
+		DrawComponent<MeshRendererComponent>("Mesh", entity, [entity, scene = m_Context](MeshRendererComponent& component) mutable 
 			{
 				EditorAssetManager& assetManager = AssetManager::Instance<EditorAssetManager>();
 				Ref<AssetHandle> assetHandle = AssetManager::GetAssetHandle(component.PMesh->m_AssetID);

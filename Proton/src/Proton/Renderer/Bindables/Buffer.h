@@ -203,11 +203,17 @@ namespace Proton
 
 		virtual const BufferLayout& GetLayout() const = 0;
 
+		virtual Ref<Bindable> Clone() override
+		{
+			return Clone(*this);
+		}
+
 		static Ref<VertexBuffer> Create(const std::string& tag, BufferLayout& layout, VertexShader* vertexShader, uint32_t numElements);
 		
-		static Scope<VertexBuffer> CreateUnique(BufferLayout& layout, VertexShader* vertexShader, uint32_t numElements);
+		static Scope<VertexBuffer> CreateUnique(const BufferLayout& layout, VertexShader* vertexShader, uint32_t numElements);
 
 		static Scope<VertexBuffer> CreateUnique(Ref<Bindable> other);
+		static Ref<VertexBuffer> Clone(const VertexBuffer& other);
 	
 		//Vertex Buffer Interface Functions
 		template<typename ...Params>
@@ -257,11 +263,11 @@ namespace Proton
 			m_MaxSize = size;
 		}
 
-		uint32_t size() { return (uint32_t)(m_End - m_Data) / m_Layout.stride; }
+		uint32_t size() const { return (uint32_t)(m_End - m_Data) / m_Layout.stride; }
 
-		uint32_t capacity() { return m_MaxSize; }
+		uint32_t capacity() const { return m_MaxSize; }
 
-		uint32_t sizeBytes() { return (uint32_t)(m_End - m_Data); }
+		uint32_t sizeBytes() const { return (uint32_t)(m_End - m_Data); }
 
 		//IMP: Go back to protected (public for testing)
 	//protected:
@@ -296,6 +302,11 @@ namespace Proton
 
 		virtual void Bind() = 0;
 
+		virtual Ref<Bindable> Clone() override
+		{
+			return Clone(*this);
+		}
+
 		uint32_t size() { return (uint32_t)m_Indices.size(); }
 
 		const uint32_t size() const { return (uint32_t)m_Indices.size(); }
@@ -306,7 +317,7 @@ namespace Proton
 			m_Changed = true;
 		}
 
-		void SetRawData(uint32_t* data, uint32_t size)
+		void SetRawData(const uint32_t* data, uint32_t size)
 		{
 			m_Indices.assign(data, data + size);
 			m_Changed = true;
@@ -328,6 +339,7 @@ namespace Proton
 		static Scope<IndexBuffer> CreateUnique(uint32_t size);
 
 		static Scope<IndexBuffer> CreateUnique(Ref<Bindable> other);
+		static Ref<IndexBuffer> Clone(const IndexBuffer& other);
 
 	protected:
 		virtual void RecreateBuffer() = 0;
@@ -350,9 +362,22 @@ namespace Proton
 	public:
 		virtual ~VertexConstantBuffer() {}
 
-		virtual void SetData(const void* data, int size = -1) = 0;
 		virtual void Bind() = 0;
-		virtual void* GetData() = 0;
+		virtual void SetData(const void* data, int size = -1);
+		void* GetData()
+		{
+			return m_Data;
+		}
+
+		const void* GetData() const
+		{
+			return m_Data;
+		}
+
+		virtual Ref<Bindable> Clone() override
+		{
+			return Clone(*this);
+		}
 
 		virtual std::string GetUID() const noexcept = 0;
 
@@ -366,9 +391,11 @@ namespace Proton
 		static Scope<VertexConstantBuffer> CreateUnique(Ref<Bindable> other);
 
 		static Scope<VertexConstantBuffer> CreateUnique(Bindable* other);
+		static Ref<VertexConstantBuffer> Clone(const VertexConstantBuffer& other);
 
 	protected:
 		uint32_t m_Size;
+		uint8_t* m_Data;
 		uint32_t m_Slot;
 	};
 
@@ -379,7 +406,15 @@ namespace Proton
 		virtual ~PixelConstantBuffer() {}
 
 		virtual void Bind() = 0;
-		virtual uint8_t* GetData() = 0;
+		uint8_t* GetData()
+		{
+			return m_Data;
+		}
+
+		virtual Ref<Bindable> Clone() override
+		{
+			return Clone(*this);
+		}
 
 		virtual std::string GetUID() const noexcept = 0;
 
@@ -392,6 +427,7 @@ namespace Proton
 
 		static Scope<PixelConstantBuffer> CreateUnique(Ref<Bindable> other);
 		static Scope<PixelConstantBuffer> CreateUnique(Bindable* other);
+		static Ref<PixelConstantBuffer> Clone(const PixelConstantBuffer& other);
 
 		static PixelConstantBuffer* CreateUniquePtr(int slot, const DCB::CookedLayout& layout);
 	protected:

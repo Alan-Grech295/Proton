@@ -78,13 +78,12 @@ namespace Proton
 
 		auto [transform, node] = sceneRegistry.get<TransformComponent, NodeComponent>(entity);
 
-		DirectX::XMMATRIX transformMat = transform.GetTransformMatrix() *
-										 node.Origin *
+		DirectX::XMMATRIX transformMat = entity.LocalTransform() *
 										 accumulatedTransform;
 
-		if (entity.HasComponent<MeshComponent>())
+		if (entity.HasComponent<MeshRendererComponent>())
 		{
-			MeshComponent& mesh = entity.GetComponent<MeshComponent>();
+			MeshRendererComponent& renderer = entity.GetComponent<MeshRendererComponent>();
 
 			const auto modelView = transformMat * cameraView;
 			const Transforms tf =
@@ -96,11 +95,11 @@ namespace Proton
 				)
 			};
 
-			mesh.TransformBufferVert->SetData(&tf);
-			(*mesh.TransformBufferPix)["modelViewProj"] = tf.modelViewProj;
-			(*mesh.TransformBufferPix)["model"] = tf.model;
+			renderer.TransformBufferVert->SetData(&tf);
+			(*renderer.TransformBufferPix)["modelViewProj"] = tf.modelViewProj;
+			(*renderer.TransformBufferPix)["model"] = tf.model;
 
-			Renderer::Submit(mesh.PMesh.get(), mesh.TransformBufferVert.get(), mesh.TransformBufferPix.get());
+			SubmitMesh(entity, renderer.PMesh.get(), renderer.Materials, renderer.TransformBufferVert.get(), renderer.TransformBufferPix.get());
 		}
 
 		for (UUID e : node.Children)
@@ -108,28 +107,9 @@ namespace Proton
 			SubmitNode(m_Scene->GetEntityByUUID(e), transformMat, cameraView, cameraProjection);
 		}
 	}
-	
-	/*void SceneRenderer::DrawChildren(Entity entity, DirectX::FXMMATRIX& accumulatedTransform, DirectX::FXMMATRIX& cameraView, DirectX::FXMMATRIX& cameraProjection)
+
+	void SceneRenderer::SubmitMesh(Entity entity, const Mesh* mesh, const std::vector<Ref<Material>>& materials, VertexConstantBuffer* vertTransformBuf, PixelConstantBuffer* pixTransformBuf)
 	{
-		auto [transform, node] = sceneRegistry.get<TransformComponent, NodeComponent>(entity);
-
-		DirectX::XMMATRIX transformMat = transform.GetTransformMatrix() *
-			node.m_Origin *
-			accumulatedTransform;
-
-		if (entity.HasComponent<MeshComponent>())
-		{
-			MeshComponent& mesh = entity.GetComponent<MeshComponent>();
-
-			for (int i = 0; i < mesh.m_NumMeshes; i++)
-			{
-				mesh.m_MeshPtrs[i]->Bind(std::bind(&Renderer::DrawCall, std::placeholders::_1), transformMat, cameraView, cameraProjection);
-			}
-		}
-
-		for (int i = 0; i < node.m_ChildNodes.size(); i++)
-		{
-			DrawChildren(node.m_ChildNodes[i], transformMat, cameraView, cameraProjection);
-		}
-	}*/
+		Renderer::Submit(mesh, materials, vertTransformBuf, pixTransformBuf);
+	}
 }

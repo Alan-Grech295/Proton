@@ -14,7 +14,7 @@ namespace Proton
 	class Entity;
 	struct TransformComponent;
 	struct NodeComponent;
-	struct MeshComponent;
+	struct MeshRendererComponent;
 
 	class Scene
 	{

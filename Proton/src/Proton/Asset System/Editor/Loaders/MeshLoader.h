@@ -8,6 +8,6 @@ namespace Proton
     class MeshLoader
     {
     public:
-        static Ref<Mesh> LoadMeshEditor(const std::filesystem::path& imagePath);
+        static Ref<Mesh> LoadMeshEditor(const std::filesystem::path& meshPath);
     };
 }

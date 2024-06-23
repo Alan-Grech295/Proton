@@ -49,5 +49,11 @@ namespace Proton
 		assert("Test first before using!" && false);
 		return Sampler::CreateUnique(dynamic_cast<Sampler&>(*other).m_Slot);
 	}
+
+	Ref<Sampler> Sampler::Clone(const Sampler& other)
+	{
+		Ref<Sampler> clone = std::move(CreateUnique(other.m_Slot));
+		return clone;
+	}
 }
 

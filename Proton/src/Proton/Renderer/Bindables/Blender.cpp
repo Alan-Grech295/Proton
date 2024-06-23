@@ -49,5 +49,10 @@ namespace Proton
 		assert("Test first before using!" && false);
 		return Blender::CreateUnique(dynamic_cast<Blender&>(*other).m_Blending);
 	}
+
+	Ref<Blender> Blender::Clone(const Blender& other)
+	{
+		return std::move(CreateUnique(other.m_Blending));
+	}
 }
 

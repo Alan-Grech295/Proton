@@ -14,6 +14,8 @@ namespace Proton
 
 		void SetContext(const Ref<Scene> scene);
 
+		void SelectEntity(Entity entity) { m_Selected = entity; }
+
 		void OnImGuiRender();
 
 		Entity GetSelectedEntity() const { return m_Selected; }

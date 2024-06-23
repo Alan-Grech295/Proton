@@ -25,6 +25,7 @@ namespace Proton
 
 #define TYPES X(Model) \
               X(Mesh) \
+              X(Material) \
               X(Image) 
     public:
         enum AssetType { 

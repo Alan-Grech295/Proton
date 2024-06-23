@@ -12,9 +12,20 @@ namespace Proton
 		Load(path);
 	}
 
+	DirectXTexture2D::DirectXTexture2D(Microsoft::WRL::ComPtr<ID3D11Texture2D> pTexture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> pTextureView, int slot)
+		: pTexture(pTexture), pTextureView(pTextureView)
+	{
+		m_Slot = slot;
+	}
+
 	void DirectXTexture2D::Bind()
 	{
 		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->PSSetShaderResources(m_Slot, 1, pTextureView.GetAddressOf());
+	}
+
+	void DirectXTexture2D::Unbind()
+	{
+		((DirectXRendererAPI*)RenderCommand::GetRendererAPI())->GetContext()->PSSetShaderResources(m_Slot, 1, nullptr);
 	}
 
 	void DirectXTexture2D::Load(const std::string& path)

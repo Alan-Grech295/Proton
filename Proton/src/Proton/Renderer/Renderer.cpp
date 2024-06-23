@@ -6,7 +6,9 @@
 
 namespace Proton
 {
-	std::array<Pass, 1> Renderer::m_RenderQueue = {Pass("Opaque")};
+	std::vector<Pass> Renderer::m_RenderQueue = {Pass("Opaque", 0)};
+	int Renderer::NextPassID = 1;
+	std::unordered_map<int, std::vector<std::function<void()>>> Renderer::m_PreRenderCallbacks = {};
 
 	void Renderer::BeginScene()
 	{
@@ -21,15 +23,56 @@ namespace Proton
 
 	}
 
-	void Renderer::Submit(const Mesh* mesh, VertexConstantBuffer* vertTransformBuf, PixelConstantBuffer* pixTransformBuf)
+	void Renderer::Submit(const Mesh* mesh, const std::vector<Ref<Material>>& materials, VertexConstantBuffer* vertTransformBuf, PixelConstantBuffer* pixTransformBuf)
 	{
 		PT_PROFILE_FUNCTION();
 
-		for (Ref<Material::Pass> t : mesh->material->m_Passes)
+		for (Ref<Material> m : materials)
 		{
-			PT_CORE_ASSERT(t->m_PassID >= 0 && t->m_PassID < m_RenderQueue.size(), "Invalid pass ID");
-			m_RenderQueue[t->m_PassID].AddJob({ mesh, vertTransformBuf, pixTransformBuf, t });
+#if PT_DEBUG
+			bool foundPass = false;
+			for (const Pass& p : m_RenderQueue)
+			{
+				if (p.m_PassID == m->m_PassID)
+				{
+					foundPass = true;
+					break;
+				}
+			}
+			PT_CORE_ASSERT(foundPass, "Invalid pass ID");
+#endif
+			m_RenderQueue[m->m_PassID].AddJob(CreateRef<MeshJob>(mesh, vertTransformBuf, pixTransformBuf, m));
 		}
+	}
+
+	void Renderer::Submit(const Mesh* mesh, Ref<class Material> material, VertexConstantBuffer* vertTransformBuf, PixelConstantBuffer* pixTransformBuf)
+	{
+		PT_PROFILE_FUNCTION();
+
+#if PT_DEBUG
+		bool foundPass = false;
+		for (const Pass& p : m_RenderQueue)
+		{
+			if (p.m_PassID == material->m_PassID)
+			{
+				foundPass = true;
+				break;
+			}
+		}
+		PT_CORE_ASSERT(foundPass, "Invalid pass ID");
+#endif
+		m_RenderQueue[material->m_PassID].AddJob(CreateRef<MeshJob>(mesh, vertTransformBuf, pixTransformBuf, material));
+	}
+
+	void Renderer::SubmitFullScreen(const std::vector<Ref<Material>>& materials)
+	{
+		for (Ref<Material> mat : materials)
+			SubmitFullScreen(mat);
+	}
+
+	void Renderer::SubmitFullScreen(Ref<Material> material)
+	{
+		m_RenderQueue[material->m_PassID].AddJob(CreateRef<Job>(material));
 	}
 
 	void Renderer::Submit(VertexBuffer* vertBuffer, IndexBuffer* indexBuffer)
@@ -41,41 +84,97 @@ namespace Proton
 
 	int Renderer::GetPassIDFromName(const std::string& name)
 	{
-		for (int i = 0; i < m_RenderQueue.size(); i++)
+		for (const Pass& p : m_RenderQueue)
 		{
-			if (m_RenderQueue[i].m_Name == name)
-				return i;
+			if (p.m_Name == name)
+				return p.m_PassID;
 		}
 
 		PT_CORE_ASSERT(false, "Pass name not found!");
 		return -1;
 	}
 
+	void Renderer::AddPreRenderCallback(const std::string& pass, std::function<void()> callback)
+	{
+		int passID = GetPassIDFromName(pass);
+		m_PreRenderCallbacks[passID].push_back(callback);
+	}
+
 	void Renderer::Render()
 	{
+		int i = 0;
 		for (Pass& p : m_RenderQueue)
 		{
-			for (Job& job : p)
+			for (auto callback : m_PreRenderCallbacks[i++])
 			{
-				// Binding the shaders
-				job.MaterialPass->m_VertexShader->Bind();
-				job.MaterialPass->m_PixelShader->Bind();
+				callback();
+			}
 
-				// Bind all bindables
-				job.Mesh->m_IndexBuffer->Bind();
-				job.Mesh->m_VertexBuffer->Bind();
-				job.Mesh->m_Topology->Bind();
+			RenderPass(p);
+		}
+	}
 
-				// Binding transform buffers
-				job.VertConstBuf->Bind();
-				job.PixConstBuf->Bind();
+	void Renderer::RenderPass(Pass& pass)
+	{
+		for (Ref<Job> job : pass)
+		{
+			// Binding the shaders
+			job->Bind();
 
-				for (Ref<Bindable> bind : job.MaterialPass->m_Bindables)
-					bind->Bind();
+			// Draw the job
+			job->Draw();
+		}
+	}
 
-				RenderCommand::DrawIndexed(job.Mesh->m_IndexBuffer->size());
+	int Renderer::AddPass(const std::string& name)
+	{
+		return m_RenderQueue.emplace_back(name, NextPassID++).m_PassID;
+	}
+
+	int Renderer::AddPassBefore(const std::string& name, const std::string& beforePassName)
+	{
+		auto insertPassIt = m_RenderQueue.end();
+
+		for (auto it = m_RenderQueue.begin(); it != m_RenderQueue.end(); ++it)
+		{
+			if (it->m_Name == beforePassName)
+			{
+				insertPassIt = it;
+				break;
 			}
 		}
+
+		if (insertPassIt == m_RenderQueue.end())
+		{
+			PT_CORE_ERROR("Could not find pass with name {0}", beforePassName);
+			return AddPass(name);
+		}
+
+		int passID = NextPassID++;
+		return m_RenderQueue.insert(insertPassIt, { name, NextPassID++ })->m_PassID;
+	}
+
+	int Renderer::AddPassAfter(const std::string& name, const std::string& afterPassName)
+	{
+		auto insertPassIt = m_RenderQueue.end();
+
+		for (auto it = m_RenderQueue.begin(); it != m_RenderQueue.end(); ++it)
+		{
+			if (it->m_Name == afterPassName)
+			{
+				insertPassIt = ++it;
+				break;
+			}
+		}
+
+		if (insertPassIt == m_RenderQueue.end())
+		{
+			PT_CORE_ERROR("Could not find pass with name {0}", afterPassName);
+			return AddPass(name);
+		}
+
+		int passID = NextPassID++;
+		return m_RenderQueue.insert(insertPassIt, { name, NextPassID++ })->m_PassID;
 	}
 
 	void Renderer::DrawCall(const UINT count)

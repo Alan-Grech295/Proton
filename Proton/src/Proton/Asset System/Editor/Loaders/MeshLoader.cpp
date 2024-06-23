@@ -6,12 +6,12 @@
 
 namespace Proton
 {
-    Ref<Mesh> Proton::MeshLoader::LoadMeshEditor(const std::filesystem::path& imagePath)
+    Ref<Mesh> Proton::MeshLoader::LoadMeshEditor(const std::filesystem::path& meshPath)
     {
         EditorAssetManager& assetManager = AssetManager::Instance<EditorAssetManager>();
         Ref<AssetHandle> assetHandle;
 
-        Ref<AssetHandle> modelAssetHandle = assetHandle = assetManager.GetAssetHandle(imagePath);
+        Ref<AssetHandle> modelAssetHandle = assetHandle = assetManager.GetSubAssetHandle(meshPath, AssetHandle::Mesh);
 
         while (modelAssetHandle->IsSubAsset() && modelAssetHandle->Type != AssetHandle::Model)
         {

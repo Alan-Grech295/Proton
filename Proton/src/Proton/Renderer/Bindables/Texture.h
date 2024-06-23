@@ -18,6 +18,13 @@ namespace Proton
 
 		virtual void Bind() = 0;
 
+		virtual void Unbind() = 0;
+
+		virtual Ref<Bindable> Clone() override
+		{
+			return Clone(*this);
+		}
+
 		virtual void Load(const std::string& path) = 0;
 		virtual Color GetPixel(int x, int y) const = 0;
 
@@ -36,6 +43,7 @@ namespace Proton
 
 		static Scope<Texture2D> CreateUnique(std::string path, int slot = 0);
 		static Scope<Texture2D> CreateUnique(Ref<Bindable> other);
+		static Ref<Texture2D> Clone(const Texture2D& other);
 	protected:
 		std::string m_Path;
 		uint32_t m_Slot;
