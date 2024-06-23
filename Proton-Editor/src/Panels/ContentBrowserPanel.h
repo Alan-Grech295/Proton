@@ -17,7 +17,7 @@ namespace Proton
 		std::filesystem::path& GetSelectedPath() { return m_SelectedPath; }
 		void SetContext(const Ref<Scene> scene) { m_ActiveScene = scene; m_SelectedPath = Project::GetAssetDirectory(); }
 
-		void SetOpenSceneFunction(std::function<void(const std::filesystem::path&)> func) { m_OpenSceneFunc = func; }
+		void SetOpenSceneFunction(std::function<bool(const std::filesystem::path&)> func) { m_OpenSceneFunc = func; }
 
 		void AddFile(std::filesystem::path filePath);
 	private:
@@ -33,6 +33,6 @@ namespace Proton
 
 		std::string m_SelectedItem;
 
-		std::function<void(const std::filesystem::path&)> m_OpenSceneFunc;
+		std::function<bool(const std::filesystem::path&)> m_OpenSceneFunc;
 	};
 }

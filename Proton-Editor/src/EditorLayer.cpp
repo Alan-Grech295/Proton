@@ -48,7 +48,7 @@ namespace Proton
 		m_ConsolePanel = CreateScope<ConsolePanel>();
 		m_SceneHierarchyPanel = CreateScope<SceneHierarchyPanel>();
 
-		m_ContentBrowserPanel->SetOpenSceneFunction(std::bind(static_cast<void(EditorLayer::*)(const std::filesystem::path&)>(&EditorLayer::OpenScene), this, std::placeholders::_1));
+		m_ContentBrowserPanel->SetOpenSceneFunction(std::bind(static_cast<bool(EditorLayer::*)(const std::filesystem::path&)>(&EditorLayer::OpenScene), this, std::placeholders::_1));
 
 		auto commandLineArgs = Application::Get().GetSpecification().CommandLineArgs;
 		if (commandLineArgs.Count > 1)
@@ -616,7 +616,10 @@ namespace Proton
 			{
 				//NewScene();
 				auto startScenePath = Project::GetAssetFileSystemPath(Project::GetActive()->GetConfig().StartScene).make_preferred();
-				OpenScene(startScenePath);
+				if (!OpenScene(startScenePath))
+				{
+					NewScene();
+				}
 			}
 			else
 			{
@@ -644,17 +647,19 @@ namespace Proton
 		m_CameraEntity.AddComponent<CameraComponent>();
 	}
 
-	void EditorLayer::OpenScene()
+	bool EditorLayer::OpenScene()
 	{
 		std::string filepath = FileDialogs::OpenFile("Proton Scene (*.proton)\0*.proton\0");
 
 		if (!filepath.empty())
 		{
-			OpenScene(filepath);
+			return OpenScene(filepath);
 		}
+
+		return false;
 	}
 
-	void EditorLayer::OpenScene(const std::filesystem::path& path)
+	bool EditorLayer::OpenScene(const std::filesystem::path& path)
 	{
 		if (m_SceneState != SceneState::Edit)
 			OnSceneStop();
@@ -662,7 +667,13 @@ namespace Proton
 		if (path.extension() != ".proton")
 		{
 			PT_CORE_ERROR("Could not open scene {0} - Not a Proton scene file", path.filename().string());
-			return;
+			return false;
+		}
+
+		if (!std::filesystem::exists(path))
+		{
+			PT_CORE_ERROR("Scene file {0} does not exist", path.string());
+			return false;
 		}
 
 		Ref<Scene> newScene = CreateRef<Scene>();
@@ -683,7 +694,11 @@ namespace Proton
 			m_CameraEntity = m_ActiveScene->FindEntityWithComponent<CameraComponent>();
 
 			m_SceneRenderer->SetScene(m_ActiveScene);
+
+			return true;
 		}
+
+		return false;
 	}
 
 	void EditorLayer::SaveScene()

@@ -192,24 +192,26 @@ namespace Proton
     {
         UUID assetID = node["ID"].as<UUID>();
         AssetHandle::AssetType assetType = AssetHandle::NameToType(node["Type"].as<std::string>());
-
         Ref<AssetHandle> assetHandle = CreateRef<AssetHandle>(assetID, assetType);
+
+        std::filesystem::path assetPath = path;
 
         if (subAsset)
         {
             assetHandle->SetSubAsset(node["Path"].as<std::string>());
+            assetPath = GetSubAssetPath(assetType, path);
         }
 
         uuidToAsset.emplace(assetID, assetHandle);
 
-        pathToUUID.emplace(path, assetID);
-        uuidToPath.emplace(assetID, path);
+        pathToUUID.emplace(assetPath, assetID);
+        uuidToPath.emplace(assetID, assetPath);
 
         if (node["Sub assets"]) 
         {
             for (const YAML::Node& subNode : node["Sub assets"])
             {
-                Ref<AssetHandle> subAssetHandle = ParseMetaData(subNode, path / subNode["Path"].as<std::string>(), true);
+                Ref<AssetHandle> subAssetHandle = ParseMetaData(subNode, assetPath / subNode["Path"].as<std::string>(), true);
                 subAssetHandle->SubAssetData->ParentAssetHandle = assetHandle;
                 assetHandle->AddSubAsset(subAssetHandle);
             }
