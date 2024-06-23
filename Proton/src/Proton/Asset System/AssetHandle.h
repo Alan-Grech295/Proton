@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 namespace Proton
 {
@@ -12,13 +13,14 @@ namespace Proton
         struct ExtraSubAssetData
         {
         public:
-            ExtraSubAssetData(const std::string& RelativePath)
-                : RelativePath(RelativePath)
+            ExtraSubAssetData(const std::string& relativePath, Ref<AssetHandle> parentAssetHandle)
+                : RelativePath(relativePath), ParentAssetHandle(parentAssetHandle)
             {
             }
 
         public:
             std::string RelativePath;
+            Ref<AssetHandle> ParentAssetHandle;
         };
 
 #define TYPES X(Model) \
@@ -43,14 +45,24 @@ namespace Proton
             return AssetTypeName[(int)type];
         }
 
-        void AddSubAsset(UUID assetID)
+        inline static AssetType NameToType(const std::string& name)
+        {
+            return AssetNameType[name];
+        }
+
+        inline void AddSubAsset(UUID assetID)
         {
             SubAssets.push_back(assetID);
         }
 
-        inline void SetSubAsset(const std::string& relativePath)
+        void AddSubAsset(Ref<AssetHandle> asset)
         {
-            SubAssetData = CreateScope<ExtraSubAssetData>(relativePath);
+            AddSubAsset(asset->ID);
+        }
+
+        inline void SetSubAsset(const std::string& relativePath, Ref<AssetHandle> parentAssetHandle = nullptr)
+        {
+            SubAssetData = CreateScope<ExtraSubAssetData>(relativePath, parentAssetHandle);
         }
 
         bool IsSubAsset() const
@@ -70,5 +82,7 @@ namespace Proton
 #define X(name) + 1
         static std::array<std::string, 0 TYPES> AssetTypeName;
 #undef X
+
+        static std::unordered_map<std::string, AssetType> AssetNameType;
     };
 }

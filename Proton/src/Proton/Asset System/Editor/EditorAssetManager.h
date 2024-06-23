@@ -9,6 +9,7 @@
 namespace YAML
 {
     class Emitter;
+    class Node;
 }
 
 namespace Proton
@@ -46,33 +47,57 @@ namespace Proton
             return LoadAsset<T>(std::filesystem::path(path));
         }
 
-        void ScanDirectory(const std::filesystem::path& path);        
+        inline bool HasAsset(const std::string& path)
+        {
+            std::filesystem::path relPath = Project::GetAssetRelativePath(path);
+            return pathToUUID.contains(relPath);
+        }
+
+        inline Ref<AssetHandle> GetAssetHandle(const std::filesystem::path& path)
+        {
+            return AssetManager::GetAssetHandle(pathToUUID[Project::GetAssetRelativePath(path)]);
+        }
+
+        void ScanDirectory(const std::filesystem::path& path, bool loadAssets = true);        
 
         template<typename T>
-        Ref<T> AddOrLoadSubAsset(const std::filesystem::path& parentPath, const std::string& name, AssetHandle::AssetType type, const std::function<Ref<T>()>& loadFunc)
+        Ref<T> AddOrLoadSubAsset(const std::filesystem::path& parentPath, const std::string& name, AssetHandle::AssetType type, const std::function<Ref<T>(UUID)>& loadFunc)
         {
             Ref<AssetHandle> assetHandle;
             Ref<void> asset;
 
             if (AddOrLoadAssetInternal(parentPath / name, type, loadFunc, assetHandle, asset))
             {
-                std::filesystem::path relativePath = std::filesystem::relative(parentPath, Project::GetAssetDirectory());
+                std::filesystem::path relativePath = Project::GetAssetRelativePath(parentPath);
                 Ref<AssetHandle> parentAsset = uuidToAsset[pathToUUID[relativePath]];
-                assetHandle->SetSubAsset(name);
+                assetHandle->SetSubAsset(name, parentAsset);
                 parentAsset->AddSubAsset(assetHandle->ID);
             }
 
             return CastRef<T>(asset);
         }
 
+        inline const std::unordered_map<std::filesystem::path, UUID>& PathToUUID() const
+        {
+            return pathToUUID;
+        }
+
+        inline const std::unordered_map<UUID, std::filesystem::path>& UUIDToPath() const
+        {
+            return uuidToPath;
+        }
+
     private:
-        bool AddOrLoadAssetInternal(const std::filesystem::path& path, AssetHandle::AssetType type, const std::function<Ref<void>()>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset);
+        bool AddOrLoadAssetInternal(const std::filesystem::path& path, AssetHandle::AssetType type, const std::function<Ref<void>(UUID)>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset);
 
         void HandleFile(const std::filesystem::path& path);
         void SaveMetaFiles();
         void SaveMetaFile(const std::filesystem::path& savePath, Ref<AssetHandle> assetHandle);
 
         void OutputAsset(YAML::Emitter& out, Ref<AssetHandle> assetHandle);
+
+        void ReadMetaFile(const std::filesystem::path& path);
+        Ref<AssetHandle> ParseMetaData(const YAML::Node& node, const std::filesystem::path& path, bool subAsset = false);
 
         void LoadAllAssets();
     protected:

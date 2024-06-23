@@ -6,6 +6,7 @@
 #include "Proton\Core\Input.h"
 #include "Proton\Core\KeyCodes.h"
 #include "Proton\Asset System\AssetManager.h"
+#include "Proton\Asset System\Editor\EditorAssetManager.h"
 #include "ContentBrowserPanel.h"
 #include "Proton/Scripting/ScriptEngine.h"
 
@@ -575,6 +576,47 @@ namespace Proton
 		}
 	}
 
+	static Ref<AssetHandle> GetModelAsset(Ref<AssetHandle> meshAsset)
+	{
+		while (meshAsset && meshAsset->Type != AssetHandle::Model)
+		{
+			meshAsset = meshAsset->SubAssetData->ParentAssetHandle;
+		}
+
+		return meshAsset;
+	}
+
+	static std::vector<std::pair<UUID, std::string>> GetMeshNames(Ref<AssetHandle> modelAsset)
+	{
+		std::vector<std::pair<UUID, std::string>> names;
+		for (UUID subAssetID : modelAsset->SubAssets)
+		{
+			Ref<AssetHandle> subAssetHandle = AssetManager::GetAssetHandle(subAssetID);
+			if (subAssetHandle->Type != AssetHandle::Mesh) continue;
+
+			names.push_back(std::make_pair(subAssetID, subAssetHandle->SubAssetData->RelativePath));
+		}
+
+		return names;
+	}
+
+	static std::vector<std::pair<UUID, std::string>> GetModelNames()
+	{
+		EditorAssetManager& assetManager = AssetManager::Instance<EditorAssetManager>();
+		std::vector<std::pair<UUID, std::string>> modelNames;
+
+		// TODO: Use name cache
+		for (const auto& [path, assetID] : assetManager.PathToUUID())
+		{
+			Ref<AssetHandle> asset = assetManager.AssetManager::GetAssetHandle(assetID);
+			if (asset->Type != AssetHandle::Model) continue;
+
+			modelNames.push_back(std::make_pair(assetID, path.filename().replace_extension().string()));
+		}
+
+		return modelNames;
+	}
+
 	void SceneHierarchyPanel::DrawComponents(Entity entity)
 	{
 		if (entity.HasComponent<TagComponent>())
@@ -627,7 +669,7 @@ namespace Proton
 			ImGui::Text(entityIDText.c_str());
 		}
 
-		DrawComponent<TransformComponent>("Transform", entity, [](auto& transform)
+		DrawComponent<TransformComponent>("Transform", entity, [](TransformComponent& transform)
 		{
 			static const float degreeToRad = 0.01745329f;
 			static const float radToDegree = 57.2957795f;
@@ -647,7 +689,7 @@ namespace Proton
 			DrawFloat3Control("Scale", transform.scale, 1.0f);
 		});
 
-		DrawComponent<LightComponent>("Light", entity, [](auto& light)
+		DrawComponent<LightComponent>("Light", entity, [](LightComponent& light)
 		{
 			ImGui::ColorPicker3("Ambient", &light.Ambient.x);
 			ImGui::ColorPicker3("Diffuse", &light.DiffuseColour.x);
@@ -657,7 +699,7 @@ namespace Proton
 			ImGui::DragFloat("Attenuation Quad", &light.AttQuad, 0.5f, 0.0f, 100.0f);
 		});
 
-		DrawComponent<CameraComponent>("Camera", entity, [](auto& cameraComponent)
+		DrawComponent<CameraComponent>("Camera", entity, [](CameraComponent& cameraComponent)
 		{
 			auto& camera = cameraComponent.Camera;
 
@@ -712,7 +754,7 @@ namespace Proton
 			}
 		});
 
-		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](auto& component) mutable
+		DrawComponent<ScriptComponent>("Script", entity, [entity, scene = m_Context](ScriptComponent& component) mutable
 		{
 			if (ImGui::Combo("Class", &component.ClassIndex, ScriptEngine::GetEntityClassNames(), ScriptEngine::GetEntityClasses().size() + 1, -1))
 			{
@@ -803,5 +845,54 @@ namespace Proton
 				}
 			}
 		});
+
+		DrawComponent<MeshComponent>("Mesh", entity, [entity, scene = m_Context](MeshComponent& component) mutable 
+			{
+				EditorAssetManager& assetManager = AssetManager::Instance<EditorAssetManager>();
+				Ref<AssetHandle> assetHandle = AssetManager::GetAssetHandle(component.PMesh->m_AssetID);
+
+				//const char* meshNames[] = {assetHandle->SubAssetData->RelativePath.c_str()};
+
+				Ref<AssetHandle> modelAsset = GetModelAsset(assetHandle);
+				std::string curModelName = assetManager.UUIDToPath().at(modelAsset->ID).filename().replace_extension().string();
+
+				if (ImGui::BeginCombo("Model", curModelName.c_str()))
+				{
+					for (const auto&[modelAssetID, modelName] : GetModelNames())
+					{
+						bool isSelected = curModelName == modelName;
+
+						if (ImGui::Selectable(modelName.c_str(), isSelected))
+						{
+							component.PMesh = AssetManager::LoadAsset<Model>(modelAssetID)->m_Meshes[0];
+						}
+
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+
+				std::string& curMeshName = assetHandle->SubAssetData->RelativePath;
+
+				if (ImGui::BeginCombo("Mesh", curMeshName.c_str()))
+				{
+					for (const auto&[meshAssetID, meshName] : GetMeshNames(modelAsset))
+					{
+						bool isSelected = meshName == curMeshName;
+
+						if (ImGui::Selectable(meshName.c_str(), isSelected))
+						{
+							component.PMesh = AssetManager::LoadAsset<Mesh>(meshAssetID);
+						}
+
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+			});
 	}
 }

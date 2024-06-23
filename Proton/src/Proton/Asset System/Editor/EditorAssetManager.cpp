@@ -5,6 +5,7 @@
 // Loaders
 #include "Loaders/ModelLoader.h"
 #include "Loaders/ImageLoader.h"
+#include "Loaders/MeshLoader.h"
 
 #include <fstream>
 #include <yaml-cpp/yaml.h>
@@ -43,13 +44,15 @@ namespace Proton
             return ImageLoader::LoadImageEditor(assetPath);
         case AssetHandle::Model:
             return ModelLoader::LoadModelEditor(assetPath);
+        case AssetHandle::Mesh:
+            return MeshLoader::LoadMeshEditor(assetPath);
         }
 
-        PT_CORE_ASSERT(false, "Could not find asset");
+        PT_CORE_ASSERT(false, "Could not find appropriate asset loader");
         return nullptr;
     }
 
-    void EditorAssetManager::ScanDirectory(const std::filesystem::path& path)
+    void EditorAssetManager::ScanDirectory(const std::filesystem::path& path, bool loadAssets)
     {
         namespace fs = std::filesystem;
 
@@ -57,13 +60,16 @@ namespace Proton
         {
             if (entry.is_directory())
             {
-                ScanDirectory(entry);
+                ScanDirectory(entry, false);
             }
-            else if (entry.path().has_extension())
+            // Skipping meta files as they are handled when loading an asset
+            else if (entry.path().has_extension() && entry.path().extension() != ".meta")
             {
                 HandleFile(entry);
             }
         }
+
+        if (!loadAssets) return;
 
         // Loads all assets to ensure sub-assets are loaded properly
         LoadAllAssets();
@@ -71,14 +77,26 @@ namespace Proton
         SaveMetaFiles();
     }
 
-    bool EditorAssetManager::AddOrLoadAssetInternal(const std::filesystem::path& path, AssetHandle::AssetType type, const std::function<Ref<void>()>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset)
+    bool EditorAssetManager::AddOrLoadAssetInternal(const std::filesystem::path& path, AssetHandle::AssetType type, const std::function<Ref<void>(UUID)>& loadFunc, Ref<AssetHandle>& outAssetHandle, Ref<void>& outAsset)
     {
         std::filesystem::path relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
 
         if (pathToUUID.contains(relativePath))
         {
-            outAssetHandle = uuidToAsset[pathToUUID[relativePath]];
-            outAsset = LoadAsset<void>(relativePath);
+            UUID assetID = pathToUUID[relativePath];
+            if (loadedAssets.contains(assetID)) 
+            {
+                outAssetHandle = uuidToAsset[assetID];
+                outAsset = LoadAsset<void>(relativePath);
+                return false;
+            }
+            
+            // Asset handle is loaded but actual asset is not loaded
+            Ref<void> asset = loadFunc(assetID);
+
+            loadedAssets[assetID] = asset;
+            outAssetHandle = uuidToAsset[assetID];
+            outAsset = asset;
             return false;
         }
 
@@ -88,7 +106,7 @@ namespace Proton
         pathToUUID.emplace(relativePath, assetID);
         uuidToPath.emplace(assetID, relativePath);
 
-        Ref<void> asset = loadFunc();
+        Ref<void> asset = loadFunc(assetID);
 
         loadedAssets[assetID] = asset;
         outAssetHandle = handle->second;
@@ -100,6 +118,13 @@ namespace Proton
     {
         std::string extension = path.extension().string();
         if (!extensionToType.contains(extension)) return;
+
+        // Meta file already exists so we read it
+        if (std::filesystem::exists(path.string() + ".meta"))
+        {
+            ReadMetaFile(path.string());
+            return;
+        }
 
         UUID assetID = UUID();
         std::filesystem::path relativePath = std::filesystem::relative(path, Project::GetAssetDirectory());
@@ -144,6 +169,52 @@ namespace Proton
         }
 
         out << YAML::EndMap;
+    }
+
+    void EditorAssetManager::ReadMetaFile(const std::filesystem::path& path)
+    {
+        YAML::Node data;
+        try
+        {
+            data = YAML::LoadFile(path.string() + ".meta");
+        }
+        catch (YAML::ParserException e)
+        {
+            PT_CORE_ERROR("Failed to load .proton file '{0'}\n	{1}", path.string() + ".meta", e.what());
+            return;
+        }
+
+        ParseMetaData(data, Project::GetAssetRelativePath(path));
+    }
+
+    Ref<AssetHandle> EditorAssetManager::ParseMetaData(const YAML::Node& node, const std::filesystem::path& path, bool subAsset)
+    {
+        UUID assetID = node["ID"].as<UUID>();
+        AssetHandle::AssetType assetType = AssetHandle::NameToType(node["Type"].as<std::string>());
+
+        Ref<AssetHandle> assetHandle = CreateRef<AssetHandle>(assetID, assetType);
+
+        if (subAsset)
+        {
+            assetHandle->SetSubAsset(node["Path"].as<std::string>());
+        }
+
+        uuidToAsset.emplace(assetID, assetHandle);
+
+        pathToUUID.emplace(path, assetID);
+        uuidToPath.emplace(assetID, path);
+
+        if (node["Sub assets"]) 
+        {
+            for (const YAML::Node& subNode : node["Sub assets"])
+            {
+                Ref<AssetHandle> subAssetHandle = ParseMetaData(subNode, path / subNode["Path"].as<std::string>(), true);
+                subAssetHandle->SubAssetData->ParentAssetHandle = assetHandle;
+                assetHandle->AddSubAsset(subAssetHandle);
+            }
+        }
+
+        return assetHandle;
     }
 
     void EditorAssetManager::LoadAllAssets()

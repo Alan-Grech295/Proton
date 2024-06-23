@@ -4,6 +4,7 @@
 #include "Entity.h"
 #include "Proton/Model/Model.h"
 #include "Proton/Scripting/ScriptEngine.h"
+#include "Proton/Asset System/AssetManager.h"
 
 #include <yaml-cpp\yaml.h>
 #include <fstream>
@@ -248,16 +249,7 @@ namespace Proton
 
 			auto& mc = entity.GetComponent<MeshComponent>();
 
-			//for (int i = 0; i < mc.MeshPtrs.size(); i++)
-			//{
-			//	Mesh& mesh = *mc.MeshPtrs[i];
-			//	out << YAML::Key << ("PMesh" + std::to_string(i));
-
-			//	out << YAML::BeginMap;	//Mesh
-			//	//out << YAML::Key << "Model UUID" << YAML::Value << mesh.m_Model->m_UUID;
-			//	out << YAML::Key << "PMesh Name" << YAML::Value << mesh.m_Name;
-			//	out << YAML::EndMap;	//Mesh
-			//}
+			out << YAML::Key << "Asset ID" << YAML::Value << mc.PMesh->m_AssetID;
 
 			out << YAML::EndMap;	//StaticMeshComponent
 		}
@@ -483,64 +475,15 @@ namespace Proton
 					nodeComponent.NodeName = node["Node Name"].as<std::string>();
 				}
 
-				/*if (node["Is Prefab"].as<bool>())
-				{
-					MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
-					PrefabNode* node = ModelCollection::GetPrefabNode(childNodeComponent.m_RootEntity.GetComponent<NodeComponent>().m_PrefabName, childNodeComponent.m_NodeName);
-
-					for (int i = 0; i < node->numMeshes; i++)
-					{
-						meshComponent.m_MeshPtrs.push_back(node->meshes[i]);
-						meshComponent.m_NumMeshes++;
-					}
-				}*/
-
 				//MeshComponent
 				auto meshNode = entity["MeshComponent"];
 
 				if (meshNode)
 				{
 					MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
-					NodeComponent& nodeComponent = deserializedEntity.GetComponent<NodeComponent>();
-
-					uint32_t i = 0;
-					YAML::Node meshDataNode;
-					while (meshDataNode = meshNode["PMesh" + std::to_string(i)])
-					{
-						/*std::string modelPath = meshDataNode["Model Path"].as<std::string>();
-						std::string meshName = meshDataNode["Mesh Name"].as<std::string>();*/
-
-						//Ref<Model> model = ModelCollection::GetOrCreate(nodeComponent.RootEntity, modelPath);
-						
-						//meshComponent.MeshPtrs.push_back(model->FindMeshWithName(meshName));
-
-						i++;
-					}
+					UUID meshAssetID = meshNode["Asset ID"].as<UUID>();
+					meshComponent.PMesh = AssetManager::LoadAsset<Mesh>(meshAssetID);
 				}
-
-				//RootNodeComponent
-				/*auto rootNode = entity["RootNodeComponent"];
-				
-				if (rootNode)
-				{
-					RootNodeComponent& rootNodeComponent = deserializedEntity.AddComponent<RootNodeComponent>();
-
-					rootNodeComponent.initialTransform = rootNode["Initial Transform"].as<DirectX::XMMATRIX>();
-					rootNodeComponent.prefabPath = rootNode["Prefab Path"].as<std::string>();
-					rootNodeComponent.nodeName = rootNode["Node Name"].as<std::string>();
-
-					if (rootNodeComponent.prefabPath != "")
-					{
-						MeshComponent& meshComponent = deserializedEntity.AddComponent<MeshComponent>();
-						PrefabNode* node = ModelCollection::GetPrefabNode(rootNodeComponent.prefabPath, rootNodeComponent.nodeName);
-
-						for (int i = 0; i < node->numMeshes; i++)
-						{
-							meshComponent.m_MeshPtrs.push_back(node->meshes[i]);
-							meshComponent.m_NumMeshes++;
-						}
-					}
-				}*/
 				
 				//LightComponent
 				auto lightNode = entity["LightComponent"];

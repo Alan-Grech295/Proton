@@ -121,11 +121,19 @@ namespace Proton
 		inline T ReadPixel(uint32_t targetIndex, int x, int y) 
 		{ 
 			T pixel = T();
-			ReadPixel_Impl(targetIndex, x, y, (uint32_t)sizeof(T), &pixel);
+			ReadPixel_Impl(targetIndex, false, x, y, (uint32_t)sizeof(T), &pixel);
 			return pixel;
 		}
 
-		virtual void ReadPixel_Impl(uint32_t targetIndex, int x, int y, uint32_t size, void* dest) = 0;
+		template<typename T>
+		inline T ReadDepthPixel(int x, int y)
+		{
+			T pixel = T();
+			ReadPixel_Impl(0, true, x, y, (uint32_t)sizeof(T), &pixel);
+			return pixel;
+		}
+
+		virtual void ReadPixel_Impl(uint32_t targetIndex, bool depth, int x, int y, uint32_t size, void* dest) = 0;
 
 		virtual void Clear() = 0;
 

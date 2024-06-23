@@ -87,7 +87,7 @@ namespace Proton
 
 		// Copy constructor
 		MeshComponent(const MeshComponent& other)
-			: PMesh(other.PMesh), ModelRef(other.ModelRef)
+			: PMesh(other.PMesh)
 		{
 			TransformBufferVert = VertexConstantBuffer::CreateUnique(other.TransformBufferVert.get());
 			TransformBufferPix = PixelConstantBuffer::CreateUnique(other.TransformBufferPix.get());
@@ -99,8 +99,7 @@ namespace Proton
 		{}*/
 
 	public:
-		Mesh* PMesh = nullptr;
-		Ref<class Model> ModelRef;
+		Ref<Mesh> PMesh = nullptr;
 
 		Ref<VertexConstantBuffer> TransformBufferVert;
 		Ref<PixelConstantBuffer> TransformBufferPix;

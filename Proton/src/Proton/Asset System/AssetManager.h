@@ -7,7 +7,7 @@ namespace Proton
     class AssetManager
     {
     public:
-        template<typename T>
+        /*template<typename T>
         Ref<T> LoadAsset(UUID assetID)
         {
             if (loadedAssets.contains(assetID))
@@ -16,6 +16,23 @@ namespace Proton
             Ref<void> assetRef = LoadAssetInternal(assetID);
             loadedAssets[assetID] = assetRef;
             return CastRef<T>(assetRef);
+        }*/
+
+        template<typename T>
+        static Ref<T> LoadAsset(UUID assetID)
+        {
+            if (instance->loadedAssets.contains(assetID))
+                return CastRef<T>(instance->loadedAssets[assetID]);
+
+            Ref<void> assetRef = instance->LoadAssetInternal(assetID);
+            instance->loadedAssets[assetID] = assetRef;
+            return CastRef<T>(assetRef);
+        }
+
+        static inline Ref<AssetHandle> GetAssetHandle(UUID assetID)
+        {
+            PT_CORE_ASSERT(instance->uuidToAsset.contains(assetID), "Could not find asset");
+            return instance->uuidToAsset[assetID];
         }
 
         inline static AssetManager& Instance() { return *instance; }

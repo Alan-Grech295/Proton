@@ -1,2 +1,6 @@
 ID: 8634800213475833723
 Type: Model
+Sub assets:
+  - ID: 8216696794815840089
+    Type: Mesh
+    Path: Cube

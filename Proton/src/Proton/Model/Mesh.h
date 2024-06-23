@@ -1,12 +1,13 @@
 #pragma once
 #include "Material.h"
+#include "Proton/Core/UUID.h"
 
 namespace Proton
 {
 	class Mesh
 	{
 	public:
-		Mesh(Ref<class Model> model);
+		Mesh(UUID assetID);
 
 		Mesh() = default;
 	public:
@@ -18,7 +19,7 @@ namespace Proton
 
 		Ref<Material> material;
 
-		WeakRef<class Model> m_Model;
+		UUID m_AssetID;
 	};
 }
 

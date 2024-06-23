@@ -23,6 +23,18 @@ namespace Proton
 		return ModelSerializer::DeserializeModel(path, uuid);
 	}*/
 
+	Ref<Mesh> Model::GetMeshByName(const std::string& name)
+	{
+		for (Ref<Mesh> mesh : m_Meshes)
+		{
+			if (mesh->m_Name == name)
+				return mesh;
+		}
+
+		PT_CORE_ASSERT(false, "Could not find mesh");
+		return nullptr;
+	}
+
 	Entity Proton::Model::CreateNodeEntity(Node& node, Scene& activeScene, Ref<Model> model)
 	{
 		//Node Creations
@@ -75,8 +87,7 @@ namespace Proton
 	void Model::AddMeshComponent(Entity entity, Ref<Model> modelRef, Ref<Mesh> mesh)
 	{
 		MeshComponent& meshComponent = entity.AddComponent<MeshComponent>();
-		meshComponent.ModelRef = modelRef;
-		meshComponent.PMesh = mesh.get();
+		meshComponent.PMesh = mesh;
 	}
 }
 
