@@ -33,8 +33,8 @@ namespace Proton
 		void SaveProject();
 
 		void NewScene();
-		void OpenScene();
-		void OpenScene(const std::filesystem::path& path);
+		bool OpenScene();
+		bool OpenScene(const std::filesystem::path& path);
 		void SaveScene();
 		void SaveSceneAs();
 
